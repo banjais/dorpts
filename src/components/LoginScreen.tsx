@@ -33,9 +33,12 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
     }
   }, [cooldown]);
 
+  const [fallbackOtp, setFallbackOtp] = useState<string | null>(null);
+
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setFallbackOtp(null);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -48,7 +51,12 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
     try {
       const { generateAndStoreOTP, requestEmailSend } = await import('../services/otpService');
       const { otp: generatedOtp, otpId } = await generateAndStoreOTP(email);
-      await requestEmailSend(email, generatedOtp);
+      try {
+        await requestEmailSend(email, generatedOtp);
+      } catch (emailErr) {
+        console.error('Email send failed, showing fallback OTP:', emailErr);
+        setFallbackOtp(generatedOtp);
+      }
       setStep('otp');
       setCooldown(30);
     } catch (err) {
@@ -216,6 +224,16 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
                   <p className="text-[10px] text-slate-400 mb-2">
                     {language === 'en' ? `Sent to ${email}` : `${email} मा पठाइएको`}
                   </p>
+                  {fallbackOtp && (
+                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg p-2.5 mb-3">
+                      <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400 mb-1">
+                        {language === 'en' ? 'Email service unavailable. Use this code:' : 'इमेल सेवा उपलब्ध छैन। यो कोड प्रयोग गर्नुहोस्:'}
+                      </p>
+                      <p className="text-lg font-black text-amber-900 dark:text-amber-300 tracking-widest text-center">
+                        {fallbackOtp}
+                      </p>
+                    </div>
+                  )}
                   <div className="flex gap-1.5 justify-between">
                     {otpRefs.map((ref, i) => (
                       <input

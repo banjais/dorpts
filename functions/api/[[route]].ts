@@ -14,7 +14,9 @@ interface Env {
 
 async function sendOTPEmail(env: Env, to: string, otp: string): Promise<void> {
   const apiKey = env.RESEND_API_KEY;
-  if (!apiKey) return;
+  if (!apiKey) {
+    throw new Error('Email service not configured on server');
+  }
 
   const appName = env.APP_NAME || 'DORPTS';
   const res = await fetch('https://api.resend.com/emails', {
@@ -46,7 +48,7 @@ async function sendOTPEmail(env: Env, to: string, otp: string): Promise<void> {
 
   if (!res.ok) {
     const errText = await res.text();
-    console.error('Resend email failed:', res.status, errText);
+    throw new Error(`Resend email failed: ${res.status} ${errText}`);
   }
 }
 
@@ -423,8 +425,8 @@ Keep explanationEn and explanationNp concise, precise, and highly professional. 
       }
       await sendOTPEmail(env, email, otp);
       return withCors(Response.json({ success: true }));
-    } catch {
-      return withCors(Response.json({ error: 'Invalid request' }, { status: 400 }));
+    } catch (error: any) {
+      return withCors(Response.json({ error: error.message || 'Failed to send OTP' }, { status: 500 }));
     }
   }
 
