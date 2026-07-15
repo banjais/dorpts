@@ -788,7 +788,6 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           total: s.total,
         };
       })
-      .filter((item) => item.total > 0)
       .sort((a, b) => b.score - a.score || b.avgCompletion - a.avgCompletion);
   }, [indicators]);
 
