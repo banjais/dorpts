@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
 import {
   FileText,
@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   X,
 } from 'lucide-react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { APP_TITLES } from '../constants/appTitles';
 
 interface ActionPortalViewProps {
