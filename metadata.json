@@ -1,0 +1,6 @@
+{
+  "name": "DOR Progress Tracker",
+  "description": "A mobile-first tracker for Department of Roads (DoR) indicator status updates, utilizing visual progress indicators, real-time sync with Google Sheets data, and secure role-based firebase authentication.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

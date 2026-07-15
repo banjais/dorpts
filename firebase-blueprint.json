@@ -1,0 +1,277 @@
+{
+  "entities": {
+    "Indicator": {
+      "title": "Indicator",
+      "description": "Represents a Department of Roads progress indicator.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the indicator."
+        },
+        "name": {
+          "type": "string",
+          "description": "Nepali indicator name."
+        },
+        "nameEn": {
+          "type": "string",
+          "description": "English translation status."
+        },
+        "sdg": {
+          "type": "string",
+          "description": "SDG code."
+        },
+        "period": {
+          "type": "string",
+          "description": "Review period (e.g. Monthly, Quarterly)."
+        },
+        "weight": {
+          "type": "number",
+          "description": "Weight of indicator in progress calculations."
+        },
+        "unit": {
+          "type": "string",
+          "description": "Measurement unit."
+        },
+        "baseline": {
+          "type": "number",
+          "description": "Baseline progress."
+        },
+        "totalTarget": {
+          "type": "number",
+          "description": "Total target amount."
+        },
+        "totalProgress": {
+          "type": "number",
+          "description": "Total progress amount."
+        },
+        "annualTarget": {
+          "type": "number",
+          "description": "Annual target amount."
+        },
+        "annualProgress": {
+          "type": "number",
+          "description": "Current progress achieved this year."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last updated timestamp."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "User email who updated this."
+        }
+      },
+      "required": ["id", "name", "weight", "annualTarget", "annualProgress"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "An authenticated supervisor with elevated privileges.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Admin email identifier."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["superadmin", "admin"],
+          "description": "Access levels mapping to Superadmin and Admin."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp indicating role assignment."
+        }
+      },
+      "required": ["email", "role", "createdAt"]
+    },
+    "UserActivity": {
+      "title": "UserActivity",
+      "description": "Tracks logging events, login actions, and app interactions securely.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the actor user."
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address."
+        },
+        "actionType": {
+          "type": "string",
+          "enum": ["login", "view_dashboard", "edit_indicator", "sync_sheets", "role_change"]
+        },
+        "details": {
+          "type": "string",
+          "description": "Specific details metadata describing the transaction."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp."
+        }
+      },
+      "required": ["id", "userId", "email", "actionType", "timestamp"]
+    },
+    "SystemMetadata": {
+      "title": "SystemMetadata",
+      "description": "Global settings and schedule updates tracker.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "lastUpdateDate": {
+          "type": "string"
+        },
+        "nextUpdateDate": {
+          "type": "string"
+        },
+        "totalWeight": {
+          "type": "number"
+        },
+        "totalWeightProgress": {
+          "type": "number"
+        },
+        "lastSyncedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastSyncedBy": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "lastUpdateDate", "nextUpdateDate"]
+    },
+    "UpdatesHistory": {
+      "title": "UpdatesHistory",
+      "description": "A snapshot of all indicators and metadata at a specific lastUpdateDate timestamp.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "lastUpdateDate": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "indicators": {
+          "type": "array"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      },
+      "required": ["id", "lastUpdateDate", "createdAt", "indicators", "metadata"]
+    },
+    "User": {
+      "title": "User",
+      "description": "User preferences and profile data.",
+      "type": "object",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "enum": ["light", "dark", "system"]
+        }
+      }
+    },
+    "UserFeedback": {
+      "title": "UserFeedback",
+      "description": "User-submitted feedback or bug reports.",
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["message", "timestamp"]
+    },
+    "IndicatorComment": {
+      "title": "IndicatorComment",
+      "description": "A user-submitted note or discussion comment attached to a specific indicator.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the comment."
+        },
+        "indicatorId": {
+          "type": "string",
+          "description": "The ID of the indicator this comment belongs to."
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the author user."
+        },
+        "userName": {
+          "type": "string",
+          "description": "Display name of the author user."
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "Email address of the author user."
+        },
+        "content": {
+          "type": "string",
+          "description": "The textual content of the comment."
+        },
+        "parentId": {
+          "type": "string",
+          "description": "Optional ID of a parent comment, for nested discussion threads."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp indicating when the comment was created."
+        }
+      },
+      "required": ["id", "indicatorId", "userId", "userName", "userEmail", "content", "createdAt"]
+    }
+  },
+  "firestore": {
+    "indicators/{indicatorId}": {
+      "schema": "Indicator",
+      "description": "Collection of Department of Roads indicators."
+    },
+    "admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Authorized administrators."
+    },
+    "activities/{activityId}": {
+      "schema": "UserActivity",
+      "description": "Security audit logs of dashboards logins / metrics tracking."
+    },
+    "metadata/{metadataId}": {
+      "schema": "SystemMetadata",
+      "description": "Global sheets metadata synchronization targets."
+    },
+    "updates_history/{historyId}": {
+      "schema": "UpdatesHistory",
+      "description": "Historic snapshots of indicator metrics and performance scores keyed by lastUpdateDate."
+    },
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User settings and profile."
+    },
+    "user_feedback/{feedbackId}": {
+      "schema": "UserFeedback",
+      "description": "Collection of user feedback entries."
+    },
+    "indicator_comments/{commentId}": {
+      "schema": "IndicatorComment",
+      "description": "Collection of collaborative comments and notes for specific indicators."
+    }
+  }
+}

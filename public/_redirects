@@ -1,0 +1,5 @@
+# Keep the API backend on Cloudflare Pages (called cross-origin by web.app)
+/api/* /api/:splat 200
+
+# Redirect all other traffic (frontend) to the canonical Firebase URL
+/* https://dorpts.web.app/:splat 301

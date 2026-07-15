@@ -1,0 +1,252 @@
+import React, { useState, useEffect } from 'react';
+import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, HelpCircle, ChevronUp, FileText, Share2, Sparkles, ChevronDown, ChevronRight, MessageSquare } from 'lucide-react';
+import { QRCodeCanvas } from 'qrcode.react';
+import { motion, AnimatePresence } from 'motion/react';
+import { useLanguage } from '../context/LanguageContext';
+import { APP_TITLES } from '../constants/appTitles';
+
+interface FooterProps {
+  onOpenReportBuilder?: () => void;
+  onOpenHelp?: () => void;
+  onOpenFeedback?: () => void;
+  onScrollTop?: () => void;
+  onScrollBottom?: () => void;
+  onOpenAI?: () => void;
+  isScrolled?: boolean;
+  fiscalYear?: string;
+}
+
+export const Footer: React.FC<FooterProps> = ({ 
+  onOpenReportBuilder, 
+  onOpenHelp,
+  onOpenFeedback,
+  onScrollTop,
+  onScrollBottom,
+  onOpenAI,
+  isScrolled,
+  fiscalYear,
+}) => {
+  const { language, t } = useLanguage();
+  const [showQr, setShowQr] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [isQrHovered, setIsQrHovered] = useState(false);
+  const currentUrl = window.location.href;
+  const [minutesAgo, setMinutesAgo] = useState<number | null>(null);
+  
+  useEffect(() => {
+    const updateMinutesAgo = () => {
+      const timestamp = localStorage.getItem('dor_last_sync_timestamp');
+      if (timestamp) {
+        const diffMs = Date.now() - new Date(timestamp).getTime();
+        setMinutesAgo(Math.max(0, Math.floor(diffMs / 60000)));
+      }
+    };
+    
+    updateMinutesAgo();
+    const interval = setInterval(updateMinutesAgo, 60000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  const shareText = language === 'en' 
+    ? `Check out ${APP_TITLES.shortAppName.en}!` 
+    : `${APP_TITLES.shortAppName.ne} हेर्नुहोस्!`;
+
+  const handleCopy = () => {
+    try {
+      navigator.clipboard.writeText(currentUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {
+      console.error('Copy failed:', e);
+    }
+  };
+
+  const shareLinks = [
+    { name: 'WhatsApp', icon: MessageCircle, color: 'text-green-600', url: `https://wa.me/?text=${encodeURIComponent(shareText + " " + currentUrl)}` },
+    { name: 'Facebook', icon: Facebook, color: 'text-blue-600', url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}` },
+    { name: 'LinkedIn', icon: Linkedin, color: 'text-blue-700', url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}` },
+    { name: 'Gmail', icon: Mail, color: 'text-red-500', url: `mailto:?subject=${encodeURIComponent(language === 'en' ? "DOR Progress Tracking" : "सडक विभाग प्रगति ट्र्याकिङ")}&body=${encodeURIComponent(shareText + " " + currentUrl)}` },
+    { name: 'Instagram', icon: Instagram, color: 'text-pink-600', url: `https://www.instagram.com/` },
+  ];
+
+  const menuItems = [
+    { 
+      id: 'btn-reports', 
+      icon: FileText, 
+      label: language === 'en' ? 'GENERATE REPORTS' : (t('reports') || 'विवरणहरू'), 
+      action: onOpenReportBuilder || (() => { try { window.print(); } catch(e) { console.error(e); } }) 
+    },
+    { id: 'btn-share', icon: Share2, label: language === 'en' ? 'SHARE APP' : (t('share') || 'साझा गर्नुहोस्'), action: () => setShowQr(true) },
+    { id: 'btn-help', icon: HelpCircle, label: language === 'en' ? 'SYSTEM INFO' : (t('help') || 'सहायता'), action: onOpenHelp || (() => {}) },
+    { id: 'btn-feedback', icon: MessageSquare, label: language === 'en' ? 'FEEDBACK' : 'प्रतिक्रिया', action: onOpenFeedback || (() => {}) },
+  ];
+
+  const actionItems = [
+    {
+      id: 'btn-scroll',
+      icon: isScrolled ? ChevronUp : ChevronDown,
+      label: isScrolled ? (language === 'en' ? 'MOVE UP' : 'माथि जानुहोस्') : (language === 'en' ? 'Down' : 'तल'),
+      action: isScrolled ? onScrollTop : onScrollBottom,
+      highlight: false
+    },
+    {
+      id: 'btn-ai',
+      icon: Sparkles,
+      label: 'AI',
+      action: onOpenAI,
+      highlight: true
+    }
+  ];
+
+  return (
+    <>
+      <footer id="app-footer" className="w-full py-12 mt-auto bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-900 text-slate-900 dark:text-white transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center justify-center gap-8">
+          
+          <div className="flex flex-col items-center mb-2 text-center">
+            <div className="w-10 h-1 bg-[#dc2626] mx-auto mb-2 rounded-full"></div>
+            <p className="text-[0.5625rem] uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 font-black">
+              {t('secureActionPortal')}
+            </p>
+          </div>
+
+          <div className="w-full flex flex-col items-center gap-4 sm:gap-6">
+            <div className="w-full flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 px-2 pb-4">
+              {/* Menu & Action Items in One Row */}
+              {[...menuItems, ...actionItems].map((item) => (
+                <div key={item.id} className="relative shrink-0">
+                  {item.id === 'btn-share' && (
+                    <AnimatePresence>
+                      {isQrHovered && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 15, scale: 0.8 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.8 }}
+                          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 flex flex-col items-center gap-2 pointer-events-none"
+                        >
+                          <div className="p-2 bg-white rounded-xl border border-slate-100">
+                            <QRCodeCanvas value={currentUrl} size={110} />
+                          </div>
+                          <span className="text-[0.5rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center whitespace-nowrap">
+                            {t('scanToOpen') || 'Scan to Open'}
+                          </span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  )}
+                   <button
+                     id={item.id}
+                     onClick={item.action}
+                     onMouseEnter={() => { if (item.id === 'btn-share') setIsQrHovered(true); }}
+                     onMouseLeave={() => { if (item.id === 'btn-share') setIsQrHovered(false); }}
+                      className={`flex flex-col items-center justify-center gap-1 w-[3.5rem] sm:w-[4.5rem] px-2 sm:px-3 py-2 rounded-xl transition-all active:scale-95 cursor-pointer border ${
+                        'highlight' in item && (item as any).highlight 
+                          ? 'bg-indigo-600 text-white border-indigo-700 shadow-lg shadow-indigo-600/20 hover:bg-indigo-700' 
+                          : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
+                      }`}
+                   >
+                     {item.id === 'btn-ai' && (
+                       <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                         <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                       </span>
+                     )}
+                     <item.icon size={12} strokeWidth={2.5} className={`${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'} sm:size-[15px] transition-colors shrink-0`} />
+                      <span className={`text-[0.5rem] sm:text-[0.55rem] leading-tight font-black uppercase tracking-tighter text-center line-clamp-2 ${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`}>
+                        {item.label}
+                      </span>
+                   </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+            <div className="flex flex-col items-center gap-2 mt-4">
+            <div className="flex items-center gap-3">
+              <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
+              <p className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                © DOR | 2082/83 B.S
+              </p>
+              <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
+            </div>
+            <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
+              v2.4.0
+            </p>
+            {minutesAgo !== null && (
+              <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium mt-1 truncate">
+                {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
+              </p>
+            )}
+          </div>
+
+        </div>
+      </footer>
+
+      <AnimatePresence>
+        {showQr && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-black/80 z-[100] p-6 backdrop-blur-md" 
+            onClick={() => setShowQr(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0, rotate: -2 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="bg-white p-8 rounded-[2rem] flex flex-col items-center gap-6 shadow-2xl relative max-w-xs w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
+                <QRCodeCanvas value={currentUrl} size={160} />
+              </div>
+              <div className="text-center space-y-2 w-full">
+                <h3 className="font-black text-slate-900 text-lg">
+                  {t('instantAccess')}
+                </h3>
+                <div className="flex items-center gap-2 bg-slate-100 p-2 rounded-lg text-[0.625rem] font-mono text-slate-600 overflow-hidden">
+                  <span className="truncate flex-1">{currentUrl}</span>
+                  <button onClick={handleCopy} className="p-1.5 bg-white rounded-md shadow-sm hover:text-indigo-600 cursor-pointer">
+                    {copied ? <Check size={12} className="text-emerald-500 font-bold" /> : <Copy size={12} />}
+                  </button>
+                </div>
+                {copied && (
+                  <p className="text-[0.625rem] font-bold text-emerald-500 tracking-wider">
+                    {language === 'en' ? 'Link Copied!' : 'लिङ्क कपि भयो!'}
+                  </p>
+                )}
+                <div className="pt-2">
+                  <p className="text-[0.625rem] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                    {t('shareTo')}
+                  </p>
+                  <div className="grid grid-cols-5 gap-2">
+                    {shareLinks.map((social) => (
+                      <a
+                        key={social.name}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`flex flex-col items-center gap-1 p-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors ${social.color}`}
+                        title={social.name}
+                      >
+                        <social.icon size={18} />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowQr(false)} 
+                className="absolute -top-4 -right-4 bg-[#dc2626] text-white p-2.5 rounded-full shadow-xl hover:scale-110 transition-transform cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
+

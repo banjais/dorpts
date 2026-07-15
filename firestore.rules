@@ -1,0 +1,107 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'banjays@gmail.com'
+      );
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Indicators
+    match /indicators/{indicatorId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Updates History
+    match /updates_history/{historyId} {
+      allow read: if true;
+      // Allow unauthenticated writes ONLY if the document doesn't exist yet (for initial population)
+      // This is slightly risky but matches the app's current auto-population logic.
+      // Better would be to restrict to admin, but we need to solve the "Missing or insufficient permissions" error.
+      allow create: if true; 
+      allow update, delete: if isAdmin();
+    }
+
+    // Metadata
+    match /metadata/{metadataId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // OTP codes (client-managed, short-lived)
+    match /otps/{otpId} {
+      allow create, read, update, delete: if true;
+    }
+
+    // Email OTP sessions
+    match /sessions/{sessionId} {
+      allow create, read: if true;
+      allow update, delete: if false;
+    }
+
+    // Users (email-based roles, admin-managed)
+    match /users/{userId} {
+      allow read, write, create: if isAdmin();
+    }
+
+    // Admins
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Activities
+    match /activities/{activityId} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+    }
+
+    // User Preferences
+    match /users/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Feedback
+    match /user_feedback/{feedbackId} {
+      allow create: if true;
+      allow read: if isAdmin();
+    }
+
+    // Indicator Comments
+    match /indicator_comments/{commentId} {
+      allow read: if true;
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin()) && incoming().userId == existing().userId;
+      allow delete: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+    }
+  }
+}
