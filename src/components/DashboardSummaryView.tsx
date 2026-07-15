@@ -1096,22 +1096,30 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden mt-4"
                 >
-                  <div className="bg-white/10 rounded-xl p-3 space-y-2">
-                    <div className="text-[10px] font-black text-white uppercase tracking-wider mb-2">
-                      {language === 'en' ? 'All Categories' : 'सबै वर्गहरू'}
-                    </div>
+                  <div className="bg-white/10 rounded-xl p-3 space-y-3 max-h-[300px] overflow-y-auto custom-scrollbar">
                     {STANDARD_CATEGORIES.map((cat) => {
-                      const count = indicators.filter((ind) => ind && normalizeCategory(ind.category) === cat).length;
-                      const label = language === 'en' ? cat.split(' ')[0] : cat.split(' ')[0];
+                      const catIndicators = indicators.filter((ind) => ind && normalizeCategory(ind.category) === cat);
+                      if (catIndicators.length === 0) return null;
                       const color = getCategoryColor(cat).hex;
-                      
+                      const label = language === 'en' ? cat.split(' ')[0] : cat.split(' ')[0];
                       return (
-                        <div key={cat} className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 flex-1 mr-2">
+                        <div key={cat}>
+                          <div className="flex items-center gap-2 mb-1.5">
                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
-                            <span className="text-[10px] font-bold text-white/80 truncate">{label}</span>
+                            <span className="text-[10px] font-black text-white uppercase tracking-wider">{label}</span>
+                            <span className="text-[9px] font-bold text-white/50">({catIndicators.length})</span>
                           </div>
-                          <span className="text-[10px] font-black text-white/90">{count}</span>
+                          <div className="space-y-1 pl-4">
+                            {catIndicators.map((ind) => {
+                              const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
+                              return (
+                                <div key={ind.id} className="flex items-center justify-between">
+                                  <span className="text-[10px] font-bold text-white/80 truncate flex-1 mr-2">{ind.name}</span>
+                                  <span className="text-[9px] font-black text-emerald-300 w-10 text-right">{pct}%</span>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       );
                     })}
