@@ -609,7 +609,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   addToast,
   highlightedCard,
 }) => {
-  const { language, t, translateUnit } = useLanguage();
+  const { language, t, translateUnit, translateOffice } = useLanguage();
   const { isAdmin } = useAuth();
   const insightsCardRef = useRef<HTMLDivElement>(null);
   const [categoryFilter, setCategoryFilter] = useState('All');
@@ -775,12 +775,10 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       .map((office) => {
         const s = scoreMap.get(office.name) || { total: 0, completed: 0, onTrack: 0, attention: 0, stale: 0 };
         const avgCompletion = s.total > 0 ? Math.round(s.completed / s.total) : 0;
-        const statusScore = (s.onTrack * 100) - (s.attention * 30) - (s.stale * 50);
-        const contributionScore = s.total > 0 ? Math.round((avgCompletion * 0.6) + ((s.onTrack / s.total) * 40) + (statusScore / s.total)) : 0;
         return {
           office: office.name,
           emails: emailMap.get(office.name) || new Set(),
-          score: Math.max(0, contributionScore),
+          score: avgCompletion,
           avgCompletion,
           onTrack: s.onTrack,
           attention: s.attention,
@@ -788,7 +786,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           total: s.total,
         };
       })
-      .sort((a, b) => b.score - a.score || b.avgCompletion - a.avgCompletion);
+      .sort((a, b) => b.avgCompletion - a.avgCompletion);
   }, [indicators, offices]);
 
   const handleToggleExpand = (id: string) => {
@@ -1298,6 +1296,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="space-y-1.5">
             {reportingOffices.slice(0, 5).map((officeData) => {
               const shortName = officeData.office.split('-').pop()?.trim() || officeData.office;
+              const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
               return (
                 <div key={officeData.office} className="flex items-center justify-between">
                   <span className="text-[9px] font-black text-white/80 truncate flex-1 mr-2">
@@ -1305,7 +1304,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   </span>
                   <div className="flex items-center gap-1.5">
                     <span className="text-[9px] font-bold text-emerald-300">
-                      {officeData.score}%
+                      {officeData.total > 0 ? `${officeData.avgCompletion}%` : '—'}
                     </span>
                     <span className="text-[9px] font-bold text-white/60">
                       {officeData.total}
@@ -1332,6 +1331,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
                   {reportingOffices.map((officeData) => {
                     const shortName = officeData.office.split('-').pop()?.trim() || officeData.office;
+                    const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
                     const emails = Array.from(officeData.emails);
                     return (
                       <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5">
@@ -1341,7 +1341,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                           </span>
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-black text-emerald-300">
-                              {officeData.score}%
+                              {officeData.total > 0 ? `${officeData.avgCompletion}%` : '—'}
                             </span>
                             <span className="text-[9px] font-bold text-white/50">
                               {officeData.total} {language === 'en' ? 'ind' : 'सूचक'}
@@ -1359,23 +1359,25 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                             {officeData.avgCompletion}%
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 mb-1">
-                          {officeData.onTrack > 0 && (
-                            <span className="text-[8px] font-bold text-emerald-400">
-                              ✓{officeData.onTrack}
-                            </span>
-                          )}
-                          {officeData.attention > 0 && (
-                            <span className="text-[8px] font-bold text-amber-400">
-                              ⚠{officeData.attention}
-                            </span>
-                          )}
-                          {officeData.stale > 0 && (
-                            <span className="text-[8px] font-bold text-rose-400">
-                              ✗{officeData.stale}
-                            </span>
-                          )}
-                        </div>
+                        {officeData.total > 0 && (
+                          <div className="flex items-center gap-2 mb-1">
+                            {officeData.onTrack > 0 && (
+                              <span className="text-[8px] font-bold text-emerald-400">
+                                ✓{officeData.onTrack}
+                              </span>
+                            )}
+                            {officeData.attention > 0 && (
+                              <span className="text-[8px] font-bold text-amber-400">
+                                ⚠{officeData.attention}
+                              </span>
+                            )}
+                            {officeData.stale > 0 && (
+                              <span className="text-[8px] font-bold text-rose-400">
+                                ✗{officeData.stale}
+                              </span>
+                            )}
+                          </div>
+                        )}
                         <div className="space-y-0.5">
                           {emails.map((email) => (
                             <div key={email} className="text-[9px] font-mono text-emerald-300 truncate">
@@ -1471,7 +1473,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                              <div className="flex items-end justify-between mb-2">
                                <div>
                                  <span className="text-2xl font-black text-white leading-none">{progress}</span>
-                                 <span className="text-[10px] font-bold text-white/60 ml-1">/ {target} {budgetInd.unit}</span>
+                                  <span className="text-[10px] font-bold text-white/60 ml-1">/ {target} {translateUnit(budgetInd.unit)}</span>
                                </div>
                                <span className="text-xs font-black text-white">{pct}%</span>
                              </div>
@@ -1485,7 +1487,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                              </div>
                               <div className="flex items-center justify-between mt-2 min-w-0">
                                 <span className="text-[9px] font-bold text-white/60 truncate">
-                                  {language === 'en' ? 'Remaining' : 'बाँकी'}: {remaining} {budgetInd.unit}
+                                   {language === 'en' ? 'Remaining' : 'बाँकी'}: {remaining} {translateUnit(budgetInd.unit)}
                                 </span>
                                 <span className="text-[9px] font-bold text-white/60 truncate">
                                   {language === 'en' ? 'Weight' : 'भार'}: {budgetInd.weight}%
@@ -1519,7 +1521,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                              <div className="flex items-end justify-between mb-2">
                                <div>
                                  <span className="text-2xl font-black text-white leading-none">{progress}</span>
-                                 <span className="text-[10px] font-bold text-white/60 ml-1">/ {target} {capexInd.unit}</span>
+                                  <span className="text-[10px] font-bold text-white/60 ml-1">/ {target} {translateUnit(capexInd.unit)}</span>
                                </div>
                                <span className="text-xs font-black text-white">{pct}%</span>
                              </div>

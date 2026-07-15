@@ -833,7 +833,7 @@ export function parseGoogleSheetsCSV(csvText: string): {
       continue;
     }
 
-    const name = cols[nameIndex];
+    const name = cols[nameIndex].trim();
     if (name.includes('कुल भार') || name.includes('कुल  भार') || name.includes('Last Update Date')) {
       continue;
     }
