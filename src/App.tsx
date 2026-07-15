@@ -901,7 +901,6 @@ function MainAppContent() {
   }, []);
 
   const fetchData = useCallback(() => {
-    if (!accessToken) return;
     setLoading(true);
     triggerHaptic("medium");
 
@@ -1021,6 +1020,31 @@ function MainAppContent() {
         setSheetUpdates(computeSheetUpdates(parsedList));
       }
     };
+
+    if (!accessToken) {
+      syncPublishedSheets({
+        dashboard: appSettings.dashboardPublishedUrl,
+        offices: appSettings.officesPublishedUrl,
+      })
+        .then((fallback) => {
+          processIndicators(fallback.indicators, fallback.metadata);
+          if (fallback.offices.length > 0) {
+            setOffices(fallback.offices);
+            setOfficesList(fallback.offices);
+            try {
+              localStorage.setItem("dor_offices_cache", JSON.stringify(fallback.offices));
+            } catch (_) {
+              // ignore
+            }
+          }
+          done(fallback.indicators);
+        })
+        .catch((fallbackErr) => {
+          console.error("Published CSV sync failed:", fallbackErr);
+          done([]);
+        });
+      return;
+    }
 
     fetchSpreadsheetMeta(
       appSettings.sheetId || "1ohBXufi7WEvKVAdMavbM5ZQfWnjxveFxgR0FJZf4EJM",
