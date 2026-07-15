@@ -59,7 +59,7 @@ import { ProgressLogicModal } from './ProgressLogicModal';
 interface DashboardSummaryViewProps {
   indicators: Indicator[];
   metadata: SystemMetadata | null;
-  offices: { name: string; updated: string }[];
+  offices: { name: string; updated: string; avgCompletion?: number; total?: number; onTrack?: number; attention?: number; stale?: number }[];
   updatesHistory?: any[];
   onOpenAbout?: (tab?: string) => void;
   onOpenDataHealth?: () => void;
@@ -745,7 +745,6 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
   const reportingOffices = useMemo(() => {
     const emailMap = new Map<string, Set<string>>();
-    const scoreMap = new Map<string, { total: number; completed: number; onTrack: number; attention: number; stale: number }>();
 
     indicators.forEach((ind) => {
       if (!ind || !ind.office) return;
@@ -756,34 +755,20 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         }
         emailMap.get(ind.office)!.add(email);
       }
-
-      const completion = ind.annualTarget > 0 ? Math.min(100, (ind.annualProgress / ind.annualTarget) * 100) : 0;
-      const status = getBreakdownStatus(ind);
-
-      if (!scoreMap.has(ind.office)) {
-        scoreMap.set(ind.office, { total: 0, completed: 0, onTrack: 0, attention: 0, stale: 0 });
-      }
-      const stats = scoreMap.get(ind.office)!;
-      stats.total += 1;
-      stats.completed += completion;
-      if (status === 'onTrack') stats.onTrack += 1;
-      else if (status === 'needsAttention') stats.attention += 1;
-      else stats.stale += 1;
     });
 
     return (offices || [])
       .map((office) => {
-        const s = scoreMap.get(office.name) || { total: 0, completed: 0, onTrack: 0, attention: 0, stale: 0 };
-        const avgCompletion = s.total > 0 ? Math.round(s.completed / s.total) : 0;
+        const avgCompletion = office.avgCompletion ?? 0;
         return {
           office: office.name,
           emails: emailMap.get(office.name) || new Set(),
           score: avgCompletion,
           avgCompletion,
-          onTrack: s.onTrack,
-          attention: s.attention,
-          stale: s.stale,
-          total: s.total,
+          onTrack: office.onTrack ?? 0,
+          attention: office.attention ?? 0,
+          stale: office.stale ?? 0,
+          total: office.total ?? 0,
         };
       })
       .sort((a, b) => b.avgCompletion - a.avgCompletion);

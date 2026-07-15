@@ -930,6 +930,6 @@ export function parseGoogleSheetsCSV(csvText: string): {
   };
 }
 
-export function setOfficesList(offices: { name: string; updated: string }[]) {
+export function setOfficesList(offices: { name: string; updated: string; avgCompletion?: number; total?: number }[]) {
   DOR_OFFICES_LIST = offices;
 }

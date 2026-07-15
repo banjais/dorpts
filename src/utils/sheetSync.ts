@@ -72,11 +72,12 @@ export async function syncPublishedSheets() {
   const { indicators, metadata } = parseSheetCsv(dashboardCsv);
   const finalIndicators = resolveOfficesFromSheet(indicators);
 
-  const parsedOffices: { name: string; updated: string }[] = [];
+  const parsedOffices: { name: string; updated: string; avgCompletion?: number; total?: number }[] = [];
   if (officesCsv) {
     const officesLines = officesCsv.split('\n').map((line) => line.trim()).filter((line) => line.length > 0);
     let headerRowIdx = -1;
     let officeColIdx = 1;
+    let totalRowValues: number[] = [];
     for (let i = 0; i < officesLines.length; i++) {
       const cols = parseCSVLine(officesLines[i]);
       if (
@@ -104,6 +105,35 @@ export async function syncPublishedSheets() {
       ) {
         parsedOffices.push({ name: officeName, updated: 'Updated recently' });
       }
+      if (officeName === 'Total' || officeName === 'कुल') {
+        totalRowValues = cols.map((val: string) => {
+          const num = parseFloat(String(val || '').replace(/,/g, ''));
+          return isNaN(num) ? 0 : num;
+        });
+      }
+    }
+    if (totalRowValues.length > 0 && parsedOffices.length > 0) {
+      parsedOffices.forEach((office) => {
+        const officeCols = parseCSVLine(officesLines.find((l: string) => {
+          const c = parseCSVLine(l.trim());
+          return c[officeColIdx] && String(c[officeColIdx]).trim() === office.name;
+        }) || '');
+        if (!officeCols || officeCols.length <= officeColIdx) return;
+        let sumCompletion = 0;
+        let count = 0;
+        for (let c = officeColIdx + 1; c < Math.min(officeCols.length, totalRowValues.length); c++) {
+          const totalVal = totalRowValues[c];
+          const officeVal = parseFloat(String(officeCols[c] || '').replace(/,/g, ''));
+          if (!isNaN(officeVal) && totalVal > 0) {
+            sumCompletion += Math.min(100, (officeVal / totalVal) * 100);
+            count++;
+          }
+        }
+        if (count > 0) {
+          office.avgCompletion = Math.round(sumCompletion / count);
+          office.total = count;
+        }
+      });
     }
   }
 

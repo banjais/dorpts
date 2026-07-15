@@ -847,7 +847,15 @@ function MainAppContent() {
     }
   }, [selectedOffice]);
   const [loading, setLoading] = useState(true);
-  const [offices, setOffices] = useState<{ name: string; updated: string }[]>(
+  const [offices, setOffices] = useState<{ 
+    name: string; 
+    updated: string; 
+    avgCompletion?: number; 
+    total?: number; 
+    onTrack?: number; 
+    attention?: number; 
+    stale?: number; 
+  }[]>(
     () => {
       if (typeof window !== "undefined") {
         try {
@@ -1233,6 +1241,7 @@ function MainAppContent() {
     const processOffices = (rows: any[][]) => {
       let officeColIdx = 1;
       let headerRowIdx = -1;
+      let totalRowValues: number[] = [];
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         if (
@@ -1251,7 +1260,7 @@ function MainAppContent() {
           break;
         }
       }
-      const parsedOffices: { name: string; updated: string }[] = [];
+      const parsedOffices: { name: string; updated: string; avgCompletion?: number; total?: number }[] = [];
       const startRowIdx = headerRowIdx !== -1 ? headerRowIdx + 1 : 0;
       for (let i = startRowIdx; i < rows.length; i++) {
         const row = rows[i];
@@ -1268,6 +1277,35 @@ function MainAppContent() {
         ) {
           parsedOffices.push({ name: officeName, updated: "Updated recently" });
         }
+        if (officeName === "Total" || officeName === "कुल") {
+          totalRowValues = row.map((val: any) => {
+            const num = parseFloat(String(val || "").replace(/,/g, ""));
+            return isNaN(num) ? 0 : num;
+          });
+        }
+      }
+      if (totalRowValues.length > 0 && parsedOffices.length > 0) {
+        parsedOffices.forEach((office) => {
+          const officeRow = rows.find((r: any[]) => {
+            const name = String(r[officeColIdx] || "").trim();
+            return name === office.name;
+          });
+          if (!officeRow) return;
+          let sumCompletion = 0;
+          let count = 0;
+          for (let c = officeColIdx + 1; c < Math.min(officeRow.length, totalRowValues.length); c++) {
+            const totalVal = totalRowValues[c];
+            const officeVal = parseFloat(String(officeRow[c] || "").replace(/,/g, ""));
+            if (!isNaN(officeVal) && totalVal > 0) {
+              sumCompletion += Math.min(100, (officeVal / totalVal) * 100);
+              count++;
+            }
+          }
+          if (count > 0) {
+            office.avgCompletion = Math.round(sumCompletion / count);
+            office.total = count;
+          }
+        });
       }
       if (parsedOffices.length > 0) {
         setOffices(parsedOffices);
