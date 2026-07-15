@@ -60,6 +60,9 @@ export interface SystemSettings {
   subHeaderEn: string;
   subHeaderNp: string;
   themeColor: string;
+  sheetId: string;
+  dashboardPublishedUrl: string;
+  officesPublishedUrl: string;
   updatedAt: string;
   updatedBy: string;
 }

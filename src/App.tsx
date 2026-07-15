@@ -299,6 +299,9 @@ function MainAppContent() {
     subHeaderEn: string;
     subHeaderNp: string;
     themeColor: string;
+    sheetId: string;
+    dashboardPublishedUrl: string;
+    officesPublishedUrl: string;
   }>({
     fiscalYear: '2082/83',
     sheetUrl: '',
@@ -307,6 +310,9 @@ function MainAppContent() {
     subHeaderEn: APP_TITLES.subHeader.en,
     subHeaderNp: APP_TITLES.subHeader.ne,
     themeColor: '#0099DA',
+    sheetId: '1ohBXufi7WEvKVAdMavbM5ZQfWnjxveFxgR0FJZf4EJM',
+    dashboardPublishedUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQElDgCZtxw83cOi2p7MPCASAVlt1jFC0QnEW3LagOZeu4ecVCKcqrG9M2IumCgeyi4vgvhYTSn2mTl/pub?output=csv&gid=0',
+    officesPublishedUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQElDgCZtxw83cOi2p7MPCASAVlt1jFC0QnEW3LagOZeu4ecVCKcqrG9M2IumCgeyi4vgvhYTSn2mTl/pub?output=csv&gid=40941786',
   });
 
   const [selectedFiscalYear, setSelectedFiscalYear] = useState<string>('2082/83');
@@ -333,6 +339,9 @@ function MainAppContent() {
             subHeaderEn: data.subHeaderEn || prev.subHeaderEn,
             subHeaderNp: data.subHeaderNp || prev.subHeaderNp,
             themeColor: data.themeColor || prev.themeColor,
+            sheetId: data.sheetId || prev.sheetId,
+            dashboardPublishedUrl: data.dashboardPublishedUrl || prev.dashboardPublishedUrl,
+            officesPublishedUrl: data.officesPublishedUrl || prev.officesPublishedUrl,
           }));
         }
       } catch {
@@ -1007,16 +1016,18 @@ function MainAppContent() {
     };
 
     fetchSpreadsheetMeta(
-      "1ohBXufi7WEvKVAdMavbM5ZQfWnjxveFxgR0FJZf4EJM",
+      appSettings.sheetId || "1ohBXufi7WEvKVAdMavbM5ZQfWnjxveFxgR0FJZf4EJM",
       accessToken,
     )
       .then((meta) => {
+        const dashboardTabId = appSettings.dashboardTabId || "0";
+        const officesTabId = appSettings.officesTabId || "40941786";
         const sheet0 =
           meta.sheets?.find(
-            (s: any) => String(s.properties.sheetId) === "0",
+            (s: any) => String(s.properties.sheetId) === dashboardTabId,
           ) || meta.sheets?.[0];
         const sheetOffices = meta.sheets?.find(
-          (s: any) => String(s.properties.sheetId) === "40941786",
+          (s: any) => String(s.properties.sheetId) === officesTabId,
         );
         const title0 = sheet0 ? sheet0.properties.title : "सडक विभाग प्रगति Dashboard";
         const titleOffices = sheetOffices
@@ -1025,12 +1036,12 @@ function MainAppContent() {
 
         return Promise.all([
           fetchSheetData(
-            "1ohBXufi7WEvKVAdMavbM5ZQfWnjxveFxgR0FJZf4EJM",
+            appSettings.sheetId || "1ohBXufi7WEvKVAdMavbM5ZQfWnjxveFxgR0FJZf4EJM",
             `${title0}!A1:Z250`,
             accessToken,
           ),
           fetchSheetData(
-            "1ohBXufi7WEvKVAdMavbM5ZQfWnjxveFxgR0FJZf4EJM",
+            appSettings.sheetId || "1ohBXufi7WEvKVAdMavbM5ZQfWnjxveFxgR0FJZf4EJM",
             `${titleOffices}!A1:Z250`,
             accessToken,
           ),
@@ -1052,7 +1063,10 @@ function MainAppContent() {
       .catch(async (err) => {
         console.error("Authenticated fetch failed, falling back to published CSV:", err);
         try {
-          const fallback = await syncPublishedSheets();
+          const fallback = await syncPublishedSheets({
+            dashboard: appSettings.dashboardPublishedUrl,
+            offices: appSettings.officesPublishedUrl,
+          });
           processIndicators(fallback.indicators, fallback.metadata);
           if (fallback.offices.length > 0) {
             setOffices(fallback.offices);
@@ -1762,7 +1776,10 @@ function MainAppContent() {
 
       // Always refresh from published Sheets so Sync reflects Sheet edits too
       try {
-        const published = await syncPublishedSheets();
+        const published = await syncPublishedSheets({
+          dashboard: appSettings.dashboardPublishedUrl,
+          offices: appSettings.officesPublishedUrl,
+        });
         if (published.indicators.length > 0) {
           setIndicators(published.indicators);
           setMetadata(published.metadata);
@@ -4222,6 +4239,7 @@ function MainAppContent() {
             isOpen={showSettingsPanel}
             onClose={() => setShowSettingsPanel(false)}
             metadata={metadata}
+            appSettings={appSettings}
             addToast={addToast}
             language={language}
             isSaving={isSavingSettings}

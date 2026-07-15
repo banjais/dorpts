@@ -61,10 +61,12 @@ export function resolveOfficesFromSheet(indicators: any[]) {
   return indicators;
 }
 
-export async function syncPublishedSheets() {
+export async function syncPublishedSheets(urls?: { dashboard?: string; offices?: string }) {
+  const dashboardUrl = urls?.dashboard || PUBLISHED_CSV_URLS.dashboard;
+  const officesUrl = urls?.offices || PUBLISHED_CSV_URLS.offices;
   const [dashboardCsv, officesCsv] = await Promise.all([
-    fetchPublishedCsv(PUBLISHED_CSV_URLS.dashboard),
-    fetchPublishedCsv(PUBLISHED_CSV_URLS.offices),
+    fetchPublishedCsv(dashboardUrl),
+    fetchPublishedCsv(officesUrl),
   ]);
 
   if (!dashboardCsv) throw new Error('Dashboard sheet fetch failed');

@@ -10,6 +10,18 @@ interface SettingsPanelModalProps {
   isOpen: boolean;
   onClose: () => void;
   metadata: SystemMetadata | null;
+  appSettings: {
+    fiscalYear: string;
+    sheetUrl: string;
+    appNameEn: string;
+    appNameNp: string;
+    subHeaderEn: string;
+    subHeaderNp: string;
+    themeColor: string;
+    sheetId: string;
+    dashboardPublishedUrl: string;
+    officesPublishedUrl: string;
+  };
   addToast: (message: string, messageEn?: string, type?: 'success' | 'info' | 'error' | 'warning', duration?: number) => void;
   language: 'en' | 'ne';
   isSaving: boolean;
@@ -17,7 +29,7 @@ interface SettingsPanelModalProps {
 }
 
 export const SettingsPanelModal: React.FC<SettingsPanelModalProps> = ({
-  isOpen, onClose, metadata, addToast, language, isSaving, setIsSaving,
+  isOpen, onClose, metadata, appSettings, addToast, language, isSaving, setIsSaving,
 }) => {
   const [form, setForm] = useState({
     fiscalYear: '2082/83',
@@ -29,23 +41,29 @@ export const SettingsPanelModal: React.FC<SettingsPanelModalProps> = ({
     themeColor: '#0099DA',
     lastUpdateDate: '',
     nextUpdateDate: '',
+    sheetId: '',
+    dashboardPublishedUrl: '',
+    officesPublishedUrl: '',
   });
 
   useEffect(() => {
-    if (metadata) {
+    if (metadata || appSettings) {
       setForm({
-        fiscalYear: metadata.lastUpdateDate || '2082/83',
-        sheetUrl: metadata.lastSyncedBy || '',
-        appNameEn: 'Progress Tracker',
-        appNameNp: 'प्रगति ट्र्याकर',
-        subHeaderEn: 'Performance Tracking System',
-        subHeaderNp: 'सम्पादन अनुगमन प्रणाली',
-        themeColor: '#0099DA',
-        lastUpdateDate: metadata.lastUpdateDate || '',
-        nextUpdateDate: metadata.nextUpdateDate || '',
+        fiscalYear: metadata?.lastUpdateDate || appSettings?.fiscalYear || '2082/83',
+        sheetUrl: metadata?.lastSyncedBy || appSettings?.sheetUrl || '',
+        appNameEn: appSettings?.appNameEn || 'Progress Tracker',
+        appNameNp: appSettings?.appNameNp || 'प्रगति ट्र्याकर',
+        subHeaderEn: appSettings?.subHeaderEn || 'Performance Tracking System',
+        subHeaderNp: appSettings?.subHeaderNp || 'सम्पादन अनुगमन प्रणाली',
+        themeColor: appSettings?.themeColor || '#0099DA',
+        lastUpdateDate: metadata?.lastUpdateDate || '',
+        nextUpdateDate: metadata?.nextUpdateDate || '',
+        sheetId: appSettings?.sheetId || '',
+        dashboardPublishedUrl: appSettings?.dashboardPublishedUrl || '',
+        officesPublishedUrl: appSettings?.officesPublishedUrl || '',
       });
     }
-  }, [metadata, isOpen]);
+  }, [metadata, appSettings, isOpen]);
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
@@ -69,6 +87,9 @@ export const SettingsPanelModal: React.FC<SettingsPanelModalProps> = ({
         subHeaderEn: form.subHeaderEn,
         subHeaderNp: form.subHeaderNp,
         themeColor: form.themeColor,
+        sheetId: form.sheetId,
+        dashboardPublishedUrl: form.dashboardPublishedUrl,
+        officesPublishedUrl: form.officesPublishedUrl,
         updatedAt: new Date().toISOString(),
         updatedBy: 'superadmin',
       });
@@ -157,6 +178,43 @@ export const SettingsPanelModal: React.FC<SettingsPanelModalProps> = ({
                   value={form.sheetUrl}
                   onChange={(e) => setForm({ ...form, sheetUrl: e.target.value })}
                   placeholder="https://docs.google.com/spreadsheets/d/..."
+                  className={`${inputClass} text-[10px]`}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                    {language === 'en' ? 'Sheet ID' : 'शीट आईडी'}
+                  </label>
+                  <input
+                    value={form.sheetId}
+                    onChange={(e) => setForm({ ...form, sheetId: e.target.value })}
+                    placeholder="1ohBXufi7WEvKVAdMavbM5ZQfWnjxveFxgR0FJZf4EJM"
+                    className={`${inputClass} text-[10px] font-mono`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                    {language === 'en' ? 'Dashboard Published CSV URL' : 'ड्यासबोर्ड प्रकाशित CSV URL'}
+                  </label>
+                  <input
+                    value={form.dashboardPublishedUrl}
+                    onChange={(e) => setForm({ ...form, dashboardPublishedUrl: e.target.value })}
+                    placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv&gid=0"
+                    className={`${inputClass} text-[10px]`}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                  {language === 'en' ? 'Offices Published CSV URL' : 'कार्यालय प्रकाशित CSV URL'}
+                </label>
+                <input
+                  value={form.officesPublishedUrl}
+                  onChange={(e) => setForm({ ...form, officesPublishedUrl: e.target.value })}
+                  placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv&gid=40941786"
                   className={`${inputClass} text-[10px]`}
                 />
               </div>
