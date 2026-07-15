@@ -599,6 +599,7 @@ const ExpandedDetailsSmall: React.FC<{
 export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   indicators,
   metadata,
+  offices,
   updatesHistory = [],
   onOpenAbout,
   onOpenDataHealth,
