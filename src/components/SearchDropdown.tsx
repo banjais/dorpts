@@ -19,6 +19,7 @@ interface SearchDropdownProps {
   onCategoryChange: (category: string) => void;
   selectedOffice?: string;
   onOfficeChange?: (office: string) => void;
+  isOfficeLocked?: boolean;
   showMilestonesOnly: boolean;
   onToggleMilestonesOnly: () => void;
   viewMode?: ViewMode;
@@ -38,6 +39,7 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({
   onCategoryChange,
   selectedOffice = 'All',
   onOfficeChange,
+  isOfficeLocked = false,
   showMilestonesOnly,
   onToggleMilestonesOnly,
   viewMode,
@@ -680,7 +682,8 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({
         <select
           value={selectedOffice}
           onChange={(e) => onOfficeChange?.(e.target.value)}
-          className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-bold uppercase tracking-wide outline-none max-w-[160px]"
+          disabled={isOfficeLocked}
+          className={`px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-slate-200 text-[11px] font-bold uppercase tracking-wide outline-none max-w-[160px] ${isOfficeLocked ? 'bg-slate-200 dark:bg-slate-700 cursor-not-allowed opacity-70' : 'bg-slate-100 dark:bg-slate-800'}`}
         >
           <option value="All">{t('all')}</option>
           {uniqueOffices.map((o) => (

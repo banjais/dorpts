@@ -272,7 +272,7 @@ function MainAppContent() {
   const layout = useDashboardLayout(dashboardWidth);
   useHaptic();
   const { language, t, translateOffice, translateUnit } = useLanguage();
-  const { accessToken, user, loading: authLoading, isAdmin, isSuperadmin, isDataUpdater, role, emailSession, logout, refreshAdmins, adminsList } = useAuth();
+  const { accessToken, user, loading: authLoading, isAdmin, isSuperadmin, isDataUpdater, role, emailSession, logout, refreshAdmins, adminsList, userAssignedOffice } = useAuth();
 
   const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -835,6 +835,13 @@ function MainAppContent() {
       isMounted = false;
     };
   }, [user, authLoading, hasAutoDetectedOffice, addToast]);
+
+  useEffect(() => {
+    if (!userAssignedOffice || isSuperadmin) return;
+    if (selectedOffice !== userAssignedOffice) {
+      setSelectedOffice(userAssignedOffice);
+    }
+  }, [userAssignedOffice, isSuperadmin, selectedOffice]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -3187,7 +3194,11 @@ function MainAppContent() {
             setCategoryFilter(cat);
           }}
           selectedOffice={selectedOffice}
+          isOfficeLocked={!isSuperadmin && !!userAssignedOffice}
           onOfficeChange={(off) => {
+            if (!isSuperadmin && userAssignedOffice && off !== userAssignedOffice) {
+              return;
+            }
             setSearchQuery("");
             setSelectedOffice(off);
           }}

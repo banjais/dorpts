@@ -21,6 +21,7 @@ interface AuthContextType {
   refreshAdmins: () => Promise<void>;
   accessToken: string | null;
   emailSession: EmailOTPSession | null;
+  userAssignedOffice: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,6 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [adminsList, setAdminsList] = useState<AdminUser[]>([]);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [emailSession, setEmailSession] = useState<EmailOTPSession | null>(null);
+  const [userAssignedOffice, setUserAssignedOffice] = useState<string | null>(null);
 
   const isSuperadmin = role === 'superadmin';
   const isAdmin = role === 'superadmin' || role === 'admin';
@@ -95,6 +97,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  const loadUserAssignedOffice = useCallback(async (email: string): Promise<string | null> => {
+    if (email === SUPERADMIN_EMAIL) return null;
+    try {
+      const q = query(collection(db, 'admins'), where('email', '==', email));
+      const snap = await firestoreGetDocs(q);
+      if (!snap.empty) {
+        const data = snap.docs[0].data();
+        const office = data.office as string | undefined;
+        if (office && office.trim()) return office.trim();
+      }
+    } catch {
+      // suppress
+    }
+    return null;
+  }, []);
+
   // Check stored session on mount
   useEffect(() => {
     let cancelled = false;
@@ -107,6 +125,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const userRole = await lookupEmailRole(session.email);
             setEmailSession(session);
             await setRoleAndLoadAdmins(userRole);
+            const assignedOffice = await loadUserAssignedOffice(session.email);
+            setUserAssignedOffice(assignedOffice);
             await logActivity('otp_login', `Email OTP login: ${session.email}`);
           } else {
             sessionStorage.removeItem('dor_session');
@@ -149,6 +169,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (detected.office) {
             await setDoc(adminRef, { office: detected.office, officeDetectionMethod: detected.method }, { merge: true });
           }
+          const assignedOffice = await loadUserAssignedOffice(currentUser.email);
+          setUserAssignedOffice(assignedOffice);
           await logActivity('login', `Google login: ${currentUser.email}`);
         } catch {
           await setRoleAndLoadAdmins('viewer');
@@ -230,6 +252,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       refreshAdmins,
       accessToken,
       emailSession,
+      userAssignedOffice,
     }}>
       {children}
     </AuthContext.Provider>
