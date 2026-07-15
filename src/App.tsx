@@ -3746,10 +3746,11 @@ function MainAppContent() {
                               </div>
                             }
                           >
-                            <DashboardSummaryView
-                              indicators={indicators}
-                              metadata={metadata}
-                              updatesHistory={visibleHistory}
+                             <DashboardSummaryView
+                               indicators={indicators}
+                               metadata={metadata}
+                               offices={offices}
+                               updatesHistory={visibleHistory}
                               onOpenAbout={(tab) => {
                                 if (tab) setAboutModalTab(tab as any);
                                 setIsAboutModalOpen(true);

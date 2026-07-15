@@ -8,7 +8,6 @@ import { normalizeCategory, getCategoryColor, STANDARD_CATEGORIES } from '../uti
 import { triggerHaptic } from '../utils/haptic';
 import { HISTORICAL_DATA } from '../historicalData';
 import { formatNepaliDate } from '../utils/date';
-import { DOR_OFFICES_LIST } from '../data';
 import {
   Filter,
   ChevronDown,
@@ -60,6 +59,7 @@ import { ProgressLogicModal } from './ProgressLogicModal';
 interface DashboardSummaryViewProps {
   indicators: Indicator[];
   metadata: SystemMetadata | null;
+  offices: { name: string; updated: string }[];
   updatesHistory?: any[];
   onOpenAbout?: (tab?: string) => void;
   onOpenDataHealth?: () => void;
@@ -771,7 +771,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       else stats.stale += 1;
     });
 
-    return (DOR_OFFICES_LIST || [])
+    return (offices || [])
       .map((office) => {
         const s = scoreMap.get(office.name) || { total: 0, completed: 0, onTrack: 0, attention: 0, stale: 0 };
         const avgCompletion = s.total > 0 ? Math.round(s.completed / s.total) : 0;
@@ -789,7 +789,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         };
       })
       .sort((a, b) => b.score - a.score || b.avgCompletion - a.avgCompletion);
-  }, [indicators]);
+  }, [indicators, offices]);
 
   const handleToggleExpand = (id: string) => {
     triggerHaptic('light');
