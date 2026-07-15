@@ -9,46 +9,42 @@ interface Env {
 }
 
 // ---------------------------------------------------------------------------
-// Email OTP via Resend HTTP API
+// Email OTP via Resend SDK
 // ---------------------------------------------------------------------------
 
+import { Resend } from 'resend';
+
 async function sendOTPEmail(env: Env, to: string, otp: string): Promise<void> {
-  const apiKey = env.RESEND_API_KEY;
+  const apiKey = env.RESEND_API_KEY || process.env.RESEND_API_KEY;
   if (!apiKey) {
     throw new Error('Email service not configured on server');
   }
 
   const appName = env.APP_NAME || 'DORPTS';
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      from: `${appName} <noreply@dorpts.app>`,
-      to,
-      subject: `${appName} - Your Login Code`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 20px; text-align: center;">
-          <div style="background: #0099DA; color: white; padding: 16px 24px; border-radius: 12px 12px 0 0; font-size: 18px; font-weight: bold;">
-            ${appName}
-          </div>
-          <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;">
-            <p style="color: #334155; font-size: 14px; margin-bottom: 16px;">Your verification code is:</p>
-            <div style="background: white; border: 2px dashed #0099DA; border-radius: 8px; padding: 16px; font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #0099DA;">
-              ${otp}
-            </div>
-            <p style="color: #64748b; font-size: 12px; margin-top: 16px;">This code expires in 10 minutes. Do not share it with anyone.</p>
-          </div>
+  const resendClient = new Resend(apiKey);
+
+  const { error } = await resendClient.emails.send({
+    from: `${appName} <noreply@dorpts.app>`,
+    to,
+    subject: `${appName} - Your Login Code`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 20px; text-align: center;">
+        <div style="background: #0099DA; color: white; padding: 16px 24px; border-radius: 12px 12px 0 0; font-size: 18px; font-weight: bold;">
+          ${appName}
         </div>
-      `,
-    }),
+        <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;">
+          <p style="color: #334155; font-size: 14px; margin-bottom: 16px;">Your verification code is:</p>
+          <div style="background: white; border: 2px dashed #0099DA; border-radius: 8px; padding: 16px; font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #0099DA;">
+            ${otp}
+          </div>
+          <p style="color: #64748b; font-size: 12px; margin-top: 16px;">This code expires in 10 minutes. Do not share it with anyone.</p>
+        </div>
+      </div>
+    `,
   });
 
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Resend email failed: ${res.status} ${errText}`);
+  if (error) {
+    throw new Error(error.message || 'Failed to send OTP email');
   }
 }
 
