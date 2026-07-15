@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { GoogleGenAI, Type } from "@google/genai";
+import { sendOTPEmail } from "./emailService";
 
 dotenv.config();
 
@@ -478,6 +479,21 @@ Keep explanationEn and explanationNp concise, precise, and highly professional. 
     } catch (error) {
       console.error("Sheets meta error:", error);
       res.status(500).json({ error: "Failed to fetch sheets metadata" });
+    }
+  });
+
+  app.post("/api/auth/send-otp", express.json(), async (req, res) => {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ error: "Email and OTP are required" });
+    }
+
+    try {
+      await sendOTPEmail(email, otp);
+      res.json({ success: true, message: "OTP sent successfully" });
+    } catch (error: any) {
+      console.error("Send OTP error:", error);
+      res.status(500).json({ error: error.message || "Failed to send OTP" });
     }
   });
 

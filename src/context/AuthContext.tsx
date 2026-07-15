@@ -5,6 +5,7 @@ import { auth, db, googleProvider } from '../firebase';
 import { AdminUser, UserActivity, EmailOTPSession } from '../types';
 import { validateSession, destroySession } from '../services/otpService';
 import { getOfficeByEmail, detectUserOffice } from '../utils/officeDetector';
+import { SUPERADMIN_EMAIL } from '../config/superadmin';
 
 interface AuthContextType {
   user: User | null;
@@ -55,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, emailSession]);
 
   const lookupEmailRole = useCallback(async (email: string): Promise<'superadmin' | 'admin' | 'data_updater' | 'viewer'> => {
-    if (email === 'banjays@gmail.com') return 'superadmin';
+    if (email === SUPERADMIN_EMAIL) return 'superadmin';
     try {
       const q = query(collection(db, 'users'), where('email', '==', email));
       const snap = await firestoreGetDocs(q);
@@ -133,14 +134,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const val = adminSnap.data();
             const detectedRole = val.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer';
             await setRoleAndLoadAdmins(detectedRole);
-          } else if (currentUser.email === 'banjays@gmail.com') {
+          } else if (currentUser.email === SUPERADMIN_EMAIL) {
             await setDoc(adminRef, {
-              email: 'banjays@gmail.com',
+              email: SUPERADMIN_EMAIL,
               role: 'superadmin',
               createdAt: serverTimestamp(),
             });
             await setRoleAndLoadAdmins('superadmin');
-            await logActivity('role_change', 'Bootstrapped banjays@gmail.com as Initial Superadmin');
+            await logActivity('role_change', `Bootstrapped ${SUPERADMIN_EMAIL} as Initial Superadmin`);
           } else {
             await setRoleAndLoadAdmins('viewer');
           }
