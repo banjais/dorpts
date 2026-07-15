@@ -1008,11 +1008,46 @@ export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
                         </div>
                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                           {language === 'en' ? 'No voice phrases matched your search' : 'कुनै आवाज वाक्यांशहरू फेला परेनन्'}
-                        </p>
+                         </p>
+                       </div>
+                     )}
+
+                    {/* Office Score Logic */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 rounded-2xl p-6 shadow-sm mt-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 bg-indigo-50 dark:bg-indigo-900/40 rounded-xl text-indigo-600 dark:text-indigo-400">
+                          <Building2 size={18} />
+                        </div>
+                        <h5 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest">
+                          {language === 'en' ? 'Reporting Offices Score' : 'विवरण पठाउने कार्यालय स्कोर'}
+                        </h5>
                       </div>
-                    )}
-                  </motion.div>
-                )}
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                        {language === 'en'
+                          ? 'Each office’s percentage is calculated from the Offices sheet, not from the Dashboard indicators. The system compares each office’s values against the Total row of the Offices sheet to derive completion percentages.'
+                          : 'प्रत्येक कार्यालयको प्रतिशत ड्यासबोर्ड सूचकहरूबाट होइन, कार्यालय शीटबाट गणना गरिन्छ। प्रणालीले पूरा हुने प्रतिशतहरू निकाल्न कार्यालयको मानहरूलाई कार्यालय शीटको कुल पङ्क्तिसँग तुलना गर्दछ।'}
+                      </p>
+                      <div className="bg-slate-50 dark:bg-slate-950/30 rounded-xl p-4 font-mono text-center">
+                        <div className="text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-3">
+                          {language === 'en' ? 'Office Completion Formula' : 'कार्यालय पूरा हुने सूत्र'}
+                        </div>
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-[11px] font-black text-slate-900 dark:text-white">
+                            {language === 'en' ? 'Office %' : 'कार्यालय %'} =
+                          </span>
+                          <span className="text-[10px] sm:text-xs font-black text-indigo-600 dark:text-indigo-400 px-4">
+                            Σ [(office value ÷ total value) × 100] ÷ number of columns
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-3 leading-relaxed">
+                        {language === 'en'
+                          ? 'Offices without indicator data display “—” instead of 0%. The list updates live when the published Offices sheet is modified.'
+                          : 'सूचक तथ्याङ्क बिना कार्यालयहरूमा ०% को सट्टा “—” देखाइन्छ। प्रकाशित कार्यालय शीट परिवर्तन भएपछि सूची लाइव अद्यावधिक हुन्छ।'}
+                      </p>
+                    </div>
+                   </motion.div>
+                 )}
 
                 {/* TAB: SETTINGS */}
                 {activeTab === 'settings' && (

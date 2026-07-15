@@ -622,6 +622,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showStatusBreakdown, setShowStatusBreakdown] = useState(false);
   const [showIndicatorsBreakdown, setShowIndicatorsBreakdown] = useState(false);
   const [showProgressLogic, setShowProgressLogic] = useState(false);
+  const [showOfficeLogicInfo, setShowOfficeLogicInfo] = useState(false);
   const [showBudgetCard, setShowBudgetCard] = useState(false);
   const [showOverallProgress, setShowOverallProgress] = useState(false);
   const [showStatusDetails, setShowStatusDetails] = useState(false);
@@ -845,6 +846,13 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               </span>
               <div className="flex items-center gap-1">
                 <Target size={16} className="text-white/80" />
+                <button
+                  onClick={() => setShowProgressLogic(true)}
+                  className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                  title={language === 'en' ? 'View calculation logic' : 'गणना विधि हेर्नुहोस्'}
+                >
+                  <Info size={14} />
+                </button>
                 <motion.div animate={{ rotate: showOverallProgress ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
                   <ChevronRight size={18} />
                 </motion.div>
@@ -1273,9 +1281,21 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 </p>
               </div>
             </div>
-            <motion.div animate={{ rotate: showReportingOffices ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
-              <ChevronRight size={18} />
-            </motion.div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowOfficeLogicInfo(true);
+                }}
+                className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                title={language === 'en' ? 'How office % is calculated' : 'कार्यालय % कसरी गणना गरिन्छ'}
+              >
+                <Info size={14} />
+              </button>
+              <motion.div animate={{ rotate: showReportingOffices ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
+                <ChevronRight size={18} />
+              </motion.div>
+            </div>
           </div>
 
           {/* Mini office score bars - always visible */}
@@ -1827,6 +1847,78 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         indicators={indicators}
         language={language}
       />
+
+      <AnimatePresence>
+        {showOfficeLogicInfo && (
+          <div className="fixed inset-0 z-[550] flex items-center justify-center p-4" onClick={() => setShowOfficeLogicInfo(false)}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700/50 overflow-hidden max-h-[80dvh] flex flex-col"
+            >
+              <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-white/5">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
+                    <Building2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white">
+                      {language === 'en' ? 'Office Score Logic' : 'कार्यालय स्कोर विधि'}
+                    </h3>
+                    <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                      {language === 'en' ? 'How individual office % is calculated' : 'व्यक्तिगत कार्यालय % कसरी गणना गरिन्छ'}
+                    </p>
+                  </div>
+                </div>
+                <button onClick={() => setShowOfficeLogicInfo(false)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="p-6 space-y-4 overflow-y-auto custom-scrollbar">
+                <div className="flex items-start gap-3 rounded-2xl p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-white/5">
+                  <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm shrink-0">
+                    <Calculator size={16} className="text-slate-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                      {language === 'en' ? 'Formula' : 'सूत्र'}
+                    </p>
+                    <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
+                      {language === 'en'
+                        ? 'Each office’s score is calculated from the Offices sheet. For every numeric indicator column, the system computes: (office value ÷ total value) × 100. The office % shown is the average of these column-wise completion percentages.'
+                        : 'प्रत्येक कार्यालयको स्कोर कार्यालय शीटबाट गणना गरिन्छ। सबै संख्यात्मक सूचक स्तम्भहरूको लागि प्रणालीले गणना गर्दछ: (कार्यालय मान ÷ कुल मान) × 100। देखाइएको कार्यालय % यी स्तम्भ-आधारित पूरा हुने प्रतिशतहरूको औसत हो।'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 rounded-2xl p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-white/5">
+                  <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm shrink-0">
+                    <Database size={16} className="text-slate-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                      {language === 'en' ? 'Baseline' : 'आधाररेखा'}
+                    </p>
+                    <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
+                      {language === 'en'
+                        ? 'The Total row from the Offices sheet is used as the baseline. If an office has no indicator data yet, it is shown as “—” instead of 0%.'
+                        : 'कार्यालय शीटको कुल पङ्क्तिलाई आधाररेखा रूपमा प्रयोग गरिन्छ। यदि कार्यालयलाई अझै सूचक तथ्याङ्क छैन भने ०% को सट्टा “—” देखाइन्छ।'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
