@@ -1239,7 +1239,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                                  <span className="text-[9px] font-black text-emerald-300 shrink-0">{pct}%</span>
                                </div>
                                <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
-                               <span className="text-[9px] font-medium text-white/40 truncate block">Weight: {ind.weight}%</span>
+                                <span className="text-[9px] font-medium text-white/40 truncate block">{language === 'en' ? 'Weight' : 'भार'}: {ind.weight}%</span>
                                <span className={`text-[9px] font-black truncate block ${statusColor}`}>{statusLabel}</span>
                              </div>
                            </div>
