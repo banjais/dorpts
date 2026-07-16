@@ -848,17 +848,9 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 {language === 'en' ? 'Overall Progress' : 'समग्र प्रगति'}
               </span>
               <div className="flex items-center gap-1">
-                <Target size={16} className="text-white/80" />
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowProgressLogic(true);
-                  }}
-                  className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all"
-                  title={language === 'en' ? 'View calculation logic' : 'गणना विधि हेर्नुहोस्'}
-                >
-                  <Info size={14} />
-                </button>
+                <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
+                  <Target size={14} className="text-white/90" />
+                </span>
                 <motion.div animate={{ rotate: showOverallProgress ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
                   <ChevronRight size={18} />
                 </motion.div>
@@ -926,6 +918,18 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       </div>
                     </div>
                   </div>
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowProgressLogic(true);
+                      }}
+                      className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                    >
+                      <Info size={12} />
+                      {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                    </button>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -947,17 +951,9 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 {language === 'en' ? 'Status Breakdown' : 'स्थिति विवरण'}
               </span>
               <div className="flex items-center gap-1">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowStatusLogicInfo(true);
-                  }}
-                  className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all"
-                  title={language === 'en' ? 'How status is calculated' : 'स्थिति कसरी गणना गरिन्छ'}
-                >
-                  <Info size={14} />
-                </button>
-                <BarChart3 size={16} className="text-white/80" />
+                <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
+                  <BarChart3 size={14} className="text-white/90" />
+                </span>
                 <motion.div animate={{ rotate: showStatusDetails ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
                   <ChevronRight size={18} />
                 </motion.div>
@@ -1041,15 +1037,27 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                           </div>
                         </div>
                       );
-                    })}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.button>
+                     })}
+                   </div>
+                   <div className="mt-3 pt-3 border-t border-white/10">
+                     <button
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         setShowStatusLogicInfo(true);
+                       }}
+                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                     >
+                       <Info size={12} />
+                       {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                     </button>
+                   </div>
+                 </motion.div>
+               )}
+             </AnimatePresence>
+           </div>
+         </motion.button>
 
-        {/* Card 3: Total Indicators */}
+         {/* Card 3: Total Indicators */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
@@ -1064,16 +1072,9 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 {language === 'en' ? 'Total Indicators' : 'कुल सूचकहरू'}
               </span>
               <div className="flex items-center gap-1">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowProgressLogic(true);
-                  }}
-                  className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all"
-                  title={language === 'en' ? 'View calculation logic' : 'गणना विधि हेर्नुहोस्'}
-                >
-                  <Info size={14} />
-                </button>
+                <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
+                  <LayoutGrid size={14} className="text-white/90" />
+                </span>
                 <motion.div animate={{ rotate: showTotalIndicators ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
                   <ChevronRight size={18} />
                 </motion.div>
@@ -1147,15 +1148,27 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                           </div>
                         </div>
                       );
-                    })}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.button>
+                     })}
+                   </div>
+                   <div className="mt-3 pt-3 border-t border-white/10">
+                     <button
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         setShowProgressLogic(true);
+                       }}
+                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                     >
+                       <Info size={12} />
+                       {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                     </button>
+                   </div>
+                 </motion.div>
+               )}
+             </AnimatePresence>
+           </div>
+         </motion.button>
 
-        {/* Card 4: Category Status */}
+         {/* Card 4: Category Status */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
@@ -1281,16 +1294,28 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                           </div>
                         </div>
                       );
-                    })}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.button>
-      </div>
+                     })}
+                   </div>
+                   <div className="mt-3 pt-3 border-t border-white/10">
+                     <button
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         setShowProgressLogic(true);
+                       }}
+                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                     >
+                       <Info size={12} />
+                       {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                     </button>
+                   </div>
+                 </motion.div>
+               )}
+             </AnimatePresence>
+           </div>
+         </motion.button>
+       </div>
 
-      {/* Reporting Offices */}
+       {/* Reporting Offices */}
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.97 }}
@@ -1300,36 +1325,22 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div className="relative z-10">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 bg-white/20 text-white rounded-xl">
-                <Building2 size={14} />
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-white/70">
+                {language === 'en' ? 'Reporting Offices' : 'विवरण पठाउने कार्यालयहरू'}
               </span>
-              <div>
-                <h3 className="text-sm font-black text-white uppercase tracking-tight">
-                  {language === 'en' ? 'Reporting Offices' : 'विवरण पठाउने कार्यालयहरू'}
-                </h3>
-                <p className="text-[10px] text-white/70">
-                  {language === 'en' ? `${reportingOffices.length} offices reporting` : `${reportingOffices.length} कार्यालयहरूबाट रिपोर्टिङ`}
-                </p>
+              <div className="flex items-center gap-1">
+                <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
+                  <Building2 size={14} className="text-white/90" />
+                </span>
+                <motion.div animate={{ rotate: showReportingOffices ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
+                  <ChevronRight size={18} />
+                </motion.div>
               </div>
             </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowOfficeLogicInfo(true);
-                }}
-                className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all"
-                title={language === 'en' ? 'How office % is calculated' : 'कार्यालय % कसरी गणना गरिन्छ'}
-              >
-                <Info size={14} />
-              </button>
-              <motion.div animate={{ rotate: showReportingOffices ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
-                <ChevronRight size={18} />
-              </motion.div>
+            <div className="text-[11px] sm:text-xs font-bold text-white/70 mb-3">
+              {language === 'en' ? `${reportingOffices.length} offices reporting` : `${reportingOffices.length} कार्यालयहरूबाट रिपोर्टिङ`}
             </div>
-          </div>
 
           {/* Mini office score bars - always visible */}
           <div className="space-y-1.5">
@@ -1425,12 +1436,24 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                           ))}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                      );
+                    })}
+                  </div>
+                   <div className="mt-3 pt-3 border-t border-white/10">
+                     <button
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         setShowOfficeLogicInfo(true);
+                       }}
+                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                     >
+                       <Info size={12} />
+                       {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                     </button>
+                   </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
         </div>
       </motion.button>
 
@@ -1589,12 +1612,24 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                         );
                       })()}
                     </div>
-                  );
-                })()}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                      );
+                    })}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowProgressLogic(true);
+                      }}
+                      className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                    >
+                      <Info size={12} />
+                      {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
       </motion.div>
 
       {/* Visual Insights — optional charts with options */}
