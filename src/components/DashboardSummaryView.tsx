@@ -940,12 +940,13 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       </div>
                     </div>
                   </div>
-                  <div className="mt-3 pt-3 border-t border-white/10">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowProgressLogic(true);
-                      }}
+                   <div className="mt-3 pt-3 border-t border-white/10">
+                     <button
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         setShowOverallProgress(false);
+                         setShowProgressLogic(true);
+                       }}
                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
                     >
                       <Info size={12} />
@@ -1179,38 +1180,37 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                            </div>
                          </div>
                        );
-                     })}
+                      })}
                     </div>
-                     <div className="mt-3 pt-3 border-t border-white/10">
+                    <div className="mt-3 pt-3 border-t border-white/10">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowMetricsChart(!showMetricsChart);
+                        }}
+                        className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors mb-3"
+                      >
+                        <BarChart3 size={12} />
+                        {language === 'en' ? 'Show Chart' : 'चार्ट देखाउनुहोस्'}
+                      </button>
+                      <AnimatePresence>
+                        {showMetricsChart && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="overflow-hidden mb-3"
+                          >
+                            <MetricsChart indicators={indicators.filter(Boolean)} />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowTotalIndicators(false);
-                          setShowProgressLogic(true);
+                          setShowSystemHelpModal(true);
                         }}
-                         className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors mb-3"
-                       >
-                         <BarChart3 size={12} />
-                         {language === 'en' ? 'Show Chart' : 'चार्ट देखाउनुहोस्'}
-                       </button>
-                       <AnimatePresence>
-                         {showMetricsChart && (
-                           <motion.div
-                             initial={{ opacity: 0, height: 0 }}
-                             animate={{ opacity: 1, height: 'auto' }}
-                             exit={{ opacity: 0, height: 0 }}
-                             className="overflow-hidden mb-3"
-                           >
-                             <MetricsChart indicators={indicators.filter(Boolean)} />
-                           </motion.div>
-                         )}
-                       </AnimatePresence>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setShowTotalIndicators(false);
-                              setShowSystemHelpModal(true);
-                            }}
                          className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
                        >
                          <Info size={12} />
