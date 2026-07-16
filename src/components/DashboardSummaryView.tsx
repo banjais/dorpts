@@ -635,8 +635,6 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showReportingOffices, setShowReportingOffices] = useState(false);
   const [showAllIndicators, setShowAllIndicators] = useState(false);
   const [showCategoryStatus, setShowCategoryStatus] = useState(false);
-  const [showMetricsChart, setShowMetricsChart] = useState(false);
-  const [showTotalIndicatorsInfo, setShowTotalIndicatorsInfo] = useState(false);
   const allIndicatorsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -1143,107 +1141,35 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 {language === 'en' ? stats.total : toNepaliNumerals(stats.total)}
               </div>
 
-             {/* Mini indicator list */}
-             <div className={`space-y-1.5 transition-opacity duration-200 ${showTotalIndicators ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
-               {indicators.filter(Boolean).slice(0, 5).map((ind) => {
-                 const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
-                 return (
-                   <div key={ind.id} className="flex items-center justify-between">
-                     <span className="text-[9px] sm:text-[10px] font-black text-white/80 truncate flex-1 mr-2">
-                       {ind.name}
-                     </span>
-                     <span className="text-[9px] sm:text-[10px] font-black text-emerald-300 w-10 text-right">{pct}%</span>
-                   </div>
-                 );
-               })}
-             </div>
-
-             <AnimatePresence>
-               {showTotalIndicators && (
-                 <motion.div
-                   initial={{ opacity: 0, height: 0 }}
-                   animate={{ opacity: 1, height: 'auto' }}
-                   exit={{ opacity: 0, height: 0 }}
-                   className="overflow-hidden mt-4"
-                 >
-                   <div className="space-y-2.5">
-                     {indicators.filter(Boolean).map((ind) => {
-                       const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
-                       const categoryLabel = language === 'en' ? (ind.category || '').split(' ')[0] : (ind.category || '');
-                       return (
-                         <div key={ind.id} className="flex items-start justify-between gap-2">
-                           <div className="flex-1 min-w-0">
-                             <div className="flex items-center gap-2">
-                               <span className="text-[10px] font-bold text-white/80 truncate block">{ind.name}</span>
-                               <span className="text-[9px] font-black text-emerald-300 shrink-0">{pct}%</span>
-                             </div>
-                             <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
-                             <span className="text-[9px] font-medium text-white/40 truncate block">Weight: {ind.weight}%</span>
-                           </div>
-                         </div>
-                       );
-                     })}
-                   </div>
-                   <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
-                     <button
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         setShowMetricsChart(!showMetricsChart);
-                       }}
-                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                     >
-                       <BarChart3 size={12} />
-                       {language === 'en' ? 'Show Chart' : 'चार्ट देखाउनुहोस्'}
-                     </button>
-                     <AnimatePresence>
-                       {showMetricsChart && (
-                         <motion.div
-                           initial={{ opacity: 0, height: 0 }}
-                           animate={{ opacity: 1, height: 'auto' }}
-                           exit={{ opacity: 0, height: 0 }}
-                           className="overflow-hidden"
-                         >
-                           <MetricsChart indicators={indicators.filter(Boolean)} />
-                         </motion.div>
-                       )}
-                     </AnimatePresence>
-                     <button
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         setShowTotalIndicatorsInfo(!showTotalIndicatorsInfo);
-                       }}
-                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                     >
-                       <Info size={12} />
-                       {language === 'en' ? 'More Info.' : 'थप जानकारी।'}
-                     </button>
-                     <AnimatePresence>
-                       {showTotalIndicatorsInfo && (
-                         <motion.div
-                           initial={{ opacity: 0, height: 0 }}
-                           animate={{ opacity: 1, height: 'auto' }}
-                           exit={{ opacity: 0, height: 0 }}
-                           className="overflow-hidden"
-                         >
-                           <div className="bg-white/10 rounded-xl p-3 space-y-2">
-                             <p className="text-[10px] font-bold text-white/80">
-                               {language === 'en' ? 'All tracked KPIs by sector and goal.' : 'क्षेत्र र लक्ष्य अनुसार सबै ट्र्याक गरिएका KPIs।'}
-                             </p>
-                             <div className="flex flex-wrap gap-1.5">
-                               {[...new Set(indicators.filter(Boolean).map(ind => ind.category).filter(Boolean))].map((cat, i) => (
-                                 <span key={i} className="text-[9px] font-black text-white/70 bg-white/10 px-2 py-0.5 rounded-full">
-                                   {cat}
-                                 </span>
-                               ))}
-                             </div>
-                           </div>
-                         </motion.div>
-                       )}
-                     </AnimatePresence>
-                   </div>
-                 </motion.div>
-               )}
-             </AnimatePresence>
+              <AnimatePresence>
+                {showTotalIndicators && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="space-y-2.5">
+                      {indicators.filter(Boolean).map((ind) => {
+                        const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
+                        const categoryLabel = language === 'en' ? (ind.category || '').split(' ')[0] : (ind.category || '');
+                        return (
+                          <div key={ind.id} className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-white/80 truncate block">{ind.name}</span>
+                                <span className="text-[9px] font-black text-emerald-300 shrink-0">{pct}%</span>
+                              </div>
+                              <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
+                              <span className="text-[9px] font-medium text-white/40 truncate block">Weight: {ind.weight}%</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
            </div>
          </motion.button>
 
