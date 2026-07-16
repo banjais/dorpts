@@ -1150,18 +1150,6 @@ function MainAppContent() {
     }
   }, []);
 
-  const [isSystemOverviewVisible, setIsSystemOverviewVisible] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("dor_system_overview_visible");
-        return saved !== "false"; // Default to true
-      } catch (_) {
-        return true;
-      }
-    }
-    return true;
-  });
-
   useEffect(() => {
     if (!accessToken) return;
 
@@ -1183,15 +1171,6 @@ function MainAppContent() {
   }, []);
   const [isHoveringAbout, setIsHoveringAbout] = useState(false);
   const [activeMetric, setActiveMetric] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "dor_system_overview_visible",
-        String(isSystemOverviewVisible),
-      );
-    }
-  }, [isSystemOverviewVisible]);
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -3192,20 +3171,14 @@ function MainAppContent() {
           lastUpdateDate={metadata?.lastUpdateDate}
           pulseKey={pulseKey}
           onOpenMap={() => setIsMapModalOpen(true)}
-          isOnline={isOnline}
-          pendingWrites={pendingWrites}
-          offices={offices}
-          onOpenAbout={() => setIsAboutModalOpen(true)}
-          onOpenDrawer={() => setIsDrawerOpen(true)}
-          onMouseEnterAbout={() => setIsHoveringAbout(true)}
-          onMouseLeaveAbout={() => setIsHoveringAbout(false)}
-          showSystemGuide={isSystemOverviewVisible || isHoveringAbout}
-          onExploreSystem={() => {
-            setIsAboutModalOpen(true);
-            setIsSystemOverviewVisible(false);
-          }}
-          onDismissSystemGuide={() => setIsSystemOverviewVisible(false)}
-          mainView={mainView}
+           isOnline={isOnline}
+           pendingWrites={pendingWrites}
+           offices={offices}
+           onOpenAbout={() => setIsAboutModalOpen(true)}
+           onOpenDrawer={() => setIsDrawerOpen(true)}
+           onMouseEnterAbout={() => setIsHoveringAbout(true)}
+           onMouseLeaveAbout={() => setIsHoveringAbout(false)}
+           mainView={mainView}
           onViewChange={handleMainViewChange}
           isAtBottom={isAtBottom}
           searchQuery={searchQuery}

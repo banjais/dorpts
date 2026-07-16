@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sun, Moon, Monitor, Languages, CloudUpload, Type, Info, Sparkles, X, Menu } from 'lucide-react';
+import { Sun, Moon, Monitor, Languages, CloudUpload, Type, Info, X, Menu } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
 import { triggerHaptic } from '../utils/haptic';
@@ -97,9 +97,6 @@ export const Header: React.FC<HeaderProps> = ({
   updatesHistory = [],
   selectedOffice = 'All',
   onOfficeChange = (office: string) => {},
-  showSystemGuide = false,
-  onExploreSystem = () => {},
-  onDismissSystemGuide = () => {},
   fiscalYear,
 }) => {
   const { language, setLanguage, t } = useLanguage();
@@ -510,39 +507,6 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               </div>
 
-              {showSystemGuide && (
-              <div className="flex items-center gap-2 shrink-0">
-                <div className="hidden sm:flex items-center gap-1.5 bg-indigo-50/70 dark:bg-indigo-900/15 border border-indigo-100 dark:border-indigo-500/20 pl-3 pr-1.5 py-1.5 rounded-2xl">
-                  <Sparkles size={14} className="text-indigo-600 dark:text-indigo-300 shrink-0" />
-                  <span className="text-[0.6rem] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-widest whitespace-nowrap leading-none hidden lg:inline">
-                    {language === 'en' ? 'System Performance Logic' : 'प्रणाली कार्यसम्पादन विधि'}
-                  </span>
-                  <button
-                    onClick={() => {
-                      triggerHaptic('medium');
-                      onExploreSystem();
-                    }}
-                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[10px] rounded-xl shadow-lg shadow-indigo-500/25 transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5 group"
-                  >
-                    <span>
-                      {language === 'en' ? 'Explore System Logic' : 'प्रणाली विधि हेर्नुहोस्'}
-                      </span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        triggerHaptic('light');
-                        onDismissSystemGuide();
-                      }}
-                      className="p-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 shadow-sm transition-colors shrink-0"
-                      title={language === 'en' ? 'Dismiss' : 'बन्द गर्नुहोस्'}
-                      aria-label={language === 'en' ? 'Dismiss' : 'बन्द गर्नुहोस्'}
-                    >
-                      <X size={11} />
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
