@@ -131,9 +131,6 @@ const IndicatorTableRow = memo(({
     pressTimerRef.current = setTimeout(() => {
       onRowClick(ind);
       triggerHaptic('medium');
-      if (typeof window !== 'undefined' && window.navigator?.vibrate) {
-        window.navigator.vibrate(50);
-      }
     }, 600);
   }, [ind, onRowClick]);
 

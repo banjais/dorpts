@@ -144,13 +144,7 @@ export const IndicatorCard = React.memo<CardProps>(
       pressTimerRef.current = setTimeout(() => {
         // Long-press peek (fast-look) only — normal click opens detail separately
         setShowFastLook(true);
-        if (
-          typeof window !== "undefined" &&
-          window.navigator &&
-          window.navigator.vibrate
-        ) {
-          window.navigator.vibrate(50);
-        }
+        triggerHaptic('medium');
       }, 550);
     }, [indicator]);
 

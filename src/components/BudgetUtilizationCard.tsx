@@ -7,6 +7,7 @@ import { motion } from 'motion/react';
 import { normalizeCategory, getCategoryColor } from '../utils/category';
 import { getStatusBadge } from '../utils/status';
 import { highlightText } from '../utils/highlight';
+import { triggerHaptic } from '../utils/haptic';
 
 interface CardProps {
   indicator: Indicator;
@@ -73,13 +74,7 @@ export const BudgetUtilizationCard = React.memo<CardProps>(({
         onClick(indicator);
       }
       setShowFastLook(true);
-      if (
-        typeof window !== "undefined" &&
-        window.navigator &&
-        window.navigator.vibrate
-      ) {
-        window.navigator.vibrate(50);
-      }
+      triggerHaptic('medium');
     }, 550);
   }, [onClick, indicator]);
 
