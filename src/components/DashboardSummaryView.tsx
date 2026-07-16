@@ -626,7 +626,6 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showIndicatorsBreakdown, setShowIndicatorsBreakdown] = useState(false);
   const [showProgressLogic, setShowProgressLogic] = useState(false);
   const [showOfficeLogicInfo, setShowOfficeLogicInfo] = useState(false);
-  const [showStatusLogicInfo, setShowStatusLogicInfo] = useState(false);
   const [showSystemHelpModal, setShowSystemHelpModal] = useState(false);
   const [showBudgetCard, setShowBudgetCard] = useState(false);
   const [showOverallProgress, setShowOverallProgress] = useState(false);
@@ -1092,19 +1091,55 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       </p>
                     </div>
                   </div>
-                  <div className="mt-3 pt-3 border-t border-white/10">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowStatusDetails(false);
-                          setShowStatusLogicInfo(true);
-                        }}
-                      className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                    >
-                      <Info size={12} />
-                      {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
-                    </button>
-                  </div>
+                   <div className="mt-3 pt-3 border-t border-white/10">
+                       <button
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           setShowStatusLogicInline(!showStatusLogicInline);
+                         }}
+                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                     >
+                       <Info size={12} />
+                       {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                     </button>
+                     <AnimatePresence>
+                       {showStatusLogicInline && (
+                         <motion.div
+                           initial={{ opacity: 0, height: 0 }}
+                           animate={{ opacity: 1, height: 'auto' }}
+                           exit={{ opacity: 0, height: 0 }}
+                           className="overflow-hidden mt-3 space-y-2"
+                         >
+                           <div className="bg-white/10 rounded-xl p-3 space-y-2">
+                             <p className="text-[10px] font-black uppercase tracking-wider text-emerald-200">
+                               {language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा'}
+                             </p>
+                             <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
+                               {language === 'en'
+                                 ? 'Achievement rate is 80% or higher. Formula: (annualProgress ÷ annualTarget) × 100 ≥ 80%.'
+                                 : 'उपलब्धि दर ८०% वा बढी हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 ≥ ८०%。'}
+                             </p>
+                             <p className="text-[10px] font-black uppercase tracking-wider text-amber-200">
+                               {language === 'en' ? 'Below Target' : 'लक्ष्यमुनि'}
+                             </p>
+                             <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
+                               {language === 'en'
+                                 ? 'Achievement rate is between 40% and 79%. Formula: (annualProgress ÷ annualTarget) × 100 is between 40% and 79%.'
+                                 : 'उपलब्धि दर ४०% र ७९% बीच हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 बीच ४०% र ७९% मा हुन्छ।'}
+                             </p>
+                             <p className="text-[10px] font-black uppercase tracking-wider text-rose-200">
+                               {language === 'en' ? 'Needs Attention' : 'ध्यान'}
+                             </p>
+                             <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
+                               {language === 'en'
+                                 ? 'Achievement rate is below 40%. Formula: (annualProgress ÷ annualTarget) × 100 < 40%.'
+                                 : 'उपलब्धि दर ४०% भन्दा कम हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 < ४०%。'}
+                             </p>
+                           </div>
+                         </motion.div>
+                       )}
+                     </AnimatePresence>
+                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -2009,94 +2044,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         )}
       </AnimatePresence>
 
-       <AnimatePresence>
-         {showStatusLogicInfo && (
-           <div key="status-logic" className="absolute inset-0 z-[550] flex items-center justify-center p-4" onClick={() => setShowStatusLogicInfo(false)}>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={{ y: "100%", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "100%", opacity: 0 }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700/50 overflow-hidden max-h-[80dvh] flex flex-col"
-            >
-              <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-white/5">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-amber-50 dark:bg-amber-900/30 rounded-xl">
-                    <BarChart3 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-black text-slate-900 dark:text-white">
-                      {language === 'en' ? 'Achievement Level Logic' : 'उपलब्धि स्तर विधि'}
-                    </h3>
-                    <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                      {language === 'en' ? 'How Meeting Target, Below Target, and Needs Attention are determined' : 'लक्ष्य पूरा, लक्ष्यमुनि र ध्यान कसरी निर्धारण गरिन्छ'}
-                    </p>
-                  </div>
-                </div>
-                <button onClick={() => setShowStatusLogicInfo(false)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                  <X size={18} />
-                </button>
-              </div>
-              <div className="p-6 space-y-4 overflow-y-auto custom-scrollbar">
-                <div className="flex items-start gap-3 rounded-2xl p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-white/5">
-                  <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm shrink-0">
-                    <Target size={16} className="text-slate-500" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                      {language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा'}
-                    </p>
-                    <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
-                      {language === 'en'
-                        ? 'An indicator is Meeting Target when its achievement rate is 80% or higher. Formula: (annualProgress ÷ annualTarget) × 100 ≥ 80%.'
-                        : 'सूचक लक्ष्य पूरा छ भन्ने काटिएको छ जब यसको उपलब्धि दर ८०% वा बढी हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 ≥ ८०%。'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 rounded-2xl p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-white/5">
-                  <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm shrink-0">
-                    <AlertTriangle size={16} className="text-slate-500" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                      {language === 'en' ? 'Below Target' : 'लक्ष्यमुनि'}
-                    </p>
-                    <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
-                      {language === 'en'
-                        ? 'An indicator is Below Target when its achievement rate is between 40% and 79%. Formula: (annualProgress ÷ annualTarget) × 100 is between 40% and 79%.'
-                        : 'सूचक लक्ष्यमुनि छ भन्ने काटिएको छ जब यसको उपलब्धि दर ४०% र ७९% बीच हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 बीच ४०% र ७९% मा हुन्छ।'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 rounded-2xl p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-white/5">
-                  <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm shrink-0">
-                    <Clock size={16} className="text-slate-500" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                      {language === 'en' ? 'Needs Attention' : 'ध्यान'}
-                    </p>
-                    <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
-                      {language === 'en'
-                        ? 'An indicator Needs Attention when its achievement rate is below 40%. Formula: (annualProgress ÷ annualTarget) × 100 < 40%.'
-                        : 'सूचकलाई ध्यान दिनुपर्छ भन्ने काटिएको छ जब यसको उपलब्धि दर ४०% भन्दा कम हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 < ४०%。'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      <SystemHelpModal
+       <SystemHelpModal
         isOpen={showSystemHelpModal}
         onClose={() => setShowSystemHelpModal(false)}
         indicators={indicators}
