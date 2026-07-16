@@ -1120,28 +1120,16 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               {language === 'en' ? stats.total : toNepaliNumerals(stats.total)}
             </div>
 
-            {/* Mini category bars */}
+            {/* Mini indicator list */}
             <div className="space-y-1.5">
-              {STANDARD_CATEGORIES.slice(0, 5).map((cat) => {
-                const count = indicators.filter((ind) => ind && normalizeCategory(ind.category) === cat).length;
-                const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
-                const color = getCategoryColor(cat).hex;
+              {indicators.filter(Boolean).slice(0, 5).map((ind) => {
+                const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
                 return (
-                  <div key={cat} className="flex items-center gap-2">
-                    <div className="w-16 sm:w-20">
-                      <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/60 truncate block">
-                        {language === 'en' ? cat.split(' ')[0] : cat.split(' ')[0]}
-                      </span>
-                    </div>
-                    <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${pct}%` }}
-                        transition={{ duration: 0.8, ease: 'easeOut' }}
-                        className="h-full rounded-full bg-white/90"
-                      />
-                    </div>
-                    <span className="text-[9px] sm:text-[10px] font-black text-white/90 w-5 text-right">{count}</span>
+                  <div key={ind.id} className="flex items-center justify-between">
+                    <span className="text-[9px] sm:text-[10px] font-black text-white/80 truncate flex-1 mr-2">
+                      {ind.name}
+                    </span>
+                    <span className="text-[9px] sm:text-[10px] font-black text-emerald-300 w-10 text-right">{pct}%</span>
                   </div>
                 );
               })}
@@ -1155,46 +1143,29 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden mt-4"
                 >
-                  <div className="bg-white/10 rounded-xl p-3 space-y-3 max-h-[300px] overflow-y-auto custom-scrollbar">
-                    {STANDARD_CATEGORIES.map((cat) => {
-                      const catIndicators = indicators.filter((ind) => ind && normalizeCategory(ind.category) === cat);
-                      if (catIndicators.length === 0) return null;
-                      const color = getCategoryColor(cat).hex;
-                      const label = language === 'en' ? cat.split(' ')[0] : cat.split(' ')[0];
+                  <div className="bg-white/10 rounded-xl p-3 space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                    {indicators.filter(Boolean).map((ind) => {
+                      const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
                       return (
-                        <div key={cat}>
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
-                            <span className="text-[10px] font-black text-white uppercase tracking-wider">{label}</span>
-                            <span className="text-[9px] font-bold text-white/50">({catIndicators.length})</span>
-                          </div>
-                          <div className="space-y-1 pl-4">
-                            {catIndicators.map((ind) => {
-                              const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
-                              return (
-                                <div key={ind.id} className="flex items-center justify-between">
-                                  <span className="text-[10px] font-bold text-white/80 truncate flex-1 mr-2">{ind.name}</span>
-                                  <span className="text-[9px] font-black text-emerald-300 w-10 text-right">{pct}%</span>
-                                </div>
-                              );
-                            })}
-                          </div>
+                        <div key={ind.id} className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold text-white/80 truncate flex-1 mr-2">{ind.name}</span>
+                          <span className="text-[9px] font-black text-emerald-300 w-10 text-right">{pct}%</span>
                         </div>
                       );
-                     })}
-                   </div>
-                   <div className="mt-3 pt-3 border-t border-white/10">
-                     <button
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         setShowProgressLogic(true);
-                       }}
-                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                     >
-                       <Info size={12} />
-                       {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
-                     </button>
-                   </div>
+                    })}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowProgressLogic(true);
+                      }}
+                      className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                    >
+                      <Info size={12} />
+                      {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                    </button>
+                  </div>
                  </motion.div>
                )}
              </AnimatePresence>
