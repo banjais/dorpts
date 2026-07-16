@@ -850,7 +850,10 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               <div className="flex items-center gap-1">
                 <Target size={16} className="text-white/80" />
                 <button
-                  onClick={() => setShowProgressLogic(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowProgressLogic(true);
+                  }}
                   className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all"
                   title={language === 'en' ? 'View calculation logic' : 'गणना विधि हेर्नुहोस्'}
                 >
