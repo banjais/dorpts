@@ -172,7 +172,7 @@ export const PWAUpdatePrompt: React.FC = () => {
                ? 'bg-emerald-600 border-emerald-400 shadow-emerald-500/30'
                : isError
                  ? 'bg-red-600 border-red-400 shadow-red-500/30'
-                 : 'bg-[#0099DA] border-[#0074A6] shadow-[#0099DA]/20'
+                 : 'bg-white dark:bg-slate-950/90 border-slate-300/60 dark:border-slate-700/50 shadow-slate-300/30 dark:shadow-slate-900/60'
            }`}>
              {/* Dreamy slow left-to-right shimmer */}
              <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
@@ -219,10 +219,10 @@ export const PWAUpdatePrompt: React.FC = () => {
                 </button>
               )}
               {showUpdate && (
-                <button
-                  onClick={handleReload}
-                  className="h-7 px-3 bg-white text-[#0099DA] text-[10px] font-black uppercase tracking-tight rounded-lg shadow-sm hover:bg-indigo-50 active:scale-95 transition-all whitespace-nowrap"
-                >
+                 <button
+                   onClick={handleReload}
+                   className="h-7 px-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[10px] font-black uppercase tracking-tight rounded-lg shadow-sm hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all whitespace-nowrap"
+                 >
                   {language === 'en' ? 'Reload' : 'रिलोड'}
                 </button>
               )}

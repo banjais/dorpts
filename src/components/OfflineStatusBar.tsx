@@ -30,7 +30,7 @@ export const OfflineStatusBar: React.FC = () => {
           transition={{ type: 'spring', damping: 24, stiffness: 200 }}
           className="fixed bottom-[88px] left-4 right-4 z-[5999] md:left-auto md:right-6 md:w-auto"
         >
-          <div className="flex items-center justify-center gap-2 bg-slate-900/90 dark:bg-slate-100/90 backdrop-blur-xl text-white dark:text-slate-900 px-4 py-2.5 rounded-2xl shadow-2xl border border-white/10 dark:border-slate-900/10">
+          <div className="flex items-center justify-center gap-2 bg-white dark:bg-slate-950/90 backdrop-blur-xl text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-2xl shadow-2xl border border-slate-300/60 dark:border-slate-700/50">
             <WifiOff size={14} className="animate-pulse" />
             <span className="text-[10px] font-black uppercase tracking-widest">
               {language === 'en' ? 'Offline' : 'अफलाइन'}
