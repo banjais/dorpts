@@ -1161,16 +1161,24 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   className="overflow-hidden mt-4"
                 >
                   <div className="bg-white/10 rounded-xl p-3 space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
-                    {indicators.filter(Boolean).map((ind) => {
-                      const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
-                      const categoryLabel = language === 'en' ? (ind.category || '').split(' ')[0] : (ind.category || '');
+                    {STANDARD_CATEGORIES.map((cat) => {
+                      const catIndicators = indicators.filter((ind) => ind && normalizeCategory(ind.category) === cat);
+                      const total = catIndicators.length;
+                      const avgCompletion = total > 0
+                        ? Math.round(catIndicators.reduce((sum, ind) => {
+                            const pct = ind.annualTarget > 0 ? Math.min(100, (ind.annualProgress / ind.annualTarget) * 100) : 0;
+                            return sum + pct;
+                          }, 0) / total)
+                        : 0;
+
+                      if (total === 0) return null;
+
                       return (
-                        <div key={ind.id} className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <span className="text-[10px] font-bold text-white/80 truncate block">{ind.name}</span>
-                            <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
-                          </div>
-                          <span className="text-[9px] font-black text-emerald-300 w-10 text-right shrink-0">{pct}%</span>
+                        <div key={cat} className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold text-white/80 truncate flex-1 mr-2">
+                            {language === 'en' ? cat.split(' ')[0] : cat.split(' ')[0]}
+                          </span>
+                          <span className="text-[9px] font-black text-emerald-300 w-10 text-right">{avgCompletion}%</span>
                         </div>
                       );
                     })}
