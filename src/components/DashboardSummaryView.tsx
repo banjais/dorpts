@@ -1012,48 +1012,81 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden mt-4"
                 >
-                  <div className="bg-white/10 rounded-xl p-3 space-y-2">
-                    <div className="text-[10px] font-black text-white uppercase tracking-wider mb-2">
-                      {language === 'en' ? 'Detailed Breakdown' : 'विस्तृत विवरण'}
-                    </div>
-                    {STANDARD_CATEGORIES.map((cat) => {
-                      const catIndicators = indicators.filter((ind) => ind && normalizeCategory(ind.category) === cat);
-                      const total = catIndicators.length;
-                      const onTrack = catIndicators.filter((ind) => getBreakdownStatus(ind) === 'onTrack').length;
-                      const needsAttention = catIndicators.filter((ind) => getBreakdownStatus(ind) === 'needsAttention').length;
-                      const stale = catIndicators.filter((ind) => getBreakdownStatus(ind) === 'stale').length;
-                      const label = language === 'en' ? cat.split(' ')[0] : cat.split(' ')[0];
-                      
-                      if (total === 0) return null;
-                      
-                      return (
-                        <div key={cat} className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold text-white/80 truncate flex-1 mr-2">{label}</span>
-                          <div className="flex items-center gap-2">
-                            {onTrack > 0 && <span className="text-[9px] font-bold text-emerald-300">{onTrack}</span>}
-                            {needsAttention > 0 && <span className="text-[9px] font-bold text-amber-300">{needsAttention}</span>}
-                            {stale > 0 && <span className="text-[9px] font-bold text-rose-300">{stale}</span>}
-                            <span className="text-[9px] font-black text-white/60 w-6 text-right">({total})</span>
-                          </div>
+                  <div className="bg-white/10 rounded-xl p-3 space-y-3">
+                    {/* Status distribution bars */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-black text-emerald-300 w-16">On Track</span>
+                        <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${stats.total > 0 ? (stats.onTrack / stats.total) * 100 : 0}%` }}
+                            transition={{ duration: 0.7, ease: 'easeOut' }}
+                            className="h-full bg-emerald-400 rounded-full"
+                          />
                         </div>
-                      );
-                     })}
-                   </div>
-                   <div className="mt-3 pt-3 border-t border-white/10">
-                     <button
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         setShowStatusLogicInfo(true);
-                       }}
-                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                     >
-                       <Info size={12} />
-                       {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
-                     </button>
-                   </div>
-                 </motion.div>
-               )}
-             </AnimatePresence>
+                        <span className="text-[9px] font-black text-white w-8 text-right">{stats.onTrack}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-black text-amber-300 w-16">Attention</span>
+                        <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${stats.total > 0 ? (stats.needsAttention / stats.total) * 100 : 0}%` }}
+                            transition={{ duration: 0.7, ease: 'easeOut' }}
+                            className="h-full bg-amber-400 rounded-full"
+                          />
+                        </div>
+                        <span className="text-[9px] font-black text-white w-8 text-right">{stats.needsAttention}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-black text-rose-300 w-16">Stale</span>
+                        <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${stats.total > 0 ? (stats.staleCount / stats.total) * 100 : 0}%` }}
+                            transition={{ duration: 0.7, ease: 'easeOut' }}
+                            className="h-full bg-rose-400 rounded-full"
+                          />
+                        </div>
+                        <span className="text-[9px] font-black text-white w-8 text-right">{stats.staleCount}</span>
+                      </div>
+                    </div>
+
+                    {/* Indicator list by status */}
+                    <div className="space-y-1.5 max-h-[200px] overflow-y-auto custom-scrollbar">
+                      {indicators.filter(Boolean).map((ind) => {
+                        const status = getBreakdownStatus(ind);
+                        const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
+                        const statusColor = status === 'onTrack' ? 'text-emerald-300' : status === 'needsAttention' ? 'text-amber-300' : 'text-rose-300';
+                        const statusLabel = status === 'onTrack' ? (language === 'en' ? 'On Track' : 'अनुसरण') : status === 'needsAttention' ? (language === 'en' ? 'Attention' : 'ध्यान') : (language === 'en' ? 'Stale' : 'पुरानो');
+                        return (
+                          <div key={ind.id} className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold text-white/80 truncate flex-1 mr-2">{ind.name}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[9px] font-black text-emerald-300 w-8 text-right">{pct}%</span>
+                              <span className={`text-[9px] font-bold ${statusColor} w-12 text-right`}>{statusLabel}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowStatusLogicInfo(true);
+                      }}
+                      className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                    >
+                      <Info size={12} />
+                      {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
            </div>
          </motion.button>
 
