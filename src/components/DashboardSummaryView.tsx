@@ -1048,7 +1048,16 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 {language === 'en' ? 'Total Indicators' : 'कुल सूचकहरू'}
               </span>
               <div className="flex items-center gap-1">
-                <LayoutGrid size={16} className="text-white/80" />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowProgressLogic(true);
+                  }}
+                  className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                  title={language === 'en' ? 'View calculation logic' : 'गणना विधि हेर्नुहोस्'}
+                >
+                  <Info size={14} />
+                </button>
                 <motion.div animate={{ rotate: showTotalIndicators ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
                   <ChevronRight size={18} />
                 </motion.div>
