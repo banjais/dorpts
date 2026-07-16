@@ -1071,25 +1071,6 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                         <span className="text-[9px] font-black text-white w-6 text-right">{stats.needsCritical}</span>
                       </div>
                     </div>
-
-                    {/* Indicator list by achievement level */}
-                    <div className="space-y-1.5 max-h-[200px] overflow-y-auto custom-scrollbar">
-                      {indicators.filter(Boolean).map((ind) => {
-                        const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
-                        const level = pct >= 80 ? 'meeting' : pct >= 40 ? 'below' : 'attention';
-                        const levelColor = level === 'meeting' ? 'text-emerald-300' : level === 'below' ? 'text-amber-300' : 'text-rose-300';
-                        const levelLabel = level === 'meeting' ? (language === 'en' ? 'Meeting' : 'लक्ष्य पूरा') : level === 'below' ? (language === 'en' ? 'Below' : 'लक्ष्यमुनि') : (language === 'en' ? 'Attention' : 'ध्यान');
-                        return (
-                          <div key={ind.id} className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-white/80 truncate flex-1 mr-2">{ind.name}</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[9px] font-black text-emerald-300 w-8 text-right">{pct}%</span>
-                              <span className={`text-[9px] font-bold ${levelColor} w-12 text-right`}>{levelLabel}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
                   </div>
                   <div className="mt-3 pt-3 border-t border-white/10">
                     <button
