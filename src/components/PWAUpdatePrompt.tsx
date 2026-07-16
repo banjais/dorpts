@@ -202,22 +202,22 @@ export const PWAUpdatePrompt: React.FC = () => {
                />
              </div>
 
-             <div className="relative z-10 flex items-center gap-1 shrink-0">
-              {isSuccess && (
-                <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center">
-                  <Check className="text-white w-3.5 h-3.5" strokeWidth={3} />
-                </div>
-              )}
-              {isError && (
-                <button
-                  onClick={handleReload}
-                  disabled={!isOnline}
-                  className="w-7 h-7 flex items-center justify-center bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all active:scale-90 disabled:opacity-50"
-                  title={language === 'en' ? 'Retry' : 'पुनः प्रयास गर्नुहोस्'}
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                </button>
-              )}
+              <div className="relative z-10 flex items-center gap-1 shrink-0">
+               {isSuccess && (
+                 <div className="w-7 h-7 bg-white/20 dark:bg-white/10 rounded-lg flex items-center justify-center">
+                   <Check className="text-emerald-600 dark:text-emerald-400 w-3.5 h-3.5" strokeWidth={3} />
+                 </div>
+               )}
+               {isError && (
+                 <button
+                   onClick={handleReload}
+                   disabled={!isOnline}
+                   className="w-7 h-7 flex items-center justify-center bg-white/20 dark:bg-white/10 hover:bg-white/30 dark:hover:bg-white/20 text-slate-700 dark:text-white rounded-lg transition-all active:scale-90 disabled:opacity-50"
+                   title={language === 'en' ? 'Retry' : 'पुनः प्रयास गर्नुहोस्'}
+                 >
+                   <RotateCcw className="w-3.5 h-3.5" />
+                 </button>
+               )}
               {showUpdate && (
                  <button
                    onClick={handleReload}
@@ -231,7 +231,7 @@ export const PWAUpdatePrompt: React.FC = () => {
                 className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all active:scale-90 ${
                   isError
                     ? 'bg-red-500/30 text-white shadow-lg shadow-red-500/50 hover:bg-red-500/50'
-                    : 'text-white/70 hover:text-white hover:bg-white/15'
+                    : 'text-slate-400 hover:text-slate-600 dark:text-white/70 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/15'
                 }`}
                 title={language === 'en' ? 'Dismiss' : 'बन्द गर्नुहोस्'}
               >
@@ -239,31 +239,31 @@ export const PWAUpdatePrompt: React.FC = () => {
               </button>
             </div>
 
-            <div className="h-5 w-px bg-white/20 shrink-0" />
+             <div className="h-5 w-px bg-slate-200 dark:bg-white/20 shrink-0" />
 
-             <div className="relative z-10 flex items-center gap-2 min-w-0">
-              <div className="w-7 h-7 bg-white/15 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
-                <img src="/pwa-192x192.png" alt={APP_TITLES.shortAppName[language]} className="w-5 h-5 object-contain" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-white font-black text-[11px] leading-tight truncate">
-                  {language === 'en' ? titleEn : titleNp}
-                </h3>
-                <p className="text-white/80 text-[9px] font-semibold leading-snug truncate">
-                  {language === 'en' ? descEn : descNp}
-                </p>
-              </div>
-            </div>
+              <div className="relative z-10 flex items-center gap-2 min-w-0">
+               <div className="w-7 h-7 bg-slate-100 dark:bg-white/15 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
+                 <img src="/pwa-192x192.png" alt={APP_TITLES.shortAppName[language]} className="w-5 h-5 object-contain" />
+               </div>
+               <div className="min-w-0">
+                 <h3 className="text-slate-700 dark:text-white font-black text-[11px] leading-tight truncate">
+                   {language === 'en' ? titleEn : titleNp}
+                 </h3>
+                 <p className="text-slate-500 dark:text-white/80 text-[9px] font-semibold leading-snug truncate">
+                   {language === 'en' ? descEn : descNp}
+                 </p>
+               </div>
+             </div>
 
-            {isSyncing && (
-              <div className="ml-auto w-16 h-1.5 bg-white/20 rounded-full overflow-hidden shrink-0">
-                <motion.div
-                  className="h-full bg-white rounded-full"
-                  style={{ width: `${progress}%` }}
-                  transition={{ ease: 'linear', duration: 0.1 }}
-                />
-              </div>
-            )}
+             {isSyncing && (
+               <div className="ml-auto w-16 h-1.5 bg-slate-200 dark:bg-white/20 rounded-full overflow-hidden shrink-0">
+                 <motion.div
+                   className="h-full bg-slate-400 dark:bg-white rounded-full"
+                   style={{ width: `${progress}%` }}
+                   transition={{ ease: 'linear', duration: 0.1 }}
+                 />
+               </div>
+             )}
           </div>
         </motion.div>
       )}
