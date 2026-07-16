@@ -1153,15 +1153,14 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                        {indicators.filter(Boolean).map((ind) => {
                          const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
                          const categoryLabel = language === 'en' ? (ind.category || '').split(' ')[0] : (ind.category || '');
-                         const breakdownStatus = getBreakdownStatus(ind);
-                         const statusLabel = breakdownStatus === 'onTrack'
-                           ? (language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा भइरहेको')
-                           : breakdownStatus === 'needsAttention'
-                           ? (language === 'en' ? 'Below Target' : 'लक्ष्य भन्दा कम')
+                         const statusLabel = pct >= 80
+                           ? (language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा')
+                           : pct >= 40
+                           ? (language === 'en' ? 'Below Target' : 'लक्ष्यमुनि')
                            : (language === 'en' ? 'Needs Attention' : 'ध्यान चाहिन्छ');
-                         const statusColor = breakdownStatus === 'onTrack'
+                         const statusColor = pct >= 80
                            ? 'text-emerald-300'
-                           : breakdownStatus === 'needsAttention'
+                           : pct >= 40
                            ? 'text-amber-300'
                            : 'text-rose-300';
                          return (
