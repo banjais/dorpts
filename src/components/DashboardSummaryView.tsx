@@ -739,11 +739,30 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       return getBreakdownStatus(ind) === 'stale';
     }).length;
 
+    const meetingTarget = indicators.filter((ind) => {
+      if (!ind) return false;
+      const pct = ind.annualTarget > 0 ? Math.min(100, (ind.annualProgress / ind.annualTarget) * 100) : 0;
+      return pct >= 80;
+    }).length;
+    const belowTarget = indicators.filter((ind) => {
+      if (!ind) return false;
+      const pct = ind.annualTarget > 0 ? Math.min(100, (ind.annualProgress / ind.annualTarget) * 100) : 0;
+      return pct >= 40 && pct < 80;
+    }).length;
+    const needsCritical = indicators.filter((ind) => {
+      if (!ind) return false;
+      const pct = ind.annualTarget > 0 ? Math.min(100, (ind.annualProgress / ind.annualTarget) * 100) : 0;
+      return pct < 40;
+    }).length;
+
     return {
       total: indicators.length,
       onTrack,
       needsAttention,
       staleCount,
+      meetingTarget,
+      belowTarget,
+      needsCritical,
       weightedRate: weightedAchievementRate,
     };
   }, [indicators, weightedAchievementRate]);
@@ -961,46 +980,46 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             </div>
             <div className="text-[11px] sm:text-xs font-bold text-white/70 mb-3">
               {language === 'en'
-                ? 'Number of indicators in each status category.'
-                : 'प्रत्येक स्थिति वर्गमा रहेका सूचकहरूको संख्या।'}
+                ? 'Indicators grouped by achievement level.'
+                : 'उपलब्धि स्तर अनुसार वर्गीकृत सूचकहरू।'}
             </div>
             <div className="flex items-end gap-3 mb-3">
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-white leading-none">{stats.onTrack}</div>
+                <div className="text-2xl sm:text-3xl font-black text-white leading-none">{stats.meetingTarget}</div>
                 <div className="text-[8px] sm:text-[9px] font-bold text-white/70 uppercase tracking-wider mt-0.5">
-                  {language === 'en' ? 'OnTrack' : 'अनुसरण'}
+                  {language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा'}
                 </div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-white/90 leading-none">{stats.needsAttention}</div>
+                <div className="text-2xl sm:text-3xl font-black text-white/90 leading-none">{stats.belowTarget}</div>
                 <div className="text-[8px] sm:text-[9px] font-bold text-white/70 uppercase tracking-wider mt-0.5">
-                  {language === 'en' ? 'Attention' : 'ध्यान'}
+                  {language === 'en' ? 'Below Target' : 'लक्ष्यमुनि'}
                 </div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-white/80 leading-none">{stats.staleCount}</div>
+                <div className="text-2xl sm:text-3xl font-black text-white/80 leading-none">{stats.needsCritical}</div>
                 <div className="text-[8px] sm:text-[9px] font-bold text-white/70 uppercase tracking-wider mt-0.5">
-                  {language === 'en' ? 'Stale' : 'पुरानो'}
+                  {language === 'en' ? 'Needs Attention' : 'ध्यान'}
                 </div>
               </div>
             </div>
-            
+
             {/* Stacked mini bar */}
             <div className="h-2 bg-white/10 rounded-full overflow-hidden flex">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${stats.total > 0 ? (stats.onTrack / stats.total) * 100 : 0}%` }}
-                className="h-full bg-white rounded-l-full"
+                animate={{ width: `${stats.total > 0 ? (stats.meetingTarget / stats.total) * 100 : 0}%` }}
+                className="h-full bg-emerald-400 rounded-l-full"
               />
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${stats.total > 0 ? (stats.needsAttention / stats.total) * 100 : 0}%` }}
-                className="h-full bg-white/70"
+                animate={{ width: `${stats.total > 0 ? (stats.belowTarget / stats.total) * 100 : 0}%` }}
+                className="h-full bg-amber-400"
               />
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${stats.total > 0 ? (stats.staleCount / stats.total) * 100 : 0}%` }}
-                className="h-full bg-white/40 rounded-r-full"
+                animate={{ width: `${stats.total > 0 ? (stats.needsCritical / stats.total) * 100 : 0}%` }}
+                className="h-full bg-rose-400 rounded-r-full"
               />
             </div>
 
@@ -1013,59 +1032,59 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   className="overflow-hidden mt-4"
                 >
                   <div className="bg-white/10 rounded-xl p-3 space-y-3">
-                    {/* Status distribution bars */}
+                    {/* Achievement distribution bars */}
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black text-emerald-300 w-16">On Track</span>
+                        <span className="text-[9px] font-black text-emerald-300 w-24">Meeting Target</span>
                         <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: `${stats.total > 0 ? (stats.onTrack / stats.total) * 100 : 0}%` }}
+                            animate={{ width: `${stats.total > 0 ? (stats.meetingTarget / stats.total) * 100 : 0}%` }}
                             transition={{ duration: 0.7, ease: 'easeOut' }}
                             className="h-full bg-emerald-400 rounded-full"
                           />
                         </div>
-                        <span className="text-[9px] font-black text-white w-8 text-right">{stats.onTrack}</span>
+                        <span className="text-[9px] font-black text-white w-6 text-right">{stats.meetingTarget}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black text-amber-300 w-16">Attention</span>
+                        <span className="text-[9px] font-black text-amber-300 w-24">Below Target</span>
                         <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: `${stats.total > 0 ? (stats.needsAttention / stats.total) * 100 : 0}%` }}
+                            animate={{ width: `${stats.total > 0 ? (stats.belowTarget / stats.total) * 100 : 0}%` }}
                             transition={{ duration: 0.7, ease: 'easeOut' }}
                             className="h-full bg-amber-400 rounded-full"
                           />
                         </div>
-                        <span className="text-[9px] font-black text-white w-8 text-right">{stats.needsAttention}</span>
+                        <span className="text-[9px] font-black text-white w-6 text-right">{stats.belowTarget}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black text-rose-300 w-16">Stale</span>
+                        <span className="text-[9px] font-black text-rose-300 w-24">Needs Attention</span>
                         <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: `${stats.total > 0 ? (stats.staleCount / stats.total) * 100 : 0}%` }}
+                            animate={{ width: `${stats.total > 0 ? (stats.needsCritical / stats.total) * 100 : 0}%` }}
                             transition={{ duration: 0.7, ease: 'easeOut' }}
                             className="h-full bg-rose-400 rounded-full"
                           />
                         </div>
-                        <span className="text-[9px] font-black text-white w-8 text-right">{stats.staleCount}</span>
+                        <span className="text-[9px] font-black text-white w-6 text-right">{stats.needsCritical}</span>
                       </div>
                     </div>
 
-                    {/* Indicator list by status */}
+                    {/* Indicator list by achievement level */}
                     <div className="space-y-1.5 max-h-[200px] overflow-y-auto custom-scrollbar">
                       {indicators.filter(Boolean).map((ind) => {
-                        const status = getBreakdownStatus(ind);
                         const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
-                        const statusColor = status === 'onTrack' ? 'text-emerald-300' : status === 'needsAttention' ? 'text-amber-300' : 'text-rose-300';
-                        const statusLabel = status === 'onTrack' ? (language === 'en' ? 'On Track' : 'अनुसरण') : status === 'needsAttention' ? (language === 'en' ? 'Attention' : 'ध्यान') : (language === 'en' ? 'Stale' : 'पुरानो');
+                        const level = pct >= 80 ? 'meeting' : pct >= 40 ? 'below' : 'attention';
+                        const levelColor = level === 'meeting' ? 'text-emerald-300' : level === 'below' ? 'text-amber-300' : 'text-rose-300';
+                        const levelLabel = level === 'meeting' ? (language === 'en' ? 'Meeting' : 'लक्ष्य पूरा') : level === 'below' ? (language === 'en' ? 'Below' : 'लक्ष्यमुनि') : (language === 'en' ? 'Attention' : 'ध्यान');
                         return (
                           <div key={ind.id} className="flex items-center justify-between">
                             <span className="text-[10px] font-bold text-white/80 truncate flex-1 mr-2">{ind.name}</span>
                             <div className="flex items-center gap-2">
                               <span className="text-[9px] font-black text-emerald-300 w-8 text-right">{pct}%</span>
-                              <span className={`text-[9px] font-bold ${statusColor} w-12 text-right`}>{statusLabel}</span>
+                              <span className={`text-[9px] font-bold ${levelColor} w-12 text-right`}>{levelLabel}</span>
                             </div>
                           </div>
                         );
