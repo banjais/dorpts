@@ -29,9 +29,11 @@ export const ProgressLogicModal: React.FC<ProgressLogicModalProps> = ({
 }) => {
   useBodyScrollLock(isOpen);
 
+  const safeIndicators = Array.isArray(indicators) ? indicators : [];
+
   const weightedRate = useMemo(() => {
-    const totalWeight = indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0) || 100;
-    const achievedWeight = indicators.reduce((acc, curr) => {
+    const totalWeight = safeIndicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0) || 100;
+    const achievedWeight = safeIndicators.reduce((acc, curr) => {
       if (!curr) return acc;
       const target = curr.annualTarget || 0;
       const progress = curr.annualProgress || 0;
@@ -39,17 +41,17 @@ export const ProgressLogicModal: React.FC<ProgressLogicModalProps> = ({
       return acc + (achievement * ((curr.weight || 0) / 100));
     }, 0);
     return totalWeight > 0 ? Math.round((achievedWeight / totalWeight) * 100) : 0;
-  }, [indicators]);
+  }, [safeIndicators]);
 
   const status = useMemo(() => {
     const map: Record<string, number> = { onTrack: 0, needsAttention: 0, stale: 0 };
-    indicators.forEach((ind) => {
+    safeIndicators.forEach((ind) => {
       if (!ind) return;
       const s = getBreakdownStatus(ind);
       map[s] += 1;
     });
     return { onTrack: map.onTrack, needsAttention: map.needsAttention, stale: map.stale };
-  }, [indicators]);
+  }, [safeIndicators]);
 
   const num = (n: number) => (language === 'ne' ? toNepaliNumerals(n) : n);
   const displayRate = num(weightedRate);

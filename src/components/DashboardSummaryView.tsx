@@ -1874,16 +1874,18 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         language={language}
       />
 
-      <ProgressLogicModal
-        isOpen={showProgressLogic}
-        onClose={() => setShowProgressLogic(false)}
-        indicators={indicators}
-        language={language}
-      />
+      {showProgressLogic && (
+        <ProgressLogicModal
+          isOpen={showProgressLogic}
+          onClose={() => setShowProgressLogic(false)}
+          indicators={indicators}
+          language={language}
+        />
+      )}
 
       <AnimatePresence>
         {showOfficeLogicInfo && (
-          <div className="fixed inset-0 z-[550] flex items-center justify-center p-4" onClick={() => setShowOfficeLogicInfo(false)}>
+          <div key="office-logic" className="fixed inset-0 z-[550] flex items-center justify-center p-4" onClick={() => setShowOfficeLogicInfo(false)}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -1955,7 +1957,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
       <AnimatePresence>
         {showStatusLogicInfo && (
-          <div className="fixed inset-0 z-[550] flex items-center justify-center p-4" onClick={() => setShowStatusLogicInfo(false)}>
+          <div key="status-logic" className="fixed inset-0 z-[550] flex items-center justify-center p-4" onClick={() => setShowStatusLogicInfo(false)}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
