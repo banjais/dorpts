@@ -837,7 +837,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   }, [showAllIndicators]);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-1 sm:px-4">
+    <div className="relative min-h-screen space-y-6 max-w-7xl mx-auto px-1 sm:px-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -1976,9 +1976,9 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         />
       )}
 
-      <AnimatePresence>
-        {showOfficeLogicInfo && (
-          <div key="office-logic" className="fixed inset-0 z-[550] flex items-center justify-center p-4" onClick={() => setShowOfficeLogicInfo(false)}>
+       <AnimatePresence>
+         {showOfficeLogicInfo && (
+           <div key="office-logic" className="absolute inset-0 z-[550] flex items-center justify-center p-4" onClick={() => setShowOfficeLogicInfo(false)}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -2048,9 +2048,9 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {showStatusLogicInfo && (
-          <div key="status-logic" className="fixed inset-0 z-[550] flex items-center justify-center p-4" onClick={() => setShowStatusLogicInfo(false)}>
+       <AnimatePresence>
+         {showStatusLogicInfo && (
+           <div key="status-logic" className="absolute inset-0 z-[550] flex items-center justify-center p-4" onClick={() => setShowStatusLogicInfo(false)}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

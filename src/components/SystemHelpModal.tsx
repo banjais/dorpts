@@ -278,9 +278,9 @@ export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
 
    if (!isOpen) return null;
 
-   return (
-     <AnimatePresence>
-       <div className="fixed inset-0 z-[9999] overflow-hidden pointer-events-none">
+    return (
+      <AnimatePresence>
+        <div className="absolute inset-0 z-[9999] overflow-hidden pointer-events-none">
          {/* Semi-transparent dark backdrop */}
          <motion.div
            initial={{ opacity: 0 }}
