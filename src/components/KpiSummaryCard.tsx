@@ -200,8 +200,8 @@ export const KpiSummaryCard: React.FC<CardProps> = ({ indicators, metadata, onVi
               <ShieldCheck size={20} className="text-indigo-600 dark:text-indigo-400" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 font-display">{t('kpiSummary')}</h3>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">{t('portfolioHealth')}</p>
+               <h3 className="text-base font-black text-slate-800 dark:text-slate-100 font-display">{t('kpiSummary')}</h3>
+               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t('portfolioHealth')}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">

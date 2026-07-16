@@ -1408,7 +1408,7 @@ export const IndicatorCard = React.memo<CardProps>(
             <div className="mt-0.5 text-left min-h-[2.4rem] sm:min-h-[3.2rem] flex flex-col justify-start">
               <div className="flex items-start justify-between gap-1.5">
                 <h4
-                  className="text-[0.75rem] sm:text-[0.8125rem] font-bold text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 text-left"
+                  className="text-[0.8125rem] sm:text-sm font-black text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 text-left"
                   title={primaryName}
                 >
                   {highlightText(primaryName, searchQuery)}
@@ -1429,7 +1429,7 @@ export const IndicatorCard = React.memo<CardProps>(
                 </div>
               </div>
               <p
-                className="text-[0.5625rem] sm:text-[0.625rem] text-slate-400 dark:text-slate-450 mt-0.5 line-clamp-1 italic font-sans text-left"
+                className="text-[0.5625rem] sm:text-[0.625rem] font-bold text-slate-400 dark:text-slate-400 mt-0.5 line-clamp-1 text-left"
                 title={secondaryName}
               >
                 {highlightText(secondaryName, searchQuery)}

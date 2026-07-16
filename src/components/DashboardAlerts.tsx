@@ -95,7 +95,7 @@ export const DashboardAlerts: React.FC<DashboardAlertsProps> = ({
               <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
                 {language === 'en' ? 'Alerts Control Center' : 'अलर्ट नियन्त्रण केन्द्र'}
               </h3>
-              <p className="text-[10px] text-slate-450 dark:text-slate-500 font-sans mt-0.5">
+               <p className="text-[10px] font-bold text-slate-500 dark:text-slate-500 mt-0.5">
                 {language === 'en' 
                   ? 'Automated tracking on critical thresholds & update times' 
                   : 'थ्रेसहोल्ड र अपडेटहरूको स्वचालित ट्र्याकिङ'}

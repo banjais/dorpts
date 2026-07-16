@@ -95,9 +95,9 @@ export const IndicatorsBreakdownModal: React.FC<IndicatorsBreakdownModalProps> =
                   <h3 className="text-sm font-black text-slate-900 dark:text-white">
                     {language === 'en' ? 'Indicators Breakdown' : 'सूचक विवरण'}
                   </h3>
-                  <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                    {language === 'en' ? `${indicators.length} indicators tracked` : `${num(indicators.length)} सूचकहरू ट्र्याक गरियो`}
-                  </p>
+                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                      {language === 'en' ? `${indicators.length} indicators tracked` : `${num(indicators.length)} सूचकहरू ट्र्याक गरियो`}
+                    </p>
                 </div>
               </div>
               <button

@@ -877,7 +877,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-white/70">
+              <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-white/70">
                 {language === 'en' ? 'Overall Progress' : 'समग्र प्रगति'}
               </span>
               <div className="flex items-center gap-1">
@@ -889,10 +889,10 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 </motion.div>
               </div>
             </div>
-            <div className="text-[11px] sm:text-xs font-bold text-white/70 mb-1">
+            <div className="text-[10px] sm:text-[11px] font-bold text-white/70 mb-1">
               {language === 'en'
-                ? 'Strategic Weighted Average — average completion across all indicators.'
-                : 'रणनीतिक भारित औसत — सबै सूचकहरूको औसत पूरा हुने प्रगति।'}
+                ? 'Strategic Weighted Average — average completion across all indicators'
+                : 'रणनीतिक भारित औसत — सबै सूचकहरूको औसत पूरा हुने प्रगति'}
             </div>
             <div className="text-4xl sm:text-5xl font-black text-white mb-4 leading-none">
               {stats.weightedRate}%
@@ -1009,7 +1009,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-white/70">
+              <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-white/70">
                 {language === 'en' ? 'Status Breakdown' : 'स्थिति विवरण'}
               </span>
               <div className="flex items-center gap-1">
@@ -1021,10 +1021,10 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 </motion.div>
               </div>
             </div>
-            <div className="text-[11px] sm:text-xs font-bold text-white/70 mb-3">
+            <div className="text-[10px] sm:text-[11px] font-bold text-white/70 mb-3">
               {language === 'en'
-                ? 'Indicators grouped by achievement level.'
-                : 'उपलब्धि स्तर अनुसार वर्गीकृत सूचकहरू।'}
+                ? 'Indicators grouped by achievement level'
+                : 'उपलब्धि स्तर अनुसार वर्गीकृत सूचकहरू'}
             </div>
             <div className="flex items-end gap-3 mb-3">
               <div>
@@ -1198,7 +1198,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-white/70">
+              <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-white/70">
                 {language === 'en' ? 'Total Indicators' : 'कुल सूचकहरू'}
               </span>
               <div className="flex items-center gap-1">
@@ -1210,8 +1210,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 </motion.div>
               </div>
             </div>
-            <div className="text-[11px] sm:text-xs font-bold text-white/70 mb-1">
-              {language === 'en' ? 'Total number of indicators being tracked.' : 'अनुगमन गरिएका कुल सूचकहरूको संख्या।'}
+            <div className="text-[10px] sm:text-[11px] font-bold text-white/70 mb-1">
+              {language === 'en' ? 'Total number of indicators being tracked' : 'अनुगमन गरिएका कुल सूचकहरूको संख्या'}
             </div>
               <div className="text-4xl sm:text-5xl font-black text-white mb-4 leading-none">
                 {language === 'en' ? stats.total : toNepaliNumerals(stats.total)}
@@ -1271,7 +1271,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-white/70">
+              <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-white/70">
                 {language === 'en' ? 'Category Status' : 'वर्ग स्थिति'}
               </span>
               <div className="flex items-center gap-1">
@@ -1283,7 +1283,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 </motion.div>
               </div>
             </div>
-            <div className="text-[11px] sm:text-xs font-bold text-white/70 mb-1">
+            <div className="text-[10px] sm:text-[11px] font-bold text-white/70 mb-1">
               {language === 'en' ? 'Completion by category' : 'वर्ग अनुसार पूरा प्रतिशत'}
             </div>
 
@@ -1448,7 +1448,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div className="relative z-10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-white/70">
+              <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-white/70">
                 {language === 'en' ? 'Reporting Offices' : 'विवरण पठाउने कार्यालयहरू'}
               </span>
               <div className="flex items-center gap-1">
@@ -1460,7 +1460,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 </motion.div>
               </div>
             </div>
-            <div className="text-[11px] sm:text-xs font-bold text-white/70 mb-3">
+            <div className="text-[10px] sm:text-[11px] font-bold text-white/70 mb-3">
               {language === 'en' ? `${reportingOffices.length} offices reporting` : `${reportingOffices.length} कार्यालयहरूबाट रिपोर्टिङ`}
             </div>
 
@@ -1628,7 +1628,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-tight">
                 {language === 'en' ? 'Budget & Capital Expenditure' : 'बजेट र पुँजीगत खर्च'}
               </h3>
-              <p className="text-[11px] sm:text-xs text-white/70">
+               <p className="text-[10px] sm:text-[11px] font-bold text-white/70">
                 {language === 'en' ? 'Allocation vs expenditure overview' : 'बजेट वितरण र खर्चको अवलोकन'}
               </p>
             </div>
@@ -1807,7 +1807,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
                 {language === 'en' ? 'Visual Insights' : 'दृश्यात्मक अन्तर्दृष्टि'}
               </h3>
-              <p className="text-[10px] text-slate-600 dark:text-white/70">
+               <p className="text-[10px] font-bold text-slate-600 dark:text-white/70">
                 {language === 'en' ? 'Optional charts & analytics' : 'वैकल्पिक चार्ट र विश्लेषण'}
               </p>
             </div>
@@ -1935,7 +1935,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
                 {language === 'en' ? 'All Indicators' : 'सबै सूचकहरू'}
               </h3>
-              <p className="text-[10px] text-slate-600 dark:text-white/70">
+               <p className="text-[10px] font-bold text-slate-600 dark:text-white/70">
                 {language === 'en' ? `${indicators.length} indicators tracked — click to explore` : `${indicators.length} सूचकहरू ट्र्याक गरिएको — अन्वेषणका लागि क्लिक गर्नुहोस्`}
               </p>
             </div>
@@ -2003,8 +2003,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     <h3 className="text-white font-bold text-sm">
                       {language === 'en' ? 'No indicators found' : 'कुनै सूचकहरू फेला परेनन्'}
                     </h3>
-                    <p className="text-[0.6875rem] text-white/60 mt-1">
-                      {language === 'en' ? 'Try adjusting your category filter.' : 'वर्ग फिल्टर परिवर्तन गर्नुहोस्।'}
+                     <p className="text-[0.6875rem] text-white/60 mt-1">
+                      {language === 'en' ? 'Try adjusting your category filter' : 'वर्ग फिल्टर परिवर्तन गर्नुहोस्'}
                     </p>
                   </div>
                 ) : (

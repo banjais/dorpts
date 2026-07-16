@@ -36,7 +36,7 @@ export const OfficeCard: React.FC<OfficeCardProps> = ({ office, variant = 'row',
       <div className="min-w-0">
         <p
           className={`${
-            isGrid ? 'text-xs' : 'text-[11px]'
+            isGrid ? 'text-sm' : 'text-xs'
           } font-black text-slate-900 dark:text-white leading-snug`}
         >
           {displayName}

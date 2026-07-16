@@ -92,12 +92,12 @@ export const StatusBreakdownModal: React.FC<StatusBreakdownModalProps> = ({ isOp
                   <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 </div>
                  <div>
-                   <h3 className="text-sm font-black text-slate-900 dark:text-white">
-                     {language === 'en' ? 'Status Breakdown ' : 'स्थिति विवरण '}
-                   </h3>
-                   <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                     {language === 'en' ? `${indicators.length} indicators tracked` : `${indicators.length} सूचकहरू ट्र्याक गरियो`}
-                   </p>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white">
+                      {language === 'en' ? 'Status Breakdown' : 'स्थिति विवरण'}
+                    </h3>
+                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                      {language === 'en' ? `${indicators.length} indicators tracked` : `${indicators.length} सूचकहरू ट्र्याक गरियो`}
+                    </p>
                  </div>
               </div>
               <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">

@@ -282,7 +282,7 @@ export const OfflineSummaryDashboard: React.FC<OfflineSummaryDashboardProps> = (
             <h2 className="text-lg font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">
               {isEn ? 'Cached Local Indicators' : 'क्यास गरिएका स्थानीय सूचकहरू'}
             </h2>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400">
+            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
               {isEn ? 'Showing indicators stored in your browser storage cache' : 'तपाईंको ब्राउजर स्टोरेज क्यासमा सुरक्षित सूचकहरू'}
             </p>
           </div>

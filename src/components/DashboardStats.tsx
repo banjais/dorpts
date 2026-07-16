@@ -240,7 +240,7 @@ const StatCard: React.FC<StatCardProps> = ({ stat, activeMetric, language, trans
       </div>
       
       <div className="flex-1 flex flex-col justify-center relative z-10">
-        <h3 className={`text-[0.6875rem] sm:text-[0.75rem] font-bold mb-1 flex items-center gap-1 group ${isSummary ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
+        <h3 className={`text-xs sm:text-sm font-black mb-1 flex items-center gap-1 group ${isSummary ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
           <span className="line-clamp-2 leading-tight">{language === 'en' ? stat.titleEn : stat.titleNep}</span>
           <div className="relative inline-block cursor-help shrink-0">
             <Info size={10} className={`${isSummary ? 'text-white/30' : 'text-slate-300 dark:text-slate-600'} hover:text-indigo-400 transition-colors`} />

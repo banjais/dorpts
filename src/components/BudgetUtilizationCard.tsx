@@ -276,10 +276,10 @@ export const BudgetUtilizationCard = React.memo<CardProps>(({
 
       {/* Title */}
       <div className="mb-4">
-        <h4 className="text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug">
+        <h4 className="text-sm font-black text-slate-800 dark:text-slate-100 leading-snug">
           {highlightText(primaryName, searchQuery)}
         </h4>
-        <p className="text-[10px] text-slate-400 dark:text-slate-500 italic mt-0.5">
+        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-0.5">
           {highlightText(secondaryName, searchQuery)}
         </p>
       </div>
