@@ -1035,21 +1035,27 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     {/* Achievement distribution bars */}
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black text-emerald-300 w-24">Meeting Target</span>
+                        <span className="text-[9px] font-black text-emerald-200 w-24">
+                          {language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा'}
+                        </span>
                         <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${stats.total > 0 ? (stats.meetingTarget / stats.total) * 100 : 0}%` }}
                             transition={{ duration: 0.7, ease: 'easeOut' }}
-                            className="h-full bg-emerald-400 rounded-full"
+                            className="h-full bg-emerald-300 rounded-full"
                           />
                         </div>
                         <span className="text-[9px] font-black text-white w-6 text-right">{stats.meetingTarget}</span>
                       </div>
-                      <p className="text-[9px] text-emerald-200/90 pl-24 -mt-1 mb-1">Achievement rate is 80% or higher</p>
+                      <p className="text-[9px] text-emerald-200/90 pl-24 -mt-1 mb-1">
+                        {language === 'en' ? 'Achievement rate is 80% or higher' : 'उपलब्धि दर ८०% वा बढी छ'}
+                      </p>
 
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black text-amber-200 w-24">Below Target</span>
+                        <span className="text-[9px] font-black text-amber-200 w-24">
+                          {language === 'en' ? 'Below Target' : 'लक्ष्यमुनि'}
+                        </span>
                         <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
@@ -1060,10 +1066,14 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                         </div>
                         <span className="text-[9px] font-black text-white w-6 text-right">{stats.belowTarget}</span>
                       </div>
-                      <p className="text-[9px] text-amber-200/90 pl-24 -mt-1 mb-1">Achievement rate is between 40% and 80%</p>
+                      <p className="text-[9px] text-amber-200/90 pl-24 -mt-1 mb-1">
+                        {language === 'en' ? 'Achievement rate is between 40% and 80%' : 'उपलब्धि दर ४०% र ८०% बीच छ'}
+                      </p>
 
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black text-rose-200 w-24">Needs Attention</span>
+                        <span className="text-[9px] font-black text-rose-200 w-24">
+                          {language === 'en' ? 'Needs Attention' : 'ध्यान'}
+                        </span>
                         <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
@@ -1074,7 +1084,9 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                         </div>
                         <span className="text-[9px] font-black text-white w-6 text-right">{stats.needsCritical}</span>
                       </div>
-                      <p className="text-[9px] text-rose-200/90 pl-24 -mt-1 mb-1">Achievement rate is below 40%</p>
+                      <p className="text-[9px] text-rose-200/90 pl-24 -mt-1 mb-1">
+                        {language === 'en' ? 'Achievement rate is below 40%' : 'उपलब्धि दर ४०% भन्दा कम छ'}
+                      </p>
                     </div>
                   </div>
                   <div className="mt-3 pt-3 border-t border-white/10">
@@ -1151,10 +1163,14 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   <div className="bg-white/10 rounded-xl p-3 space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
                     {indicators.filter(Boolean).map((ind) => {
                       const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
+                      const categoryLabel = language === 'en' ? (ind.category || '').split(' ')[0] : (ind.category || '');
                       return (
-                        <div key={ind.id} className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold text-white/80 truncate flex-1 mr-2">{ind.name}</span>
-                          <span className="text-[9px] font-black text-emerald-300 w-10 text-right">{pct}%</span>
+                        <div key={ind.id} className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[10px] font-bold text-white/80 truncate block">{ind.name}</span>
+                            <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
+                          </div>
+                          <span className="text-[9px] font-black text-emerald-300 w-10 text-right shrink-0">{pct}%</span>
                         </div>
                       );
                     })}
