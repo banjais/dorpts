@@ -1149,24 +1149,36 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     exit={{ opacity: 0, height: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="space-y-2.5">
-                      {indicators.filter(Boolean).map((ind) => {
-                        const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
-                        const categoryLabel = language === 'en' ? (ind.category || '').split(' ')[0] : (ind.category || '');
-                        return (
-                          <div key={ind.id} className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-bold text-white/80 truncate block">{ind.name}</span>
-                                <span className="text-[9px] font-black text-emerald-300 shrink-0">{pct}%</span>
-                              </div>
-                              <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
-                              <span className="text-[9px] font-medium text-white/40 truncate block">Weight: {ind.weight}%</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                     <div className="space-y-2.5">
+                       {indicators.filter(Boolean).map((ind) => {
+                         const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
+                         const categoryLabel = language === 'en' ? (ind.category || '').split(' ')[0] : (ind.category || '');
+                         const breakdownStatus = getBreakdownStatus(ind);
+                         const statusLabel = breakdownStatus === 'onTrack'
+                           ? (language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा भइरहेको')
+                           : breakdownStatus === 'needsAttention'
+                           ? (language === 'en' ? 'Below Target' : 'लक्ष्य भन्दा कम')
+                           : (language === 'en' ? 'Needs Attention' : 'ध्यान चाहिन्छ');
+                         const statusColor = breakdownStatus === 'onTrack'
+                           ? 'text-emerald-300'
+                           : breakdownStatus === 'needsAttention'
+                           ? 'text-amber-300'
+                           : 'text-rose-300';
+                         return (
+                           <div key={ind.id} className="flex items-start justify-between gap-2">
+                             <div className="flex-1 min-w-0">
+                               <div className="flex items-center gap-2">
+                                 <span className="text-[10px] font-bold text-white/80 truncate block">{ind.name}</span>
+                                 <span className="text-[9px] font-black text-emerald-300 shrink-0">{pct}%</span>
+                               </div>
+                               <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
+                               <span className="text-[9px] font-medium text-white/40 truncate block">Weight: {ind.weight}%</span>
+                               <span className={`text-[9px] font-black truncate block ${statusColor}`}>{statusLabel}</span>
+                             </div>
+                           </div>
+                         );
+                       })}
+                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
