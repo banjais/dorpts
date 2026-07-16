@@ -1325,10 +1325,9 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     {STANDARD_CATEGORIES.map((cat) => {
                       const catIndicators = indicators.filter((ind) => ind && normalizeCategory(ind.category) === cat);
                       const total = catIndicators.length;
-                      const onTrack = catIndicators.filter((ind) => getBreakdownStatus(ind) === 'onTrack').length;
-                      const needsAttention = catIndicators.filter((ind) => getBreakdownStatus(ind) === 'needsAttention').length;
-                      const stale = catIndicators.filter((ind) => getBreakdownStatus(ind) === 'stale').length;
-                      const color = getCategoryColor(cat).hex;
+                       const onTrack = catIndicators.filter((ind) => getBreakdownStatus(ind) === 'onTrack').length;
+                       const needsAttention = catIndicators.filter((ind) => getBreakdownStatus(ind) === 'needsAttention').length;
+                       const color = getCategoryColor(cat).hex;
                       const label = language === 'en' ? cat.split(' ')[0] : cat.split(' ')[0];
                       const avgCompletion = total > 0
                         ? Math.round(catIndicators.reduce((sum, ind) => {
@@ -1363,17 +1362,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                                 {Math.round((onTrack / total) * 100)}% {language === 'en' ? 'On Track' : 'अनुसरण'}
                               </span>
                             )}
-                            {needsAttention > 0 && (
-                              <span className="text-[9px] sm:text-[10px] font-bold text-amber-400">
-                                {Math.round((needsAttention / total) * 100)}% {language === 'en' ? 'Attention' : 'ध्यान'}
-                              </span>
-                            )}
-                            {stale > 0 && (
-                              <span className="text-[9px] sm:text-[10px] font-bold text-rose-400">
-                                {Math.round((stale / total) * 100)}% {language === 'en' ? 'Stale' : 'पुरानो'}
-                              </span>
-                            )}
-                          </div>
+                             {needsAttention > 0 && (
+                               <span className="text-[9px] sm:text-[10px] font-bold text-amber-400">
+                                 {Math.round((needsAttention / total) * 100)}% {language === 'en' ? 'Attention' : 'ध्यान'}
+                               </span>
+                             )}
+                           </div>
                         </div>
                       );
                      })}
