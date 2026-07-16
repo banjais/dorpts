@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Target, CheckCircle2, AlertTriangle, Clock, Calculator } from 'lucide-react';
+import { X, Target, CheckCircle2, AlertTriangle, Clock, Calculator, Scale } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { getBreakdownStatus } from '../utils/status';
 import { Indicator } from '../types';
@@ -135,46 +135,112 @@ export const ProgressLogicModal: React.FC<ProgressLogicModalProps> = ({
                 </div>
               </div>
 
-              {/* Formula */}
-              <div className="flex items-start gap-3 rounded-2xl p-3.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-                <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm shrink-0">
-                  <Calculator size={16} className="text-slate-500" />
+              {/* Performance Algorithm */}
+              <div className="bg-slate-50 dark:bg-slate-950/30 rounded-[32px] p-6 sm:p-8 border border-slate-100 dark:border-white/5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+                
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-indigo-100 dark:bg-indigo-900/40 rounded-xl text-indigo-600 dark:text-indigo-400">
+                    <Scale size={20} />
+                  </div>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                    {language === 'en' ? 'Performance Algorithm' : 'कार्यसम्पादन विधि'}
+                  </h4>
                 </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                    {language === 'en' ? 'How it is calculated' : 'यसरी गणना गरिन्छ'}
-                  </p>
-                  <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
-                    {language === 'en'
-                      ? 'Each indicator’s achievement % (progress ÷ target, capped at 100%) is multiplied by its weight, then averaged across all indicators by total weight.'
-                      : 'प्रत्येक सूचकको उपलब्धि % (प्रगति ÷ लक्ष्य, १००% सम्म सीमित) लाई यसको तौलले गुणा गरी सबै सूचकहरूको कुल तौल अनुसार औसत लिइन्छ।'}
-                  </p>
+
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-8">
+                  {language === 'en'
+                    ? `The system employs a Strategic Weighted Average (SWA) model. Critical infrastructure Indicators carry higher impact weights, ensuring the total percentage accurately reflects departmental priorities.`
+                    : `प्रणालीले रणनीतिक भारित औसत (SWA) मोडेल प्रयोग गर्दछ। महत्त्वपूर्ण पूर्वाधार सूचकहरूको भार बढी हुन्छ, जसले समग्र प्रतिशतले विभागको प्राथमिकतालाई सही रूपमा प्रतिबिम्बित गर्दछ।`}
+                </p>
+
+                {/* Mathematical Formula Card */}
+                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 rounded-2xl p-6 font-mono text-center shadow-lg">
+                  <div className="text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-4">
+                    {language === 'en' ? 'Core Equation' : 'मुख्य समीकरण'}
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <span className="text-sm font-black text-slate-900 dark:text-white">
+                      {language === 'en' ? 'Total Score' : 'कुल स्कोर'} % =
+                    </span>
+                    <div className="flex flex-col items-center">
+                      <span className="text-[11px] sm:text-xs font-black text-indigo-600 dark:text-indigo-400 px-4">
+                        Σ (Achievement % × Weight)
+                      </span>
+                      <div className="w-full h-px bg-slate-200 dark:bg-white/10 my-1" />
+                      <span className="text-[11px] sm:text-xs font-black text-slate-400">
+                        Σ (Total Active Weight)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mathematical Divergence Clarification Box */}
+                <div className="bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/20 rounded-[24px] p-5 text-left mt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-lg shrink-0 mt-0.5">
+                      <Scale size={16} />
+                    </div>
+                    <div>
+                      <h5 className="text-[11px] font-black text-amber-800 dark:text-amber-400 uppercase tracking-wider">
+                        {language === 'en' ? 'Strategic vs. Weighted Divergence' : 'रणनीतिक बनाम भारित कार्यसम्पादन'}
+                      </h5>
+                      <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed mt-1.5">
+                        {language === 'en'
+                          ? 'Why are they sometimes equal? On our starting baseline data, both models align at around 78% due to balanced indicators. However, they use distinct mathematical formulas:'
+                          : 'किन कहिलेकाहीँ समान देखिन्छन्? सुरुवाती आधारभूत तथ्याङ्कमा, दुवै मोडेलहरू लगभग ७८% मा सन्तुलित देखिन्छन्। तर यिनीहरूले फरक गणितीय सूत्र प्रयोग गर्दछन्:'}
+                      </p>
+                      <ul className="list-disc pl-4 mt-2 space-y-1 text-[10px] text-slate-600 dark:text-slate-300">
+                        <li>
+                          <strong>{language === 'en' ? 'Strategic Average' : 'रणनीतिक औसत'}</strong>:{' '}
+                          {language === 'en'
+                            ? 'Treats each of the 5 high-impact sectors with equal 20% importance (e.g., Infrastructure progress counts as 20%, Budget counts as 20% of the overall score).'
+                            : 'पाँचवटै उच्च-प्रभाव क्षेत्रहरूलाई समान २०% महत्त्व दिन्छ (जस्तै पूर्वाधारको प्रगति २०%, बजेटको प्रगति २०%)।'}
+                        </li>
+                        <li>
+                          <strong>{language === 'en' ? 'Weighted Average' : 'भारित औसत'}</strong>:{' '}
+                          {language === 'en'
+                            ? 'Ignores sector groupings and scales strictly based on each of the 17 indicators individual priority weight.'
+                            : 'क्षेत्रगत समूहहरूलाई छोडेर प्रत्येक १७ सूचकहरूको व्यक्तिगत प्राथमिकता भारको आधारमा मात्र स्क्यालिङ गर्दछ।'}
+                        </li>
+                      </ul>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed mt-2 italic">
+                        {language === 'en'
+                          ? '→ As progress updates flow in, these two percentages will dynamically diverge!'
+                          : '→ प्रगति विवरणहरू अद्यावधिक हुँदा, यी दुई प्रतिशतहरू फरक-फरक दरमा परिवर्तन हुनेछन्!'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Status distribution */}
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-2">
-                  {language === 'en' ? 'Status Distribution' : 'स्थिति वितरण'}
-                </p>
-                <div className="space-y-2">
-                  {statusItems.map((s) => (
-                    <div key={s.key} className="flex items-center gap-3">
-                      <span className="w-24 sm:w-28 text-[10px] font-bold text-slate-600 dark:text-slate-300 truncate">
-                        {language === 'en' ? s.labelEn : s.labelNp}
-                      </span>
-                      <div className="flex-1 h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${(s.value / maxStatus) * 100}%` }}
-                          transition={{ duration: 0.7, ease: 'easeOut' }}
-                          className="h-full rounded-full"
-                          style={{ backgroundColor: s.color }}
-                        />
-                      </div>
-                      <span className="w-8 text-right text-[11px] font-black text-slate-800 dark:text-white">{num(s.value)}</span>
-                    </div>
-                  ))}
+              {/* Weight Breakdown - Bento Style */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-6 rounded-[24px] border border-slate-100 dark:border-white/5 bg-white dark:bg-slate-900 shadow-sm group hover:border-indigo-500/30 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-500 mb-4 group-hover:scale-110 transition-transform">
+                    <Target size={16} />
+                  </div>
+                  <h5 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest mb-2">
+                    {language === 'en' ? 'High Impact' : 'उच्च प्रभाव'}
+                  </h5>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    {language === 'en'
+                      ? 'Core Indicators like Road Blacktopping and Bridge completion are prioritized with weights up to 40%.'
+                      : 'सडक कालोपत्रे र पुल निर्माण जस्ता मुख्य सूचकहरूलाई ४०% सम्मको भारका साथ प्राथमिकता दिइन्छ।'}
+                  </p>
+                </div>
+                <div className="p-6 rounded-[24px] border border-slate-100 dark:border-white/5 bg-white dark:bg-slate-900 shadow-sm group hover:border-blue-500/30 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/40 flex items-center justify-center text-blue-500 mb-4 group-hover:scale-110 transition-transform">
+                    <Activity size={16} />
+                  </div>
+                  <h5 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest mb-2">
+                    {language === 'en' ? 'Balanced Portfolio' : 'सन्तुलित पोर्टफोलियो'}
+                  </h5>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    {language === 'en'
+                      ? 'Secondary tasks (gravel roads, minor repairs) are monitored with 0 weight to track but not skew averages.'
+                      : 'दोस्रो कार्यहरू (ग्राभेल, सानो मर्मत) लाई औसत नबिग्रियोस् भन्नका लागि ० भारका साथ अनुगमन गरिन्छ।'}
+                  </p>
                 </div>
               </div>
             </div>
