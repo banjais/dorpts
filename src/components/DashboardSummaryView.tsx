@@ -57,6 +57,7 @@ import CategoryInsightsChart from './CategoryInsightsChart';
 import { StatusBreakdownModal } from './StatusBreakdownModal';
 import { IndicatorsBreakdownModal } from './IndicatorsBreakdownModal';
 import { ProgressLogicModal } from './ProgressLogicModal';
+import { SystemHelpModal } from './SystemHelpModal';
 
 interface DashboardSummaryViewProps {
   indicators: Indicator[];
@@ -626,6 +627,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showProgressLogic, setShowProgressLogic] = useState(false);
   const [showOfficeLogicInfo, setShowOfficeLogicInfo] = useState(false);
   const [showStatusLogicInfo, setShowStatusLogicInfo] = useState(false);
+  const [showSystemHelpModal, setShowSystemHelpModal] = useState(false);
   const [showBudgetCard, setShowBudgetCard] = useState(false);
   const [showOverallProgress, setShowOverallProgress] = useState(false);
   const [showStatusDetails, setShowStatusDetails] = useState(false);
@@ -1160,41 +1162,35 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden mt-4"
                 >
-                  <div className="bg-white/10 rounded-xl p-3 space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
-                    {STANDARD_CATEGORIES.map((cat) => {
-                      const catIndicators = indicators.filter((ind) => ind && normalizeCategory(ind.category) === cat);
-                      const total = catIndicators.length;
-                      const avgCompletion = total > 0
-                        ? Math.round(catIndicators.reduce((sum, ind) => {
-                            const pct = ind.annualTarget > 0 ? Math.min(100, (ind.annualProgress / ind.annualTarget) * 100) : 0;
-                            return sum + pct;
-                          }, 0) / total)
-                        : 0;
-
-                      if (total === 0) return null;
-
-                      return (
-                        <div key={cat} className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold text-white/80 truncate flex-1 mr-2">
-                            {language === 'en' ? cat.split(' ')[0] : cat.split(' ')[0]}
-                          </span>
-                          <span className="text-[9px] font-black text-emerald-300 w-10 text-right">{avgCompletion}%</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-white/10">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowProgressLogic(true);
-                      }}
-                      className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                    >
-                      <Info size={12} />
-                      {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
-                    </button>
-                  </div>
+                   <div className="bg-white/10 rounded-xl p-3 space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                     {indicators.filter(Boolean).map((ind) => {
+                       const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
+                       const categoryLabel = language === 'en' ? (ind.category || '').split(' ')[0] : (ind.category || '');
+                       return (
+                         <div key={ind.id} className="flex items-start justify-between gap-2">
+                           <div className="flex-1 min-w-0">
+                             <div className="flex items-center gap-2">
+                               <span className="text-[10px] font-bold text-white/80 truncate block">{ind.name}</span>
+                               <span className="text-[9px] font-black text-emerald-300 shrink-0">{pct}%</span>
+                             </div>
+                             <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
+                           </div>
+                         </div>
+                       );
+                     })}
+                   </div>
+                   <div className="mt-3 pt-3 border-t border-white/10">
+                     <button
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         setShowSystemHelpModal(true);
+                       }}
+                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                     >
+                       <Info size={12} />
+                       {language === 'en' ? 'More Info.' : 'थप जानकारी।'}
+                     </button>
+                   </div>
                  </motion.div>
                )}
              </AnimatePresence>
@@ -2109,6 +2105,14 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           </div>
         )}
       </AnimatePresence>
+
+      <SystemHelpModal
+        isOpen={showSystemHelpModal}
+        onClose={() => setShowSystemHelpModal(false)}
+        indicators={indicators}
+        offices={offices}
+        defaultTab="indicators"
+      />
     </div>
   );
 };
