@@ -1247,8 +1247,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               {language === 'en' ? 'Completion by category' : 'वर्ग अनुसार पूरा प्रतिशत'}
             </div>
 
-            {/* Mini category completion bars - always visible */}
-            <div className="space-y-2">
+             {/* Mini category completion bars - hidden when expanded */}
+             <div className={`space-y-2 transition-opacity duration-200 ${showCategoryStatus ? 'opacity-0 pointer-events-none h-0 overflow-hidden' : 'opacity-100'}`}>
               {STANDARD_CATEGORIES.map((cat) => {
                 const catIndicators = indicators.filter((ind) => ind && normalizeCategory(ind.category) === cat);
                 const total = catIndicators.length;
@@ -1310,16 +1310,15 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
                       return (
                         <div key={cat} className="bg-white/5 border border-white/10 rounded-xl p-3">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
-                              <span className="text-[10px] font-black text-white uppercase tracking-wider">
-                                {label}
-                              </span>
-                              <span className="text-[9px] font-bold text-white/50">
-                                ({total})
-                              </span>
-                            </div>
+                           <div className="flex items-center justify-between mb-2">
+                             <div className="flex items-center gap-2">
+                               <span className="text-[10px] font-black text-white uppercase tracking-wider">
+                                 {label}
+                               </span>
+                               <span className="text-[9px] font-bold text-white/50">
+                                 ({total})
+                               </span>
+                             </div>
                             <span className="text-lg font-black text-emerald-300">
                               {avgCompletion}%
                             </span>
