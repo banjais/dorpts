@@ -1139,8 +1139,23 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             <div className="text-[11px] sm:text-xs font-bold text-white/70 mb-1">
               {language === 'en' ? 'Total number of indicators being tracked.' : 'अनुगमन गरिएका कुल सूचकहरूको संख्या।'}
             </div>
-             <div className="text-4xl sm:text-5xl font-black text-white mb-4 leading-none">
-               {language === 'en' ? stats.total : toNepaliNumerals(stats.total)}
+              <div className="text-4xl sm:text-5xl font-black text-white mb-4 leading-none">
+                {language === 'en' ? stats.total : toNepaliNumerals(stats.total)}
+              </div>
+
+             {/* Mini indicator list */}
+             <div className={`space-y-1.5 transition-opacity duration-200 ${showTotalIndicators ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
+               {indicators.filter(Boolean).slice(0, 5).map((ind) => {
+                 const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
+                 return (
+                   <div key={ind.id} className="flex items-center justify-between">
+                     <span className="text-[9px] sm:text-[10px] font-black text-white/80 truncate flex-1 mr-2">
+                       {ind.name}
+                     </span>
+                     <span className="text-[9px] sm:text-[10px] font-black text-emerald-300 w-10 text-right">{pct}%</span>
+                   </div>
+                 );
+               })}
              </div>
 
              <AnimatePresence>
@@ -1149,9 +1164,9 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                    initial={{ opacity: 0, height: 0 }}
                    animate={{ opacity: 1, height: 'auto' }}
                    exit={{ opacity: 0, height: 0 }}
-                   className="overflow-hidden"
+                   className="overflow-hidden mt-4"
                  >
-                   <div className="space-y-3">
+                   <div className="space-y-2.5">
                      {indicators.filter(Boolean).map((ind) => {
                        const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
                        const categoryLabel = language === 'en' ? (ind.category || '').split(' ')[0] : (ind.category || '');
@@ -1163,6 +1178,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                                <span className="text-[9px] font-black text-emerald-300 shrink-0">{pct}%</span>
                              </div>
                              <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
+                             <span className="text-[9px] font-medium text-white/40 truncate block">Weight: {ind.weight}%</span>
                            </div>
                          </div>
                        );
