@@ -2037,10 +2037,10 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   </div>
                   <div>
                     <h3 className="text-sm font-black text-slate-900 dark:text-white">
-                      {language === 'en' ? 'Status Breakdown Logic' : 'स्थिति विवरण विधि'}
+                      {language === 'en' ? 'Achievement Level Logic' : 'उपलब्धि स्तर विधि'}
                     </h3>
                     <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                      {language === 'en' ? 'How On Track, Attention, and Stale are determined' : 'अनुसरण, ध्यान र पुरानो कसरी निर्धारण गरिन्छ'}
+                      {language === 'en' ? 'How Meeting Target, Below Target, and Needs Attention are determined' : 'लक्ष्य पूरा, लक्ष्यमुनि र ध्यान कसरी निर्धारण गरिन्छ'}
                     </p>
                   </div>
                 </div>
@@ -2055,12 +2055,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   </div>
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                      {language === 'en' ? 'On Track' : 'अनुसरण'}
+                      {language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा'}
                     </p>
                     <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
                       {language === 'en'
-                        ? 'An indicator is On Track when its completion percentage is 60% or higher. Formula: (annualProgress ÷ annualTarget) × 100 ≥ 60%.'
-                        : 'सूचक अनुसरणमा छ भन्ने काटिएको छ जब यसको पूरा हुने प्रतिशत ६०% वा बढी हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 ≥ ६०%。'}
+                        ? 'An indicator is Meeting Target when its achievement rate is 80% or higher. Formula: (annualProgress ÷ annualTarget) × 100 ≥ 80%.'
+                        : 'सूचक लक्ष्य पूरा छ भन्ने काटिएको छ जब यसको उपलब्धि दर ८०% वा बढी हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 ≥ ८०%。'}
                     </p>
                   </div>
                 </div>
@@ -2070,12 +2070,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   </div>
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                      {language === 'en' ? 'Needs Attention' : 'ध्यान'}
+                      {language === 'en' ? 'Below Target' : 'लक्ष्यमुनि'}
                     </p>
                     <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
                       {language === 'en'
-                        ? 'An indicator Needs Attention when its completion percentage is below 60%. Formula: (annualProgress ÷ annualTarget) × 100 < 60%.'
-                        : 'सूचकलाई ध्यान दिनुपर्छ भन्ने काटिएको छ जब यसको पूरा हुने प्रतिशत ६०% भन्दा कम हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 < ६०%。'}
+                        ? 'An indicator is Below Target when its achievement rate is between 40% and 79%. Formula: (annualProgress ÷ annualTarget) × 100 is between 40% and 79%.'
+                        : 'सूचक लक्ष्यमुनि छ भन्ने काटिएको छ जब यसको उपलब्धि दर ४०% र ७९% बीच हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 बीच ४०% र ७९% मा हुन्छ।'}
                     </p>
                   </div>
                 </div>
@@ -2085,12 +2085,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   </div>
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                      {language === 'en' ? 'Stale' : 'पुरानो'}
+                      {language === 'en' ? 'Needs Attention' : 'ध्यान'}
                     </p>
                     <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
                       {language === 'en'
-                        ? 'An indicator is Stale when it has no update date, or when the last update was more than 30 days ago. Stale indicators are not counted as On Track or Needs Attention.'
-                        : 'सूचक पुरानो छ भन्ने काटिएको छ जब यसको अद्यावधिक मिति छैन, वा अन्तिम अद्यावधिक ३० दिनभन्दा बढी पहिले भएको छ। पुराना सूचकहरू अनुसरण वा ध्यान मानिन्दैनन्।'}
+                        ? 'An indicator Needs Attention when its achievement rate is below 40%. Formula: (annualProgress ÷ annualTarget) × 100 < 40%.'
+                        : 'सूचकलाई ध्यान दिनुपर्छ भन्ने काटिएको छ जब यसको उपलब्धि दर ४०% भन्दा कम हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 < ४०%。'}
                     </p>
                   </div>
                 </div>
