@@ -1140,7 +1140,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             </div>
 
             {/* Mini indicator list */}
-            <div className="space-y-1.5">
+            <div className={`space-y-1.5 transition-opacity duration-200 ${showTotalIndicators ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
               {indicators.filter(Boolean).slice(0, 5).map((ind) => {
                 const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
                 return (
