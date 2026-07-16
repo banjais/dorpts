@@ -32,6 +32,8 @@ import {
   Building2,
   ArrowUpRight,
   ArrowDownRight,
+  AlertTriangle,
+  Clock,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -623,6 +625,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showIndicatorsBreakdown, setShowIndicatorsBreakdown] = useState(false);
   const [showProgressLogic, setShowProgressLogic] = useState(false);
   const [showOfficeLogicInfo, setShowOfficeLogicInfo] = useState(false);
+  const [showStatusLogicInfo, setShowStatusLogicInfo] = useState(false);
   const [showBudgetCard, setShowBudgetCard] = useState(false);
   const [showOverallProgress, setShowOverallProgress] = useState(false);
   const [showStatusDetails, setShowStatusDetails] = useState(false);
@@ -941,6 +944,16 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 {language === 'en' ? 'Status Breakdown' : 'स्थिति विवरण'}
               </span>
               <div className="flex items-center gap-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowStatusLogicInfo(true);
+                  }}
+                  className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                  title={language === 'en' ? 'How status is calculated' : 'स्थिति कसरी गणना गरिन्छ'}
+                >
+                  <Info size={14} />
+                </button>
                 <BarChart3 size={16} className="text-white/80" />
                 <motion.div animate={{ rotate: showStatusDetails ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
                   <ChevronRight size={18} />
@@ -1928,6 +1941,93 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       {language === 'en'
                         ? 'The Total row from the Offices sheet is used as the baseline. If an office has no indicator data yet, it is shown as “—” instead of 0%.'
                         : 'कार्यालय शीटको कुल पङ्क्तिलाई आधाररेखा रूपमा प्रयोग गरिन्छ। यदि कार्यालयलाई अझै सूचक तथ्याङ्क छैन भने ०% को सट्टा “—” देखाइन्छ।'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showStatusLogicInfo && (
+          <div className="fixed inset-0 z-[550] flex items-center justify-center p-4" onClick={() => setShowStatusLogicInfo(false)}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700/50 overflow-hidden max-h-[80dvh] flex flex-col"
+            >
+              <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-white/5">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-amber-50 dark:bg-amber-900/30 rounded-xl">
+                    <BarChart3 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white">
+                      {language === 'en' ? 'Status Breakdown Logic' : 'स्थिति विवरण विधि'}
+                    </h3>
+                    <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                      {language === 'en' ? 'How On Track, Attention, and Stale are determined' : 'अनुसरण, ध्यान र पुरानो कसरी निर्धारण गरिन्छ'}
+                    </p>
+                  </div>
+                </div>
+                <button onClick={() => setShowStatusLogicInfo(false)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="p-6 space-y-4 overflow-y-auto custom-scrollbar">
+                <div className="flex items-start gap-3 rounded-2xl p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-white/5">
+                  <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm shrink-0">
+                    <Target size={16} className="text-slate-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                      {language === 'en' ? 'On Track' : 'अनुसरण'}
+                    </p>
+                    <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
+                      {language === 'en'
+                        ? 'An indicator is On Track when its completion percentage is 60% or higher. Formula: (annualProgress ÷ annualTarget) × 100 ≥ 60%.'
+                        : 'सूचक अनुसरणमा छ भन्ने काटिएको छ जब यसको पूरा हुने प्रतिशत ६०% वा बढी हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 ≥ ६०%。'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 rounded-2xl p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-white/5">
+                  <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm shrink-0">
+                    <AlertTriangle size={16} className="text-slate-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                      {language === 'en' ? 'Needs Attention' : 'ध्यान'}
+                    </p>
+                    <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
+                      {language === 'en'
+                        ? 'An indicator Needs Attention when its completion percentage is below 60%. Formula: (annualProgress ÷ annualTarget) × 100 < 60%.'
+                        : 'सूचकलाई ध्यान दिनुपर्छ भन्ने काटिएको छ जब यसको पूरा हुने प्रतिशत ६०% भन्दा कम हुन्छ। सूत्र: (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 < ६०%。'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 rounded-2xl p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-white/5">
+                  <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm shrink-0">
+                    <Clock size={16} className="text-slate-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                      {language === 'en' ? 'Stale' : 'पुरानो'}
+                    </p>
+                    <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-relaxed">
+                      {language === 'en'
+                        ? 'An indicator is Stale when it has no update date, or when the last update was more than 30 days ago. Stale indicators are not counted as On Track or Needs Attention.'
+                        : 'सूचक पुरानो छ भन्ने काटिएको छ जब यसको अद्यावधिक मिति छैन, वा अन्तिम अद्यावधिक ३० दिनभन्दा बढी पहिले भएको छ। पुराना सूचकहरू अनुसरण वा ध्यान मानिन्दैनन्।'}
                     </p>
                   </div>
                 </div>
