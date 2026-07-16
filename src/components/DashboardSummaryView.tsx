@@ -628,6 +628,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showOfficeLogicInfo, setShowOfficeLogicInfo] = useState(false);
   const [showStatusLogicInline, setShowStatusLogicInline] = useState(false);
   const [showIndicatorsLogicInline, setShowIndicatorsLogicInline] = useState(false);
+  const [showOverallLogicInline, setShowOverallLogicInline] = useState(false);
   const [showCategoryLogicInline, setShowCategoryLogicInline] = useState(false);
   const [showReportingOfficesLogicInline, setShowReportingOfficesLogicInline] = useState(false);
   const [showSystemHelpModal, setShowSystemHelpModal] = useState(false);
@@ -942,47 +943,47 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       </div>
                     </div>
                   </div>
-                    <div className="mt-3 pt-3 border-t border-white/10">
-                       <button
-                         onClick={(e) => {
-                           e.stopPropagation();
-                           setShowCategoryLogicInline(!showCategoryLogicInline);
-                         }}
-                        className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                      >
-                        <Info size={12} />
-                        {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
-                      </button>
-                      <AnimatePresence>
-                        {showCategoryLogicInline && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="overflow-hidden mt-3 space-y-2"
-                          >
-                            <div className="bg-white/10 rounded-xl p-3 space-y-2">
-                              <p className="text-[10px] font-black uppercase tracking-wider text-emerald-200">
-                                {language === 'en' ? 'Category Completion' : 'वर्ग पूरा'}
-                              </p>
-                              <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
-                                {language === 'en'
-                                  ? 'Average achievement percentage for all indicators in each category.'
-                                  : 'प्रत्येक वर्गमा सबै सूचकहरूको औसत उपलब्धि प्रतिशत।'}
-                              </p>
-                              <p className="text-[10px] font-black uppercase tracking-wider text-amber-200">
-                                {language === 'en' ? 'Calculation' : 'गणना'}
-                              </p>
-                              <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
-                                {language === 'en'
-                                  ? 'Formula: Sum of (annualProgress ÷ annualTarget) × 100 for each indicator, divided by total indicators in category.'
-                                  : 'सूत्र: प्रत्येक सूचकको लागि (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 को योग, वर्गमा कुल सूचकहरूको संख्या ले विभाजित।'}
-                              </p>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
+                     <div className="mt-3 pt-3 border-t border-white/10">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowOverallLogicInline(!showOverallLogicInline);
+                          }}
+                         className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                       >
+                         <Info size={12} />
+                         {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                       </button>
+                       <AnimatePresence>
+                         {showOverallLogicInline && (
+                           <motion.div
+                             initial={{ opacity: 0, height: 0 }}
+                             animate={{ opacity: 1, height: 'auto' }}
+                             exit={{ opacity: 0, height: 0 }}
+                             className="overflow-hidden mt-3 space-y-2"
+                           >
+                             <div className="bg-white/10 rounded-xl p-3 space-y-2">
+                               <p className="text-[10px] font-black uppercase tracking-wider text-emerald-200">
+                                 {language === 'en' ? 'Overall Progress' : 'समग्र प्रगति'}
+                               </p>
+                               <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
+                                 {language === 'en'
+                                   ? 'Strategic weighted average across all indicators.'
+                                   : 'सबै सूचकहरूमा रणनीतिक भारित औसत।'}
+                               </p>
+                               <p className="text-[10px] font-black uppercase tracking-wider text-amber-200">
+                                 {language === 'en' ? 'Calculation' : 'गणना'}
+                               </p>
+                               <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
+                                 {language === 'en'
+                                   ? 'Formula: Sum of (achievement% × weight/100) for each indicator, divided by total weight.'
+                                   : 'सूत्र: प्रत्येक सूचकको लागि (उपलब्धि% × भार/100) को योग, कुल भार ले विभाजित।'}
+                               </p>
+                             </div>
+                           </motion.div>
+                         )}
+                       </AnimatePresence>
+                     </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -1372,19 +1373,55 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       );
                      })}
                    </div>
-                   <div className="mt-3 pt-3 border-t border-white/10">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowOverallProgress(false);
-                          setShowProgressLogic(true);
-                        }}
-                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                     >
-                       <Info size={12} />
-                       {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
-                     </button>
-                   </div>
+                    <div className="mt-3 pt-3 border-t border-white/10">
+                       <button
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           setShowCategoryLogicInline(!showCategoryLogicInline);
+                         }}
+                        className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                      >
+                        <Info size={12} />
+                        {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                      </button>
+                      <AnimatePresence>
+                        {showCategoryLogicInline && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="overflow-hidden mt-3 space-y-2"
+                          >
+                            <div className="bg-white/10 rounded-xl p-3 space-y-2">
+                              <p className="text-[10px] font-black uppercase tracking-wider text-emerald-200">
+                                {language === 'en' ? 'Category Completion' : 'वर्ग पूरा'}
+                              </p>
+                              <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
+                                {language === 'en'
+                                  ? 'Average achievement percentage for all indicators in each category.'
+                                  : 'प्रत्येक वर्गमा सबै सूचकहरूको औसत उपलब्धि प्रतिशत।'}
+                              </p>
+                              <p className="text-[10px] font-black uppercase tracking-wider text-amber-200">
+                                {language === 'en' ? 'Calculation' : 'गणना'}
+                              </p>
+                              <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
+                                {language === 'en'
+                                  ? 'Formula: Sum of (annualProgress ÷ annualTarget) × 100 for each indicator, divided by total indicators in category.'
+                                  : 'सूत्र: प्रत्येक सूचकको लागि (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 को योग, वर्गमा कुल सूचकहरूको संख्या ले विभाजित।'}
+                              </p>
+                              <p className="text-[10px] font-black uppercase tracking-wider text-rose-200">
+                                {language === 'en' ? 'Status Levels' : 'स्थिति स्तर'}
+                              </p>
+                              <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
+                                {language === 'en'
+                                  ? 'Meeting Target: ≥80%. Below Target: 40%-79%. Needs Attention: <40%.'
+                                  : 'लक्ष्य पूरा: ≥80%. लक्ष्यमुनि: 40%-79%. ध्यान चाहिन्छ: <40%.'}
+                              </p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                  </motion.div>
                )}
              </AnimatePresence>
