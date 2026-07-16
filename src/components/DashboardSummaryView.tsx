@@ -626,6 +626,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showIndicatorsBreakdown, setShowIndicatorsBreakdown] = useState(false);
   const [showProgressLogic, setShowProgressLogic] = useState(false);
   const [showOfficeLogicInfo, setShowOfficeLogicInfo] = useState(false);
+  const [showStatusLogicInline, setShowStatusLogicInline] = useState(false);
   const [showSystemHelpModal, setShowSystemHelpModal] = useState(false);
   const [showBudgetCard, setShowBudgetCard] = useState(false);
   const [showOverallProgress, setShowOverallProgress] = useState(false);
