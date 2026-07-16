@@ -985,20 +985,20 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             </div>
             <div className="flex items-end gap-3 mb-3">
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-white leading-none">{stats.meetingTarget}</div>
-                <div className="text-[8px] sm:text-[9px] font-bold text-white/70 uppercase tracking-wider mt-0.5">
+                <div className="text-2xl sm:text-3xl font-black text-emerald-200 leading-none">{stats.meetingTarget}</div>
+                <div className="text-[8px] sm:text-[9px] font-bold text-emerald-200/80 uppercase tracking-wider mt-0.5">
                   {language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा'}
                 </div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-white/90 leading-none">{stats.belowTarget}</div>
-                <div className="text-[8px] sm:text-[9px] font-bold text-white/70 uppercase tracking-wider mt-0.5">
+                <div className="text-2xl sm:text-3xl font-black text-amber-200 leading-none">{stats.belowTarget}</div>
+                <div className="text-[8px] sm:text-[9px] font-bold text-amber-200/80 uppercase tracking-wider mt-0.5">
                   {language === 'en' ? 'Below Target' : 'लक्ष्यमुनि'}
                 </div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-white/80 leading-none">{stats.needsCritical}</div>
-                <div className="text-[8px] sm:text-[9px] font-bold text-white/70 uppercase tracking-wider mt-0.5">
+                <div className="text-2xl sm:text-3xl font-black text-rose-200 leading-none">{stats.needsCritical}</div>
+                <div className="text-[8px] sm:text-[9px] font-bold text-rose-200/80 uppercase tracking-wider mt-0.5">
                   {language === 'en' ? 'Needs Attention' : 'ध्यान'}
                 </div>
               </div>
@@ -1009,17 +1009,17 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${stats.total > 0 ? (stats.meetingTarget / stats.total) * 100 : 0}%` }}
-                className="h-full bg-emerald-400 rounded-l-full"
+                className="h-full bg-emerald-300 rounded-l-full"
               />
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${stats.total > 0 ? (stats.belowTarget / stats.total) * 100 : 0}%` }}
-                className="h-full bg-amber-400"
+                className="h-full bg-amber-300"
               />
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${stats.total > 0 ? (stats.needsCritical / stats.total) * 100 : 0}%` }}
-                className="h-full bg-rose-400 rounded-r-full"
+                className="h-full bg-rose-300 rounded-r-full"
               />
             </div>
 
@@ -1046,30 +1046,35 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                         </div>
                         <span className="text-[9px] font-black text-white w-6 text-right">{stats.meetingTarget}</span>
                       </div>
+                      <p className="text-[9px] text-emerald-200/90 pl-24 -mt-1 mb-1">Achievement rate is 80% or higher</p>
+
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black text-amber-300 w-24">Below Target</span>
+                        <span className="text-[9px] font-black text-amber-200 w-24">Below Target</span>
                         <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${stats.total > 0 ? (stats.belowTarget / stats.total) * 100 : 0}%` }}
                             transition={{ duration: 0.7, ease: 'easeOut' }}
-                            className="h-full bg-amber-400 rounded-full"
+                            className="h-full bg-amber-300 rounded-full"
                           />
                         </div>
                         <span className="text-[9px] font-black text-white w-6 text-right">{stats.belowTarget}</span>
                       </div>
+                      <p className="text-[9px] text-amber-200/90 pl-24 -mt-1 mb-1">Achievement rate is between 40% and 80%</p>
+
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black text-rose-300 w-24">Needs Attention</span>
+                        <span className="text-[9px] font-black text-rose-200 w-24">Needs Attention</span>
                         <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${stats.total > 0 ? (stats.needsCritical / stats.total) * 100 : 0}%` }}
                             transition={{ duration: 0.7, ease: 'easeOut' }}
-                            className="h-full bg-rose-400 rounded-full"
+                            className="h-full bg-rose-300 rounded-full"
                           />
                         </div>
                         <span className="text-[9px] font-black text-white w-6 text-right">{stats.needsCritical}</span>
                       </div>
+                      <p className="text-[9px] text-rose-200/90 pl-24 -mt-1 mb-1">Achievement rate is below 40%</p>
                     </div>
                   </div>
                   <div className="mt-3 pt-3 border-t border-white/10">
