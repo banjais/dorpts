@@ -1178,19 +1178,22 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                          </div>
                        );
                      })}
-                   </div>
-                   <div className="mt-3 pt-3 border-t border-white/10">
-                     <button
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         setShowSystemHelpModal(true);
-                       }}
-                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                     >
-                       <Info size={12} />
-                       {language === 'en' ? 'More Info.' : 'थप जानकारी।'}
-                     </button>
-                   </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-white/10">
+                      <div className="mb-3">
+                        <MetricsChart indicators={indicators.filter(Boolean)} />
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowSystemHelpModal(true);
+                        }}
+                        className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                      >
+                        <Info size={12} />
+                        {language === 'en' ? 'More Info.' : 'थप जानकारी।'}
+                      </button>
+                    </div>
                  </motion.div>
                )}
              </AnimatePresence>
