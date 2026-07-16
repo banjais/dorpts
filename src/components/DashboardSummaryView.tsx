@@ -1093,11 +1093,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     </div>
                   </div>
                   <div className="mt-3 pt-3 border-t border-white/10">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowStatusLogicInfo(true);
-                      }}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowStatusDetails(false);
+                          setShowStatusLogicInfo(true);
+                        }}
                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
                     >
                       <Info size={12} />
@@ -1181,11 +1182,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                      })}
                     </div>
                      <div className="mt-3 pt-3 border-t border-white/10">
-                       <button
-                         onClick={(e) => {
-                           e.stopPropagation();
-                           setShowMetricsChart(!showMetricsChart);
-                         }}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowTotalIndicators(false);
+                          setShowProgressLogic(true);
+                        }}
                          className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors mb-3"
                        >
                          <BarChart3 size={12} />
@@ -1203,11 +1205,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                            </motion.div>
                          )}
                        </AnimatePresence>
-                       <button
-                         onClick={(e) => {
-                           e.stopPropagation();
-                           setShowSystemHelpModal(true);
-                         }}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowTotalIndicators(false);
+                              setShowSystemHelpModal(true);
+                            }}
                          className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
                        >
                          <Info size={12} />
@@ -1349,11 +1352,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                      })}
                    </div>
                    <div className="mt-3 pt-3 border-t border-white/10">
-                     <button
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         setShowProgressLogic(true);
-                       }}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowOverallProgress(false);
+                          setShowProgressLogic(true);
+                        }}
                        className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
                      >
                        <Info size={12} />
@@ -1492,11 +1496,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     })}
                   </div>
                    <div className="mt-3 pt-3 border-t border-white/10">
-                     <button
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         setShowOfficeLogicInfo(true);
-                       }}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowCategoryStatus(false);
+                          setShowOfficeLogicInfo(true);
+                        }}
                        className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
                      >
                        <Info size={12} />
@@ -1671,6 +1676,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        setShowReportingOffices(false);
                         setShowProgressLogic(true);
                       }}
                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
