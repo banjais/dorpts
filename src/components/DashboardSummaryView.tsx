@@ -79,6 +79,14 @@ const toNepaliNumerals = (numStr: string | number): string => {
   return String(numStr).replace(/[0-9]/g, (digit) => nepaliDigits[parseInt(digit, 10)]);
 };
 
+const CATEGORY_SHORT_LABELS: Record<string, { en: string; np: string }> = {
+  'Infrastructure Creation': { en: 'Infrastructure', np: 'पूर्वाधार' },
+  'Maintenance': { en: 'Maintenance', np: 'मर्मत' },
+  'Employment Creation': { en: 'Employment', np: 'रोजगारी' },
+  'Budget Utilization': { en: 'Budget', np: 'बजेट' },
+  'Governance': { en: 'Governance', np: 'सुशासन' },
+};
+
 const getSparklineData = (
   indicatorId: string,
   currentProgress: number,
@@ -1234,8 +1242,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                          return (
                            <div key={ind.id} className="flex items-start justify-between gap-2">
                              <div className="flex-1 min-w-0">
-                               <div className="flex items-center gap-2">
-                                 <span className="text-[10px] font-bold text-white/80 truncate block">{ind.name}</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] font-bold text-white/80 truncate block">{language === 'en' ? ind.nameEn : ind.name}</span>
                                  <span className="text-[9px] font-black text-emerald-300 shrink-0">{pct}%</span>
                                </div>
                                <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
@@ -1297,7 +1305,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   <div key={cat} className="flex items-center gap-2">
                     <div className="w-20 sm:w-24">
                       <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/60 truncate block">
-                        {language === 'en' ? cat.split(' ')[0] : cat.split(' ')[0]}
+                        {language === 'en' ? (CATEGORY_SHORT_LABELS[cat]?.en || cat.split(' ')[0]) : (CATEGORY_SHORT_LABELS[cat]?.np || cat.split(' ')[0])}
                       </span>
                     </div>
                     <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
@@ -1329,7 +1337,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                        const onTrack = catIndicators.filter((ind) => getBreakdownStatus(ind) === 'onTrack').length;
                        const needsAttention = catIndicators.filter((ind) => getBreakdownStatus(ind) === 'needsAttention').length;
                        const color = getCategoryColor(cat).hex;
-                      const label = language === 'en' ? cat.split(' ')[0] : cat.split(' ')[0];
+                      const label = language === 'en' ? (CATEGORY_SHORT_LABELS[cat]?.en || cat.split(' ')[0]) : (CATEGORY_SHORT_LABELS[cat]?.np || cat.split(' ')[0]);
                       const avgCompletion = total > 0
                         ? Math.round(catIndicators.reduce((sum, ind) => {
                             const pct = ind.annualTarget > 0 ? Math.min(100, (ind.annualProgress / ind.annualTarget) * 100) : 0;
@@ -1499,16 +1507,16 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     const emails = Array.from(officeData.emails);
                     return (
                       <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] font-black text-white uppercase tracking-wider truncate flex-1 mr-2">
-                            {shortName}
-                          </span>
+                         <div className="flex items-center justify-between mb-1">
+                           <span className="text-[10px] font-black text-white uppercase tracking-wider truncate flex-1 mr-2">
+                             {displayName}
+                           </span>
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-black text-emerald-300">
                               {officeData.total > 0 ? `${officeData.avgCompletion}%` : '—'}
                             </span>
                             <span className="text-[9px] font-bold text-white/50">
-                              {officeData.total} {language === 'en' ? 'ind' : 'सूचक'}
+                              {officeData.total} {language === 'en' ? 'indicators' : 'सूचक'}
                             </span>
                           </div>
                         </div>
