@@ -635,35 +635,36 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showReportingOffices, setShowReportingOffices] = useState(false);
   const [showAllIndicators, setShowAllIndicators] = useState(false);
   const [showCategoryStatus, setShowCategoryStatus] = useState(false);
+  const [showMetricsChart, setShowMetricsChart] = useState(false);
   const allIndicatorsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!showBudgetCard) return;
-    setShowInsights(false);
-    setShowAllIndicators(false);
-    setShowCategoryStatus(false);
-  }, [showBudgetCard]);
-
-  useEffect(() => {
-    if (!showInsights) return;
-    setShowBudgetCard(false);
-    setShowAllIndicators(false);
-    setShowCategoryStatus(false);
-  }, [showInsights]);
-
-  useEffect(() => {
-    if (!showAllIndicators) return;
-    setShowBudgetCard(false);
-    setShowInsights(false);
-    setShowCategoryStatus(false);
-  }, [showAllIndicators]);
-
-  useEffect(() => {
-    if (!showCategoryStatus) return;
-    setShowBudgetCard(false);
-    setShowInsights(false);
-    setShowAllIndicators(false);
-  }, [showCategoryStatus]);
+    const states = [
+      showOverallProgress,
+      showStatusDetails,
+      showTotalIndicators,
+      showReportingOffices,
+      showAllIndicators,
+      showCategoryStatus,
+      showBudgetCard,
+      showInsights,
+    ];
+    const openedIndex = states.findIndex(Boolean);
+    if (openedIndex === -1) return;
+    const setters = [
+      setShowOverallProgress,
+      setShowStatusDetails,
+      setShowTotalIndicators,
+      setShowReportingOffices,
+      setShowAllIndicators,
+      setShowCategoryStatus,
+      setShowBudgetCard,
+      setShowInsights,
+    ];
+    setters.forEach((setter, index) => {
+      if (index !== openedIndex) setter(false);
+    });
+  }, [showOverallProgress, showStatusDetails, showTotalIndicators, showReportingOffices, showAllIndicators, showCategoryStatus, showBudgetCard, showInsights]);
 
   useEffect(() => {
     if (highlightedCard !== 'insights') return;
@@ -1179,21 +1180,40 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                        );
                      })}
                     </div>
-                    <div className="mt-3 pt-3 border-t border-white/10">
-                      <div className="mb-3">
-                        <MetricsChart indicators={indicators.filter(Boolean)} />
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowSystemHelpModal(true);
-                        }}
-                        className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                      >
-                        <Info size={12} />
-                        {language === 'en' ? 'More Info.' : 'थप जानकारी।'}
-                      </button>
-                    </div>
+                     <div className="mt-3 pt-3 border-t border-white/10">
+                       <button
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           setShowMetricsChart(!showMetricsChart);
+                         }}
+                         className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors mb-3"
+                       >
+                         <BarChart3 size={12} />
+                         {language === 'en' ? 'Show Chart' : 'चार्ट देखाउनुहोस्'}
+                       </button>
+                       <AnimatePresence>
+                         {showMetricsChart && (
+                           <motion.div
+                             initial={{ opacity: 0, height: 0 }}
+                             animate={{ opacity: 1, height: 'auto' }}
+                             exit={{ opacity: 0, height: 0 }}
+                             className="overflow-hidden mb-3"
+                           >
+                             <MetricsChart indicators={indicators.filter(Boolean)} />
+                           </motion.div>
+                         )}
+                       </AnimatePresence>
+                       <button
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           setShowSystemHelpModal(true);
+                         }}
+                         className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                       >
+                         <Info size={12} />
+                         {language === 'en' ? 'More Info.' : 'थप जानकारी।'}
+                       </button>
+                     </div>
                  </motion.div>
                )}
              </AnimatePresence>
