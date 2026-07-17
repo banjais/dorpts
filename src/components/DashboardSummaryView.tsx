@@ -1467,12 +1467,11 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           {/* Mini office score bars - always visible */}
           <div className="space-y-1.5">
             {reportingOffices.slice(0, 5).map((officeData) => {
-              const shortName = officeData.office.split('-').pop()?.trim() || officeData.office;
               const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
               return (
                 <div key={officeData.office} className="flex items-center justify-between">
                   <span className="text-[9px] font-black text-white/80 truncate flex-1 mr-2">
-                    {shortName}
+                    {displayName}
                   </span>
                   <div className="flex items-center gap-1.5">
                     <span className="text-[9px] font-bold text-emerald-300">
