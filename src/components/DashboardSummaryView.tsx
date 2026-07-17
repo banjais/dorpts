@@ -1505,7 +1505,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 className="overflow-hidden mt-3"
               >
                  <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
-                   {reportingOffices.map((officeData) => {
+                   {reportingOffices.slice(3).map((officeData) => {
                      const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
                      const emails = Array.from(officeData.emails);
                      const adminEmail = emails[0] || '';
