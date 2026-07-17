@@ -1474,7 +1474,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             {reportingOffices.slice(0, 3).map((officeData) => {
               const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
               const emails = Array.from(officeData.emails);
-              const adminEmail = emails[0] || (language === 'en' ? 'No email' : 'इमेल छैन');
+              const adminEmail = emails[0] || '';
               return (
                 <div key={officeData.office} className="space-y-0.5">
                   <div className="text-[9px] font-black text-white/80 truncate">
@@ -1483,9 +1483,11 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   <div className="text-[8px] font-bold text-white/50 truncate">
                     {fmt(officeData.total)} {language === 'en' ? 'indicators' : 'सूचक'}
                   </div>
-                  <div className="text-[8px] font-bold text-white/40 truncate">
-                    {language === 'en' ? 'Admin: ' : 'प्रशासक: '}{adminEmail}
-                  </div>
+                  {adminEmail && (
+                    <div className="text-[8px] font-bold text-white/40 truncate">
+                      {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
+                    </div>
+                  )}
                   <div className="text-[8px] font-black text-emerald-300">
                     {fmt(officeData.avgCompletion)}%
                   </div>
@@ -1511,33 +1513,19 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                    {reportingOffices.map((officeData) => {
                      const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
                      const emails = Array.from(officeData.emails);
+                     const adminEmail = emails[0] || '';
                      return (
-                       <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5">
-                         {officeData.total > 0 && (
-                           <div className="flex items-center gap-2 mb-1">
-                             {officeData.onTrack > 0 && (
-                               <span className="text-[8px] font-bold text-emerald-400">
-                                 ✓{fmt(officeData.onTrack)}
-                               </span>
-                             )}
-                             {officeData.attention > 0 && (
-                               <span className="text-[8px] font-bold text-amber-400">
-                                 ⚠{fmt(officeData.attention)}
-                               </span>
-                             )}
-                             {officeData.stale > 0 && (
-                               <span className="text-[8px] font-bold text-rose-400">
-                                 ✗{fmt(officeData.stale)}
-                               </span>
-                             )}
+                       <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5 space-y-0.5">
+                         <div className="text-[9px] font-black text-white/80 truncate">
+                           {displayName}
+                         </div>
+                         {adminEmail && (
+                           <div className="text-[8px] font-bold text-white/40 truncate">
+                             {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
                            </div>
                          )}
-                         <div className="space-y-0.5">
-                           {emails.map((email) => (
-                             <div key={email} className="text-[9px] font-mono text-emerald-300 truncate">
-                               {email}
-                             </div>
-                           ))}
+                         <div className="text-[8px] font-black text-emerald-300">
+                           {fmt(officeData.avgCompletion)}%
                          </div>
                        </div>
                      );
