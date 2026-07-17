@@ -1473,7 +1473,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
            {/* Mini office list - always visible */}
            <div className="space-y-2.5">
              {reportingOffices.slice(0, 3).map((officeData) => {
-               const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
+                const displayName = translateOffice(officeData.office);
                const emails = Array.from(officeData.emails);
                const adminEmail = emails[0] || '';
                return (
@@ -1506,7 +1506,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               >
                  <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
                    {reportingOffices.slice(3).map((officeData) => {
-                     const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
+              const displayName = translateOffice(officeData.office);
                      const emails = Array.from(officeData.emails);
                      const adminEmail = emails[0] || '';
                      return (

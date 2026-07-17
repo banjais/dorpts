@@ -117,7 +117,10 @@ export const OFFICE_ENGLISH_TRANSLATIONS: Record<string, string> = {
 };
 
 export function translateOffice(name: string, language: 'en' | 'ne'): string {
-  if (language === 'ne') return name;
+  if (language === 'ne') {
+    const normalized = name.replace(/सडक सडक/g, 'सडक डिभिजन');
+    return normalized;
+  }
   return OFFICE_ENGLISH_TRANSLATIONS[name] || name;
 }
 
