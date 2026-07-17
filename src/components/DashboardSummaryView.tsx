@@ -276,7 +276,7 @@ const ExpandedDetails: React.FC<{
 
           <div className="bg-indigo-50/50 dark:bg-indigo-950/20 p-2.5 rounded-xl border border-indigo-100 dark:border-indigo-900/30">
             <div className="text-[8px] font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400 mb-1">
-              {language === 'en' ? 'Calculation Logic' : 'गणना तर्क'}
+              {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
             </div>
             <div className="text-[10px] font-bold text-slate-600 dark:text-slate-300 leading-relaxed">
               {language === 'en' ? 'Weighted' : 'भारित'}: {weight} × {pct}% = <span className="text-indigo-600 dark:text-indigo-400">{weightedContribution}</span>
@@ -966,7 +966,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                          className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
                        >
                          <Info size={12} />
-                         {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                         {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
                        </button>
                        <AnimatePresence>
                          {showOverallLogicInline && (
@@ -1147,7 +1147,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                        className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
                      >
                        <Info size={12} />
-                       {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                       {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
                      </button>
                      <AnimatePresence>
                        {showStatusLogicInline && (
@@ -1396,7 +1396,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                         className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
                       >
                         <Info size={12} />
-                        {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                        {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
                       </button>
                       <AnimatePresence>
                         {showCategoryLogicInline && (
@@ -1522,52 +1522,11 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                        </div>
                      );
                    })}
-                 </div>
-                    <div className="mt-3 pt-3 border-t border-white/10">
-                       <button
-                         onClick={(e) => {
-                           e.stopPropagation();
-                           setShowReportingOfficesLogicInline(!showReportingOfficesLogicInline);
-                         }}
-                        className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                      >
-                        <Info size={12} />
-                        {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
-                      </button>
-                      <AnimatePresence>
-                        {showReportingOfficesLogicInline && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="overflow-hidden mt-3 space-y-2"
-                          >
-                            <div className="bg-white/10 rounded-xl p-3 space-y-2">
-                              <p className="text-[10px] font-black uppercase tracking-wider text-emerald-200">
-                                {language === 'en' ? 'Office Score' : 'कार्यालय स्कोर'}
-                              </p>
-                              <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
-                                {language === 'en'
-                                  ? 'Average completion percentage across all indicators assigned to each office.'
-                                  : 'प्रत्येक कार्यालयलाई असाइन गरिएका सबै सूचकहरूमा औसत पूरा प्रतिशत।'}
-                              </p>
-                              <p className="text-[10px] font-black uppercase tracking-wider text-amber-200">
-                                {language === 'en' ? 'Calculation' : 'गणना'}
-                              </p>
-                              <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
-                                {language === 'en'
-                                  ? 'Formula: Sum of (annualProgress ÷ annualTarget) × 100 for each indicator in office, divided by total indicators in that office.'
-                                  : 'सूत्र: कार्यालयमा प्रत्येक सूचकको लागि (वार्षिक प्रगति ÷ वार्षिक लक्ष्य) × 100 को योग, त्यही कार्यालयमा कुल सूचकहरूको संख्या ले विभाजित।'}
-                              </p>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
-        </div>
+          </div>
       </motion.button>
 
       {/* Budget Allocation & Capital Expenditure */}
@@ -1738,7 +1697,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
                     >
                       <Info size={12} />
-                      {language === 'en' ? 'How is this calculated?' : 'यस कसरी गणना गरिन्छ?'}
+                      {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
                     </button>
                   </div>
                 </motion.div>
