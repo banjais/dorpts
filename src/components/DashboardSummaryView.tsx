@@ -1473,7 +1473,6 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="space-y-2.5">
             {reportingOffices.slice(0, 3).map((officeData) => {
               const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
-              const shortId = officeData.office.split('-').pop()?.trim() || officeData.office;
               const emails = Array.from(officeData.emails);
               const adminEmail = emails[0] || (language === 'en' ? 'No email' : 'इमेल छैन');
               return (
@@ -1482,10 +1481,13 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     {displayName}
                   </div>
                   <div className="text-[8px] font-bold text-white/50 truncate">
-                    {shortId}
+                    {fmt(officeData.total)} {language === 'en' ? 'indicators' : 'सूचक'}
                   </div>
                   <div className="text-[8px] font-bold text-white/40 truncate">
                     {language === 'en' ? 'Admin: ' : 'प्रशासक: '}{adminEmail}
+                  </div>
+                  <div className="text-[8px] font-black text-emerald-300">
+                    {fmt(officeData.avgCompletion)}%
                   </div>
                 </div>
               );
@@ -1505,37 +1507,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden mt-3"
               >
-                <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
-                  {reportingOffices.map((officeData) => {
-                    const shortName = officeData.office.split('-').pop()?.trim() || officeData.office;
-                    const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
-                    const emails = Array.from(officeData.emails);
-                    return (
-                      <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5">
-                         <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] font-black text-white uppercase tracking-wider truncate flex-1 mr-2">
-                              {displayName}
-                            </span>
-                           <div className="flex items-center gap-2">
-                             <span className="text-[10px] font-black text-emerald-300">
-                               {officeData.total > 0 ? `${fmt(officeData.avgCompletion)}%` : '—'}
-                             </span>
-                             <span className="text-[9px] font-bold text-white/50">
-                               {fmt(officeData.total)} {language === 'en' ? 'indicators' : 'सूचक'}
-                             </span>
-                           </div>
-                         </div>
-                         <div className="flex items-center gap-2 mb-1.5">
-                           <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                             <div
-                               className="h-full bg-emerald-400 rounded-full"
-                               style={{ width: `${Math.min(100, officeData.avgCompletion)}%` }}
-                             />
-                           </div>
-                           <span className="text-[9px] font-bold text-white/70 w-8 text-right">
-                             {fmt(officeData.avgCompletion)}%
-                           </span>
-                         </div>
+                 <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
+                   {reportingOffices.map((officeData) => {
+                     const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
+                     const emails = Array.from(officeData.emails);
+                     return (
+                       <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5">
                          {officeData.total > 0 && (
                            <div className="flex items-center gap-2 mb-1">
                              {officeData.onTrack > 0 && (
@@ -1547,25 +1524,25 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                                <span className="text-[8px] font-bold text-amber-400">
                                  ⚠{fmt(officeData.attention)}
                                </span>
-                            )}
+                             )}
                              {officeData.stale > 0 && (
                                <span className="text-[8px] font-bold text-rose-400">
                                  ✗{fmt(officeData.stale)}
                                </span>
                              )}
-                          </div>
-                        )}
-                        <div className="space-y-0.5">
-                          {emails.map((email) => (
-                            <div key={email} className="text-[9px] font-mono text-emerald-300 truncate">
-                              {email}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      );
-                    })}
-                  </div>
+                           </div>
+                         )}
+                         <div className="space-y-0.5">
+                           {emails.map((email) => (
+                             <div key={email} className="text-[9px] font-mono text-emerald-300 truncate">
+                               {email}
+                             </div>
+                           ))}
+                         </div>
+                       </div>
+                     );
+                   })}
+                 </div>
                     <div className="mt-3 pt-3 border-t border-white/10">
                        <button
                          onClick={(e) => {
