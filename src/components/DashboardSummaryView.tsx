@@ -801,6 +801,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
     });
 
     return (offices || [])
+      .filter((office) => office.name.includes('-'))
       .map((office) => {
         const avgCompletion = office.avgCompletion ?? 0;
         return {
