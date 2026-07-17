@@ -883,7 +883,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-white/70">
+              <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
                 {language === 'en' ? 'Overall Progress' : 'समग्र प्रगति'}
               </span>
               <div className="flex items-center gap-1">
@@ -900,7 +900,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 ? 'Strategic Weighted Average — average completion across all indicators'
                 : 'रणनीतिक भारित औसत — सबै सूचकहरूको औसत पूरा हुने प्रगति'}
             </div>
-            <div className="text-4xl sm:text-5xl font-black text-white mb-4 leading-none">
+            <div className="text-2xl sm:text-3xl font-black text-white mb-4 leading-none">
               {fmt(stats.weightedRate)}%
             </div>
             
@@ -1015,7 +1015,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-white/70">
+              <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
                 {language === 'en' ? 'Status Breakdown' : 'स्थिति विवरण'}
               </span>
               <div className="flex items-center gap-1">
@@ -1204,7 +1204,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-white/70">
+              <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
                 {language === 'en' ? 'Total Indicators' : 'कुल सूचकहरू'}
               </span>
               <div className="flex items-center gap-1">
@@ -1219,7 +1219,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             <div className="text-[10px] sm:text-[11px] font-bold text-white/70 mb-1">
               {language === 'en' ? 'Total number of indicators being tracked' : 'अनुगमन गरिएका कुल सूचकहरूको संख्या'}
             </div>
-              <div className="text-4xl sm:text-5xl font-black text-white mb-4 leading-none">
+              <div className="text-2xl sm:text-3xl font-black text-white mb-4 leading-none">
                 {fmt(stats.total)}
               </div>
 
@@ -1277,7 +1277,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-white/70">
+              <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
                 {language === 'en' ? 'Category Status' : 'वर्ग स्थिति'}
               </span>
               <div className="flex items-center gap-1">
@@ -1454,7 +1454,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div className="relative z-10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-white/70">
+              <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
                 {language === 'en' ? 'Reporting Offices' : 'विवरण पठाउने कार्यालयहरू'}
               </span>
               <div className="flex items-center gap-1">
@@ -1841,29 +1841,33 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       <motion.div
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.98 }}
-        className="group relative cursor-not-allowed bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] shadow-xl shadow-violet-500/10 dark:shadow-violet-500/5 transition-all duration-200 overflow-hidden opacity-80"
+        className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-2xl shadow-indigo-500/30 border border-white/30 hover:shadow-indigo-500/50 active:shadow-indigo-500/50 transition-all duration-300 overflow-hidden"
       >
-        <div className="absolute inset-0 bg-black/5" />
-        <div className="relative w-full flex items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-violet-50/80 to-white dark:from-violet-950/30 dark:to-slate-900">
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 bg-violet-500 text-white rounded-xl">
-              <LayoutGrid size={14} />
+        <div className="absolute inset-0 bg-black/10" />
+        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <button
+          onClick={() => setShowAllIndicators(!showAllIndicators)}
+          className="relative w-full flex items-center justify-between gap-3 px-5 sm:px-6 py-5 sm:py-6"
+        >
+          <div className="flex items-center gap-3">
+            <span className="p-2 bg-white/20 hover:bg-white/30 transition-colors rounded-xl">
+              <LayoutGrid size={18} className="text-white" />
             </span>
             <div className="text-left">
-              <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
+              <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight">
                 {language === 'en' ? 'All Indicators' : 'सबै सूचकहरू'}
               </h3>
-               <p className="text-[10px] font-bold text-slate-600 dark:text-white/70">
-                {language === 'en' ? `${indicators.length} indicators tracked` : `${indicators.length} सूचकहरू ट्र्याक गरिएको`}
+               <p className="text-[10px] sm:text-xs font-bold text-white/80">
+                {language === 'en' ? `${indicators.length} indicators tracked — click to explore` : `${indicators.length} सूचकहरू ट्र्याक गरिएको — अन्वेषणका लागि क्लिक गर्नुहोस्`}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[9px] font-black uppercase tracking-wider bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-2 py-1 rounded-full">
-              {language === 'en' ? 'Unavailable' : 'उपलब्ध छैन'}
-            </span>
+            <motion.div animate={{ rotate: showAllIndicators ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/90">
+              <ChevronRight size={20} />
+            </motion.div>
           </div>
-        </div>
+        </button>
 
         <AnimatePresence>
           {showAllIndicators && (
@@ -1871,9 +1875,9 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-               className="overflow-hidden bg-slate-900 dark:bg-violet-950/30"
+               className="overflow-hidden bg-white/10"
             >
-               <div className="px-5 pb-5 pt-1 space-y-4">
+               <div className="px-5 sm:px-6 pb-5 pt-3 space-y-4">
                   {/* Filters */}
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
                     <div className="flex flex-col sm:flex-row gap-3">
