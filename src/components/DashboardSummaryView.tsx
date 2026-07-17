@@ -1533,7 +1533,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.97 }}
-        className="group relative cursor-pointer bg-gradient-to-br from-amber-400 via-orange-400 to-rose-400 rounded-[28px] shadow-xl shadow-amber-500/25 border border-white/20 hover:shadow-2xl hover:shadow-amber-500/40 active:shadow-2xl active:shadow-amber-500/40 transition-all duration-200 overflow-hidden"
+         className="group relative cursor-pointer bg-gradient-to-br from-yellow-200 via-amber-200 to-orange-200 rounded-[28px] shadow-xl shadow-amber-500/25 border border-white/20 hover:shadow-2xl hover:shadow-amber-500/40 active:shadow-2xl active:shadow-amber-500/40 transition-all duration-200 overflow-hidden"
       >
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
