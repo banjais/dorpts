@@ -2804,6 +2804,7 @@ function MainAppContent() {
         activeView={mainView}
         onNavigate={handleMainViewChange}
         onOpenVisualInsights={goToVisualInsights}
+        onOpenAbout={() => setIsAboutModalOpen(true)}
       />
       <BudgetModal
         isOpen={isBudgetOpen}

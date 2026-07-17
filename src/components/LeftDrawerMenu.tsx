@@ -11,6 +11,7 @@ import {
   LogIn,
   LogOut,
   User,
+  Info,
 } from 'lucide-react';
 import type { MainView } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -22,6 +23,7 @@ interface LeftDrawerMenuProps {
   activeView: MainView;
   onNavigate: (view: MainView) => void;
   onOpenVisualInsights: () => void;
+  onOpenAbout?: () => void;
 }
 
 export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
@@ -31,6 +33,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
   activeView,
   onNavigate,
   onOpenVisualInsights,
+  onOpenAbout,
 }) => {
   const { user, isAdmin, loginWithGoogle, logout } = useAuth();
 
@@ -87,6 +90,16 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       labelEn: 'Action Portal',
       labelNp: 'कार्य पोर्टल',
       onClick: () => onNavigate('action-portal'),
+    },
+    {
+      id: 'about',
+      icon: <Info size={18} />,
+      labelEn: 'About',
+      labelNp: 'बारेमा',
+      onClick: () => {
+        onOpenAbout?.();
+        onClose();
+      },
     },
   ];
 

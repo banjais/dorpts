@@ -364,38 +364,9 @@ export const Header: React.FC<HeaderProps> = ({
               </motion.div>
 
               <div className="relative flex flex-col justify-center min-w-0 h-10 sm:h-12 overflow-hidden">
-                {/* Collapsed Brand Name */}
-                <div
-                  className={`absolute left-0 right-0 flex flex-col justify-center smooth-branding-transition ${
-                    scrolled
-                      ? 'opacity-100 scale-100 translate-y-0'
-                      : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
-                  }`}
-                >
+                <div className="flex flex-col justify-center">
                   <span className="font-display text-[0.62rem] sm:text-[0.8rem] md:text-[0.9rem] font-black tracking-wide whitespace-nowrap text-brand-gradient uppercase leading-none truncate">
                     {language === 'ne' ? 'प्रगति ट्र्याकर' : APP_TITLES.shortAppName[language]}
-                  </span>
-                  <span className="text-[0.4rem] sm:text-[0.48rem] md:text-[0.52rem] uppercase tracking-tight leading-tight whitespace-nowrap font-extrabold text-[#0099DA] dark:text-[#00ADF7] truncate">
-                    {t('deptOfRoads')}
-                  </span>
-                </div>
-
-                {/* Expanded Brand Name */}
-                <div
-                  className={`flex flex-col justify-center smooth-branding-transition ${
-                    scrolled
-                      ? 'opacity-0 scale-95 translate-y-2 pointer-events-none'
-                      : 'opacity-100 scale-100 translate-y-0'
-                  }`}
-                >
-                  <span className={`text-[0.4rem] sm:text-[0.48rem] md:text-[0.52rem] uppercase tracking-tight leading-tight whitespace-nowrap truncate ${scrolled ? 'font-medium text-slate-500 dark:text-slate-400' : 'font-extrabold text-[#0099DA] dark:text-[#00ADF7]'}`}>
-                    {t('govOfNepal')}
-                  </span>
-                  <span className={`text-[0.44rem] sm:text-[0.55rem] md:text-[0.62rem] tracking-tight leading-tight whitespace-nowrap truncate ${scrolled ? 'font-medium text-slate-500 dark:text-slate-400' : 'font-black text-[#0099DA] dark:text-[#00ADF7]'}`}>
-                    {t('ministryOfPhysical')}
-                  </span>
-                  <span className={`font-display text-[0.62rem] sm:text-[0.78rem] md:text-[0.92rem] tracking-tight leading-none whitespace-nowrap uppercase truncate ${scrolled ? 'font-bold text-slate-600 dark:text-slate-300' : 'font-black text-[#0099DA] dark:text-[#00ADF7]'}`}>
-                    {t('deptOfRoads')}
                   </span>
                 </div>
               </div>
@@ -484,27 +455,11 @@ export const Header: React.FC<HeaderProps> = ({
                 <h1 className="font-display text-[0.72rem] sm:text-[0.95rem] md:text-[1.05rem] font-extrabold text-slate-800 dark:text-white tracking-tight uppercase leading-none truncate">
                   <span className="text-brand-gradient">{t('dorProgress')}</span>
                 </h1>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <p className="text-[8px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-tight truncate">
-                    {t('splashSubtext')}
-                  </p>
-                  {fiscalYear && (
-                    <span className="text-[8px] sm:text-[10px] font-black text-[#0099DA] dark:text-[#00ADF7] bg-[#0099DA]/10 dark:bg-[#00ADF7]/10 px-1.5 py-0.5 rounded-md shrink-0">
-                      FY {fiscalYear}
-                    </span>
-                  )}
-                  <button
-                    onClick={() => {
-                      triggerHaptic('light');
-                      onOpenAbout?.();
-                    }}
-                    className="flex items-center justify-center text-[#0099DA] dark:text-[#00ADF7] hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors rounded-full hover:bg-[#0099DA]/10 dark:hover:bg-[#00ADF7]/10 p-0.5 shrink-0"
-                    title={language === 'en' ? 'System info' : 'प्रणाली जानकारी'}
-                    aria-label={language === 'en' ? 'System Info' : 'प्रणाली जानकारी'}
-                  >
-                    <Info size={13} className="sm:w-3.5 sm:h-3.5" />
-                  </button>
-                </div>
+                {fiscalYear && (
+                  <span className="text-[8px] sm:text-[10px] font-black text-[#0099DA] dark:text-[#00ADF7] bg-[#0099DA]/10 dark:bg-[#00ADF7]/10 px-1.5 py-0.5 rounded-md shrink-0">
+                    FY {fiscalYear}
+                  </span>
+                )}
               </div>
 
             </div>
