@@ -373,7 +373,7 @@ const SummaryCard: React.FC<{
 }> = ({ indicator, language, isExpanded, onToggle, onClick, sparklineData, status, progressPercent, isAdmin, onViewHistory, onOpenComments, index, translateUnit, addToast }) => {
   const catColor = getCategoryColor(indicator.category);
   const gradient = getCardGradient(status, catColor);
-  const nepaliPercent = isNepali ? toNepaliNumerals(progressPercent.toString()) : progressPercent.toString();
+  const nepaliPercent = language === 'ne' ? toNepaliNumerals(progressPercent.toString()) : progressPercent.toString();
   const weight = indicator.weight || 0;
   const trendDirection = sparklineData.length >= 2
     ? sparklineData[sparklineData.length - 1].value - sparklineData[0].value
