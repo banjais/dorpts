@@ -231,7 +231,7 @@ const ExpandedDetails: React.FC<{
                 {language === 'en' ? 'Target vs Progress' : 'लक्ष्य र प्रगति'}
               </span>
               <span className={`text-xs font-black ${pct >= 60 ? 'text-emerald-600' : pct >= 40 ? 'text-amber-600' : 'text-rose-600'}`}>
-                {pct}%
+                {fmt(pct)}%
               </span>
             </div>
             <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -245,10 +245,10 @@ const ExpandedDetails: React.FC<{
             </div>
             <div className="flex justify-between mt-1">
               <span className="text-[9px] font-bold text-slate-400">
-                {language === 'en' ? 'Target' : 'लक्ष्य'}: {target != null ? target.toLocaleString() : '—'}
+                {language === 'en' ? 'Target' : 'लक्ष्य'}: {fmt(target != null ? target.toLocaleString() : '—')}
               </span>
               <span className="text-[9px] font-bold text-slate-400">
-                {language === 'en' ? 'Progress' : 'प्रगति'}: {progress != null ? progress.toLocaleString() : '—'}
+                {language === 'en' ? 'Progress' : 'प्रगति'}: {fmt(progress != null ? progress.toLocaleString() : '—')}
               </span>
             </div>
           </div>
@@ -260,8 +260,8 @@ const ExpandedDetails: React.FC<{
               </div>
               <div className="text-xs font-black text-slate-700 dark:text-slate-200 truncate">
                 {indicator.baseline != null && (indicator.baseline as any)?.toLocaleString
-                  ? (indicator.baseline as any).toLocaleString()
-                  : indicator.baseline || '—'}
+                  ? fmt((indicator.baseline as any).toLocaleString())
+                  : fmt(indicator.baseline || '—')}
               </div>
             </div>
             <div className="bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-white/5">
@@ -373,7 +373,7 @@ const SummaryCard: React.FC<{
 }> = ({ indicator, language, isExpanded, onToggle, onClick, sparklineData, status, progressPercent, isAdmin, onViewHistory, onOpenComments, index, translateUnit, addToast }) => {
   const catColor = getCategoryColor(indicator.category);
   const gradient = getCardGradient(status, catColor);
-  const nepaliPercent = language === 'np' ? toNepaliNumerals(progressPercent.toString()) : progressPercent.toString();
+  const nepaliPercent = isNepali ? toNepaliNumerals(progressPercent.toString()) : progressPercent.toString();
   const weight = indicator.weight || 0;
   const trendDirection = sparklineData.length >= 2
     ? sparklineData[sparklineData.length - 1].value - sparklineData[0].value
@@ -439,12 +439,12 @@ const SummaryCard: React.FC<{
                 {nepaliPercent}%
               </div>
               <div className="flex items-center gap-2 mt-1.5 min-w-0">
-                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
-                  {language === 'en' ? 'Weight' : 'भार'}: {weight}%
-                </span>
-                <span className="text-[9px] font-bold text-slate-400 truncate">
-                  {indicator.annualProgress?.toLocaleString()} / {indicator.annualTarget?.toLocaleString()}
-                </span>
+                 <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                   {language === 'en' ? 'Weight' : 'भार'}: {fmt(weight)}%
+                 </span>
+                 <span className="text-[9px] font-bold text-slate-400 truncate">
+                   {fmt(indicator.annualProgress?.toLocaleString() ?? 0)} / {fmt(indicator.annualTarget?.toLocaleString() ?? 0)}
+                 </span>
               </div>
             </div>
           </div>
@@ -539,7 +539,7 @@ const ExpandedDetailsSmall: React.FC<{
             {language === 'en' ? 'Target vs Progress' : 'लक्ष्य र प्रगति'}
           </span>
           <span className={`text-xs font-black ${pct >= 60 ? 'text-emerald-600' : pct >= 40 ? 'text-amber-600' : 'text-rose-600'}`}>
-            {pct}%
+            {fmt(pct)}%
           </span>
         </div>
         <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -553,10 +553,10 @@ const ExpandedDetailsSmall: React.FC<{
         </div>
         <div className="flex justify-between mt-1">
           <span className="text-[9px] font-bold text-slate-400">
-            {language === 'en' ? 'Target' : 'लक्ष्य'}: {target.toLocaleString()}
+            {language === 'en' ? 'Target' : 'लक्ष्य'}: {fmt(target.toLocaleString())}
           </span>
           <span className="text-[9px] font-bold text-slate-400">
-            {language === 'en' ? 'Progress' : 'प्रगति'}: {progress.toLocaleString()}
+            {language === 'en' ? 'Progress' : 'प्रगति'}: {fmt(progress.toLocaleString())}
           </span>
         </div>
       </div>
@@ -623,6 +623,11 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 }) => {
   const { language, t, translateUnit, translateOffice } = useLanguage();
   const { isAdmin } = useAuth();
+  const isNepali = language === 'ne';
+  const fmt = (val: number | string): string => {
+    if (isNepali) return toNepaliNumerals(val);
+    return String(val);
+  };
   const insightsCardRef = useRef<HTMLDivElement>(null);
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [sortType, setSortType] = useState<'default' | 'low' | 'high' | 'weight' | 'status'>('default');
@@ -895,7 +900,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 : 'रणनीतिक भारित औसत — सबै सूचकहरूको औसत पूरा हुने प्रगति'}
             </div>
             <div className="text-4xl sm:text-5xl font-black text-white mb-4 leading-none">
-              {stats.weightedRate}%
+              {fmt(stats.weightedRate)}%
             </div>
             
             {/* Mini trend bar */}
@@ -926,21 +931,21 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-[10px]">
                         <span className="text-white/70">{language === 'en' ? 'Total Indicators' : 'कुल सूचकहरू'}</span>
-                        <span className="font-black text-white">{stats.total}</span>
+                        <span className="font-black text-white">{fmt(stats.total)}</span>
                       </div>
                       <div className="flex justify-between text-[10px]">
                         <span className="text-white/70">{language === 'en' ? 'Total Weight' : 'कुल भार'}</span>
-                        <span className="font-black text-white">{indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0) || 100}%</span>
+                        <span className="font-black text-white">{fmt(indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0) || 100)}%</span>
                       </div>
                       <div className="flex justify-between text-[10px]">
                         <span className="text-white/70">{language === 'en' ? 'Achieved Weight' : 'प्राप्त भार'}</span>
-                        <span className="font-black text-white">{Math.round(indicators.reduce((acc, curr) => {
+                        <span className="font-black text-white">{fmt(Math.round(indicators.reduce((acc, curr) => {
                           if (!curr) return acc;
                           const target = curr.annualTarget || 0;
                           const progress = curr.annualProgress || 0;
                           const achievement = target > 0 ? Math.min((progress / target) * 100, 100) : 0;
                           return acc + (achievement * ((curr.weight || 0) / 100));
-                        }, 0))}%</span>
+                        }, 0)))}%</span>
                       </div>
                       <div className="h-1.5 bg-white/10 rounded-full overflow-hidden mt-2">
                         <motion.div
@@ -1027,24 +1032,24 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 : 'उपलब्धि स्तर अनुसार वर्गीकृत सूचकहरू'}
             </div>
             <div className="flex items-end gap-3 mb-3">
-              <div>
-                <div className="text-2xl sm:text-3xl font-black text-emerald-200 leading-none">{stats.meetingTarget}</div>
-                <div className="text-[8px] sm:text-[9px] font-bold text-emerald-200/80 uppercase tracking-wider mt-0.5">
-                  {language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा'}
-                </div>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-black text-amber-200 leading-none">{stats.belowTarget}</div>
-                <div className="text-[8px] sm:text-[9px] font-bold text-amber-200/80 uppercase tracking-wider mt-0.5">
-                  {language === 'en' ? 'Below Target' : 'लक्ष्यमुनि'}
-                </div>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-black text-rose-200 leading-none">{stats.needsCritical}</div>
-                <div className="text-[8px] sm:text-[9px] font-bold text-rose-200/80 uppercase tracking-wider mt-0.5">
-                  {language === 'en' ? 'Needs Attention' : 'ध्यान'}
-                </div>
-              </div>
+               <div>
+                 <div className="text-2xl sm:text-3xl font-black text-emerald-200 leading-none">{fmt(stats.meetingTarget)}</div>
+                 <div className="text-[8px] sm:text-[9px] font-bold text-emerald-200/80 uppercase tracking-wider mt-0.5">
+                   {language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा'}
+                 </div>
+               </div>
+               <div>
+                 <div className="text-2xl sm:text-3xl font-black text-amber-200 leading-none">{fmt(stats.belowTarget)}</div>
+                 <div className="text-[8px] sm:text-[9px] font-bold text-amber-200/80 uppercase tracking-wider mt-0.5">
+                   {language === 'en' ? 'Below Target' : 'लक्ष्यमुनि'}
+                 </div>
+               </div>
+               <div>
+                 <div className="text-2xl sm:text-3xl font-black text-rose-200 leading-none">{fmt(stats.needsCritical)}</div>
+                 <div className="text-[8px] sm:text-[9px] font-bold text-rose-200/80 uppercase tracking-wider mt-0.5">
+                   {language === 'en' ? 'Needs Attention' : 'ध्यान'}
+                 </div>
+               </div>
             </div>
 
             {/* Stacked mini bar */}
@@ -1089,7 +1094,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                             className="h-full bg-emerald-300 rounded-full"
                           />
                         </div>
-                        <span className="text-[9px] font-black text-white w-6 text-right">{stats.meetingTarget}</span>
+                        <span className="text-[9px] font-black text-white w-6 text-right">{fmt(stats.meetingTarget)}</span>
                       </div>
                       <p className="text-[9px] text-emerald-200/90 pl-24 -mt-1 mb-1">
                         {language === 'en' ? 'Achievement rate is 80% or higher' : 'उपलब्धि दर ८०% वा बढी छ'}
@@ -1107,7 +1112,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                             className="h-full bg-amber-300 rounded-full"
                           />
                         </div>
-                        <span className="text-[9px] font-black text-white w-6 text-right">{stats.belowTarget}</span>
+                        <span className="text-[9px] font-black text-white w-6 text-right">{fmt(stats.belowTarget)}</span>
                       </div>
                       <p className="text-[9px] text-amber-200/90 pl-24 -mt-1 mb-1">
                         {language === 'en' ? 'Achievement rate is between 40% and 80%' : 'उपलब्धि दर ४०% र ८०% बीच छ'}
@@ -1125,7 +1130,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                             className="h-full bg-rose-300 rounded-full"
                           />
                         </div>
-                        <span className="text-[9px] font-black text-white w-6 text-right">{stats.needsCritical}</span>
+                        <span className="text-[9px] font-black text-white w-6 text-right">{fmt(stats.needsCritical)}</span>
                       </div>
                       <p className="text-[9px] text-rose-200/90 pl-24 -mt-1 mb-1">
                         {language === 'en' ? 'Achievement rate is below 40%' : 'उपलब्धि दर ४०% भन्दा कम छ'}
@@ -1214,7 +1219,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               {language === 'en' ? 'Total number of indicators being tracked' : 'अनुगमन गरिएका कुल सूचकहरूको संख्या'}
             </div>
               <div className="text-4xl sm:text-5xl font-black text-white mb-4 leading-none">
-                {language === 'en' ? stats.total : toNepaliNumerals(stats.total)}
+                {fmt(stats.total)}
               </div>
 
               <AnimatePresence>
@@ -1241,15 +1246,15 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                            : 'text-rose-300';
                          return (
                            <div key={ind.id} className="flex items-start justify-between gap-2">
-                             <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-[10px] font-bold text-white/80 truncate block">{language === 'en' ? ind.nameEn : ind.name}</span>
-                                 <span className="text-[9px] font-black text-emerald-300 shrink-0">{pct}%</span>
-                               </div>
-                               <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
-                                <span className="text-[9px] font-medium text-white/40 truncate block">{language === 'en' ? 'Weight' : 'भार'}: {ind.weight}%</span>
-                               <span className={`text-[9px] font-black truncate block ${statusColor}`}>{statusLabel}</span>
-                             </div>
+                              <div className="flex-1 min-w-0">
+                                 <div className="flex items-center gap-2">
+                                   <span className="text-[10px] font-bold text-white/80 truncate block">{language === 'en' ? ind.nameEn : ind.name}</span>
+                                  <span className="text-[9px] font-black text-emerald-300 shrink-0">{fmt(pct)}%</span>
+                                </div>
+                                <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
+                                 <span className="text-[9px] font-medium text-white/40 truncate block">{language === 'en' ? 'Weight' : 'भार'}: {fmt(ind.weight)}%</span>
+                                <span className={`text-[9px] font-black truncate block ${statusColor}`}>{statusLabel}</span>
+                              </div>
                            </div>
                          );
                        })}
@@ -1302,22 +1307,22 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 if (total === 0) return null;
                 
                 return (
-                  <div key={cat} className="flex items-center gap-2">
-                    <div className="w-20 sm:w-24">
-                      <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/60 truncate block">
-                        {language === 'en' ? (CATEGORY_SHORT_LABELS[cat]?.en || cat.split(' ')[0]) : (CATEGORY_SHORT_LABELS[cat]?.np || cat.split(' ')[0])}
-                      </span>
-                    </div>
-                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${avgCompletion}%` }}
-                        transition={{ duration: 0.8, ease: 'easeOut' }}
-                        className="h-full rounded-full bg-emerald-400"
-                      />
-                    </div>
-                    <span className="text-[9px] font-black text-emerald-300 w-8 text-right">{avgCompletion}%</span>
-                  </div>
+                   <div key={cat} className="flex items-center gap-2">
+                     <div className="w-20 sm:w-24">
+                       <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/60 truncate block">
+                         {language === 'en' ? (CATEGORY_SHORT_LABELS[cat]?.en || cat.split(' ')[0]) : (CATEGORY_SHORT_LABELS[cat]?.np || cat.split(' ')[0])}
+                       </span>
+                     </div>
+                     <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                       <motion.div
+                         initial={{ width: 0 }}
+                         animate={{ width: `${avgCompletion}%` }}
+                         transition={{ duration: 0.8, ease: 'easeOut' }}
+                         className="h-full rounded-full bg-emerald-400"
+                       />
+                     </div>
+                     <span className="text-[9px] font-black text-emerald-300 w-8 text-right">{fmt(avgCompletion)}%</span>
+                   </div>
                 );
               })}
             </div>
@@ -1350,33 +1355,33 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       return (
                         <div key={cat} className="bg-white/5 border border-white/10 rounded-xl p-3">
                            <div className="flex items-center justify-between mb-2">
-                             <div className="flex items-center gap-2">
-                               <span className="text-[10px] font-black text-white uppercase tracking-wider">
-                                 {label}
-                               </span>
-                               <span className="text-[9px] font-bold text-white/50">
-                                 ({total})
-                               </span>
-                             </div>
-                            <span className="text-lg font-black text-emerald-300">
-                              {avgCompletion}%
-                            </span>
-                          </div>
-                          <div className="flex h-2.5 bg-white/10 rounded-full overflow-hidden mb-2">
-                            <div className="h-full bg-emerald-400 rounded-full transition-all" style={{ width: `${avgCompletion}%` }} />
-                          </div>
-                          <div className="flex items-center gap-3">
-                            {onTrack > 0 && (
-                              <span className="text-[9px] sm:text-[10px] font-bold text-emerald-400">
-                                {Math.round((onTrack / total) * 100)}% {language === 'en' ? 'On Track' : 'अनुसरण'}
-                              </span>
-                            )}
-                             {needsAttention > 0 && (
-                               <span className="text-[9px] sm:text-[10px] font-bold text-amber-400">
-                                 {Math.round((needsAttention / total) * 100)}% {language === 'en' ? 'Attention' : 'ध्यान'}
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-black text-white uppercase tracking-wider">
+                                  {label}
+                                </span>
+                                <span className="text-[9px] font-bold text-white/50">
+                                  ({fmt(total)})
+                                </span>
+                              </div>
+                             <span className="text-lg font-black text-emerald-300">
+                               {fmt(avgCompletion)}%
+                             </span>
+                           </div>
+                           <div className="flex h-2.5 bg-white/10 rounded-full overflow-hidden mb-2">
+                             <div className="h-full bg-emerald-400 rounded-full transition-all" style={{ width: `${avgCompletion}%` }} />
+                           </div>
+                           <div className="flex items-center gap-3">
+                             {onTrack > 0 && (
+                               <span className="text-[9px] sm:text-[10px] font-bold text-emerald-400">
+                                 {fmt(Math.round((onTrack / total) * 100))}% {language === 'en' ? 'On Track' : 'अनुसरण'}
                                </span>
                              )}
-                           </div>
+                              {needsAttention > 0 && (
+                                 <span className="text-[9px] sm:text-[10px] font-bold text-amber-400">
+                                   {fmt(Math.round((needsAttention / total) * 100))}% {language === 'en' ? 'Attention' : 'ध्यान'}
+                                 </span>
+                              )}
+                            </div>
                         </div>
                       );
                      })}
@@ -1464,29 +1469,30 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               {language === 'en' ? `${reportingOffices.length} offices reporting` : `${reportingOffices.length} कार्यालयहरूबाट रिपोर्टिङ`}
             </div>
 
-          {/* Mini office score bars - always visible */}
-          <div className="space-y-1.5">
-            {reportingOffices.slice(0, 5).map((officeData) => {
+          {/* Mini office list - always visible */}
+          <div className="space-y-2.5">
+            {reportingOffices.slice(0, 3).map((officeData) => {
               const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
+              const shortId = officeData.office.split('-').pop()?.trim() || officeData.office;
+              const emails = Array.from(officeData.emails);
+              const adminEmail = emails[0] || (language === 'en' ? 'No email' : 'इमेल छैन');
               return (
-                <div key={officeData.office} className="flex items-center justify-between">
-                  <span className="text-[9px] font-black text-white/80 truncate flex-1 mr-2">
+                <div key={officeData.office} className="space-y-0.5">
+                  <div className="text-[9px] font-black text-white/80 truncate">
                     {displayName}
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-bold text-emerald-300">
-                      {officeData.total > 0 ? `${officeData.avgCompletion}%` : '—'}
-                    </span>
-                    <span className="text-[9px] font-bold text-white/60">
-                      {officeData.total}
-                    </span>
+                  </div>
+                  <div className="text-[8px] font-bold text-white/50 truncate">
+                    {language === 'en' ? 'ID' : 'आईडी'}: {shortId}
+                  </div>
+                  <div className="text-[8px] font-bold text-white/40 truncate">
+                    {adminEmail}
                   </div>
                 </div>
               );
             })}
-            {reportingOffices.length > 5 && (
+            {reportingOffices.length > 3 && (
               <div className="text-[9px] font-bold text-white/50">
-                +{reportingOffices.length - 5} {language === 'en' ? 'more' : 'थप'}
+                +{fmt(reportingOffices.length - 3)} {language === 'en' ? 'more' : 'थप'}
               </div>
             )}
           </div>
@@ -1507,46 +1513,46 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     return (
                       <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5">
                          <div className="flex items-center justify-between mb-1">
-                           <span className="text-[10px] font-black text-white uppercase tracking-wider truncate flex-1 mr-2">
-                             {displayName}
+                            <span className="text-[10px] font-black text-white uppercase tracking-wider truncate flex-1 mr-2">
+                              {displayName}
+                            </span>
+                           <div className="flex items-center gap-2">
+                             <span className="text-[10px] font-black text-emerald-300">
+                               {officeData.total > 0 ? `${fmt(officeData.avgCompletion)}%` : '—'}
+                             </span>
+                             <span className="text-[9px] font-bold text-white/50">
+                               {fmt(officeData.total)} {language === 'en' ? 'indicators' : 'सूचक'}
+                             </span>
+                           </div>
+                         </div>
+                         <div className="flex items-center gap-2 mb-1.5">
+                           <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                             <div
+                               className="h-full bg-emerald-400 rounded-full"
+                               style={{ width: `${Math.min(100, officeData.avgCompletion)}%` }}
+                             />
+                           </div>
+                           <span className="text-[9px] font-bold text-white/70 w-8 text-right">
+                             {fmt(officeData.avgCompletion)}%
                            </span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-black text-emerald-300">
-                              {officeData.total > 0 ? `${officeData.avgCompletion}%` : '—'}
-                            </span>
-                            <span className="text-[9px] font-bold text-white/50">
-                              {officeData.total} {language === 'en' ? 'indicators' : 'सूचक'}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-emerald-400 rounded-full"
-                              style={{ width: `${Math.min(100, officeData.avgCompletion)}%` }}
-                            />
-                          </div>
-                          <span className="text-[9px] font-bold text-white/70 w-8 text-right">
-                            {officeData.avgCompletion}%
-                          </span>
-                        </div>
-                        {officeData.total > 0 && (
-                          <div className="flex items-center gap-2 mb-1">
-                            {officeData.onTrack > 0 && (
-                              <span className="text-[8px] font-bold text-emerald-400">
-                                ✓{officeData.onTrack}
-                              </span>
+                         </div>
+                         {officeData.total > 0 && (
+                           <div className="flex items-center gap-2 mb-1">
+                             {officeData.onTrack > 0 && (
+                               <span className="text-[8px] font-bold text-emerald-400">
+                                 ✓{fmt(officeData.onTrack)}
+                               </span>
+                             )}
+                             {officeData.attention > 0 && (
+                               <span className="text-[8px] font-bold text-amber-400">
+                                 ⚠{fmt(officeData.attention)}
+                               </span>
                             )}
-                            {officeData.attention > 0 && (
-                              <span className="text-[8px] font-bold text-amber-400">
-                                ⚠{officeData.attention}
-                              </span>
-                            )}
-                            {officeData.stale > 0 && (
-                              <span className="text-[8px] font-bold text-rose-400">
-                                ✗{officeData.stale}
-                              </span>
-                            )}
+                             {officeData.stale > 0 && (
+                               <span className="text-[8px] font-bold text-rose-400">
+                                 ✗{fmt(officeData.stale)}
+                               </span>
+                             )}
                           </div>
                         )}
                         <div className="space-y-0.5">
@@ -1682,29 +1688,29 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                                  </p>
                                </div>
                              </div>
-                             <div className="flex items-end justify-between mb-2">
-                               <div>
-                                 <span className="text-2xl font-black text-white leading-none">{progress}</span>
-                                  <span className="text-[10px] font-bold text-white/60 ml-1">/ {target} {translateUnit(budgetInd.unit)}</span>
-                               </div>
-                               <span className="text-xs font-black text-white">{pct}%</span>
-                             </div>
-                             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                               <motion.div
-                                 initial={{ width: 0 }}
-                                 animate={{ width: `${pct}%` }}
-                                 transition={{ duration: 0.8, ease: 'easeOut' }}
-                                 className="h-full bg-white rounded-full"
-                               />
-                             </div>
-                              <div className="flex items-center justify-between mt-2 min-w-0">
-                                <span className="text-[9px] font-bold text-white/60 truncate">
-                                   {language === 'en' ? 'Remaining' : 'बाँकी'}: {remaining} {translateUnit(budgetInd.unit)}
-                                </span>
-                                <span className="text-[9px] font-bold text-white/60 truncate">
-                                  {language === 'en' ? 'Weight' : 'भार'}: {budgetInd.weight}%
-                                </span>
+                              <div className="flex items-end justify-between mb-2">
+                                <div>
+                                  <span className="text-2xl font-black text-white leading-none">{fmt(progress)}</span>
+                                   <span className="text-[10px] font-bold text-white/60 ml-1">/ {fmt(target)} {translateUnit(budgetInd.unit)}</span>
+                                </div>
+                                <span className="text-xs font-black text-white">{fmt(pct)}%</span>
                               </div>
+                              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${pct}%` }}
+                                  transition={{ duration: 0.8, ease: 'easeOut' }}
+                                  className="h-full bg-white rounded-full"
+                                />
+                              </div>
+                               <div className="flex items-center justify-between mt-2 min-w-0">
+                                 <span className="text-[9px] font-bold text-white/60 truncate">
+                                    {language === 'en' ? 'Remaining' : 'बाँकी'}: {fmt(remaining)} {translateUnit(budgetInd.unit)}
+                                 </span>
+                                 <span className="text-[9px] font-bold text-white/60 truncate">
+                                   {language === 'en' ? 'Weight' : 'भार'}: {fmt(budgetInd.weight)}%
+                                 </span>
+                               </div>
                            </div>
                          );
                        })()}
@@ -1730,32 +1736,32 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                                  </p>
                                </div>
                              </div>
-                             <div className="flex items-end justify-between mb-2">
-                               <div>
-                                 <span className="text-2xl font-black text-white leading-none">{progress}</span>
-                                  <span className="text-[10px] font-bold text-white/60 ml-1">/ {target} {translateUnit(capexInd.unit)}</span>
-                               </div>
-                               <span className="text-xs font-black text-white">{pct}%</span>
-                             </div>
-                             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                               <motion.div
-                                 initial={{ width: 0 }}
-                                 animate={{ width: `${pct}%` }}
-                                 transition={{ duration: 0.8, ease: 'easeOut' }}
-                                 className="h-full bg-white rounded-full"
-                               />
-                             </div>
-                              <div className="flex items-center justify-between mt-2 min-w-0">
-                                <span className="text-[9px] font-bold text-white/60 truncate">
-                                  {language === 'en' ? 'Baseline' : 'आधारभूत'}: {baseline}%
-                                </span>
-                               <span className={`text-[9px] font-bold flex items-center gap-0.5 ${
-                                 progress >= baseline
-                                   ? 'text-emerald-400'
-                                   : 'text-rose-400'
-                               }`}>
-                                 {progress >= baseline ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
-                                 {baselinePct}% {language === 'en' ? 'of baseline' : 'आधारभूत'}
+                              <div className="flex items-end justify-between mb-2">
+                                <div>
+                                  <span className="text-2xl font-black text-white leading-none">{fmt(progress)}</span>
+                                   <span className="text-[10px] font-bold text-white/60 ml-1">/ {fmt(target)} {translateUnit(capexInd.unit)}</span>
+                                </div>
+                                <span className="text-xs font-black text-white">{fmt(pct)}%</span>
+                              </div>
+                              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${pct}%` }}
+                                  transition={{ duration: 0.8, ease: 'easeOut' }}
+                                  className="h-full bg-white rounded-full"
+                                />
+                              </div>
+                               <div className="flex items-center justify-between mt-2 min-w-0">
+                                 <span className="text-[9px] font-bold text-white/60 truncate">
+                                   {language === 'en' ? 'Baseline' : 'आधारभूत'}: {fmt(baseline)}%
+                                 </span>
+                                <span className={`text-[9px] font-bold flex items-center gap-0.5 ${
+                                  progress >= baseline
+                                    ? 'text-emerald-400'
+                                    : 'text-rose-400'
+                                }`}>
+                                  {progress >= baseline ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
+                                  {fmt(baselinePct)}% {language === 'en' ? 'of baseline' : 'आधारभूत'}
                                </span>
                              </div>
                            </div>
