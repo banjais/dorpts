@@ -1470,37 +1470,31 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               {language === 'en' ? `${reportingOffices.length} offices reporting` : `${reportingOffices.length} कार्यालयहरूबाट रिपोर्टिङ`}
             </div>
 
-          {/* Mini office list - always visible */}
-          <div className="space-y-2.5">
-            {reportingOffices.slice(0, 3).map((officeData) => {
-              const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
-              const emails = Array.from(officeData.emails);
-              const adminEmail = emails[0] || '';
-              return (
-                <div key={officeData.office} className="space-y-0.5">
-                  <div className="text-[9px] font-black text-white/80 truncate">
-                    {displayName}
-                  </div>
-                  <div className="text-[8px] font-bold text-white/50 truncate">
-                    {fmt(officeData.total)} {language === 'en' ? 'indicators' : 'सूचक'}
-                  </div>
-                  {adminEmail && (
-                    <div className="text-[8px] font-bold text-white/40 truncate">
-                      {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
-                    </div>
-                  )}
-                  <div className="text-[8px] font-black text-emerald-300">
-                    {fmt(officeData.avgCompletion)}%
-                  </div>
-                </div>
-              );
-            })}
-            {reportingOffices.length > 3 && (
-              <div className="text-[9px] font-bold text-white/50">
-                +{fmt(reportingOffices.length - 3)} {language === 'en' ? 'more' : 'थप'}
-              </div>
-            )}
-          </div>
+           {/* Mini office list - always visible */}
+           <div className="space-y-2.5">
+             {reportingOffices.slice(0, 3).map((officeData) => {
+               const displayName = language === 'en' ? translateOffice(officeData.office) : officeData.office;
+               const emails = Array.from(officeData.emails);
+               const adminEmail = emails[0] || '';
+               return (
+                 <div key={officeData.office} className="space-y-0.5">
+                   <div className="text-[9px] font-black text-white/80 truncate">
+                     {displayName}
+                   </div>
+                   {adminEmail && (
+                     <div className="text-[8px] font-bold text-white/40 truncate">
+                       {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
+                     </div>
+                   )}
+                 </div>
+               );
+             })}
+             {reportingOffices.length > 3 && (
+               <div className="text-[9px] font-bold text-white/50">
+                 +{fmt(reportingOffices.length - 3)} {language === 'en' ? 'more' : 'थप'}
+               </div>
+             )}
+           </div>
 
           <AnimatePresence>
             {showReportingOffices && (
@@ -1525,9 +1519,6 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                              {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
                            </div>
                          )}
-                         <div className="text-[8px] font-black text-emerald-300">
-                           {fmt(officeData.avgCompletion)}%
-                         </div>
                        </div>
                      );
                    })}
