@@ -872,78 +872,75 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
       {/* Summary Stats - Bold 3D Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        {/* Card 1: Overall Progress */}
+        {/* Card 1: Hero Overall Progress */}
         <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => setShowOverallProgress(!showOverallProgress)}
-          className="group relative cursor-pointer bg-gradient-to-br from-sky-300 via-blue-300 to-indigo-300 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-sky-500/25 border border-white/20 hover:shadow-2xl hover:shadow-sky-500/40 active:shadow-2xl active:shadow-sky-500/40 transition-all duration-200 overflow-hidden"
+          className="group relative col-span-full sm:col-span-2 lg:col-span-4 cursor-pointer bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-[28px] p-6 sm:p-8 text-left shadow-2xl shadow-emerald-500/25 border border-white/20 hover:shadow-emerald-500/40 active:shadow-emerald-500/40 transition-all duration-300 overflow-hidden"
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
-                {language === 'en' ? 'Overall Progress' : 'समग्र प्रगति'}
-              </span>
-              <div className="flex items-center gap-1">
-                <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
-                  <Target size={14} className="text-white/90" />
+          <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/5 rounded-full -ml-10 -mb-10 blur-3xl" />
+          
+          <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="flex-1 text-center sm:text-left">
+              <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
+                <span className="p-2 bg-white/20 rounded-xl">
+                  <Target size={28} className="text-white" />
                 </span>
-                <motion.div animate={{ rotate: showOverallProgress ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
-                  <ChevronRight size={18} />
-                </motion.div>
-              </div>
-            </div>
-            <div className="text-[10px] sm:text-[11px] font-bold text-white/70 mb-3">
-              {language === 'en'
-                ? 'Strategic Weighted Average — average completion across all indicators'
-                : 'रणनीतिक भारित औसत — सबै सूचकहरूको औसत पूरा हुने प्रगति'}
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="text-2xl sm:text-3xl font-black text-white mb-1 leading-none">
-                  {fmt(stats.weightedRate)}%
-                </div>
-                <div className="text-[9px] font-bold text-white/60">
-                  {language === 'en' ? 'Completion' : 'पूरा'}
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">
+                    {language === 'en' ? 'Overall Progress' : 'समग्र प्रगति'}
+                  </h3>
+                  <p className="text-[10px] sm:text-xs font-bold text-white/80">
+                    {language === 'en' ? 'Department of Roads' : 'सडक विभाग'}
+                  </p>
                 </div>
               </div>
               
-              {/* Circular Progress */}
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                  <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="10" />
-                  <circle 
-                    cx="60" cy="60" r="54" 
-                    fill="none" 
-                    stroke="white" 
-                    strokeWidth="10" 
-                    strokeLinecap="round"
-                    strokeDasharray={`${2 * Math.PI * 54 * stats.weightedRate / 100} ${2 * Math.PI * 54 * (100 - stats.weightedRate) / 100}`}
-                    className="transition-all duration-1000 ease-out"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs sm:text-sm font-black text-white">{fmt(stats.weightedRate)}%</span>
+              <div className="flex items-center justify-center sm:justify-start gap-6 mt-4">
+                <div className="text-center">
+                  <div className="text-2xl sm:text-3xl font-black text-white">{fmt(stats.total)}</div>
+                  <div className="text-[9px] font-bold text-white/70 uppercase tracking-wider">
+                    {language === 'en' ? 'Indicators' : 'सूचकहरू'}
+                  </div>
+                </div>
+                <div className="w-px h-10 bg-white/20" />
+                <div className="text-center">
+                  <div className="text-2xl sm:text-3xl font-black text-white">{fmt(reportingOffices.length)}</div>
+                  <div className="text-[9px] font-bold text-white/70 uppercase tracking-wider">
+                    {language === 'en' ? 'Offices' : 'कार्यालय'}
+                  </div>
                 </div>
               </div>
             </div>
             
-            {/* Mini trend bar */}
-            <div className="flex items-end gap-1 h-10 mt-3">
-              {[45, 52, 48, 61, 55, stats.weightedRate].map((val, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ height: 0 }}
-                  animate={{ height: `${Math.max(val, 10)}%` }}
-                  transition={{ duration: 0.6, delay: i * 0.05 }}
-                  className="flex-1 bg-white/80 rounded-t-md"
+            <div className="relative w-36 h-36 sm:w-44 sm:h-44 flex-shrink-0">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="12" />
+                <motion.circle 
+                  cx="60" cy="60" r="54" 
+                  fill="none" 
+                  stroke="white" 
+                  strokeWidth="12" 
+                  strokeLinecap="round"
+                  initial={{ strokeDasharray: `0 ${2 * Math.PI * 54}` }}
+                  animate={{ strokeDasharray: `${2 * Math.PI * 54 * stats.weightedRate / 100} ${2 * Math.PI * 54 * (100 - stats.weightedRate) / 100}` }}
+                  transition={{ duration: 1.5, ease: 'easeOut' }}
                 />
-              ))}
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-3xl sm:text-4xl font-black text-white">{fmt(stats.weightedRate)}%</div>
+                  <div className="text-[8px] font-bold text-white/70 uppercase tracking-wider">
+                    {language === 'en' ? 'Overall' : 'समग्र'}
+                  </div>
+                </div>
+              </div>
             </div>
-
+            
             <AnimatePresence>
               {showOverallProgress && (
                 <motion.div
@@ -984,47 +981,47 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       </div>
                     </div>
                   </div>
-                     <div className="mt-3 pt-3 border-t border-white/10">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowOverallLogicInline(!showOverallLogicInline);
-                          }}
-                         className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                       >
-                         <Info size={12} />
-                         {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
-                       </button>
-                       <AnimatePresence>
-                         {showOverallLogicInline && (
-                           <motion.div
-                             initial={{ opacity: 0, height: 0 }}
-                             animate={{ opacity: 1, height: 'auto' }}
-                             exit={{ opacity: 0, height: 0 }}
-                             className="overflow-hidden mt-3 space-y-2"
-                           >
-                             <div className="bg-white/10 rounded-xl p-3 space-y-2">
-                               <p className="text-[10px] font-black uppercase tracking-wider text-emerald-200">
-                                 {language === 'en' ? 'Overall Progress' : 'समग्र प्रगति'}
-                               </p>
-                               <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
-                                 {language === 'en'
-                                   ? 'Strategic weighted average across all indicators.'
-                                   : 'सबै सूचकहरूमा रणनीतिक भारित औसत।'}
-                               </p>
-                               <p className="text-[10px] font-black uppercase tracking-wider text-amber-200">
-                                 {language === 'en' ? 'Calculation' : 'गणना'}
-                               </p>
-                               <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
-                                 {language === 'en'
-                                   ? 'Formula: Sum of (achievement% × weight/100) for each indicator, divided by total weight.'
-                                   : 'सूत्र: प्रत्येक सूचकको लागि (उपलब्धि% × भार/100) को योग, कुल भार ले विभाजित।'}
-                               </p>
-                             </div>
-                           </motion.div>
-                         )}
-                       </AnimatePresence>
-                     </div>
+                   <div className="mt-3 pt-3 border-t border-white/10">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowOverallLogicInline(!showOverallLogicInline);
+                        }}
+                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+                      >
+                        <Info size={12} />
+                        {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
+                      </button>
+                      <AnimatePresence>
+                        {showOverallLogicInline && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="overflow-hidden mt-3 space-y-2"
+                          >
+                            <div className="bg-white/10 rounded-xl p-3 space-y-2">
+                              <p className="text-[10px] font-black uppercase tracking-wider text-emerald-200">
+                                {language === 'en' ? 'Overall Progress' : 'समग्र प्रगति'}
+                              </p>
+                              <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
+                                {language === 'en'
+                                  ? 'Strategic weighted average across all indicators.'
+                                  : 'सबै सूचकहरूमा रणनीतिक भारित औसत।'}
+                              </p>
+                              <p className="text-[10px] font-black uppercase tracking-wider text-amber-200">
+                                {language === 'en' ? 'Calculation' : 'गणना'}
+                              </p>
+                              <p className="text-[10px] font-semibold text-white/70 leading-relaxed">
+                                {language === 'en'
+                                  ? 'Formula: Sum of (achievement% × weight/100) for each indicator, divided by total weight.'
+                                  : 'सूत्र: प्रत्येक सूचकको लागि (उपलब्धि% × भार/100) को योग, कुल भार ले विभाजित।'}
+                              </p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                 </motion.div>
               )}
             </AnimatePresence>
