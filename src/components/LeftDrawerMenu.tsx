@@ -173,7 +173,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
                     </span>
                   </span>
                   {item.soon && (
-                    <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300">
                       {language === 'en' ? 'Soon' : 'चाँडो'}
                     </span>
                   )}
@@ -189,7 +189,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-bold text-slate-900 dark:text-white truncate">{user.displayName || user.email}</p>
-                    <p className="text-[9px] text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
                   </div>
                   <button
                     onClick={() => { logout(); onClose(); }}

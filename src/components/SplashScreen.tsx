@@ -165,7 +165,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ progress }) => {
           <p className="text-[10px] font-bold text-white/60 uppercase tracking-wider">
             {language === 'en' ? 'Department of Roads' : 'सडक विभाग'}
           </p>
-          <p className="text-[9px] font-semibold text-white/40 uppercase tracking-widest">
+          <p className="text-[10px] font-semibold text-white/60 uppercase tracking-widest">
             {language === 'en' ? 'Performance Management System' : 'कार्यसम्पादन व्यवस्थापन प्रणाली'}
           </p>
         </motion.div>

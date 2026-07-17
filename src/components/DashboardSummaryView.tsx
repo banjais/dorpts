@@ -190,7 +190,7 @@ const ExpandedDetails: React.FC<{
             <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-100 dark:border-white/5">
               <button
                 onClick={() => setViewMode('annual')}
-                className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase transition-all ${
+                className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase transition-all ${
                   viewMode === 'annual' ? 'bg-white dark:bg-slate-700 text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
@@ -198,7 +198,7 @@ const ExpandedDetails: React.FC<{
               </button>
               <button
                 onClick={() => setViewMode('total')}
-                className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase transition-all ${
+                className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase transition-all ${
                   viewMode === 'total' ? 'bg-white dark:bg-slate-700 text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
@@ -245,10 +245,10 @@ const ExpandedDetails: React.FC<{
               />
             </div>
             <div className="flex justify-between mt-1">
-              <span className="text-[9px] font-bold text-slate-400">
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300">
                 {language === 'en' ? 'Target' : 'लक्ष्य'}: {fmt(target != null ? target.toLocaleString() : '—')}
               </span>
-              <span className="text-[9px] font-bold text-slate-400">
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300">
                 {language === 'en' ? 'Progress' : 'प्रगति'}: {fmt(progress != null ? progress.toLocaleString() : '—')}
               </span>
             </div>
@@ -256,7 +256,7 @@ const ExpandedDetails: React.FC<{
 
           <div className="grid grid-cols-2 gap-2">
             <div className="bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-white/5">
-              <div className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-0.5">
+              <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-0.5">
                 {language === 'en' ? 'Baseline' : 'आधारभूत'}
               </div>
               <div className="text-xs font-black text-slate-700 dark:text-slate-200 truncate">
@@ -266,7 +266,7 @@ const ExpandedDetails: React.FC<{
               </div>
             </div>
             <div className="bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-white/5">
-              <div className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-0.5">
+              <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-0.5">
                 {language === 'en' ? 'Unit' : 'एकाई'}
               </div>
               <div className="text-xs font-black text-slate-700 dark:text-slate-200 truncate">
@@ -276,18 +276,18 @@ const ExpandedDetails: React.FC<{
           </div>
 
           <div className="bg-indigo-50/50 dark:bg-indigo-950/20 p-2.5 rounded-xl border border-indigo-100 dark:border-indigo-900/30">
-            <div className="text-[8px] font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400 mb-1">
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">
               {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
             </div>
             <div className="text-[10px] font-bold text-slate-600 dark:text-slate-300 leading-relaxed">
               {language === 'en' ? 'Weighted' : 'भारित'}: {weight} × {pct}% = <span className="text-indigo-600 dark:text-indigo-400">{weightedContribution}</span>
             </div>
-            <div className="text-[8px] text-slate-400 mt-0.5">
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
               {language === 'en' ? 'Formula' : 'सूत्र'}: (Progress% × Weight) / 100
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-[9px] text-slate-400">
+          <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-300">
             <Calendar size={10} />
             <span className="font-semibold">
               {language === 'en' ? 'Updated' : 'अद्यावधिक'}:{' '}
@@ -303,7 +303,7 @@ const ExpandedDetails: React.FC<{
                   onViewHistory(indicator);
                   triggerHaptic('light');
                 }}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 transition-all text-[10px] font-bold"
+                className="flex items-center gap-1 px-3 py-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 transition-all text-[10px] font-bold min-w-[44px] justify-center"
               >
                 <MoreHorizontal size={10} />
                 {language === 'en' ? 'More' : 'थप'}
@@ -316,7 +316,7 @@ const ExpandedDetails: React.FC<{
                   onOpenComments(indicator);
                   triggerHaptic('light');
                 }}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 transition-all text-[10px] font-bold"
+                className="flex items-center gap-1 px-3 py-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 transition-all text-[10px] font-bold min-w-[44px] justify-center"
               >
                 <MessageSquare size={10} />
                 {language === 'en' ? 'Comments' : 'टिप्पणी'}
@@ -329,7 +329,7 @@ const ExpandedDetails: React.FC<{
                   onClick();
                   triggerHaptic('light');
                 }}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-all text-[10px] font-bold"
+                className="flex items-center gap-1 px-3 py-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-all text-[10px] font-bold min-w-[44px] justify-center"
               >
                 <Edit3 size={10} />
                 {language === 'en' ? 'Edit' : 'सम्पादन'}
@@ -410,7 +410,7 @@ const SummaryCard: React.FC<{
                 className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
                 style={{ backgroundColor: catColor.hex }}
               />
-              <span className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
+              <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-600 dark:text-slate-300">
                 {normalizeCategory(indicator.category).split(' ')[0]}
               </span>
               {isTrendUp && (
@@ -420,10 +420,10 @@ const SummaryCard: React.FC<{
                 <TrendingDown size={12} className="text-rose-500 shrink-0" />
               )}
               {!isTrendUp && !isTrendDown && sparklineData.length >= 2 && (
-                <span className="text-[8px] font-black text-slate-400 shrink-0">—</span>
+                <span className="text-[10px] font-black text-slate-400 shrink-0">—</span>
               )}
             </div>
-            <span className={`text-[9px] font-black px-2 py-1 rounded-full ${status.className}`}>
+            <span className={`text-[10px] font-black px-2 py-1 rounded-full ${status.className}`}>
               {status.label}
             </span>
           </div>
@@ -440,10 +440,10 @@ const SummaryCard: React.FC<{
                 {nepaliPercent}%
               </div>
               <div className="flex items-center gap-2 mt-1.5 min-w-0">
-                 <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
                    {language === 'en' ? 'Weight' : 'भार'}: {fmt(weight)}%
                  </span>
-                 <span className="text-[9px] font-bold text-slate-400 truncate">
+                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate">
                    {fmt(indicator.annualProgress?.toLocaleString() ?? 0)} / {fmt(indicator.annualTarget?.toLocaleString() ?? 0)}
                  </span>
               </div>
@@ -474,7 +474,7 @@ const SummaryCard: React.FC<{
               </div>
               {/* Footer row with update log - only visible when expanded */}
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 dark:border-white/5">
-                <div className="flex items-center gap-1 text-[9px] text-slate-400 font-semibold">
+                <div className="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
                   <Calendar size={10} />
                   <span>
                     {indicator.updatedAt
@@ -485,7 +485,7 @@ const SummaryCard: React.FC<{
                 <motion.div
                   animate={{ rotate: isExpanded ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
-                  className="p-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400"
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
                 >
                   <ChevronDown size={12} />
                 </motion.div>
@@ -536,7 +536,7 @@ const ExpandedDetailsSmall: React.FC<{
       {/* Target vs Progress */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
             {language === 'en' ? 'Target vs Progress' : 'लक्ष्य र प्रगति'}
           </span>
           <span className={`text-xs font-black ${pct >= 60 ? 'text-emerald-600' : pct >= 40 ? 'text-amber-600' : 'text-rose-600'}`}>
@@ -553,10 +553,10 @@ const ExpandedDetailsSmall: React.FC<{
           />
         </div>
         <div className="flex justify-between mt-1">
-          <span className="text-[9px] font-bold text-slate-400">
+          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300">
             {language === 'en' ? 'Target' : 'लक्ष्य'}: {fmt(target.toLocaleString())}
           </span>
-          <span className="text-[9px] font-bold text-slate-400">
+          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300">
             {language === 'en' ? 'Progress' : 'प्रगति'}: {fmt(progress.toLocaleString())}
           </span>
         </div>
@@ -915,14 +915,14 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               <div className="flex items-center justify-center sm:justify-start gap-6 mt-4">
                 <div className="text-center">
                   <div className="text-2xl sm:text-3xl font-black text-white">{fmt(stats.total)}</div>
-                  <div className="text-[9px] font-bold text-white/70 uppercase tracking-wider">
+                  <div className="text-[10px] font-bold text-white/80 uppercase tracking-wider">
                     {language === 'en' ? 'Indicators' : 'सूचकहरू'}
                   </div>
                 </div>
                 <div className="w-px h-10 bg-white/20" />
                 <div className="text-center">
                   <div className="text-2xl sm:text-3xl font-black text-white">{fmt(reportingOffices.length)}</div>
-                  <div className="text-[9px] font-bold text-white/70 uppercase tracking-wider">
+                  <div className="text-[10px] font-bold text-white/80 uppercase tracking-wider">
                     {language === 'en' ? 'Offices' : 'कार्यालय'}
                   </div>
                 </div>
@@ -946,7 +946,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
                   <div className="text-3xl sm:text-4xl font-black text-white">{fmt(stats.weightedRate)}%</div>
-                  <div className="text-[8px] font-bold text-white/70 uppercase tracking-wider">
+                  <div className="text-[10px] font-bold text-white/60 uppercase tracking-wider">
                     {language === 'en' ? 'Overall' : 'समग्र'}
                   </div>
                 </div>
@@ -1071,19 +1071,19 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             <div className="flex items-end gap-3 mb-3">
                <div>
                  <div className="text-2xl sm:text-3xl font-black text-emerald-200 leading-none">{fmt(stats.meetingTarget)}</div>
-                 <div className="text-[8px] sm:text-[9px] font-bold text-emerald-200/80 uppercase tracking-wider mt-0.5">
+                 <div className="text-[10px] font-bold text-emerald-200 uppercase tracking-wider mt-0.5">
                    {language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा'}
                  </div>
                </div>
                <div>
                  <div className="text-2xl sm:text-3xl font-black text-amber-200 leading-none">{fmt(stats.belowTarget)}</div>
-                 <div className="text-[8px] sm:text-[9px] font-bold text-amber-200/80 uppercase tracking-wider mt-0.5">
+                 <div className="text-[10px] font-bold text-amber-200 uppercase tracking-wider mt-0.5">
                    {language === 'en' ? 'Below Target' : 'लक्ष्यमुनि'}
                  </div>
                </div>
                <div>
                  <div className="text-2xl sm:text-3xl font-black text-rose-200 leading-none">{fmt(stats.needsCritical)}</div>
-                 <div className="text-[8px] sm:text-[9px] font-bold text-rose-200/80 uppercase tracking-wider mt-0.5">
+                 <div className="text-[10px] font-bold text-rose-200 uppercase tracking-wider mt-0.5">
                    {language === 'en' ? 'Needs Attention' : 'ध्यान'}
                  </div>
                </div>
@@ -1120,7 +1120,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     {/* Achievement distribution bars */}
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black text-emerald-200 w-24">
+                        <span className="text-[10px] font-black text-emerald-200 w-24">
                           {language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा'}
                         </span>
                         <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
@@ -1131,14 +1131,14 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                             className="h-full bg-emerald-300 rounded-full"
                           />
                         </div>
-                        <span className="text-[9px] font-black text-white w-6 text-right">{fmt(stats.meetingTarget)}</span>
+                        <span className="text-[10px] font-black text-white w-6 text-right">{fmt(stats.meetingTarget)}</span>
                       </div>
-                      <p className="text-[9px] text-emerald-200/90 pl-24 -mt-1 mb-1">
+                      <p className="text-[10px] font-bold text-emerald-200/90 uppercase tracking-wider pl-24 -mt-1 mb-1">
                         {language === 'en' ? 'Achievement rate is 80% or higher' : 'उपलब्धि दर ८०% वा बढी छ'}
                       </p>
 
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black text-amber-200 w-24">
+                        <span className="text-[10px] font-black text-amber-200 w-24">
                           {language === 'en' ? 'Below Target' : 'लक्ष्यमुनि'}
                         </span>
                         <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
@@ -1149,14 +1149,14 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                             className="h-full bg-amber-300 rounded-full"
                           />
                         </div>
-                        <span className="text-[9px] font-black text-white w-6 text-right">{fmt(stats.belowTarget)}</span>
+                        <span className="text-[10px] font-black text-white w-6 text-right">{fmt(stats.belowTarget)}</span>
                       </div>
-                      <p className="text-[9px] text-amber-200/90 pl-24 -mt-1 mb-1">
+                      <p className="text-[10px] text-amber-200 pl-24 -mt-1 mb-1">
                         {language === 'en' ? 'Achievement rate is between 40% and 80%' : 'उपलब्धि दर ४०% र ८०% बीच छ'}
                       </p>
 
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black text-rose-200 w-24">
+                        <span className="text-[10px] font-black text-rose-200 w-24">
                           {language === 'en' ? 'Needs Attention' : 'ध्यान'}
                         </span>
                         <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
@@ -1167,9 +1167,9 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                             className="h-full bg-rose-300 rounded-full"
                           />
                         </div>
-                        <span className="text-[9px] font-black text-white w-6 text-right">{fmt(stats.needsCritical)}</span>
+                        <span className="text-[10px] font-black text-white w-6 text-right">{fmt(stats.needsCritical)}</span>
                       </div>
-                      <p className="text-[9px] text-rose-200/90 pl-24 -mt-1 mb-1">
+                      <p className="text-[10px] text-rose-200 pl-24 -mt-1 mb-1">
                         {language === 'en' ? 'Achievement rate is below 40%' : 'उपलब्धि दर ४०% भन्दा कम छ'}
                       </p>
                     </div>
@@ -1286,11 +1286,11 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                               <div className="flex-1 min-w-0">
                                  <div className="flex items-center gap-2">
                                    <span className="text-[10px] font-bold text-white/80 truncate block">{language === 'en' ? ind.nameEn : ind.name}</span>
-                                  <span className="text-[9px] font-black text-emerald-300 shrink-0">{fmt(pct)}%</span>
+                                  <span className="text-[10px] font-black text-emerald-300 shrink-0">{fmt(pct)}%</span>
                                 </div>
-                                <span className="text-[9px] font-medium text-white/50 truncate block">{categoryLabel}</span>
-                                 <span className="text-[9px] font-medium text-white/40 truncate block">{language === 'en' ? 'Weight' : 'भार'}: {fmt(ind.weight)}%</span>
-                                <span className={`text-[9px] font-black truncate block ${statusColor}`}>{statusLabel}</span>
+                                <span className="text-[10px] font-medium text-white/70 truncate block">{categoryLabel}</span>
+                                 <span className="text-[10px] font-medium text-white/60 truncate block">{language === 'en' ? 'Weight' : 'भार'}: {fmt(ind.weight)}%</span>
+                                 <span className={`text-[10px] font-black truncate block ${statusColor}`}>{statusLabel}</span>
                               </div>
                            </div>
                          );
@@ -1346,7 +1346,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 return (
                    <div key={cat} className="flex items-center gap-2">
                      <div className="w-20 sm:w-24">
-                       <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/60 truncate block">
+                       <span className="text-[10px] font-black uppercase tracking-wider text-white/70 truncate block">
                          {language === 'en' ? (CATEGORY_SHORT_LABELS[cat]?.en || cat.split(' ')[0]) : (CATEGORY_SHORT_LABELS[cat]?.np || cat.split(' ')[0])}
                        </span>
                      </div>
@@ -1358,7 +1358,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                          className="h-full rounded-full bg-emerald-400"
                        />
                      </div>
-                     <span className="text-[9px] font-black text-emerald-300 w-8 text-right">{fmt(avgCompletion)}%</span>
+                     <span className="text-[10px] font-black text-emerald-300 w-8 text-right">{fmt(avgCompletion)}%</span>
                    </div>
                 );
               })}
@@ -1396,7 +1396,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                                 <span className="text-[10px] font-black text-white uppercase tracking-wider">
                                   {label}
                                 </span>
-                                <span className="text-[9px] font-bold text-white/50">
+                                <span className="text-[10px] font-bold text-white/70">
                                   ({fmt(total)})
                                 </span>
                               </div>
@@ -1409,12 +1409,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                            </div>
                            <div className="flex items-center gap-3">
                              {onTrack > 0 && (
-                               <span className="text-[9px] sm:text-[10px] font-bold text-emerald-400">
+                               <span className="text-[10px] font-bold text-emerald-400">
                                  {fmt(Math.round((onTrack / total) * 100))}% {language === 'en' ? 'On Track' : 'अनुसरण'}
                                </span>
                              )}
                               {needsAttention > 0 && (
-                                 <span className="text-[9px] sm:text-[10px] font-bold text-amber-400">
+                                 <span className="text-[10px] font-bold text-amber-400">
                                    {fmt(Math.round((needsAttention / total) * 100))}% {language === 'en' ? 'Attention' : 'ध्यान'}
                                  </span>
                               )}
@@ -1514,11 +1514,11 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                const adminEmail = emails[0] || '';
                return (
                  <div key={officeData.office} className="space-y-0.5">
-                   <div className="text-[9px] font-black text-white/80 truncate">
+                   <div className="text-[10px] font-black text-white/80 truncate">
                      {displayName}
                    </div>
                    {adminEmail && (
-                     <div className="text-[8px] font-bold text-white/40 truncate">
+                     <div className="text-[10px] font-bold text-white/60 truncate">
                        {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
                      </div>
                    )}
@@ -1526,7 +1526,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                );
              })}
              {reportingOffices.length > 3 && (
-               <div className="text-[9px] font-bold text-white/50">
+               <div className="text-[10px] font-bold text-white/70">
                  +{fmt(reportingOffices.length - 3)} {language === 'en' ? 'more' : 'थप'}
                </div>
              )}
@@ -1547,11 +1547,11 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                      const adminEmail = emails[0] || '';
                      return (
                        <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5 space-y-0.5">
-                         <div className="text-[9px] font-black text-white/80 truncate">
+                         <div className="text-[10px] font-black text-white/80 truncate">
                            {displayName}
                          </div>
                          {adminEmail && (
-                           <div className="text-[8px] font-bold text-white/40 truncate">
+                           <div className="text-[10px] font-bold text-white/60 truncate">
                              {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
                            </div>
                          )}
@@ -1635,7 +1635,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                                  <h4 className="text-[11px] font-black text-white uppercase tracking-tight">
                                    {language === 'en' ? budgetInd.nameEn : budgetInd.name}
                                  </h4>
-                                 <p className="text-[9px] text-white/60">
+                                 <p className="text-[10px] text-white/70">
                                    {language === 'en' ? 'Total Budget Allocated' : 'कुल बजेट वितरण'}
                                  </p>
                                </div>
@@ -1656,10 +1656,10 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                                 />
                               </div>
                                <div className="flex items-center justify-between mt-2 min-w-0">
-                                 <span className="text-[9px] font-bold text-white/60 truncate">
+                                 <span className="text-[10px] font-bold text-white/60 truncate">
                                     {language === 'en' ? 'Remaining' : 'बाँकी'}: {fmt(remaining)} {translateUnit(budgetInd.unit)}
                                  </span>
-                                 <span className="text-[9px] font-bold text-white/60 truncate">
+                                 <span className="text-[10px] font-bold text-white/60 truncate">
                                    {language === 'en' ? 'Weight' : 'भार'}: {fmt(budgetInd.weight)}%
                                  </span>
                                </div>
@@ -1683,7 +1683,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                                  <h4 className="text-[11px] font-black text-white uppercase tracking-tight">
                                    {language === 'en' ? capexInd.nameEn : capexInd.name}
                                  </h4>
-                                 <p className="text-[9px] text-white/60">
+                                 <p className="text-[10px] text-white/70">
                                    {language === 'en' ? 'Capital Expenditure' : 'पुँजीगत खर्च'}
                                  </p>
                                </div>
@@ -1704,10 +1704,10 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                                 />
                               </div>
                                <div className="flex items-center justify-between mt-2 min-w-0">
-                                 <span className="text-[9px] font-bold text-white/60 truncate">
+                                 <span className="text-[10px] font-bold text-white/60 truncate">
                                    {language === 'en' ? 'Baseline' : 'आधारभूत'}: {fmt(baseline)}%
                                  </span>
-                                <span className={`text-[9px] font-bold flex items-center gap-0.5 ${
+                                 <span className={`text-[10px] font-bold flex items-center gap-0.5 ${
                                   progress >= baseline
                                     ? 'text-emerald-400'
                                     : 'text-rose-400'
@@ -1918,7 +1918,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
                     <div className="flex flex-col sm:flex-row gap-3">
                       <div>
-                        <span className="block text-[9px] font-black uppercase tracking-widest text-white/60 mb-1">
+                        <span className="block text-[10px] font-bold text-white/60 uppercase tracking-wider mb-1">
                           {language === 'en' ? 'Sort By' : 'क्रमबद्ध गर्नुहोस्'}
                         </span>
                         <select
@@ -1935,7 +1935,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       </div>
 
                       <div>
-                        <span className="block text-[9px] font-black uppercase tracking-widest text-white/60 mb-1">
+                        <span className="block text-[10px] font-bold text-white/60 uppercase tracking-wider mb-1">
                           {language === 'en' ? 'Category' : 'वर्ग'}
                         </span>
                         <select

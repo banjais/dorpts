@@ -389,7 +389,7 @@ const StatCard: React.FC<StatCardProps> = ({ stat, activeMetric, language, trans
               {(stat as any).distribution.map((d: any, i: number) => (
                 <div key={i} className="flex flex-col items-center">
                   <div className="w-1.5 h-1.5 rounded-full mb-1" style={{ backgroundColor: d.color }} />
-                  <span className="text-[8px] font-black text-white/30">{d.count}</span>
+                  <span className="text-[10px] font-black text-white/50">{d.count}</span>
                 </div>
               ))}
             </div>

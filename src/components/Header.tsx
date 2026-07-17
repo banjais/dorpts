@@ -456,7 +456,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <span className="text-brand-gradient">{t('dorProgress')}</span>
                 </h1>
                 {fiscalYear && (
-                  <span className="text-[8px] sm:text-[10px] font-black text-[#0099DA] dark:text-[#00ADF7] bg-[#0099DA]/10 dark:bg-[#00ADF7]/10 px-1.5 py-0.5 rounded-md shrink-0">
+                  <span className="text-[10px] sm:text-xs font-black text-[#0099DA] dark:text-[#00ADF7] bg-[#0099DA]/10 dark:bg-[#00ADF7]/10 px-2 py-1 rounded-md shrink-0">
                     FY {fiscalYear}
                   </span>
                 )}
