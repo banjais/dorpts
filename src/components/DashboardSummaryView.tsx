@@ -1482,10 +1482,10 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     {displayName}
                   </div>
                   <div className="text-[8px] font-bold text-white/50 truncate">
-                    {language === 'en' ? 'ID' : 'आईडी'}: {shortId}
+                    {shortId}
                   </div>
                   <div className="text-[8px] font-bold text-white/40 truncate">
-                    {adminEmail}
+                    {language === 'en' ? 'Admin: ' : 'प्रशासक: '}{adminEmail}
                   </div>
                 </div>
               );
