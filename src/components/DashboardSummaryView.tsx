@@ -877,7 +877,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => setShowOverallProgress(!showOverallProgress)}
-          className="group relative cursor-pointer bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-500 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-emerald-500/25 border border-white/20 hover:shadow-2xl hover:shadow-emerald-500/40 active:shadow-2xl active:shadow-emerald-500/40 transition-all duration-200 overflow-hidden"
+          className="group relative cursor-pointer bg-gradient-to-br from-sky-400 via-blue-400 to-indigo-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-sky-500/25 border border-white/20 hover:shadow-2xl hover:shadow-sky-500/40 active:shadow-2xl active:shadow-sky-500/40 transition-all duration-200 overflow-hidden"
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1009,7 +1009,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => setShowStatusDetails(!showStatusDetails)}
-          className="group relative cursor-pointer bg-gradient-to-br from-amber-600 via-orange-500 to-rose-500 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-amber-500/25 border border-white/20 hover:shadow-2xl hover:shadow-amber-500/40 active:shadow-2xl active:shadow-amber-500/40 transition-all duration-200 overflow-hidden"
+          className="group relative cursor-pointer bg-gradient-to-br from-violet-400 via-purple-400 to-fuchsia-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-violet-500/25 border border-white/20 hover:shadow-2xl hover:shadow-violet-500/40 active:shadow-2xl active:shadow-violet-500/40 transition-all duration-200 overflow-hidden"
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1198,7 +1198,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => setShowTotalIndicators(!showTotalIndicators)}
-          className="group relative cursor-pointer bg-gradient-to-br from-indigo-600 via-blue-600 to-cyan-500 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
+          className="group relative cursor-pointer bg-gradient-to-br from-indigo-400 via-blue-400 to-cyan-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1271,7 +1271,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => setShowCategoryStatus(!showCategoryStatus)}
-          className="group relative cursor-pointer bg-gradient-to-br from-cyan-600 via-teal-600 to-emerald-500 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-cyan-500/25 border border-white/20 hover:shadow-2xl hover:shadow-cyan-500/40 active:shadow-2xl active:shadow-cyan-500/40 transition-all duration-200 overflow-hidden"
+          className="group relative cursor-pointer bg-gradient-to-br from-teal-400 via-emerald-400 to-green-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-teal-500/25 border border-white/20 hover:shadow-2xl hover:shadow-teal-500/40 active:shadow-2xl active:shadow-teal-500/40 transition-all duration-200 overflow-hidden"
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1448,7 +1448,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.97 }}
         onClick={() => setShowReportingOffices(!showReportingOffices)}
-        className="group relative cursor-pointer bg-gradient-to-br from-slate-700 via-slate-600 to-slate-500 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-slate-500/25 border border-white/20 hover:shadow-2xl hover:shadow-slate-500/40 active:shadow-2xl active:shadow-slate-500/40 transition-all duration-200 overflow-hidden"
+        className="group relative cursor-pointer bg-gradient-to-br from-slate-400 via-gray-400 to-zinc-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-slate-500/25 border border-white/20 hover:shadow-2xl hover:shadow-slate-500/40 active:shadow-2xl active:shadow-slate-500/40 transition-all duration-200 overflow-hidden"
       >
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1574,7 +1574,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.97 }}
-        className="group relative cursor-pointer bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-500 rounded-[28px] shadow-xl shadow-emerald-500/25 border border-white/20 hover:shadow-2xl hover:shadow-emerald-500/40 active:shadow-2xl active:shadow-emerald-500/40 transition-all duration-200 overflow-hidden"
+        className="group relative cursor-pointer bg-gradient-to-br from-amber-400 via-orange-400 to-rose-400 rounded-[28px] shadow-xl shadow-amber-500/25 border border-white/20 hover:shadow-2xl hover:shadow-amber-500/40 active:shadow-2xl active:shadow-amber-500/40 transition-all duration-200 overflow-hidden"
       >
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
