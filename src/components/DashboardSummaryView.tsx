@@ -870,6 +870,85 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         </div>
       </div>
 
+      {/* Hero Department Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-[28px] p-5 sm:p-8 text-left shadow-2xl shadow-emerald-500/25 border border-white/20 overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-black/10" />
+        <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-10 -mb-10 blur-3xl" />
+        
+        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="p-2 bg-white/20 rounded-xl">
+                <Building2 size={24} className="text-white" />
+              </span>
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight">
+                  {language === 'en' ? 'Department of Roads' : 'सडक विभाग'}
+                </h3>
+                <p className="text-[10px] font-bold text-white/80">
+                  {language === 'en' ? 'Ministry of Physical Infrastructure & Transport' : 'भौतिक बुनियादी ढाँचा र यातायात मन्त्रालय'}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-6 mt-4">
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl font-black text-white">{fmt(stats.total)}</div>
+                <div className="text-[9px] font-bold text-white/70 uppercase tracking-wider">
+                  {language === 'en' ? 'Indicators' : 'सूचकहरू'}
+                </div>
+              </div>
+              <div className="w-px h-10 bg-white/20" />
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl font-black text-white">{fmt(reportingOffices.length)}</div>
+                <div className="text-[9px] font-bold text-white/70 uppercase tracking-wider">
+                  {language === 'en' ? 'Offices' : 'कार्यालय'}
+                </div>
+              </div>
+              <div className="w-px h-10 bg-white/20" />
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl font-black text-emerald-100">{fmt(stats.weightedRate)}%</div>
+                <div className="text-[9px] font-bold text-white/70 uppercase tracking-wider">
+                  {language === 'en' ? 'Completion' : 'पूरा'}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex-shrink-0">
+            <div className="relative w-32 h-32 sm:w-40 sm:h-40">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="12" />
+                <circle 
+                  cx="60" cy="60" r="54" 
+                  fill="none" 
+                  stroke="white" 
+                  strokeWidth="12" 
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 54 * stats.weightedRate / 100} ${2 * Math.PI * 54 * (100 - stats.weightedRate) / 100}`}
+                  className="transition-all duration-1000 ease-out"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-3xl sm:text-4xl font-black text-white">{fmt(stats.weightedRate)}%</div>
+                  <div className="text-[8px] font-bold text-white/70 uppercase tracking-wider">
+                    {language === 'en' ? 'Overall' : 'समग्र'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Summary Stats - Bold 3D Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 1: Overall Progress */}
