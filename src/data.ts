@@ -76,6 +76,7 @@ export const OFFICE_ENGLISH_TRANSLATIONS: Record<string, string> = {
   '337014807-सिद्धबाबा सुरुङ्ग मार्ग योजना': '337014807-Siddhababa Tunnel Road Project',
   '337014808-वुटवल-गोरुसिंगे-चन्द्रौटा सडक योजना, वुटवल': '337014808-Butwal-Gorusinge-Chandrawata Road Project, Butwal',
   '337014901-सडक, शिवपुर': '337014901-Shivapur Road Office',
+  '337014901-सडक डिभिजन, शिवपुर': '337014901-Road Division, Shivapur',
   '337014902-हुलाकि राजमार्ग निर्देशनालय, योजना कार्यालय, शिवनगर, कपिलवस्तु': '337014902-Feeder Road Directorate, Project Office, Shivnagar, Kapilvastu',
   '33701702-हुलाकी राजमार्ग निर्देशनालय, योजना कार्यालय, धनगढी , कैलाली': '33701702-Feeder Road Directorate, Project Office, Dhangadhi, Kailali',
   '337015001-सडक डिभिजन, पाल्पा': '337015001-Road Division, Palpa',
@@ -117,11 +118,9 @@ export const OFFICE_ENGLISH_TRANSLATIONS: Record<string, string> = {
 };
 
 export function translateOffice(name: string, language: 'en' | 'ne'): string {
-  if (language === 'ne') {
-    const normalized = name.replace(/सडक सडक/g, 'सडक डिभिजन');
-    return normalized;
-  }
-  return OFFICE_ENGLISH_TRANSLATIONS[name] || name;
+  const normalized = name.replace(/सडक सडक/g, 'सडक डिभिजन');
+  if (language === 'ne') return normalized;
+  return OFFICE_ENGLISH_TRANSLATIONS[normalized] || OFFICE_ENGLISH_TRANSLATIONS[name] || name;
 }
 
 export function getSectorForIndicator(name: string, sdg?: string): Indicator['category'] {
