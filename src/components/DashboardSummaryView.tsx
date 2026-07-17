@@ -1880,15 +1880,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
       {/* All Indicators Overview */}
       <motion.div
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.97 }}
-        className="group relative cursor-pointer bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] shadow-xl shadow-violet-500/10 dark:shadow-violet-500/5 hover:shadow-2xl hover:shadow-violet-500/20 dark:hover:shadow-violet-500/10 active:shadow-2xl active:shadow-violet-500/20 dark:active:shadow-violet-500/10 transition-all duration-200 overflow-hidden"
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.98 }}
+        className="group relative cursor-not-allowed bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] shadow-xl shadow-violet-500/10 dark:shadow-violet-500/5 transition-all duration-200 overflow-hidden opacity-80"
       >
-        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <button
-          onClick={() => setShowAllIndicators(!showAllIndicators)}
-          className="relative w-full flex items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-violet-50/80 to-white dark:from-violet-950/30 dark:to-slate-900 hover:from-violet-50 dark:hover:from-violet-950/40 transition-colors"
-        >
+        <div className="absolute inset-0 bg-black/5" />
+        <div className="relative w-full flex items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-violet-50/80 to-white dark:from-violet-950/30 dark:to-slate-900">
           <div className="flex items-center gap-2">
             <span className="p-1.5 bg-violet-500 text-white rounded-xl">
               <LayoutGrid size={14} />
@@ -1898,16 +1895,16 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 {language === 'en' ? 'All Indicators' : 'सबै सूचकहरू'}
               </h3>
                <p className="text-[10px] font-bold text-slate-600 dark:text-white/70">
-                {language === 'en' ? `${indicators.length} indicators tracked — click to explore` : `${indicators.length} सूचकहरू ट्र्याक गरिएको — अन्वेषणका लागि क्लिक गर्नुहोस्`}
+                {language === 'en' ? `${indicators.length} indicators tracked` : `${indicators.length} सूचकहरू ट्र्याक गरिएको`}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <motion.div animate={{ rotate: showAllIndicators ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-slate-500 dark:text-white/70">
-              <ChevronRight size={18} />
-            </motion.div>
+            <span className="text-[9px] font-black uppercase tracking-wider bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-2 py-1 rounded-full">
+              {language === 'en' ? 'Unavailable' : 'उपलब्ध छैन'}
+            </span>
           </div>
-        </button>
+        </div>
 
         <AnimatePresence>
           {showAllIndicators && (
