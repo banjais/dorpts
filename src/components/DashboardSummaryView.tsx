@@ -58,6 +58,7 @@ import { StatusBreakdownModal } from './StatusBreakdownModal';
 import { IndicatorsBreakdownModal } from './IndicatorsBreakdownModal';
 import { ProgressLogicModal } from './ProgressLogicModal';
 import { SystemHelpModal } from './SystemHelpModal';
+import { SplashScreen } from './SplashScreen';
 
 interface DashboardSummaryViewProps {
   indicators: Indicator[];
@@ -633,6 +634,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [sortType, setSortType] = useState<'default' | 'low' | 'high' | 'weight' | 'status'>('default');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showInsights, setShowInsights] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
   const [insightTab, setInsightTab] = useState<'health' | 'category' | 'indicators' | 'trends' | 'heatmap'>('health');
   const [portfolioMode, setPortfolioMode] = useState<'bar' | 'pie'>('bar');
   const [showStatusBreakdown, setShowStatusBreakdown] = useState(false);
@@ -853,8 +855,18 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
     };
   }, [showAllIndicators]);
 
+  useEffect(() => {
+    if (!showSplash) return;
+    const timer = setTimeout(() => setShowSplash(false), 4000);
+    return () => clearTimeout(timer);
+  }, [showSplash]);
+
   return (
     <div className="relative min-h-screen space-y-6 max-w-7xl mx-auto px-1 sm:px-4">
+      {showSplash && (
+        <SplashScreen progress={stats.weightedRate} />
+      )}
+      
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
