@@ -2304,47 +2304,41 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
       {/* Bottom dock: collected cards appear here as a horizontal menu plate */}
       <AnimatePresence>
-        {collectedCards.size > 0 && (
-          <motion.div
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 40, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-            className="fixed bottom-0 left-0 right-0 z-40 pointer-events-auto"
-          >
-            <div className="mx-auto max-w-7xl px-2 sm:px-4 pb-4">
-              <div className="flex items-end justify-end gap-2 overflow-x-auto custom-scrollbar pb-1">
-                {Array.from(collectedCards)
-                  .slice()
-                  .reverse()
-                  .map((idx: number) => {
-                    const meta = cardDockMeta[idx];
-                    if (!meta) return null;
-                    const Icon = meta.icon;
-                    return (
-                      <motion.button
-                        key={idx}
-                        layout
-                        initial={{ y: 20, opacity: 0, scale: 0.9 }}
-                        animate={{ y: 0, opacity: 1, scale: 1 }}
-                        exit={{ y: 20, opacity: 0, scale: 0.9 }}
-                        transition={{ type: 'spring', stiffness: 340, damping: 26 }}
-                        whileHover={{ scale: 1.04 }}
-                        whileTap={{ scale: 0.96 }}
-                        onClick={() => scrollToCard(idx)}
-                        className={`shrink-0 flex items-center gap-2 pl-3 pr-3 py-2 rounded-2xl bg-gradient-to-r ${meta.color} text-white shadow-lg border border-white/20 hover:shadow-xl transition-all`}
-                      >
-                        <Icon size={16} className="shrink-0" />
-                        <span className="text-[10px] sm:text-xs font-black uppercase tracking-tight whitespace-nowrap">
-                          {language === 'en' ? meta.en : meta.np}
-                        </span>
-                      </motion.button>
-                    );
-                  })}
-              </div>
+        <motion.div
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 40, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+          className="fixed bottom-0 left-0 right-0 z-40 pointer-events-auto"
+        >
+          <div className="mx-auto max-w-7xl px-2 sm:px-4 pb-4">
+            <div className="flex items-end justify-end gap-2 overflow-x-auto custom-scrollbar pb-1">
+              {cardDockMeta.map((meta, idx) => {
+                const isCollected = collectedCards.has(idx);
+                const Icon = meta.icon;
+                return (
+                  <motion.button
+                    key={idx}
+                    layout
+                    initial={{ y: 20, opacity: 0, scale: 0.9 }}
+                    animate={{ y: 0, opacity: isCollected ? 1 : 0.45, scale: 1 }}
+                    exit={{ y: 20, opacity: 0, scale: 0.9 }}
+                    transition={{ type: 'spring', stiffness: 340, damping: 26 }}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => scrollToCard(idx)}
+                    className={`shrink-0 flex items-center gap-2 pl-3 pr-3 py-2 rounded-2xl bg-gradient-to-r ${meta.color} text-white shadow-lg border border-white/20 hover:shadow-xl transition-all`}
+                  >
+                    <Icon size={16} className="shrink-0" />
+                    <span className="text-[10px] sm:text-xs font-black uppercase tracking-tight whitespace-nowrap">
+                      {language === 'en' ? meta.en : meta.np}
+                    </span>
+                  </motion.button>
+                );
+              })}
             </div>
-          </motion.div>
-        )}
+          </div>
+        </motion.div>
       </AnimatePresence>
 
       <StatusBreakdownModal
