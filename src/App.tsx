@@ -2481,6 +2481,7 @@ function MainAppContent() {
   const [headerCompact, setHeaderCompact] = useState(false);
   const [isChartFocusMode, setIsChartFocusMode] = useState(true);
   const chartRef = useRef<HTMLDivElement>(null);
+  const [fabRevealed, setFabRevealed] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -3461,19 +3462,26 @@ function MainAppContent() {
 
         {/* Unified Floating Action Bar */}
         <div
-          className={`fixed bottom-4 right-4 md:bottom-6 md:right-8 mb-[env(safe-area-inset-bottom)] z-[1000] flex items-center transition-all duration-300 ease-out ${
-            isReportBuilderOpen
-              ? "opacity-0 scale-90 translate-y-1 pointer-events-none"
-              : "opacity-100 scale-100 translate-y-0 pointer-events-auto"
-          }`}
+          className="fixed bottom-4 right-4 md:bottom-6 md:right-8 mb-[env(safe-area-inset-bottom)] z-[1000] flex items-center transition-all duration-300 ease-out"
         >
-          <div 
-            className={`flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-2 py-1 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-2xl`}
-            style={{ 
-              borderColor: mainView === 'dashboard' ? '#4f46e540' : mainView === 'trends' ? '#05966940' : mainView === 'heatmap' ? '#d9770640' : '#7c3aed40',
-              boxShadow: `0 8px 32px ${mainView === 'dashboard' ? '#4f46e512' : mainView === 'trends' ? '#05966912' : mainView === 'heatmap' ? '#d9770612' : '#7c3aed12'}`
-            }}
+          <div
+            className="relative"
+            onMouseEnter={() => setFabRevealed(true)}
+            onMouseLeave={() => setFabRevealed(false)}
+            onTouchStart={() => setFabRevealed(true)}
+            onTouchEnd={() => setTimeout(() => setFabRevealed(false), 1200)}
           >
+            <div
+              className={`flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-2 py-1 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-2xl transition-all duration-300 ease-out ${
+                isReportBuilderOpen || !fabRevealed
+                  ? "opacity-0 scale-90 translate-y-1 pointer-events-none"
+                  : "opacity-100 scale-100 translate-y-0 pointer-events-auto"
+              }`}
+              style={{
+                borderColor: mainView === 'dashboard' ? '#4f46e540' : mainView === 'trends' ? '#05966940' : mainView === 'heatmap' ? '#d9770640' : '#7c3aed40',
+                boxShadow: `0 8px 32px ${mainView === 'dashboard' ? '#4f46e512' : mainView === 'trends' ? '#05966912' : mainView === 'heatmap' ? '#d9770612' : '#7c3aed12'}`
+              }}
+            >
             {/* Current View Indicator - Compact */}
             <div className="pr-2 mr-1 border-r border-slate-200 dark:border-slate-700 hidden sm:block">
               <span className="text-[0.5625rem] font-black uppercase tracking-[0.15em] text-indigo-600 dark:text-indigo-400">
@@ -3590,6 +3598,7 @@ function MainAppContent() {
               </span>
               </button>
             </div>
+          </div>
         </div>
 
         {/* Auth Toolbar */}
