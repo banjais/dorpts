@@ -3493,6 +3493,9 @@ function MainAppContent() {
             <div className="pr-2 mr-1 border-r border-slate-200 dark:border-slate-700 hidden sm:block">
               <span className="text-[0.5625rem] font-black uppercase tracking-[0.15em] text-indigo-600 dark:text-indigo-400">
                 {(() => {
+                  if (mainView === 'insights') {
+                    return language === 'en' ? 'Graph' : 'ग्राफ';
+                  }
                   const item = NAV_ITEMS.find((i) => i.id === mainView);
                   return item
                     ? language === "en"
@@ -3505,7 +3508,7 @@ function MainAppContent() {
 
             {[
               { id: 'dashboard', labelEn: 'Home', labelNp: 'गृहपृष्ठ', icon: NAV_ITEMS[0].icon, onClick: () => handleMainViewChange('dashboard') },
-              { id: 'chart', labelEn: 'Chart', labelNp: 'चार्ट', icon: <BarChart3 size={16} />, onClick: () => handleMainViewChange('insights') },
+              { id: 'chart', labelEn: 'Graph', labelNp: 'ग्राफ', icon: <BarChart3 size={16} />, onClick: () => handleMainViewChange('insights') },
               { id: 'trends', labelEn: 'Trends', labelNp: 'प्रवृत्ति', icon: NAV_ITEMS[1].icon, onClick: () => handleMainViewChange('trends') },
               { id: 'heatmap', labelEn: 'Heatmap', labelNp: 'हिटम्याप', icon: NAV_ITEMS[2].icon, onClick: () => handleMainViewChange('heatmap') },
               { id: 'institutional', labelEn: 'Institutional', labelNp: 'संस्थागत', icon: NAV_ITEMS[3].icon, onClick: () => handleMainViewChange('institutional') },
