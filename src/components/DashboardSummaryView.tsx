@@ -76,6 +76,7 @@ interface DashboardSummaryViewProps {
   onSelectIndicatorFromBreakdown?: (indicator: Indicator) => void;
   addToast?: (message: string, messageEn?: string, type?: 'success' | 'info' | 'error' | 'warning', duration?: number) => void;
   highlightedCard?: 'insights' | null;
+  isFooterExpanded?: boolean;
 }
 
 const toNepaliNumerals = (numStr: string | number): string => {
@@ -636,6 +637,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   onSelectIndicatorFromBreakdown,
   addToast,
   highlightedCard,
+  isFooterExpanded,
 }) => {
   const { language, setLanguage, t, translateUnit, translateOffice } = useLanguage();
   const { isAdmin } = useAuth();
@@ -741,6 +743,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       if (!el) return;
       const obs = new IntersectionObserver(
         ([entry]) => {
+          if (isFooterExpanded && idx === 7) return;
           const shouldHide = !entry.isIntersecting && entry.boundingClientRect.top < 0;
           // Avoid duplicate queuing
           const alreadyQueued = pendingQueue.current.some(
