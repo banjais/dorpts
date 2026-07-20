@@ -748,6 +748,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [stackIndexes, setStackIndexes] = useState<number[]>(Array(8).fill(-1));
   const rafRef = useRef<number | null>(null);
   const lastStackKey = useRef<string>('');
+  const [collectedCards, setCollectedCards] = useState<Set<number>>(new Set());
 
   const measureCardTops = useCallback(() => {
     cardWrapRefs.current.forEach((el, i) => {
@@ -810,6 +811,39 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     };
   }, [measureCardTops, computeStack, onScroll]);
+
+  // Track which cards have been scrolled into the bottom dock.
+  // Use the same scroll measurement as the stack logic so collection
+  // stays in sync with the visible card flow.
+  useEffect(() => {
+    const scrollY = window.scrollY || window.pageYOffset;
+    const next = new Set<number>();
+    for (let i = 0; i < 8; i++) {
+      const top = cardTopsRef.current[i];
+      if (top > 0 && scrollY + STICKY_TOP >= top) {
+        next.add(i);
+      }
+    }
+    setCollectedCards(next);
+  }, [stackIndexes]);
+
+  const scrollToCard = useCallback((idx: number) => {
+    const top = cardTopsRef.current[idx];
+    if (!top) return;
+    window.scrollTo({ top: top - STICKY_TOP - 16, behavior: 'smooth' });
+  }, []);
+
+  // Card metadata for the dock menu
+  const cardDockMeta = [
+    { en: 'Overall Progress', np: 'समग्र प्रगति', icon: Target, color: 'from-emerald-500 to-cyan-500' },
+    { en: 'Status Breakdown', np: 'स्थिति विवरण', icon: BarChart3, color: 'from-violet-400 to-fuchsia-400' },
+    { en: 'Total Indicators', np: 'कुल सूचकहरू', icon: Activity, color: 'from-blue-400 to-indigo-500' },
+    { en: 'Category Status', np: 'वर्ग स्थिति', icon: PieChartIcon, color: 'from-amber-400 to-orange-500' },
+    { en: 'Reporting Offices', np: 'विवरण पठाउने कार्यालयहरू', icon: Building2, color: 'from-teal-400 to-emerald-500' },
+    { en: 'Budget & Capital Expenditure', np: 'बजेट र पुँजीगत खर्च', icon: Wallet, color: 'from-emerald-400 to-green-500' },
+    { en: 'Visual Insights', np: 'दृश्यात्मक अन्तर्दृष्टि', icon: BarChart3, color: 'from-indigo-400 to-purple-500' },
+    { en: 'All Indicators', np: 'सबै सूचकहरू', icon: LayoutGrid, color: 'from-slate-400 to-slate-600' },
+  ];
 
   useEffect(() => {
     const states = [
@@ -2267,6 +2301,51 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       </AnimatePresence>
         </StackCard>
       </div>
+
+      {/* Bottom dock: collected cards appear here as a horizontal menu plate */}
+      <AnimatePresence>
+        {collectedCards.size > 0 && (
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 40, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+            className="fixed bottom-0 left-0 right-0 z-40 pointer-events-auto"
+          >
+            <div className="mx-auto max-w-7xl px-2 sm:px-4 pb-4">
+              <div className="flex items-end justify-end gap-2 overflow-x-auto custom-scrollbar pb-1">
+                {Array.from(collectedCards)
+                  .slice()
+                  .reverse()
+                  .map((idx: number) => {
+                    const meta = cardDockMeta[idx];
+                    if (!meta) return null;
+                    const Icon = meta.icon;
+                    return (
+                      <motion.button
+                        key={idx}
+                        layout
+                        initial={{ y: 20, opacity: 0, scale: 0.9 }}
+                        animate={{ y: 0, opacity: 1, scale: 1 }}
+                        exit={{ y: 20, opacity: 0, scale: 0.9 }}
+                        transition={{ type: 'spring', stiffness: 340, damping: 26 }}
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.96 }}
+                        onClick={() => scrollToCard(idx)}
+                        className={`shrink-0 flex items-center gap-2 pl-3 pr-3 py-2 rounded-2xl bg-gradient-to-r ${meta.color} text-white shadow-lg border border-white/20 hover:shadow-xl transition-all`}
+                      >
+                        <Icon size={16} className="shrink-0" />
+                        <span className="text-[10px] sm:text-xs font-black uppercase tracking-tight whitespace-nowrap">
+                          {language === 'en' ? meta.en : meta.np}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <StatusBreakdownModal
         isOpen={showStatusBreakdown}
