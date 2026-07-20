@@ -1724,102 +1724,77 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         <div className="col-span-full sm:col-span-2 lg:col-span-4">
           <div ref={(el) => { sentinelRefs.current[4] = el; }} className="h-0 w-full" aria-hidden="true" />
           <AnimatePresence>
-          {!orbiterHidden.has(4) && (
-            <motion.button
-              layout
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setShowReportingOffices(p => !p)}
-              className="group relative cursor-pointer w-full bg-gradient-to-br from-slate-400 via-gray-400 to-zinc-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-slate-500/25 border border-white/20 hover:shadow-2xl hover:shadow-slate-500/40 active:shadow-2xl active:shadow-slate-500/40 transition-all duration-200 overflow-hidden"
-            >
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <div className="relative z-10">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
-                {language === 'en' ? 'Reporting Offices' : 'विवरण पठाउने कार्यालयहरू'}
-              </span>
-              <div className="flex items-center gap-1">
-                <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
-                  <Building2 size={14} className="text-white/90" />
-                </span>
-                <motion.div animate={{ rotate: showReportingOffices ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
-                  <ChevronRight size={18} />
-                </motion.div>
-              </div>
-            </div>
-            <div className="text-[10px] sm:text-[11px] font-bold text-white/70 mb-3">
-              {language === 'en' ? `${reportingOffices.length} offices reporting` : `${reportingOffices.length} कार्यालयहरूबाट रिपोर्टिङ`}
-            </div>
-
-           {/* Mini office list - always visible */}
-           <div className="space-y-2.5">
-             {reportingOffices.slice(0, 3).map((officeData) => {
-                const displayName = translateOffice(officeData.office);
-               const emails = Array.from(officeData.emails);
-               const adminEmail = emails[0] || '';
-               return (
-                 <div key={officeData.office} className="space-y-0.5">
-                   <div className="text-[10px] font-black text-white/80 truncate">
-                     {displayName}
-                   </div>
-                   {adminEmail && (
-                     <div className="text-[10px] font-bold text-white/60 truncate">
-                       {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
-                     </div>
-                   )}
-                 </div>
-               );
-             })}
-             {reportingOffices.length > 3 && (
-               <div className="text-[10px] font-bold text-white/70">
-                 +{fmt(reportingOffices.length - 3)} {language === 'en' ? 'more' : 'थप'}
-               </div>
-             )}
-           </div>
-
-          <AnimatePresence>
-            {showReportingOffices && (
+            {!orbiterHidden.has(4) && (
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden mt-3"
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                className="group relative cursor-pointer bg-gradient-to-br from-slate-400 via-gray-400 to-zinc-400 rounded-[28px] shadow-xl shadow-slate-500/25 border border-white/20 hover:shadow-2xl hover:shadow-slate-500/40 active:shadow-2xl active:shadow-slate-500/40 transition-all duration-200 overflow-hidden"
               >
-                 <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
-                   {reportingOffices.slice(3).map((officeData) => {
-              const displayName = translateOffice(officeData.office);
-                     const emails = Array.from(officeData.emails);
-                     const adminEmail = emails[0] || '';
-                     return (
-                       <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5 space-y-0.5">
-                         <div className="text-[10px] font-black text-white/80 truncate">
-                           {displayName}
-                         </div>
-                         {adminEmail && (
-                           <div className="text-[10px] font-bold text-white/60 truncate">
-                             {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
-                           </div>
-                         )}
-                       </div>
-                     );
-                   })}
+                <div className="absolute inset-0 bg-black/10" />
+                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <button
+                  onClick={() => setShowReportingOffices(p => !p)}
+                  className="relative w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 bg-white/20 text-white rounded-xl">
+                      <Building2 size={14} />
+                    </span>
+                    <div className="text-left">
+                      <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-tight">
+                        {language === 'en' ? 'Reporting Offices' : 'विवरण पठाउने कार्यालयहरू'}
+                      </h3>
+                      <p className="text-[10px] sm:text-[11px] font-bold text-white/70">
+                        {language === 'en' ? `${reportingOffices.length} offices reporting` : `${reportingOffices.length} कार्यालयहरूबाट रिपोर्टिङ`}
+                      </p>
+                    </div>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-      </motion.button>
-      )}
-    </AnimatePresence>
+                  <motion.div animate={{ rotate: showReportingOffices ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
+                    <ChevronRight size={18} />
+                  </motion.div>
+                </button>
 
-        </div>
+                <AnimatePresence>
+                  {showReportingOffices && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-5 pb-5 pt-1 space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
+                        {reportingOffices.map((officeData) => {
+                          const displayName = translateOffice(officeData.office);
+                          const emails = Array.from(officeData.emails);
+                          const adminEmail = emails[0] || '';
+                          return (
+                            <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5 space-y-0.5">
+                              <div className="text-[10px] font-black text-white/80 truncate">
+                                {displayName}
+                              </div>
+                              {adminEmail && (
+                                <div className="text-[10px] font-bold text-white/60 truncate">
+                                  {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+         </div>
 
-      {/* Card 5: Budget & Capital Expenditure */}
+       {/* Card 5: Budget & Capital Expenditure */}
       <div className="col-span-full sm:col-span-2 lg:col-span-4">
         <div ref={(el) => { sentinelRefs.current[5] = el; }} className="h-0 w-full" aria-hidden="true" />
       <AnimatePresence>
