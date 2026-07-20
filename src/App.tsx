@@ -110,6 +110,7 @@ import {
   LogOut,
   ShieldCheck,
   Shield,
+  Menu,
 } from "lucide-react";
 import {
   doc,
@@ -3465,140 +3466,150 @@ function MainAppContent() {
           className="fixed bottom-4 right-4 md:bottom-6 md:right-8 mb-[env(safe-area-inset-bottom)] z-[1000] flex items-center transition-all duration-300 ease-out"
         >
           <div
-            className="relative"
             onMouseEnter={() => setFabRevealed(true)}
             onMouseLeave={() => setFabRevealed(false)}
             onTouchStart={() => setFabRevealed(true)}
             onTouchEnd={() => setTimeout(() => setFabRevealed(false), 1200)}
           >
             <div
-              className={`flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-2 py-1 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-2xl transition-all duration-300 ease-out ${
+              className={`flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl pl-2 pr-1 py-1 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-2xl transition-all duration-300 ease-out ${
                 isReportBuilderOpen || !fabRevealed
-                  ? "opacity-0 scale-90 translate-y-1 pointer-events-none"
-                  : "opacity-100 scale-100 translate-y-0 pointer-events-auto"
+                  ? "opacity-0 scale-90 translate-x-2 pointer-events-none"
+                  : "opacity-100 scale-100 translate-x-0 pointer-events-auto"
               }`}
               style={{
                 borderColor: mainView === 'dashboard' ? '#4f46e540' : mainView === 'trends' ? '#05966940' : mainView === 'heatmap' ? '#d9770640' : '#7c3aed40',
                 boxShadow: `0 8px 32px ${mainView === 'dashboard' ? '#4f46e512' : mainView === 'trends' ? '#05966912' : mainView === 'heatmap' ? '#d9770612' : '#7c3aed12'}`
               }}
             >
-            {/* Current View Indicator - Compact */}
-            <div className="pr-2 mr-1 border-r border-slate-200 dark:border-slate-700 hidden sm:block">
-              <span className="text-[0.5625rem] font-black uppercase tracking-[0.15em] text-indigo-600 dark:text-indigo-400">
-                {(() => {
-                  if (mainView === 'insights') {
-                    return language === 'en' ? 'Graph' : 'ग्राफ';
-                  }
-                  const item = NAV_ITEMS.find((i) => i.id === mainView);
-                  return item
-                    ? language === "en"
-                      ? item.labelEn
-                      : item.labelNp
-                    : viewMode.replace("-", " ");
-                })()}
-              </span>
-            </div>
+              <div className="pr-2 mr-1 border-r border-slate-200 dark:border-slate-700 hidden sm:block">
+                <span className="text-[0.5625rem] font-black uppercase tracking-[0.15em] text-indigo-600 dark:text-indigo-400">
+                  {(() => {
+                    if (mainView === 'insights') {
+                      return language === 'en' ? 'Graph' : 'ग्राफ';
+                    }
+                    const item = NAV_ITEMS.find((i) => i.id === mainView);
+                    return item
+                      ? language === "en"
+                        ? item.labelEn
+                        : item.labelNp
+                      : viewMode.replace("-", " ");
+                  })()}
+                </span>
+              </div>
 
-            {[
-              { id: 'dashboard', labelEn: 'Home', labelNp: 'गृहपृष्ठ', icon: NAV_ITEMS[0].icon, onClick: () => handleMainViewChange('dashboard') },
-              { id: 'chart', labelEn: 'Graph', labelNp: 'ग्राफ', icon: <BarChart3 size={16} />, onClick: () => handleMainViewChange('insights') },
-              { id: 'trends', labelEn: 'Trends', labelNp: 'प्रवृत्ति', icon: NAV_ITEMS[1].icon, onClick: () => handleMainViewChange('trends') },
-              { id: 'heatmap', labelEn: 'Heatmap', labelNp: 'हिटम्याप', icon: NAV_ITEMS[2].icon, onClick: () => handleMainViewChange('heatmap') },
-              { id: 'institutional', labelEn: 'Institutional', labelNp: 'संस्थागत', icon: NAV_ITEMS[3].icon, onClick: () => handleMainViewChange('institutional') },
-            ].map((item) => {
-              const isActive = mainView === item.id || (item.id === 'chart' && mainView === 'insights');
-              return (
-                <button
-                  key={item.id}
+              {[
+                { id: 'dashboard', labelEn: 'Home', labelNp: 'गृहपृष्ठ', icon: NAV_ITEMS[0].icon, onClick: () => handleMainViewChange('dashboard') },
+                { id: 'chart', labelEn: 'Graph', labelNp: 'ग्राफ', icon: <BarChart3 size={16} />, onClick: () => handleMainViewChange('insights') },
+                { id: 'trends', labelEn: 'Trends', labelNp: 'प्रवृत्ति', icon: NAV_ITEMS[1].icon, onClick: () => handleMainViewChange('trends') },
+                { id: 'heatmap', labelEn: 'Heatmap', labelNp: 'हिटम्याप', icon: NAV_ITEMS[2].icon, onClick: () => handleMainViewChange('heatmap') },
+                { id: 'institutional', labelEn: 'Institutional', labelNp: 'संस्थागत', icon: NAV_ITEMS[3].icon, onClick: () => handleMainViewChange('institutional') },
+              ].map((item) => {
+                const isActive = mainView === item.id || (item.id === 'chart' && mainView === 'insights');
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      triggerHaptic('light');
+                      item.onClick();
+                    }}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                      isActive
+                        ? item.id === 'chart'
+                          ? 'bg-violet-600 text-white shadow-md shadow-violet-500/30'
+                          : mainView === 'dashboard' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30'
+                          : mainView === 'trends' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30'
+                          : mainView === 'heatmap' ? 'bg-amber-600 text-white shadow-md shadow-amber-500/30'
+                          : 'bg-violet-600 text-white shadow-md shadow-violet-500/30'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-white hover:bg-indigo-600 dark:hover:bg-indigo-500'
+                    }`}
+                    title={language === 'en' ? item.labelEn : item.labelNp}
+                  >
+                    {React.cloneElement(item.icon, { size: 16, className: 'sm:w-[18px] sm:h-[18px]' })}
+                  </button>
+                );
+              })}
+
+              {/* Scroll Button (Up/Down) */}
+              <motion.button
+                onClick={() => {
+                  triggerHaptic("light");
+                  if (isScrolled) {
+                    scrollToTop();
+                  } else {
+                    scrollToBottom();
+                  }
+                }}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-white hover:bg-indigo-600 dark:hover:bg-indigo-500 transition-all active:scale-90 cursor-pointer overflow-hidden"
+                title={
+                  isScrolled
+                    ? language === "en"
+                      ? "Scroll to top"
+                      : "माथि जानुहोस्"
+                    : language === "en"
+                      ? "Scroll to bottom"
+                      : "तल जानुहोस्"
+                }
+              >
+                <motion.div
+                  key={isScrolled ? "up" : "down"}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex items-center justify-center"
+                >
+                  {isScrolled ? (
+                    <ChevronUp size={16} strokeWidth={2.5} />
+                  ) : (
+                    <ChevronDown size={16} strokeWidth={2.5} />
+                  )}
+                </motion.div>
+              </motion.button>
+
+              {pwaDismissed && (
+                <motion.button
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
                   onClick={() => {
                     triggerHaptic('light');
-                    item.onClick();
+                    window.location.reload();
                   }}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                    isActive
-                      ? item.id === 'chart'
-                        ? 'bg-violet-600 text-white shadow-md shadow-violet-500/30'
-                        : mainView === 'dashboard' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30'
-                        : mainView === 'trends' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30'
-                        : mainView === 'heatmap' ? 'bg-amber-600 text-white shadow-md shadow-amber-500/30'
-                        : 'bg-violet-600 text-white shadow-md shadow-violet-500/30'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-white hover:bg-indigo-600 dark:hover:bg-indigo-500'
-                  }`}
-                  title={language === 'en' ? item.labelEn : item.labelNp}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-white hover:bg-indigo-600 dark:hover:bg-indigo-500 transition-all active:scale-90 cursor-pointer"
+                  title={language === "en" ? "Check for updates" : "अपडेटहरू जाँच्नुहोस्"}
                 >
-                  {React.cloneElement(item.icon, { size: 16, className: 'sm:w-[18px] sm:h-[18px]' })}
-                </button>
-              );
-            })}
+                  <RefreshCw size={16} strokeWidth={2.5} />
+                </motion.button>
+              )}
 
-            {/* Scroll Button (Up/Down) */}
-            <motion.button
-              onClick={() => {
-                triggerHaptic("light");
-                if (isScrolled) {
-                  scrollToTop();
-                } else {
-                  scrollToBottom();
-                }
-              }}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-white hover:bg-indigo-600 dark:hover:bg-indigo-500 transition-all active:scale-90 cursor-pointer overflow-hidden"
-                  title={
-                    isScrolled
-                      ? language === "en"
-                        ? "Scroll to top"
-                        : "माथि जानुहोस्"
-                      : language === "en"
-                        ? "Scroll to bottom"
-                        : "तल जानुहोस्"
-                  }
-            >
-              <motion.div
-                key={isScrolled ? "up" : "down"}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.15 }}
-                className="flex items-center justify-center"
-              >
-                {isScrolled ? (
-                  <ChevronUp size={16} strokeWidth={2.5} />
-                ) : (
-                  <ChevronDown size={16} strokeWidth={2.5} />
-                )}
-              </motion.div>
-            </motion.button>
-
-            {pwaDismissed && (
-              <motion.button
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
+              {/* AI Assistant FAB (Sparkles) */}
+              <button
                 onClick={() => {
-                  triggerHaptic('light');
-                  window.location.reload();
+                  triggerHaptic("success");
+                  setIsAIAssistantOpen(true);
                 }}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-white hover:bg-indigo-600 dark:hover:bg-indigo-500 transition-all active:scale-90 cursor-pointer"
-                title={language === "en" ? "Check for updates" : "अपडेटहरू जाँच्नुहोस्"}
+                className="w-9 h-9 rounded-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/25 active:scale-95 transition-all cursor-pointer relative"
+                title={language === "en" ? "AI assistant" : "एआई सहायक"}
               >
-                <RefreshCw size={16} strokeWidth={2.5} />
-              </motion.button>
-            )}
-
-            {/* AI Assistant FAB (Sparkles) */}
-            <button
-              onClick={() => {
-                triggerHaptic("success");
-                setIsAIAssistantOpen(true);
-              }}
-              className="w-9 h-9 rounded-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/25 active:scale-95 transition-all cursor-pointer relative"
-              title={language === "en" ? "AI assistant" : "एआई सहायक"}
-            >
-              <Sparkles size={16} strokeWidth={2} />
-              <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-              </span>
+                <Sparkles size={16} strokeWidth={2} />
+                <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                </span>
               </button>
             </div>
           </div>
+
+          {/* Always-visible small handle */}
+          <motion.button
+            onMouseEnter={() => setFabRevealed(true)}
+            onMouseLeave={() => setFabRevealed(false)}
+            onTouchStart={() => setFabRevealed(true)}
+            onTouchEnd={() => setTimeout(() => setFabRevealed(false), 1200)}
+            className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
+            title={language === "en" ? "Actions" : "कार्यहरू"}
+          >
+            <Menu size={14} />
+          </motion.button>
         </div>
 
         {/* Auth Toolbar */}
