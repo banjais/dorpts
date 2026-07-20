@@ -368,7 +368,7 @@ const StackCard: React.FC<{
   return (
     <motion.div
       ref={(el) => registerRef(el, index)}
-      className="col-span-full sm:col-span-2 lg:col-span-4"
+      className="w-full"
       style={{
         position: reducedMotion ? 'relative' : 'sticky',
         top: stickyTop,
@@ -1040,7 +1040,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
       {/* Summary Stats - Bold 3D Cards */}
       {/* Each card slot = sentinel (always in DOM) + AnimatePresence card */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div className="flex flex-col gap-4 sm:gap-5">
         {/* Card 0: Hero Overall Progress */}
          <StackCard
           index={0}
