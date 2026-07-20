@@ -2479,7 +2479,6 @@ function MainAppContent() {
   const [isAtBottom, setIsAtBottom] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [headerCompact, setHeaderCompact] = useState(false);
-  const [isFABVisible, setIsFABVisible] = useState(true);
   const [isChartFocusMode, setIsChartFocusMode] = useState(true);
   const chartRef = useRef<HTMLDivElement>(null);
 
@@ -2488,30 +2487,15 @@ function MainAppContent() {
   }, [viewMode]);
 
   useEffect(() => {
-    let lastY = window.scrollY;
-
     const handleScroll = () => {
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
       const currentY = window.scrollY || document.documentElement.scrollTop;
 
-      // Determine if we are near the bottom where the footer items are starting to show
       const isBottom = currentY + windowHeight >= documentHeight - 120;
       setIsAtBottom(isBottom);
       setIsScrolled(currentY > 100 || isBottom);
-      // Matches the Header collapse threshold (scrollY > 20) so the main
-      // content padding reserves the full header height while at the top.
       setHeaderCompact(currentY > 20);
-
-      // FAB visibility: Hide when scrolling down, show when scrolling up
-      // Also hide when at the absolute bottom near footer
-      if (currentY > lastY && currentY > 200) {
-        setIsFABVisible(false);
-      } else {
-        setIsFABVisible(!isBottom);
-      }
-
-      lastY = currentY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -3478,7 +3462,7 @@ function MainAppContent() {
         {/* Unified Floating Action Bar */}
         <div
           className={`fixed bottom-4 right-4 md:bottom-6 md:right-8 mb-[env(safe-area-inset-bottom)] z-[1000] flex items-center transition-all duration-300 ease-out ${
-            isReportBuilderOpen || !isFABVisible
+            isReportBuilderOpen
               ? "opacity-0 scale-90 translate-y-1 pointer-events-none"
               : "opacity-100 scale-100 translate-y-0 pointer-events-auto"
           }`}
