@@ -737,8 +737,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   // Cards detach from normal flow as they scroll past the sticky line and
   // stack beneath the header with depth (scale + offset + z-index layering).
   const STICKY_TOP = 88; // px below header so the stack never overlaps it
-  const STACK_OFFSET = 8; // vertical offset per stacked card (px) - packed tight
-  const STACK_SCALE = 0.008; // scale reduction per stacked card - subtle depth
+  const STACK_OFFSET = 0; // packed tight - all cards collapse into one place
+  const STACK_SCALE = 0.012; // subtle depth while packed
   const reducedMotion = useReducedMotion();
   const cardWrapRefs = useRef<(HTMLDivElement | null)[]>(Array(8).fill(null));
   const registerCardRef = useCallback((el: HTMLDivElement | null, index: number) => {
