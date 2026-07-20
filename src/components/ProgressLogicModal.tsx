@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Target, CheckCircle2, AlertTriangle, Clock, Calculator, Scale } from 'lucide-react';
+import { X, Target, CheckCircle2, AlertTriangle, Clock, Calculator, Scale, Activity } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { getBreakdownStatus } from '../utils/status';
 import { Indicator } from '../types';

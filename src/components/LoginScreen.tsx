@@ -33,6 +33,12 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
     }
   }, [cooldown]);
 
+  useEffect(() => {
+    if (step === 'otp') {
+      setTimeout(() => otpRefs[0]?.current?.focus(), 100);
+    }
+  }, [step]);
+
   const [fallbackOtp, setFallbackOtp] = useState<string | null>(null);
 
   const handleSendOTP = async (e: React.FormEvent) => {
@@ -224,15 +230,20 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
                   <p className="text-[10px] text-slate-400 mb-2">
                     {language === 'en' ? `Sent to ${email}` : `${email} मा पठाइएको`}
                   </p>
-                  {fallbackOtp && (
-                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg p-2.5 mb-3">
-                      <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400 mb-1">
+                   {fallbackOtp && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                      className="bg-amber-50 dark:bg-amber-900/30 border-2 border-amber-400 dark:border-amber-600 rounded-xl p-4 mb-4 shadow-lg"
+                    >
+                      <p className="text-[11px] font-black text-amber-800 dark:text-amber-300 mb-2 uppercase tracking-wider text-center">
                         {language === 'en' ? 'Email service unavailable. Use this code:' : 'इमेल सेवा उपलब्ध छैन। यो कोड प्रयोग गर्नुहोस्:'}
                       </p>
-                      <p className="text-lg font-black text-amber-900 dark:text-amber-300 tracking-widest text-center">
+                      <p className="text-3xl font-black text-amber-900 dark:text-amber-100 tracking-[0.3em] text-center font-mono">
                         {fallbackOtp}
                       </p>
-                    </div>
+                    </motion.div>
                   )}
                   <div className="flex gap-1.5 justify-between">
                     {otpRefs.map((ref, i) => (

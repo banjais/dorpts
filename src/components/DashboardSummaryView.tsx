@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Indicator, SystemMetadata, Toast } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -34,6 +34,9 @@ import {
   ArrowDownRight,
   AlertTriangle,
   Clock,
+  X,
+  Calculator,
+  Database,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -173,6 +176,10 @@ const ExpandedDetails: React.FC<{
   const catColor = getCategoryColor(indicator.category);
   const weight = indicator.weight || 0;
   const weightedContribution = pct > 0 ? Math.round((pct * weight) / 100) : 0;
+  const fmt = (val: number | string): string => {
+    if (language === 'ne') return toNepaliNumerals(val);
+    return String(val);
+  };
 
   return (
     <motion.div
@@ -381,6 +388,10 @@ const SummaryCard: React.FC<{
     : 0;
   const isTrendUp = trendDirection > 0;
   const isTrendDown = trendDirection < 0;
+  const fmt = (val: number | string): string => {
+    if (language === 'ne') return toNepaliNumerals(val);
+    return String(val);
+  };
 
   return (
     <motion.div
@@ -511,6 +522,10 @@ const ExpandedDetailsSmall: React.FC<{
   const target = indicator.annualTarget || 0;
   const progress = indicator.annualProgress || 0;
   const pct = target > 0 ? Math.round((progress / target) * 100) : 0;
+  const fmt = (val: number | string): string => {
+    if (language === 'ne') return toNepaliNumerals(val);
+    return String(val);
+  };
 
   return (
     <div className="space-y-3">
@@ -622,7 +637,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   addToast,
   highlightedCard,
 }) => {
-  const { language, t, translateUnit, translateOffice } = useLanguage();
+  const { language, setLanguage, t, translateUnit, translateOffice } = useLanguage();
   const { isAdmin } = useAuth();
   const isNepali = language === 'ne';
   const fmt = (val: number | string): string => {
@@ -655,6 +670,104 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showAllIndicators, setShowAllIndicators] = useState(false);
   const [showCategoryStatus, setShowCategoryStatus] = useState(false);
   const allIndicatorsRef = useRef<HTMLDivElement>(null);
+
+  const closeAllCards = useCallback(() => {
+    setShowOverallProgress(false);
+    setShowStatusDetails(false);
+    setShowTotalIndicators(false);
+    setShowReportingOffices(false);
+    setShowAllIndicators(false);
+    setShowCategoryStatus(false);
+    setShowBudgetCard(false);
+    setShowInsights(false);
+  }, []);
+
+  const toggleCard = useCallback((setter: (value: boolean) => void, currentValue: boolean) => {
+    closeAllCards();
+    if (!currentValue) {
+      setter(true);
+    }
+  }, [closeAllCards]);
+
+  const orbiterScrollRef = useRef<HTMLDivElement>(null);
+  const [orbiterHidden, setOrbiterHidden] = useState<Set<number>>(new Set());
+  const [scrollDirection, setScrollDirection] = useState<'up' | 'down' | null>(null);
+  // One sentinel ref per card — always stays in DOM so observer never detaches
+  const sentinelRefs = useRef<(HTMLDivElement | null)[]>(Array(8).fill(null));
+  // Pending queue for staggered one-at-a-time transitions
+  const pendingQueue = useRef<Array<{ idx: number; hide: boolean }>>([]);
+  const queueTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cardMeta = [
+    { en: 'Overall Progress', np: 'समग्र प्रगति', icon: Target, color: 'from-emerald-500 to-cyan-500' },
+    { en: 'Status Breakdown', np: 'स्थिति विवरण', icon: BarChart3, color: 'from-violet-400 to-fuchsia-400' },
+    { en: 'Total Indicators', np: 'कुल सूचकहरू', icon: Activity, color: 'from-blue-400 to-indigo-500' },
+    { en: 'Category Status', np: 'वर्ग स्थिति', icon: PieChartIcon, color: 'from-amber-400 to-orange-500' },
+    { en: 'Reporting Offices', np: 'विवरण पठाउने कार्यालयहरू', icon: Building2, color: 'from-teal-400 to-emerald-500' },
+    { en: 'Budget & Capital Expenditure', np: 'बजेट र पुँजीगत खर्च', icon: Wallet, color: 'from-emerald-400 to-green-500' },
+    { en: 'Visual Insights', np: 'दृश्यात्मक अन्तर्दृष्टि', icon: BarChart3, color: 'from-indigo-400 to-purple-500' },
+    { en: 'All Indicators', np: 'सबै सूचकहरू', icon: LayoutGrid, color: 'from-slate-400 to-slate-600' },
+  ];
+
+  const releaseAllCards = useCallback(() => {
+    setOrbiterHidden(new Set());
+    pendingQueue.current = [];
+    if (queueTimer.current) clearTimeout(queueTimer.current);
+  }, []);
+
+  // Drain the queue one item every 150ms for a smooth staggered feel
+  const drainQueue = useCallback(() => {
+    const item = pendingQueue.current.shift();
+    if (!item) return;
+    const { idx, hide } = item;
+    setOrbiterHidden((prev) => {
+      const next = new Set(prev);
+      if (hide) next.add(idx);
+      else next.delete(idx);
+      return next;
+    });
+    setScrollDirection(hide ? 'down' : 'up');
+    if (pendingQueue.current.length > 0) {
+      queueTimer.current = setTimeout(drainQueue, 150);
+    } else {
+      queueTimer.current = setTimeout(() => setScrollDirection(null), 600);
+    }
+  }, []);
+
+  // IntersectionObserver: one sentinel div per card, always in DOM
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+    sentinelRefs.current.forEach((el, idx) => {
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          const shouldHide = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+          // Avoid duplicate queuing
+          const alreadyQueued = pendingQueue.current.some(
+            (item) => item.idx === idx && item.hide === shouldHide
+          );
+          if (alreadyQueued) return;
+          // Remove any opposite pending action for same card
+          pendingQueue.current = pendingQueue.current.filter((item) => item.idx !== idx);
+          pendingQueue.current.push({ idx, hide: shouldHide });
+          if (!queueTimer.current) {
+            drainQueue();
+          }
+        },
+        // Root margin: trigger when the sentinel crosses 80px below the top of viewport
+        { rootMargin: '-80px 0px 0px 0px', threshold: 0 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+    return () => observers.forEach((obs) => obs.disconnect());
+  }, [drainQueue]);
+
+  useEffect(() => {
+    if (orbiterHidden.size === 0) return;
+    const timer = setTimeout(() => setScrollDirection(null), 800);
+    return () => clearTimeout(timer);
+  }, [orbiterHidden.size]);
 
   useEffect(() => {
     const states = [
@@ -857,39 +970,128 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
   useEffect(() => {
     if (!showSplash) return;
-    const timer = setTimeout(() => setShowSplash(false), 4000);
-    return () => clearTimeout(timer);
+    const hasLang = localStorage.getItem("language");
+    if (hasLang) {
+      const timer = setTimeout(() => setShowSplash(false), 4000);
+      return () => clearTimeout(timer);
+    }
   }, [showSplash]);
 
   return (
     <div className="relative min-h-screen space-y-6 max-w-7xl mx-auto px-1 sm:px-4">
       {showSplash && (
-        <SplashScreen progress={stats.weightedRate} />
+        <SplashScreen
+          progress={stats.weightedRate}
+          requireLanguageSelect={!localStorage.getItem("language")}
+          onLanguageSelect={(lang) => {
+            triggerHaptic('light');
+            setLanguage(lang);
+            localStorage.setItem("language", lang);
+            setTimeout(() => {
+              setShowSplash(false);
+            }, 1200);
+          }}
+        />
       )}
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-black text-slate-850 dark:text-slate-100 uppercase tracking-tight flex items-center gap-2">
-            <Target className="text-indigo-500" size={24} />
-            {language === 'en' ? 'PERFORMANCE OVERVIEW' : 'कार्यसम्पादन अवलोकन'}
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            {language === 'en'
-              ? 'A comprehensive overview of tracked performance indicators, including overall progress, current status, calculation logic, trends, and sectoral insights.'
-              : 'ट्र्याक गरिएका कार्यसम्पादन सूचकहरूको व्यापक अवलोकन, जसमा समग्र प्रगति, हालको स्थिति, गणना तर्क, प्रवृत्ति र क्षेत्रीय अन्तर्दृष्टि समावेश छन्।'}
-          </p>
-        </div>
-      </div>
+      {/* Card Orbiter */}
+      <AnimatePresence>
+        {orbiterHidden.size > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="fixed top-[76px] right-4 z-40 flex flex-col items-end gap-2 max-h-[calc(100vh-100px)] overflow-y-auto"
+            style={{ scrollbarWidth: 'none' }}
+          >
+            <div className="flex flex-col items-end gap-1.5">
+              <AnimatePresence mode="popLayout">
+                {Array.from(orbiterHidden).map((idx) => {
+                  const meta = cardMeta[idx as number];
+                  if (!meta) return null;
+                  const Icon = meta.icon;
+                  return (
+                    <motion.button
+                      key={idx}
+                      initial={{ opacity: 0, x: 30, scale: 0.9 }}
+                      animate={{ opacity: 1, x: 0, scale: 1 }}
+                      exit={{ opacity: 0, x: 30, scale: 0.9 }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() =>
+                        setOrbiterHidden((prev) => {
+                          const next = new Set(prev);
+                          next.delete(idx);
+                          return next;
+                        })
+                      }
+                      className={`flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-xl bg-gradient-to-r ${meta.color} text-white shadow-lg border border-white/20 hover:shadow-xl transition-all cursor-pointer`}
+                    >
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <Icon size={14} className="shrink-0" />
+                    <span className="text-[10px] sm:text-xs font-black uppercase tracking-tight truncate max-w-[120px]">
+                      {language === 'en' ? meta.en : meta.np}
+                    </span>
+                  </div>
+                  <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <span className="text-[8px] font-black">+</span>
+                  </span>
+                </motion.button>
+              );
+            })}
+              </AnimatePresence>
+            </div>
+          <button
+            onClick={releaseAllCards}
+            className="mt-1 px-3 py-1 bg-slate-900/90 dark:bg-slate-800/90 backdrop-blur-xl text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-lg border border-white/10 hover:bg-slate-800 transition-colors"
+          >
+            {language === 'en' ? 'Release All' : 'सबै निकाल्नुहोस्'}
+          </button>
+        </motion.div>
+      )}
+      </AnimatePresence>
+
+      {/* Reserved sub-header space when cards are grouping */}
+      {orbiterHidden.size > 0 && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="overflow-hidden"
+        >
+          <div className="flex items-center justify-end gap-3 py-2">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent" />
+            <p className="text-[10px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 text-right max-w-md leading-relaxed">
+              {language === 'en'
+                ? 'A comprehensive overview of tracked performance indicators, including overall progress, current status, calculation logic, trends, and sectoral insights.'
+                : 'ट्र्याक गरिएका कार्यसम्पादन सूचकहरूको व्यापक अवलोकन, जसमा समग्र प्रगति, हालको स्थिति, गणना तर्क, प्रवृत्ति र क्षेत्रीय अन्तर्दृष्टि समावेश छन्।'}
+            </p>
+          </div>
+        </motion.div>
+      )}
 
       {/* Summary Stats - Bold 3D Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        {/* Card 1: Hero Overall Progress */}
-        <motion.button
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setShowOverallProgress(!showOverallProgress)}
-          className="group relative col-span-full sm:col-span-2 lg:col-span-4 cursor-pointer bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-[28px] p-6 sm:p-8 text-left shadow-2xl shadow-emerald-500/25 border border-white/20 hover:shadow-emerald-500/40 active:shadow-emerald-500/40 transition-all duration-300 overflow-hidden"
+      {/* Each card slot = sentinel (always in DOM) + AnimatePresence card */}
+      <div ref={orbiterScrollRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* Card 0: Hero Overall Progress */}
+        <div className="col-span-full sm:col-span-2 lg:col-span-4">
+          {/* Sentinel: always rendered so IntersectionObserver never loses it */}
+          <div ref={(el) => { sentinelRefs.current[0] = el; }} className="h-0 w-full" aria-hidden="true" />
+         <AnimatePresence>
+          {!orbiterHidden.has(0) && (
+            <motion.button
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+             whileHover={{ scale: 1.02 }}
+               whileTap={{ scale: 0.98 }}
+               onClick={() => setShowOverallProgress(p => !p)}
+               className="group relative w-full cursor-pointer bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-emerald-500/25 border border-white/20 hover:shadow-2xl hover:shadow-emerald-500/40 active:shadow-2xl active:shadow-emerald-500/40 transition-all duration-200 overflow-hidden"
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1039,13 +1241,20 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             </AnimatePresence>
           </div>
         </motion.button>
+      )}
+    </AnimatePresence>
+        </div>
 
-        {/* Card 2: Status Breakdown */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setShowStatusDetails(!showStatusDetails)}
-          className="group relative cursor-pointer bg-gradient-to-br from-violet-400 via-purple-400 to-fuchsia-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-violet-500/25 border border-white/20 hover:shadow-2xl hover:shadow-violet-500/40 active:shadow-2xl active:shadow-violet-500/40 transition-all duration-200 overflow-hidden"
+        {/* Card 1: Status Breakdown */}
+        <div className="col-span-full sm:col-span-2 lg:col-span-4">
+          <div ref={(el) => { sentinelRefs.current[1] = el; }} className="h-0 w-full" aria-hidden="true" />
+          <AnimatePresence>
+          {!orbiterHidden.has(1) && (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setShowStatusDetails(p => !p)}
+          className="group relative cursor-pointer w-full bg-gradient-to-br from-violet-400 via-purple-400 to-fuchsia-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-violet-500/25 border border-white/20 hover:shadow-2xl hover:shadow-violet-500/40 active:shadow-2xl active:shadow-violet-500/40 transition-all duration-200 overflow-hidden"
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1226,16 +1435,28 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 </motion.div>
               )}
             </AnimatePresence>
-           </div>
-         </motion.button>
+            </div>
+          </motion.button>
+      )}
+    </AnimatePresence>
+        </div>
 
-         {/* Card 3: Total Indicators */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setShowTotalIndicators(!showTotalIndicators)}
-          className="group relative cursor-pointer bg-gradient-to-br from-indigo-400 via-blue-400 to-cyan-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
-        >
+        {/* Card 2: Total Indicators */}
+        <div className="col-span-full sm:col-span-2 lg:col-span-4">
+          <div ref={(el) => { sentinelRefs.current[2] = el; }} className="h-0 w-full" aria-hidden="true" />
+          <AnimatePresence>
+          {!orbiterHidden.has(2) && (
+            <motion.button
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setShowTotalIndicators(p => !p)}
+              className="group relative cursor-pointer w-full bg-gradient-to-br from-indigo-400 via-blue-400 to-cyan-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
+            >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="relative z-10">
@@ -1299,16 +1520,29 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   </motion.div>
                 )}
               </AnimatePresence>
-           </div>
-         </motion.button>
+            </div>
+          </motion.button>
+      )}
+    </AnimatePresence>
 
-         {/* Card 4: Category Status */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setShowCategoryStatus(!showCategoryStatus)}
-          className="group relative cursor-pointer bg-gradient-to-br from-teal-400 via-emerald-400 to-green-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-teal-500/25 border border-white/20 hover:shadow-2xl hover:shadow-teal-500/40 active:shadow-2xl active:shadow-teal-500/40 transition-all duration-200 overflow-hidden"
-        >
+        </div>
+
+        {/* Card 3: Category Status */}
+        <div className="col-span-full sm:col-span-2 lg:col-span-4">
+          <div ref={(el) => { sentinelRefs.current[3] = el; }} className="h-0 w-full" aria-hidden="true" />
+          <AnimatePresence>
+          {!orbiterHidden.has(3) && (
+            <motion.button
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setShowCategoryStatus(p => !p)}
+              className="group relative cursor-pointer w-full bg-gradient-to-br from-teal-400 via-emerald-400 to-green-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-teal-500/25 border border-white/20 hover:shadow-2xl hover:shadow-teal-500/40 active:shadow-2xl active:shadow-teal-500/40 transition-all duration-200 overflow-hidden"
+            >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="relative z-10">
@@ -1476,16 +1710,29 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                )}
              </AnimatePresence>
            </div>
-         </motion.button>
-       </div>
+          </motion.button>
+      )}
+    </AnimatePresence>
+      </div>
 
-       {/* Reporting Offices */}
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.97 }}
-        onClick={() => setShowReportingOffices(!showReportingOffices)}
-        className="group relative cursor-pointer bg-gradient-to-br from-slate-400 via-gray-400 to-zinc-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-slate-500/25 border border-white/20 hover:shadow-2xl hover:shadow-slate-500/40 active:shadow-2xl active:shadow-slate-500/40 transition-all duration-200 overflow-hidden"
-      >
+        </div>
+
+        {/* Card 4: Reporting Offices */}
+        <div className="col-span-full sm:col-span-2 lg:col-span-4">
+          <div ref={(el) => { sentinelRefs.current[4] = el; }} className="h-0 w-full" aria-hidden="true" />
+          <AnimatePresence>
+          {!orbiterHidden.has(4) && (
+            <motion.button
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setShowReportingOffices(p => !p)}
+              className="group relative cursor-pointer w-full bg-gradient-to-br from-slate-400 via-gray-400 to-zinc-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-slate-500/25 border border-white/20 hover:shadow-2xl hover:shadow-slate-500/40 active:shadow-2xl active:shadow-slate-500/40 transition-all duration-200 overflow-hidden"
+            >
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div className="relative z-10">
@@ -1564,17 +1811,30 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             </AnimatePresence>
           </div>
       </motion.button>
+      )}
+    </AnimatePresence>
 
-      {/* Budget Allocation & Capital Expenditure */}
-      <motion.div
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.97 }}
-         className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
-      >
+        </div>
+
+      {/* Card 5: Budget & Capital Expenditure */}
+      <div className="col-span-full sm:col-span-2 lg:col-span-4">
+        <div ref={(el) => { sentinelRefs.current[5] = el; }} className="h-0 w-full" aria-hidden="true" />
+      <AnimatePresence>
+        {!orbiterHidden.has(5) && (
+          <motion.div
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
+          >
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <button
-          onClick={() => setShowBudgetCard(!showBudgetCard)}
+              onClick={() => setShowBudgetCard(p => !p)}
           className="relative w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
         >
           <div className="flex items-center gap-2">
@@ -1740,20 +2000,33 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               )}
             </AnimatePresence>
       </motion.div>
+      )}
+    </AnimatePresence>
 
-      {/* Visual Insights — optional charts with options */}
-      <motion.div
-        ref={insightsCardRef}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.97 }}
-        className="group relative cursor-pointer bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] shadow-xl shadow-indigo-500/10 dark:shadow-indigo-500/5 hover:shadow-2xl hover:shadow-indigo-500/20 dark:hover:shadow-indigo-500/10 active:shadow-2xl active:shadow-indigo-500/20 dark:active:shadow-indigo-500/10 transition-all duration-200 overflow-hidden"
-      >
+      </div>
+
+      {/* Card 6: Visual Insights */}
+      <div className="col-span-full sm:col-span-2 lg:col-span-4">
+        <div ref={(el) => { sentinelRefs.current[6] = el; }} className="h-0 w-full" aria-hidden="true" />
+      <AnimatePresence>
+        {!orbiterHidden.has(6) && (
+          <motion.div
+            ref={insightsCardRef}
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            className="group relative cursor-pointer bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] shadow-xl shadow-indigo-500/10 dark:shadow-indigo-500/5 hover:shadow-2xl hover:shadow-indigo-500/20 dark:hover:shadow-indigo-500/10 active:shadow-2xl active:shadow-indigo-500/20 dark:active:shadow-indigo-500/10 transition-all duration-200 overflow-hidden"
+          >
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         {highlightedCard === 'insights' && (
           <div className="absolute inset-0 rounded-[28px] ring-4 ring-indigo-500/60 animate-pulse pointer-events-none z-20" />
         )}
         <button
-          onClick={() => setShowInsights(!showInsights)}
+              onClick={() => setShowInsights(p => !p)}
           className="relative w-full flex items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-indigo-50/80 to-white dark:from-indigo-950/30 dark:to-slate-900 hover:from-indigo-50 dark:hover:from-indigo-950/40 transition-colors"
         >
           <div className="flex items-center gap-2">
@@ -1872,17 +2145,30 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           )}
         </AnimatePresence>
       </motion.div>
+      )}
+    </AnimatePresence>
 
-      {/* All Indicators Overview */}
-      <motion.div
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.98 }}
-        className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-2xl shadow-indigo-500/30 border border-white/30 hover:shadow-indigo-500/50 active:shadow-indigo-500/50 transition-all duration-300 overflow-hidden"
-      >
+      </div>
+
+      {/* Card 7: All Indicators Overview */}
+      <div className="col-span-full sm:col-span-2 lg:col-span-4">
+        <div ref={(el) => { sentinelRefs.current[7] = el; }} className="h-0 w-full" aria-hidden="true" />
+      <AnimatePresence>
+        {!orbiterHidden.has(7) && (
+          <motion.div
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+             whileHover={{ scale: 1.02 }}
+             whileTap={{ scale: 0.98 }}
+             className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/30 border border-white/30 hover:shadow-2xl hover:shadow-indigo-500/50 active:shadow-2xl active:shadow-indigo-500/50 transition-all duration-200 overflow-hidden"
+          >
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <button
-          onClick={() => setShowAllIndicators(!showAllIndicators)}
+              onClick={() => setShowAllIndicators(p => !p)}
           className="relative w-full flex items-center justify-between gap-3 px-5 sm:px-6 py-5 sm:py-6"
         >
           <div className="flex items-center gap-3">
@@ -2003,6 +2289,9 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           )}
         </AnimatePresence>
       </motion.div>
+      )}
+    </AnimatePresence>
+      </div>
 
       <StatusBreakdownModal
         isOpen={showStatusBreakdown}

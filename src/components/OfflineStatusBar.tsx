@@ -24,11 +24,11 @@ export const OfflineStatusBar: React.FC = () => {
     <AnimatePresence>
       {isOffline && (
         <motion.div
-          initial={{ y: 80, opacity: 0 }}
+          initial={{ y: -80, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 80, opacity: 0 }}
+          exit={{ y: -80, opacity: 0 }}
           transition={{ type: 'spring', damping: 24, stiffness: 200 }}
-          className="fixed bottom-[88px] left-4 right-4 z-[5999] md:left-auto md:right-6 md:w-auto"
+          className="fixed top-4 left-4 right-4 z-[5999] md:left-auto md:right-6 md:w-auto"
         >
           <div className="flex items-center justify-center gap-2 bg-white dark:bg-slate-950/90 backdrop-blur-xl text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-2xl shadow-2xl border border-slate-300/60 dark:border-slate-700/50">
             <WifiOff size={14} className="animate-pulse" />

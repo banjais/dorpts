@@ -4,9 +4,11 @@ import { useLanguage } from '../context/LanguageContext';
 
 interface SplashScreenProps {
   progress: number;
+  requireLanguageSelect?: boolean;
+  onLanguageSelect?: (lang: 'en' | 'ne') => void;
 }
 
-export const SplashScreen: React.FC<SplashScreenProps> = ({ progress }) => {
+export const SplashScreen: React.FC<SplashScreenProps> = ({ progress, requireLanguageSelect = false, onLanguageSelect }) => {
   const { language } = useLanguage();
   const displayProgress = Math.min(100, Math.round(progress));
   
@@ -151,6 +153,33 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ progress }) => {
             </div>
           </div>
         </motion.div>
+
+        {requireLanguageSelect && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0, duration: 0.6 }}
+            className="flex flex-col items-center gap-4 mb-8 z-20"
+          >
+            <p className="text-xs font-bold text-white/70 uppercase tracking-widest">
+              Choose Language / भाषा चयन गर्नुहोस्
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => onLanguageSelect?.('en')}
+                className="px-6 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs font-black uppercase tracking-wider transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer shadow-lg hover:border-indigo-500/50 hover:shadow-indigo-500/10"
+              >
+                <span className="text-lg">🇺🇸</span> English
+              </button>
+              <button
+                onClick={() => onLanguageSelect?.('ne')}
+                className="px-6 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs font-black uppercase tracking-wider transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer shadow-lg hover:border-indigo-500/50 hover:shadow-indigo-500/10"
+              >
+                <span className="text-lg">🇳🇵</span> नेपाली
+              </button>
+            </div>
+          </motion.div>
+        )}
 
         {/* Branding - 3 lines at bottom */}
         <motion.div

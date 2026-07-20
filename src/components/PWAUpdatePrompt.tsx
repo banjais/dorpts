@@ -13,7 +13,11 @@ const DISMISSED_KEY = 'pwa-update-dismissed';
 
 export const PWAUpdatePrompt: React.FC = () => {
   const { language } = useLanguage();
-  const { needRefresh, offlineReady, updateServiceWorker } = useRegisterSW();
+  const { needRefresh, offlineReady, updateServiceWorker } = useRegisterSW({
+    onRegisterError: (error) => {
+      console.debug('[DORPTS] Service worker registration error:', error);
+    },
+  });
   const [dismissed, setDismissed] = useState(() => sessionStorage.getItem(DISMISSED_KEY) === 'true');
   const [isOnline, setIsOnline] = useState(typeof window !== 'undefined' ? navigator.onLine : true);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');

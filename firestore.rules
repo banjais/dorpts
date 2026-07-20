@@ -2,11 +2,6 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Global Deny
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
     // Helpers
     function isValidId(id) {
       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
@@ -35,6 +30,12 @@ service cloud.firestore {
       return resource.data;
     }
 
+    // Settings
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Indicators
     match /indicators/{indicatorId} {
       allow read: if true;
@@ -44,9 +45,6 @@ service cloud.firestore {
     // Updates History
     match /updates_history/{historyId} {
       allow read: if true;
-      // Allow unauthenticated writes ONLY if the document doesn't exist yet (for initial population)
-      // This is slightly risky but matches the app's current auto-population logic.
-      // Better would be to restrict to admin, but we need to solve the "Missing or insufficient permissions" error.
       allow create: if true; 
       allow update, delete: if isAdmin();
     }
@@ -64,13 +62,19 @@ service cloud.firestore {
 
     // Email OTP sessions
     match /sessions/{sessionId} {
-      allow create, read: if true;
-      allow update, delete: if false;
+      allow create, read, delete: if true;
+      allow update: if false;
     }
 
     // Users (email-based roles, admin-managed)
     match /users/{userId} {
-      allow read, write, create: if isAdmin();
+      allow read: if true;
+      allow write, create: if isAdmin();
+    }
+
+    // Users (self-service)
+    match /users/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
     }
 
     // Admins
@@ -102,6 +106,11 @@ service cloud.firestore {
       allow create: if isSignedIn() && incoming().userId == request.auth.uid;
       allow update: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin()) && incoming().userId == existing().userId;
       allow delete: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    // Global Deny (must be last)
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

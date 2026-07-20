@@ -24,6 +24,7 @@ interface LeftDrawerMenuProps {
   onNavigate: (view: MainView) => void;
   onOpenVisualInsights: () => void;
   onOpenAbout?: () => void;
+  onOpenLogin?: () => void;
 }
 
 export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
@@ -34,6 +35,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
   onNavigate,
   onOpenVisualInsights,
   onOpenAbout,
+  onOpenLogin,
 }) => {
   const { user, isAdmin, loginWithGoogle, logout } = useAuth();
 
@@ -44,6 +46,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
     labelNp: string;
     onClick: () => void;
     active?: boolean;
+    soon?: boolean;
   }[] = [
     {
       id: 'overview',
@@ -203,7 +206,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
             ) : (
               <div className="px-5 py-4 border-t border-slate-100 dark:border-white/5">
                 <button
-                  onClick={() => { loginWithGoogle(); onClose(); }}
+                  onClick={() => { onClose(); onOpenLogin?.(); }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-black shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98]"
                 >
                   <LogIn size={14} />

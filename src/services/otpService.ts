@@ -16,15 +16,23 @@ function hashEmail(email: string): string {
 }
 
 export async function requestEmailSend(email: string, otp: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/auth/send-otp`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, otp }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: 'unknown' }));
-    throw new Error(err.error || 'Failed to send OTP');
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/send-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, otp }),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'unknown' }));
+      throw new Error(err.error || 'Failed to send OTP');
+    }
+  } finally {
+    clearTimeout(timeout);
   }
 }
 

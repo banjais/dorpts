@@ -14,6 +14,9 @@ interface FooterProps {
   onOpenAI?: () => void;
   isScrolled?: boolean;
   fiscalYear?: string;
+  isExpanded?: boolean;
+  onExpandChange?: (expanded: boolean) => void;
+  isAtBottom?: boolean;
 }
 
 export const Footer: React.FC<FooterProps> = ({ 
@@ -25,6 +28,9 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenAI,
   isScrolled,
   fiscalYear,
+  isExpanded = false,
+  onExpandChange,
+  isAtBottom = false,
 }) => {
   const { language, t } = useLanguage();
   const [showQr, setShowQr] = useState(false);
@@ -32,6 +38,9 @@ export const Footer: React.FC<FooterProps> = ({
   const [isQrHovered, setIsQrHovered] = useState(false);
   const currentUrl = window.location.href;
   const [minutesAgo, setMinutesAgo] = useState<number | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const shouldExpand = isExpanded || isHovered || isAtBottom;
   
   useEffect(() => {
     const updateMinutesAgo = () => {
@@ -100,86 +109,129 @@ export const Footer: React.FC<FooterProps> = ({
 
   return (
     <>
-      <footer id="app-footer" className="w-full py-12 mt-auto bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-900 text-slate-900 dark:text-white transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center justify-center gap-8">
-          
-          <div className="flex flex-col items-center mb-2 text-center">
-            <div className="w-10 h-1 bg-[#dc2626] mx-auto mb-2 rounded-full"></div>
-            <p className="text-[0.5625rem] uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 font-black">
-              {t('secureActionPortal')}
-            </p>
-          </div>
+      <footer 
+        id="app-footer"
+        onMouseEnter={() => { setIsHovered(true); onExpandChange?.(true); }}
+        onMouseLeave={() => { setIsHovered(false); onExpandChange?.(false); }}
+        onClick={(e) => { e.stopPropagation(); onExpandChange?.(!shouldExpand); }}
+        className={`fixed bottom-0 left-0 w-full bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-900 text-slate-900 dark:text-white transition-all duration-500 ease-out cursor-pointer z-[850] ${
+          shouldExpand ? 'py-8 sm:py-12' : 'py-3 sm:py-4'
+        }`}
+      >
+        <motion.div 
+          className="max-w-7xl mx-auto px-6 flex flex-col items-center justify-center"
+          animate={{ 
+            height: shouldExpand ? 'auto' : 'auto',
+            opacity: shouldExpand ? 1 : 0.9,
+          }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+        >
+          {shouldExpand && (
+            <>
+              <div className="flex flex-col items-center mb-2 text-center">
+                <div className="w-10 h-1 bg-[#dc2626] mx-auto mb-2 rounded-full"></div>
+                <p className="text-[0.5625rem] uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 font-black">
+                  {t('secureActionPortal')}
+                </p>
+              </div>
 
-          <div className="w-full flex flex-col items-center gap-4 sm:gap-6">
-            <div className="w-full flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 px-2 pb-4">
-              {/* Menu & Action Items in One Row */}
-              {[...menuItems, ...actionItems].map((item) => (
-                <div key={item.id} className="relative shrink-0">
-                  {item.id === 'btn-share' && (
-                    <AnimatePresence>
-                      {isQrHovered && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 15, scale: 0.8 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.8 }}
-                          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 flex flex-col items-center gap-2 pointer-events-none"
-                        >
-                          <div className="p-2 bg-white rounded-xl border border-slate-100">
-                            <QRCodeCanvas value={currentUrl} size={110} />
-                          </div>
-                          <span className="text-[0.5rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center whitespace-nowrap">
-                            {t('scanToOpen') || 'Scan to Open'}
-                          </span>
-                        </motion.div>
+              <div className="w-full flex flex-col items-center gap-4 sm:gap-6">
+                <div className="w-full flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 px-2 pb-4">
+                  {[...menuItems, ...actionItems].map((item) => (
+                    <div key={item.id} className="relative shrink-0">
+                      {item.id === 'btn-share' && (
+                        <AnimatePresence>
+                          {isQrHovered && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 15, scale: 0.8 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 10, scale: 0.8 }}
+                              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 flex flex-col items-center gap-2 pointer-events-none"
+                            >
+                              <div className="p-2 bg-white rounded-xl border border-slate-100">
+                                <QRCodeCanvas value={currentUrl} size={110} />
+                              </div>
+                              <span className="text-[0.5rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center whitespace-nowrap">
+                                {t('scanToOpen') || 'Scan to Open'}
+                              </span>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       )}
-                    </AnimatePresence>
-                  )}
-                   <button
-                     id={item.id}
-                     onClick={item.action}
-                     onMouseEnter={() => { if (item.id === 'btn-share') setIsQrHovered(true); }}
-                     onMouseLeave={() => { if (item.id === 'btn-share') setIsQrHovered(false); }}
-                      className={`flex flex-col items-center justify-center gap-1 w-[3.5rem] sm:w-[4.5rem] px-2 sm:px-3 py-2 rounded-xl transition-all active:scale-95 cursor-pointer border ${
-                        'highlight' in item && (item as any).highlight 
-                          ? 'bg-indigo-600 text-white border-indigo-700 shadow-lg shadow-indigo-600/20 hover:bg-indigo-700' 
-                          : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
-                      }`}
-                   >
-                     {item.id === 'btn-ai' && (
-                       <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                         <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                       </span>
-                     )}
-                     <item.icon size={12} strokeWidth={2.5} className={`${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'} sm:size-[15px] transition-colors shrink-0`} />
-                      <span className={`text-[0.5rem] sm:text-[0.55rem] leading-tight font-black uppercase tracking-tighter text-center line-clamp-2 ${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`}>
-                        {item.label}
-                      </span>
-                   </button>
+                       <button
+                         id={item.id}
+                         onClick={(e) => { e.stopPropagation(); item.action(); }}
+                         onMouseEnter={() => { if (item.id === 'btn-share') setIsQrHovered(true); }}
+                         onMouseLeave={() => { if (item.id === 'btn-share') setIsQrHovered(false); }}
+                          className={`flex flex-col items-center justify-center gap-1 w-[3.5rem] sm:w-[4.5rem] px-2 sm:px-3 py-2 rounded-xl transition-all active:scale-95 cursor-pointer border ${
+                            'highlight' in item && (item as any).highlight 
+                              ? 'bg-indigo-600 text-white border-indigo-700 shadow-lg shadow-indigo-600/20 hover:bg-indigo-700' 
+                              : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
+                          }`}
+                       >
+                         {item.id === 'btn-ai' && (
+                           <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                             <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                           </span>
+                         )}
+                         <item.icon size={12} strokeWidth={2.5} className={`${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'} sm:size-[15px] transition-colors shrink-0`} />
+                          <span className={`text-[0.5rem] sm:text-[0.55rem] leading-tight font-black uppercase tracking-tighter text-center line-clamp-2 ${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`}>
+                            {item.label}
+                          </span>
+                       </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-            <div className="flex flex-col items-center gap-2 mt-4">
-            <div className="flex items-center gap-3">
-              <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
-              <p className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                © DOR | 2082/83 B.S
+              <div className="flex flex-col items-center gap-2 mt-4">
+              <div className="flex items-center gap-3">
+                <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
+                <p className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                  © DOR | 2082/83 B.S
+                </p>
+                <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
+              </div>
+              <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
+                v2.4.0
               </p>
-              <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
+              {minutesAgo !== null && (
+                <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium mt-1 truncate">
+                  {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
+                </p>
+              )}
             </div>
-            <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
-              v2.4.0
-            </p>
-            {minutesAgo !== null && (
-              <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium mt-1 truncate">
-                {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
-              </p>
-            )}
-          </div>
+            </>
+          )}
 
-        </div>
+          {!shouldExpand && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-center gap-2 py-1"
+            >
+              <div className="h-[1px] w-6 bg-slate-300 dark:bg-slate-700"></div>
+              <span className="text-[0.5rem] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                {language === 'en' ? 'Action Portal' : 'कार्य पोर्टल'}
+                <motion.span
+                  animate={{ 
+                    opacity: [0.4, 1, 0.4],
+                    y: [0, 2, 0]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                >
+                  <ChevronDown size={10} className="text-indigo-500 dark:text-indigo-400" />
+                </motion.span>
+              </span>
+              <div className="h-[1px] w-6 bg-slate-300 dark:bg-slate-700"></div>
+            </motion.div>
+          )}
+        </motion.div>
       </footer>
 
       <AnimatePresence>

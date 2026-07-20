@@ -1,3 +1,5 @@
+import { Indicator } from '../types';
+
 export type StatusType = 'excellent' | 'onTrack' | 'progressing' | 'atRisk' | 'delayed';
 
 export type BreakdownStatus = 'onTrack' | 'needsAttention' | 'stale';

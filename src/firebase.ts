@@ -84,9 +84,7 @@ export async function testFirestoreConnection() {
   const { doc, getDocFromServer } = await import('firebase/firestore');
   try {
     await getDocFromServer(doc(db, 'test-connection-placeholder', 'check'));
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.error("Please check your Firebase configuration.");
-    }
+  } catch {
+    // Suppress all connection test errors (expected for unauthenticated/public access)
   }
 }

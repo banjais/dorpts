@@ -443,7 +443,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div
             className={`overflow-hidden pb-0.5 smooth-header-transition ${
               scrolled
-                ? 'opacity-0 h-0 pointer-events-none'
+                ? 'opacity-100 h-auto pointer-events-auto'
                 : 'opacity-100 h-[45px] sm:h-[60px] pointer-events-auto'
             }`}
             style={{
@@ -452,10 +452,12 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <div className="flex flex-row items-center justify-between gap-2 h-[45px] sm:h-[60px]">
                 <div className="border-l-2 border-[#0099DA]/70 dark:border-[#00ADF7]/70 pl-2.5 py-0.5 min-w-0">
-                <h1 className="font-display text-[0.72rem] sm:text-[0.95rem] md:text-[1.05rem] font-extrabold text-slate-800 dark:text-white tracking-tight uppercase leading-none truncate">
-                  <span className="text-brand-gradient">{t('dorProgress')}</span>
+                <h1 className={`font-display font-extrabold text-slate-800 dark:text-white tracking-tight uppercase leading-none truncate ${
+                  scrolled ? 'text-[8px] sm:text-[9px]' : 'text-[0.72rem] sm:text-[0.95rem] md:text-[1.05rem]'
+                }`}>
+                  <span className="text-brand-gradient">{language === 'en' ? 'PERFORMANCE OVERVIEW' : 'कार्यसम्पादन अवलोकन'}</span>
                 </h1>
-                {fiscalYear && (
+                {!scrolled && fiscalYear && (
                   <span className="text-[10px] sm:text-xs font-black text-[#0099DA] dark:text-[#00ADF7] bg-[#0099DA]/10 dark:bg-[#00ADF7]/10 px-2 py-1 rounded-md shrink-0">
                     FY {fiscalYear}
                   </span>

@@ -25,6 +25,11 @@ export const triggerHaptic = (pattern: 'light' | 'medium' | 'heavy' | 'success' 
       const intensity = getHapticIntensity();
       if (intensity === 'off') return;
       
+      if (typeof document !== 'undefined') {
+        if (document.visibilityState === 'hidden') return;
+        if (typeof document.hasFocus === 'function' && !document.hasFocus()) return;
+      }
+      
       let multiplier = 1;
       
       if (intensity === 'light') multiplier = 0.5;
@@ -47,7 +52,6 @@ export const triggerHaptic = (pattern: 'light' | 'medium' | 'heavy' | 'success' 
         navigator.vibrate(scale(pattern));
       }
     } catch (e) {
-      // Ignore potential iframe security blocks or errors
       console.debug('Haptic feedback not supported or blocked:', e);
     }
   }

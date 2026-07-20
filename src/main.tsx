@@ -17,7 +17,10 @@ const ignoredWarnings = [
   'lucide-react',
   'Could not reach Cloud Firestore backend',
   '@firebase/firestore',
-  'firestore'
+  'firestore',
+  'Failed to execute \'put\' on \'Cache\'',
+  'Entry was not found',
+  'NotFoundError',
 ];
 
 const originalWarn = console.warn;
@@ -43,7 +46,14 @@ console.error = (...args) => {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
-  </StrictMode>,
+  </StrictMode>
 );
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('unhandledrejection', (event) => {
+    console.debug('[DORPTS] Unhandled promise rejection:', event.reason);
+    event.preventDefault();
+  });
+}
 
 

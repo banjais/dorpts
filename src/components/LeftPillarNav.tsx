@@ -42,6 +42,18 @@ const SECTION_COLORS: Record<MainView, PillarColor> = {
     glow: 'shadow-violet-500/40',
     border: 'border-violet-200 dark:border-violet-700/40',
   },
+  insights: {
+    bg: 'bg-slate-50/80 dark:bg-slate-900/80',
+    activeBg: 'bg-indigo-600 dark:bg-indigo-500',
+    glow: 'shadow-indigo-500/40',
+    border: 'border-indigo-200 dark:border-indigo-700/40',
+  },
+  'action-portal': {
+    bg: 'bg-slate-50/80 dark:bg-slate-900/80',
+    activeBg: 'bg-rose-600 dark:bg-rose-500',
+    glow: 'shadow-rose-500/40',
+    border: 'border-rose-200 dark:border-rose-700/40',
+  },
 };
 
 interface LeftPillarNavProps {

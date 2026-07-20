@@ -430,24 +430,12 @@ function MainAppContent() {
     };
   }, [addToast]);
 
-  const [metadata, setMetadata] = useState<SystemMetadata | null>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("dor_metadata_cache");
-        if (saved) {
-          return JSON.parse(saved);
-        }
-      } catch (_) {
-        // Suppress redundant log
-      }
-    }
-    return {
-      id: "current",
-      lastUpdateDate: "2083/02/30",
-      nextUpdateDate: "2083/03/07",
-      totalWeight: 75,
-      totalWeightProgress: 61,
-    };
+  const [metadata, setMetadata] = useState<SystemMetadata | null>({
+    id: "current",
+    lastUpdateDate: "2083/02/30",
+    nextUpdateDate: "2083/03/07",
+    totalWeight: 75,
+    totalWeightProgress: 61,
   });
 
   const categoryThemes = useMemo(() => {
@@ -481,24 +469,13 @@ function MainAppContent() {
   };
 
   const [isFooterExpanded, setIsFooterExpanded] = useState(false);
-  const [isHighContrast, setIsHighContrast] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("dor_high_contrast") === 'true';
-    }
-    return false;
-  });
-  const [widgetVisibility, setWidgetVisibility] = useState<WidgetVisibility>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("dor_widget_visibility");
-      if (saved) return JSON.parse(saved);
-    }
-    return {
-      radialChart: true,
-      summaryCards: true,
-      trendsGraph: true,
-      budgetUtilization: true,
-      performanceHeatmap: true,
-    };
+  const [isHighContrast, setIsHighContrast] = useState(false);
+  const [widgetVisibility, setWidgetVisibility] = useState<WidgetVisibility>({
+    radialChart: true,
+    summaryCards: true,
+    trendsGraph: true,
+    budgetUtilization: true,
+    performanceHeatmap: true,
   });
 
   useEffect(() => {
@@ -507,13 +484,11 @@ function MainAppContent() {
     } else {
       document.documentElement.classList.remove('high-contrast');
     }
-    localStorage.setItem("dor_high_contrast", String(isHighContrast));
   }, [isHighContrast]);
 
   const handleToggleWidget = (key: keyof WidgetVisibility) => {
     setWidgetVisibility(prev => {
       const next = { ...prev, [key]: !prev[key] };
-      localStorage.setItem("dor_widget_visibility", JSON.stringify(next));
       return next;
     });
   };
@@ -527,7 +502,6 @@ function MainAppContent() {
       performanceHeatmap: true,
     };
     setWidgetVisibility(defaults);
-    localStorage.setItem("dor_widget_visibility", JSON.stringify(defaults));
     
     if (isAdmin) {
       try {
@@ -589,20 +563,9 @@ function MainAppContent() {
   ] as const;
 
   const [indicators, setIndicatorsRaw] = useState<Indicator[]>(() => {
-    let list = DEFAULT_INDICATORS;
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("dor_indicators_cache");
-        if (saved) {
-          list = JSON.parse(saved);
-        }
-      } catch (_) {
-        // Suppress redundant log
-      }
-    }
     const isBlank = (val: any) => val === null || val === undefined || isNaN(Number(val)) || String(val).trim() === '';
     const seen = new Set<string>();
-    return list
+    return DEFAULT_INDICATORS
       .map(ind => {
         if (!ind) return ind;
         const annualTarget = isBlank(ind.annualTarget) ? 1 : ind.annualTarget;
@@ -655,17 +618,7 @@ function MainAppContent() {
       return normalized;
     });
   }, []);
-  const [alertLogs, setAlertLogs] = useState<AlertLogEntry[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("dor_alert_logs");
-        return saved ? JSON.parse(saved) : [];
-      } catch (_) {
-        return [];
-      }
-    }
-    return [];
-  });
+  const [alertLogs, setAlertLogs] = useState<AlertLogEntry[]>([]);
 
   const checkAndLogThresholdBreaches = useCallback(
     (currentIndicators: Indicator[], currentLogs: AlertLogEntry[]) => {
@@ -673,44 +626,38 @@ function MainAppContent() {
       const nextLogs = [...currentLogs];
 
       currentIndicators.forEach((ind) => {
-        const thresholdStr = localStorage.getItem(
-          `indicator-threshold-${ind.id}`,
-        );
-        if (thresholdStr !== null) {
-          const threshold = Number(thresholdStr);
-          const progressPercent =
-            ind.annualTarget > 0
-              ? Math.round((ind.annualProgress / ind.annualTarget) * 100)
-              : 0;
+        const threshold = 80;
+        const progressPercent =
+          ind.annualTarget > 0
+            ? Math.round((ind.annualProgress / ind.annualTarget) * 100)
+            : 0;
 
-          if (progressPercent <= threshold) {
-            const alreadyLogged = nextLogs.some(
-              (log) =>
-                log.indicatorId === ind.id &&
-                log.progress === progressPercent &&
-                log.threshold === threshold,
-            );
+        if (progressPercent <= threshold) {
+          const alreadyLogged = nextLogs.some(
+            (log) =>
+              log.indicatorId === ind.id &&
+              log.progress === progressPercent &&
+              log.threshold === threshold,
+          );
 
-            if (!alreadyLogged) {
-              const newLog: AlertLogEntry = {
-                id: `alert-log-${Date.now()}-${ind.id}-${Math.random().toString(36).substr(2, 5)}`,
-                indicatorId: ind.id,
-                indicatorName: ind.name,
-                indicatorNameEn: ind.nameEn || ind.name,
-                category: ind.category || "Infrastructure Creation",
-                threshold,
-                progress: progressPercent,
-                timestamp: new Date().toISOString(),
-              };
-              nextLogs.unshift(newLog);
-              updated = true;
-            }
+          if (!alreadyLogged) {
+            const newLog: AlertLogEntry = {
+              id: `alert-log-${Date.now()}-${ind.id}-${Math.random().toString(36).substr(2, 5)}`,
+              indicatorId: ind.id,
+              indicatorName: ind.name,
+              indicatorNameEn: ind.nameEn || ind.name,
+              category: ind.category || "Infrastructure Creation",
+              threshold,
+              progress: progressPercent,
+              timestamp: new Date().toISOString(),
+            };
+            nextLogs.unshift(newLog);
+            updated = true;
           }
         }
       });
 
       if (updated) {
-        localStorage.setItem("dor_alert_logs", JSON.stringify(nextLogs));
         return nextLogs;
       }
       return null;
@@ -729,7 +676,6 @@ function MainAppContent() {
 
   const handleClearAlertLogs = useCallback(() => {
     setAlertLogs([]);
-    localStorage.setItem("dor_alert_logs", JSON.stringify([]));
   }, []);
 
   useEffect(() => {
@@ -741,49 +687,10 @@ function MainAppContent() {
 
   const [isQuickSortOpen, setIsQuickSortOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortType, setSortType] = useState<"default" | "low" | "high" | "weight" | "status">(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("dor_sort_type_pref");
-        if (
-          saved &&
-          (saved === "default" || saved === "low" || saved === "high" || saved === "weight" || saved === "status")
-        ) {
-          return saved as "default" | "low" | "high" | "weight" | "status";
-        }
-      } catch (_) {
-        // Suppress redundant log
-      }
-    }
-    return "default";
-  });
+  const [sortType, setSortType] = useState<"default" | "low" | "high" | "weight" | "status">("default");
   const [categoryFilter, setCategoryFilter] = useState("All");
-  const [selectedOffice, setSelectedOffice] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("dor_selected_office_pref");
-        if (saved !== null) {
-          return saved;
-        }
-      } catch (_) {
-        // Suppress
-      }
-    }
-    return "All";
-  });
-  const [hasAutoDetectedOffice, setHasAutoDetectedOffice] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("dor_selected_office_pref");
-        if (saved !== null) {
-          return true; // Already has a user preference, skip auto-detection
-        }
-      } catch (_) {
-        // Suppress
-      }
-    }
-    return false;
-  });
+  const [selectedOffice, setSelectedOffice] = useState<string>("All");
+  const [hasAutoDetectedOffice, setHasAutoDetectedOffice] = useState(false);
   const [showMilestonesOnly, setShowMilestonesOnly] = useState(false);
   const [isDataHealthModalOpen, setIsDataHealthModalOpen] = useState(false);
   const [healthRetryKey, setHealthRetryKey] = useState(0);
@@ -800,16 +707,6 @@ function MainAppContent() {
     let isMounted = true;
 
     async function performOfficeDetection() {
-      try {
-        const saved = localStorage.getItem("dor_selected_office_pref");
-        if (saved !== null) {
-          setHasAutoDetectedOffice(true);
-          return;
-        }
-      } catch (_) {
-        // Suppress
-      }
-
       const result = await detectUserOffice(user?.email);
       if (!isMounted) return;
 
@@ -843,25 +740,6 @@ function MainAppContent() {
     }
   }, [userAssignedOffice, isSuperadmin, selectedOffice]);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("dor_sort_type_pref", sortType);
-      } catch (_) {
-        // Suppress redundant log
-      }
-    }
-  }, [sortType]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("dor_selected_office_pref", selectedOffice);
-      } catch (_) {
-        // Suppress redundant log
-      }
-    }
-  }, [selectedOffice]);
   const [loading, setLoading] = useState(true);
   const [offices, setOffices] = useState<{ 
     name: string; 
@@ -1171,29 +1049,9 @@ function MainAppContent() {
   }, []);
   const [isHoveringAbout, setIsHoveringAbout] = useState(false);
   const [activeMetric, setActiveMetric] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("dor_view_mode");
-        if (saved) return saved as ViewMode;
-      } catch (_) {
-        return "dashboard";
-      }
-    }
-    return "dashboard";
-  });
+  const [viewMode, setViewMode] = useState<ViewMode>("dashboard");
 
-  const [mainView, setMainView] = useState<MainView>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("dor_main_view");
-        if (saved && (['dashboard', 'insights', 'institutional', 'trends', 'heatmap'] as string[]).includes(saved)) return saved as MainView;
-      } catch (_) {
-        return "dashboard";
-      }
-    }
-    return "dashboard";
-  });
+  const [mainView, setMainView] = useState<MainView>("dashboard");
   const [highlightedCard, setHighlightedCard] = useState<'insights' | null>(null);
 
   const [direction, setDirection] = useState(0);
@@ -1468,17 +1326,6 @@ function MainAppContent() {
 
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("dor_view_mode", viewMode);
-        localStorage.removeItem("searchHistory");
-        localStorage.removeItem("dor_search_history");
-        localStorage.removeItem("last_search_query");
-      } catch (_) {
-        // Silently catch
-      }
-    }
-    // Auto-delete search query when navigating to another view
     setSearchQuery("");
   }, [viewMode, categoryFilter, selectedOffice]);
   const [chartSubView, setChartSubView] = useState<"performance" | "trend">(
@@ -1490,7 +1337,6 @@ function MainAppContent() {
     const newDirection = viewOrder[view] - viewOrder[mainView];
     setDirection(newDirection);
     setMainView(view);
-    localStorage.setItem("dor_main_view", view);
     triggerHaptic('light');
 
     if (view === 'dashboard') {
@@ -1599,25 +1445,13 @@ function MainAppContent() {
   }, [updatesHistory]);
 
   // AUTOMATED ALERTS: Tracked indicators persistence
-  const [trackedIds, setTrackedIds] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem("dor_tracked_indicators");
-      return saved ? JSON.parse(saved) : [];
-    } catch (_) {
-      return [];
-    }
-  });
+  const [trackedIds, setTrackedIds] = useState<string[]>([]);
 
   const toggleTrack = useCallback((id: string) => {
     setTrackedIds((prev) => {
       const next = prev.includes(id)
         ? prev.filter((x) => x !== id)
         : [...prev, id];
-      try {
-        localStorage.setItem("dor_tracked_indicators", JSON.stringify(next));
-      } catch (_) {
-        console.error("Failed to save tracked indicators:");
-      }
       return next;
     });
   }, []);
@@ -1633,17 +1467,14 @@ function MainAppContent() {
   useEffect(() => {
     if (indicators.length > 0 && !hasSpokenHealthStatus.current) {
       let belowThresholdCount = 0;
+      const threshold = 80;
       indicators.forEach((ind) => {
-        const thresholdStr = localStorage.getItem(`indicator-threshold-${ind.id}`);
-        if (thresholdStr !== null) {
-          const threshold = Number(thresholdStr);
-          const progressPercent =
-            ind.annualTarget > 0
-              ? Math.round((ind.annualProgress / ind.annualTarget) * 100)
-              : 0;
-          if (progressPercent <= threshold) {
-            belowThresholdCount++;
-          }
+        const progressPercent =
+          ind.annualTarget > 0
+            ? Math.round((ind.annualProgress / ind.annualTarget) * 100)
+            : 0;
+        if (progressPercent <= threshold) {
+          belowThresholdCount++;
         }
       });
 
@@ -1660,18 +1491,12 @@ function MainAppContent() {
   const [isSyncing, setIsSyncing] = useState(false);
 
   const [hasNewUpdate, setHasNewUpdate] = useState(false);
-  const [lastSeenUpdate, setLastSeenUpdate] = useState<string | null>(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("dor_last_seen_update");
-    }
-    return null;
-  });
+  const [lastSeenUpdate, setLastSeenUpdate] = useState<string | null>(null);
 
   useEffect(() => {
     if (metadata?.lastUpdateDate) {
       if (!lastSeenUpdate) {
         setLastSeenUpdate(metadata.lastUpdateDate);
-        localStorage.setItem("dor_last_seen_update", metadata.lastUpdateDate);
       } else if (metadata.lastUpdateDate !== lastSeenUpdate) {
         setHasNewUpdate(true);
       }
@@ -2805,6 +2630,7 @@ function MainAppContent() {
         onNavigate={handleMainViewChange}
         onOpenVisualInsights={goToVisualInsights}
         onOpenAbout={() => setIsAboutModalOpen(true)}
+        onOpenLogin={() => setShowLogin(true)}
       />
       <BudgetModal
         isOpen={isBudgetOpen}
@@ -3216,9 +3042,7 @@ function MainAppContent() {
 
         <div
           className={`flex flex-col min-h-[100dvh] transition-all duration-700 ease-in-out pt-2 sm:pt-4 pb-28 sm:pb-32 ${
-            isAtBottom
-              ? "scale-[0.98] origin-center opacity-20 blur-[1px] pointer-events-none"
-              : "opacity-100"
+            isFooterExpanded ? "opacity-0 pointer-events-none scale-[0.98]" : "opacity-100"
           }`}
         >
           <OfflineStatusBar />
@@ -3630,6 +3454,9 @@ function MainAppContent() {
           isScrolled={isScrolled}
           viewMode={viewMode}
           fiscalYear={selectedFiscalYear}
+          isExpanded={isFooterExpanded}
+          onExpandChange={setIsFooterExpanded}
+          isAtBottom={isAtBottom}
         />
 
         {/* Dim Overlay - Outside scaled content */}
@@ -3642,7 +3469,7 @@ function MainAppContent() {
               onClick={() => {
                 setIsFooterExpanded(false);
               }}
-              className="fixed inset-0 bg-transparent z-[900] cursor-pointer"
+              className="fixed inset-0 bg-[#0b1329]/10 dark:bg-black/20 backdrop-blur-sm z-[80]"
             />
           )}
         </AnimatePresence>
@@ -3851,10 +3678,6 @@ function MainAppContent() {
 
         {/* Secure Bottom Control Dock & Scroll Indicator */}
         <div className="fixed bottom-0 left-0 w-full h-20 z-[900] pointer-events-none flex items-end justify-between px-6 pb-4">
-          {/* Visual "Secure" Backdrop - only shows when not expanded */}
-          {!isFooterExpanded && (
-            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-slate-50 via-slate-50/90 to-transparent dark:from-[#0b1329] dark:via-[#0b1329]/90 dark:to-transparent pointer-none" />
-          )}
         </div>
 
         {/* Dim Overlay - Outside scaled content */}
@@ -4261,17 +4084,7 @@ function MainAppContent() {
 }
 
 export default function App() {
-  const [isReady, setIsReady] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("dor_app_ready");
-        return saved ? parseInt(saved) : 5;
-      } catch (_) {
-        return 5;
-      }
-    }
-    return false;
-  });
+  const [isReady, setIsReady] = useState(false);
 
   const [splashFiscalYear, setSplashFiscalYear] = useState('2082/83');
   useEffect(() => {
@@ -4293,10 +4106,15 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (isReady) {
-      localStorage.setItem("dor_app_ready", "true");
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('dor_') && key !== 'language') {
+        keysToRemove.push(key);
+      }
     }
-  }, [isReady]);
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+  }, []);
 
   return (
     <ErrorBoundary>
