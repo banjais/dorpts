@@ -1051,7 +1051,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             className="mt-1 px-3 py-1 bg-slate-900/90 dark:bg-slate-800/90 backdrop-blur-xl text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-lg border border-white/10 hover:bg-slate-800 transition-colors"
           >
             {language === 'en' ? 'Release All' : 'सबै निकाल्नुहोस्'}
-          </button>
+           </button>
         </motion.div>
       )}
       </AnimatePresence>
@@ -1788,11 +1788,11 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       </div>
                     </motion.div>
                   )}
-                </AnimatePresence>
-              </motion.div>
-            )}
-          </AnimatePresence>
-         </div>
+         </AnimatePresence>
+        </motion.div>
+      )}
+    </AnimatePresence>
+       </div>
 
        {/* Card 5: Budget & Capital Expenditure */}
       <div className="col-span-full sm:col-span-2 lg:col-span-4">
@@ -2131,9 +2131,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       {/* Card 7: All Indicators Overview */}
       <div className="col-span-full sm:col-span-2 lg:col-span-4">
         <div ref={(el) => { sentinelRefs.current[7] = el; }} className="h-0 w-full" aria-hidden="true" />
-      <AnimatePresence>
-        {!orbiterHidden.has(7) && (
-          <motion.div
+       <AnimatePresence>
+         <motion.div
             layout
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -2265,11 +2264,10 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
-      </motion.div>
-      )}
-    </AnimatePresence>
-      </div>
+         </AnimatePresence>
+       </motion.div>
+     </AnimatePresence>
+       </div>
 
       <StatusBreakdownModal
         isOpen={showStatusBreakdown}
