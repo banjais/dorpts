@@ -130,7 +130,7 @@ export const ActionPortalView: React.FC<ActionPortalViewProps> = ({
       transition={{ duration: 0.3, ease: 'easeInOut' }}
       className="bg-white dark:bg-slate-900 rounded-[28px] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-500/10 dark:shadow-slate-500/5 overflow-hidden"
     >
-      <div className="px-5 sm:px-6 py-5 space-y-5">
+      <div className="px-3 sm:px-4 py-3 space-y-3">
         {/* Header */}
         <div className="flex items-center gap-3">
           <span className="p-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl">
@@ -147,7 +147,7 @@ export const ActionPortalView: React.FC<ActionPortalViewProps> = ({
         </div>
 
         {/* Menu Items Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
           {menuItems.map((item) => {
             const colors = colorMap[item.color];
             return (
@@ -158,7 +158,7 @@ export const ActionPortalView: React.FC<ActionPortalViewProps> = ({
                 onClick={() => {
                   item.action();
                 }}
-                className={`flex flex-col items-center justify-center gap-2 p-4 sm:p-5 rounded-2xl border ${colors.bg} ${colors.border} ${colors.text} ${colors.shadow} ${colors.hover} transition-all cursor-pointer`}
+                className={`flex flex-col items-center justify-center gap-2 p-3 sm:p-4 rounded-2xl border ${colors.bg} ${colors.border} ${colors.text} ${colors.shadow} ${colors.hover} transition-all cursor-pointer`}
               >
                 <item.icon size={20} className="sm:size-6 shrink-0" />
                 <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-center leading-tight">
@@ -170,7 +170,7 @@ export const ActionPortalView: React.FC<ActionPortalViewProps> = ({
         </div>
 
         {/* Action Items Row */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           {actionItems.map((item) => {
             const colors = colorMap[item.color];
             return (
@@ -181,7 +181,7 @@ export const ActionPortalView: React.FC<ActionPortalViewProps> = ({
                 onClick={() => {
                   item.action?.();
                 }}
-                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border ${colors.bg} ${colors.border} ${colors.text} ${colors.shadow} ${colors.hover} transition-all cursor-pointer`}
+                className={`flex items-center justify-center gap-2 px-3 py-2 rounded-2xl border ${colors.bg} ${colors.border} ${colors.text} ${colors.shadow} ${colors.hover} transition-all cursor-pointer`}
               >
                 <item.icon size={16} className="sm:size-5 shrink-0" />
                 <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider">
@@ -193,8 +193,8 @@ export const ActionPortalView: React.FC<ActionPortalViewProps> = ({
         </div>
 
         {/* Share Section */}
-        <div className="border-t border-slate-100 dark:border-white/5 pt-4">
-          <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3 text-center">
+        <div className="border-t border-slate-100 dark:border-white/5 pt-3">
+          <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2 text-center">
             {language === 'en' ? 'Share This App' : 'एप साझा गर्नुहोस्'}
           </div>
           <div className="flex flex-wrap items-center justify-center gap-2">
@@ -204,7 +204,7 @@ export const ActionPortalView: React.FC<ActionPortalViewProps> = ({
                 href={social.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex flex-col items-center gap-1 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 ${social.color} hover:border-indigo-500/50 transition-all`}
+                className={`flex flex-col items-center gap-1 p-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 ${social.color} hover:border-indigo-500/50 transition-all`}
                 title={social.name}
               >
                 <social.icon size={18} />
@@ -260,20 +260,6 @@ export const ActionPortalView: React.FC<ActionPortalViewProps> = ({
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Footer Info */}
-        <div className="flex flex-col items-center gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-white/5">
-          <div className="flex items-center gap-3">
-            <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
-            <p className="text-[0.5625rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-              © DOR | 2082/83 B.S
-            </p>
-            <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
-          </div>
-          <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
-            v2.4.0
-          </p>
-        </div>
       </div>
     </motion.div>
   );
