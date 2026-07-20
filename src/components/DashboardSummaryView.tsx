@@ -743,7 +743,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       if (!el) return;
       const obs = new IntersectionObserver(
         ([entry]) => {
-          if (isFooterExpanded && idx === 7) return;
+          if (idx === 7) return;
           const shouldHide = !entry.isIntersecting && entry.boundingClientRect.top < 0;
           // Avoid duplicate queuing
           const alreadyQueued = pendingQueue.current.some(
