@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Indicator, SystemMetadata, Toast } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -350,6 +350,48 @@ const ExpandedDetails: React.FC<{
   );
 };
 
+// Sticky wrapper that turns a summary card into a member of the scroll stack.
+// When the card scrolls past the sticky line it receives a stack `depth`
+// (>=0). Depth drives a GPU-accelerated translate3d + scale + z-index so the
+// cards pile up beneath the header. Reduced motion disables the depth effect.
+const StackCard: React.FC<{
+  index: number;
+  depth: number;
+  reducedMotion: boolean;
+  stickyTop: number;
+  stackOffset: number;
+  stackScale: number;
+  registerRef: (el: HTMLDivElement | null, index: number) => void;
+  children: React.ReactNode;
+}> = ({ index, depth, reducedMotion, stickyTop, stackOffset, stackScale, registerRef, children }) => {
+  const stuck = depth >= 0 && !reducedMotion;
+  return (
+    <motion.div
+      ref={(el) => registerRef(el, index)}
+      className="col-span-full sm:col-span-2 lg:col-span-4"
+      style={{
+        position: reducedMotion ? 'relative' : 'sticky',
+        top: stickyTop,
+        zIndex: stuck ? 1000 - depth : 1,
+        willChange: 'transform',
+        transform: 'translate3d(0,0,0)',
+      }}
+      animate={
+        reducedMotion
+          ? undefined
+          : {
+              y: stuck ? depth * stackOffset : 0,
+              scale: stuck ? Math.max(0.82, 1 - depth * stackScale) : 1,
+              opacity: stuck ? Math.max(0.78, 1 - depth * 0.07) : 1,
+            }
+      }
+      transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
 const getCardGradient = (status: { status: string }, categoryColor: { hex: string }) => {
   const base = categoryColor.hex;
   if (status.status === 'onTrack' || status.status === 'excellent') {
@@ -691,86 +733,83 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
     }
   }, [closeAllCards]);
 
-  const orbiterScrollRef = useRef<HTMLDivElement>(null);
-  const [orbiterHidden, setOrbiterHidden] = useState<Set<number>>(new Set());
-  const [scrollDirection, setScrollDirection] = useState<'up' | 'down' | null>(null);
-  // One sentinel ref per card — always stays in DOM so observer never detaches
-  const sentinelRefs = useRef<(HTMLDivElement | null)[]>(Array(8).fill(null));
-  // Pending queue for staggered one-at-a-time transitions
-  const pendingQueue = useRef<Array<{ idx: number; hide: boolean }>>([]);
-  const queueTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // --- Premium sticky card stack scroll animation ---
+  // Cards detach from normal flow as they scroll past the sticky line and
+  // stack beneath the header with depth (scale + offset + z-index layering).
+  const STICKY_TOP = 88; // px below header so the stack never overlaps it
+  const STACK_OFFSET = 22; // vertical offset per stacked card (px)
+  const STACK_SCALE = 0.02; // scale reduction per stacked card
+  const reducedMotion = useReducedMotion();
+  const cardWrapRefs = useRef<(HTMLDivElement | null)[]>(Array(8).fill(null));
+  const registerCardRef = useCallback((el: HTMLDivElement | null, index: number) => {
+    cardWrapRefs.current[index] = el;
+  }, []);
+  const cardTopsRef = useRef<number[]>(Array(8).fill(0));
+  const [stackIndexes, setStackIndexes] = useState<number[]>(Array(8).fill(-1));
+  const rafRef = useRef<number | null>(null);
+  const lastStackKey = useRef<string>('');
 
-  const cardMeta = [
-    { en: 'Overall Progress', np: 'समग्र प्रगति', icon: Target, color: 'from-emerald-500 to-cyan-500' },
-    { en: 'Status Breakdown', np: 'स्थिति विवरण', icon: BarChart3, color: 'from-violet-400 to-fuchsia-400' },
-    { en: 'Total Indicators', np: 'कुल सूचकहरू', icon: Activity, color: 'from-blue-400 to-indigo-500' },
-    { en: 'Category Status', np: 'वर्ग स्थिति', icon: PieChartIcon, color: 'from-amber-400 to-orange-500' },
-    { en: 'Reporting Offices', np: 'विवरण पठाउने कार्यालयहरू', icon: Building2, color: 'from-teal-400 to-emerald-500' },
-    { en: 'Budget & Capital Expenditure', np: 'बजेट र पुँजीगत खर्च', icon: Wallet, color: 'from-emerald-400 to-green-500' },
-    { en: 'Visual Insights', np: 'दृश्यात्मक अन्तर्दृष्टि', icon: BarChart3, color: 'from-indigo-400 to-purple-500' },
-    { en: 'All Indicators', np: 'सबै सूचकहरू', icon: LayoutGrid, color: 'from-slate-400 to-slate-600' },
-  ];
-
-  const releaseAllCards = useCallback(() => {
-    setOrbiterHidden(new Set());
-    pendingQueue.current = [];
-    if (queueTimer.current) clearTimeout(queueTimer.current);
+  const measureCardTops = useCallback(() => {
+    cardWrapRefs.current.forEach((el, i) => {
+      if (!el) return;
+      let top = 0;
+      let node: HTMLElement | null = el;
+      while (node) {
+        top += node.offsetTop;
+        node = node.offsetParent as HTMLElement | null;
+      }
+      cardTopsRef.current[i] = top;
+    });
   }, []);
 
-  // Drain the queue one item every 150ms for a smooth staggered feel
-  const drainQueue = useCallback(() => {
-    const item = pendingQueue.current.shift();
-    if (!item) return;
-    const { idx, hide } = item;
-    setOrbiterHidden((prev) => {
-      const next = new Set(prev);
-      if (hide) next.add(idx);
-      else next.delete(idx);
-      return next;
-    });
-    setScrollDirection(hide ? 'down' : 'up');
-    if (pendingQueue.current.length > 0) {
-      queueTimer.current = setTimeout(drainQueue, 150);
-    } else {
-      queueTimer.current = setTimeout(() => setScrollDirection(null), 600);
+  const computeStack = useCallback(() => {
+    const scrollY = window.scrollY || window.pageYOffset;
+    const indexes: number[] = Array(8).fill(-1);
+    let depth = 0;
+    for (let i = 0; i < 8; i++) {
+      const top = cardTopsRef.current[i];
+      if (top > 0 && scrollY + STICKY_TOP >= top) {
+        indexes[i] = depth;
+        depth++;
+      }
+    }
+    const key = indexes.join(',');
+    if (key !== lastStackKey.current) {
+      lastStackKey.current = key;
+      setStackIndexes(indexes);
     }
   }, []);
 
-  // IntersectionObserver: one sentinel div per card, always in DOM
-  useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    sentinelRefs.current.forEach((el, idx) => {
-      if (!el) return;
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (idx === 7) return;
-          const shouldHide = !entry.isIntersecting && entry.boundingClientRect.top < 0;
-          // Avoid duplicate queuing
-          const alreadyQueued = pendingQueue.current.some(
-            (item) => item.idx === idx && item.hide === shouldHide
-          );
-          if (alreadyQueued) return;
-          // Remove any opposite pending action for same card
-          pendingQueue.current = pendingQueue.current.filter((item) => item.idx !== idx);
-          pendingQueue.current.push({ idx, hide: shouldHide });
-          if (!queueTimer.current) {
-            drainQueue();
-          }
-        },
-        // Root margin: trigger when the sentinel crosses 80px below the top of viewport
-        { rootMargin: '-80px 0px 0px 0px', threshold: 0 }
-      );
-      obs.observe(el);
-      observers.push(obs);
+  const onScroll = useCallback(() => {
+    if (rafRef.current != null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      computeStack();
     });
-    return () => observers.forEach((obs) => obs.disconnect());
-  }, [drainQueue]);
+  }, [computeStack]);
 
   useEffect(() => {
-    if (orbiterHidden.size === 0) return;
-    const timer = setTimeout(() => setScrollDirection(null), 800);
-    return () => clearTimeout(timer);
-  }, [orbiterHidden.size]);
+    measureCardTops();
+    computeStack();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', measureCardTops);
+    const ro = new ResizeObserver(() => {
+      measureCardTops();
+      computeStack();
+    });
+    cardWrapRefs.current.forEach((el) => el && ro.observe(el));
+    const t = setTimeout(() => {
+      measureCardTops();
+      computeStack();
+    }, 300);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', measureCardTops);
+      ro.disconnect();
+      clearTimeout(t);
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+    };
+  }, [measureCardTops, computeStack, onScroll]);
 
   useEffect(() => {
     const states = [
@@ -997,94 +1036,22 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         />
       )}
       
-      {/* Card Orbiter */}
-      <AnimatePresence>
-        {orbiterHidden.size > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="fixed top-[76px] right-4 z-40 flex flex-col items-end gap-2 max-h-[calc(100vh-100px)] overflow-y-auto"
-            style={{ scrollbarWidth: 'none' }}
-          >
-            <div className="flex flex-col items-end gap-1.5">
-              <AnimatePresence mode="popLayout">
-                {Array.from(orbiterHidden).map((idx) => {
-                  const meta = cardMeta[idx as number];
-                  if (!meta) return null;
-                  const Icon = meta.icon;
-                  return (
-                    <motion.button
-                      key={idx}
-                      initial={{ opacity: 0, x: 30, scale: 0.9 }}
-                      animate={{ opacity: 1, x: 0, scale: 1 }}
-                      exit={{ opacity: 0, x: 30, scale: 0.9 }}
-                      transition={{ duration: 0.3, ease: 'easeOut' }}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() =>
-                        setOrbiterHidden((prev) => {
-                          const next = new Set(prev);
-                          next.delete(idx);
-                          return next;
-                        })
-                      }
-                      className={`flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-xl bg-gradient-to-r ${meta.color} text-white shadow-lg border border-white/20 hover:shadow-xl transition-all cursor-pointer`}
-                    >
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <Icon size={14} className="shrink-0" />
-                    <span className="text-[10px] sm:text-xs font-black uppercase tracking-tight truncate max-w-[120px]">
-                      {language === 'en' ? meta.en : meta.np}
-                    </span>
-                  </div>
-                  <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                    <span className="text-[8px] font-black">+</span>
-                  </span>
-                </motion.button>
-              );
-            })}
-              </AnimatePresence>
-            </div>
-          <button
-            onClick={releaseAllCards}
-            className="mt-1 px-3 py-1 bg-slate-900/90 dark:bg-slate-800/90 backdrop-blur-xl text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-lg border border-white/10 hover:bg-slate-800 transition-colors"
-          >
-            {language === 'en' ? 'Release All' : 'सबै निकाल्नुहोस्'}
-           </button>
-        </motion.div>
-      )}
-      </AnimatePresence>
-
-      {/* Reserved sub-header space when cards are grouping */}
-      {orbiterHidden.size > 0 && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="overflow-hidden"
-        >
-          <div className="flex items-center justify-end gap-3 py-2">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent" />
-            <p className="text-[10px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 text-right max-w-md leading-relaxed">
-              {language === 'en'
-                ? 'A comprehensive overview of tracked performance indicators, including overall progress, current status, calculation logic, trends, and sectoral insights.'
-                : 'ट्र्याक गरिएका कार्यसम्पादन सूचकहरूको व्यापक अवलोकन, जसमा समग्र प्रगति, हालको स्थिति, गणना तर्क, प्रवृत्ति र क्षेत्रीय अन्तर्दृष्टि समावेश छन्।'}
-            </p>
-          </div>
-        </motion.div>
-      )}
+      {/* Sticky card stack — cards peel off and stack below the header as you scroll */}
 
       {/* Summary Stats - Bold 3D Cards */}
       {/* Each card slot = sentinel (always in DOM) + AnimatePresence card */}
-      <div ref={orbiterScrollRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Card 0: Hero Overall Progress */}
-        <div className="col-span-full sm:col-span-2 lg:col-span-4">
-          {/* Sentinel: always rendered so IntersectionObserver never loses it */}
-          <div ref={(el) => { sentinelRefs.current[0] = el; }} className="h-0 w-full" aria-hidden="true" />
-         <AnimatePresence>
-          {!orbiterHidden.has(0) && (
+         <StackCard
+          index={0}
+          depth={stackIndexes[0]}
+          reducedMotion={!!reducedMotion}
+          stickyTop={STICKY_TOP}
+          stackOffset={STACK_OFFSET}
+          stackScale={STACK_SCALE}
+          registerRef={registerCardRef}
+        >
+          <AnimatePresence>
             <motion.button
               layout
               initial={{ opacity: 0, scale: 0.95 }}
@@ -1244,15 +1211,20 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             </AnimatePresence>
           </div>
         </motion.button>
-      )}
     </AnimatePresence>
-        </div>
+        </StackCard>
 
         {/* Card 1: Status Breakdown */}
-        <div className="col-span-full sm:col-span-2 lg:col-span-4">
-          <div ref={(el) => { sentinelRefs.current[1] = el; }} className="h-0 w-full" aria-hidden="true" />
+        <StackCard
+          index={1}
+          depth={stackIndexes[1]}
+          reducedMotion={!!reducedMotion}
+          stickyTop={STICKY_TOP}
+          stackOffset={STACK_OFFSET}
+          stackScale={STACK_SCALE}
+          registerRef={registerCardRef}
+        >
           <AnimatePresence>
-          {!orbiterHidden.has(1) && (
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
@@ -1440,15 +1412,20 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             </AnimatePresence>
             </div>
           </motion.button>
-      )}
     </AnimatePresence>
-        </div>
+        </StackCard>
 
         {/* Card 2: Total Indicators */}
-        <div className="col-span-full sm:col-span-2 lg:col-span-4">
-          <div ref={(el) => { sentinelRefs.current[2] = el; }} className="h-0 w-full" aria-hidden="true" />
+        <StackCard
+          index={2}
+          depth={stackIndexes[2]}
+          reducedMotion={!!reducedMotion}
+          stickyTop={STICKY_TOP}
+          stackOffset={STACK_OFFSET}
+          stackScale={STACK_SCALE}
+          registerRef={registerCardRef}
+        >
           <AnimatePresence>
-          {!orbiterHidden.has(2) && (
             <motion.button
               layout
               initial={{ opacity: 0, scale: 0.95 }}
@@ -1521,20 +1498,24 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                        })}
                      </div>
                   </motion.div>
-                )}
-              </AnimatePresence>
+              )}
+            </AnimatePresence>
             </div>
           </motion.button>
-      )}
     </AnimatePresence>
-
-        </div>
+        </StackCard>
 
         {/* Card 3: Category Status */}
-        <div className="col-span-full sm:col-span-2 lg:col-span-4">
-          <div ref={(el) => { sentinelRefs.current[3] = el; }} className="h-0 w-full" aria-hidden="true" />
+        <StackCard
+          index={3}
+          depth={stackIndexes[3]}
+          reducedMotion={!!reducedMotion}
+          stickyTop={STICKY_TOP}
+          stackOffset={STACK_OFFSET}
+          stackScale={STACK_SCALE}
+          registerRef={registerCardRef}
+        >
           <AnimatePresence>
-          {!orbiterHidden.has(3) && (
             <motion.button
               layout
               initial={{ opacity: 0, scale: 0.95 }}
@@ -1710,22 +1691,25 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       </AnimatePresence>
                     </div>
                  </motion.div>
-               )}
+              )}
              </AnimatePresence>
-           </div>
-          </motion.button>
-      )}
-    </AnimatePresence>
-      </div>
-
-        </div>
+            </div>
+           </motion.button>
+     </AnimatePresence>
+       </StackCard>
 
         {/* Card 4: Reporting Offices */}
-        <div className="col-span-full sm:col-span-2 lg:col-span-4">
-          <div ref={(el) => { sentinelRefs.current[4] = el; }} className="h-0 w-full" aria-hidden="true" />
+        <StackCard
+          index={4}
+          depth={stackIndexes[4]}
+          reducedMotion={!!reducedMotion}
+          stickyTop={STICKY_TOP}
+          stackOffset={STACK_OFFSET}
+          stackScale={STACK_SCALE}
+          registerRef={registerCardRef}
+        >
           <AnimatePresence>
-            {!orbiterHidden.has(4) && (
-              <motion.div
+            <motion.div
                 layout
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -1788,18 +1772,23 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       </div>
                     </motion.div>
                   )}
-         </AnimatePresence>
-        </motion.div>
-      )}
-    </AnimatePresence>
-       </div>
+          </AnimatePresence>
+         </motion.div>
+     </AnimatePresence>
+        </StackCard>
 
        {/* Card 5: Budget & Capital Expenditure */}
-      <div className="col-span-full sm:col-span-2 lg:col-span-4">
-        <div ref={(el) => { sentinelRefs.current[5] = el; }} className="h-0 w-full" aria-hidden="true" />
-      <AnimatePresence>
-        {!orbiterHidden.has(5) && (
-          <motion.div
+       <StackCard
+          index={5}
+          depth={stackIndexes[5]}
+          reducedMotion={!!reducedMotion}
+          stickyTop={STICKY_TOP}
+          stackOffset={STACK_OFFSET}
+          stackScale={STACK_SCALE}
+          registerRef={registerCardRef}
+        >
+          <AnimatePresence>
+            <motion.div
             layout
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -1976,19 +1965,23 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   </div>
                 </motion.div>
               )}
-            </AnimatePresence>
-      </motion.div>
-      )}
-    </AnimatePresence>
-
-      </div>
+             </AnimatePresence>
+       </motion.div>
+     </AnimatePresence>
+       </StackCard>
 
       {/* Card 6: Visual Insights */}
-      <div className="col-span-full sm:col-span-2 lg:col-span-4">
-        <div ref={(el) => { sentinelRefs.current[6] = el; }} className="h-0 w-full" aria-hidden="true" />
-      <AnimatePresence>
-        {!orbiterHidden.has(6) && (
-          <motion.div
+      <StackCard
+          index={6}
+          depth={stackIndexes[6]}
+          reducedMotion={!!reducedMotion}
+          stickyTop={STICKY_TOP}
+          stackOffset={STACK_OFFSET}
+          stackScale={STACK_SCALE}
+          registerRef={registerCardRef}
+        >
+          <AnimatePresence>
+            <motion.div
             ref={insightsCardRef}
             layout
             initial={{ opacity: 0, scale: 0.95 }}
@@ -2121,18 +2114,23 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
-      </motion.div>
-      )}
-    </AnimatePresence>
-
-      </div>
+         </AnimatePresence>
+       </motion.div>
+     </AnimatePresence>
+       </StackCard>
 
       {/* Card 7: All Indicators Overview */}
-      <div className="col-span-full sm:col-span-2 lg:col-span-4">
-        <div ref={(el) => { sentinelRefs.current[7] = el; }} className="h-0 w-full" aria-hidden="true" />
-       <AnimatePresence>
-         <motion.div
+      <StackCard
+          index={7}
+          depth={stackIndexes[7]}
+          reducedMotion={!!reducedMotion}
+          stickyTop={STICKY_TOP}
+          stackOffset={STACK_OFFSET}
+          stackScale={STACK_SCALE}
+          registerRef={registerCardRef}
+        >
+        <AnimatePresence>
+          <motion.div
             layout
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -2262,12 +2260,13 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   </div>
                 )}
               </div>
-            </motion.div>
-          )}
-         </AnimatePresence>
-       </motion.div>
-     </AnimatePresence>
-       </div>
+             </motion.div>
+           )}
+          </AnimatePresence>
+        </motion.div>
+      </AnimatePresence>
+        </StackCard>
+      </div>
 
       <StatusBreakdownModal
         isOpen={showStatusBreakdown}
