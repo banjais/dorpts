@@ -1676,69 +1676,67 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       </div>
                     </motion.div>
                   )}
-          </AnimatePresence>
-         </motion.div>
-      </AnimatePresence>
+              </AnimatePresence>
+           </motion.div>
+         </AnimatePresence>
 
-       {/* Card 5: Budget & Capital Expenditure */}
-          <AnimatePresence>
-            <motion.div
-            layout
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
-          >
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <button
-              onClick={() => toggleCard(setShowBudgetCard, showBudgetCard)}
-          className="relative w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
-        >
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 bg-white/20 text-white rounded-xl">
-              <Wallet size={14} />
-            </span>
-            <div className="text-left">
-              <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-tight">
-                {language === 'en' ? 'Budget & Capital Expenditure' : 'बजेट र पुँजीगत खर्च'}
-              </h3>
-               <p className="text-[10px] sm:text-[11px] font-bold text-white/70">
-                {language === 'en' ? 'Allocation vs expenditure overview' : 'बजेट वितरण र खर्चको अवलोकन'}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <motion.div animate={{ rotate: showBudgetCard ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
-              <ChevronRight size={18} />
-            </motion.div>
-          </div>
-        </button>
-
-        <AnimatePresence>
-          {showBudgetCard && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden bg-emerald-950/20"
-            >
-              <div className="px-5 pb-5 pt-1 space-y-4">
-                 {(() => {
-                   const budgetInd = indicators.find(i => i.id === 'ind_14');
-                   const capexInd = indicators.find(i => i.id === 'ind_15');
-                   if (!budgetInd && !capexInd) {
-                     return (
-                       <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center">
-                         <p className="text-xs text-white/70">
-                           {language === 'en' ? 'Budget data not configured' : 'बजेट डाटा कन्फिगर गरिएको छैन'}
-                         </p>
-                       </div>
-                     );
-                   }
+         {/* Card 5: Budget & Capital Expenditure */}
+           <AnimatePresence>
+             <motion.div
+             layout
+             initial={{ opacity: 0, scale: 0.95 }}
+             animate={{ opacity: 1, scale: 1 }}
+             exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+             transition={{ duration: 0.3, ease: 'easeInOut' }}
+             whileHover={{ scale: 1.02 }}
+             whileTap={{ scale: 0.97 }}
+             className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
+           >
+         <div className="absolute inset-0 bg-black/10" />
+         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+         <div className="relative z-10 flex flex-col gap-3">
+           <div className="flex items-center justify-between">
+             <div>
+               <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-tight">
+                 {language === 'en' ? 'Budget & Capital Expenditure' : 'बजेट र पुँजीगत खर्च'}
+               </h3>
+                <p className="text-[10px] sm:text-[11px] font-bold text-white/70">
+                 {language === 'en' ? 'Allocation vs expenditure overview' : 'बजेट वितरण र खर्चको अवलोकन'}
+               </p>
+             </div>
+             <span className="p-1.5 bg-white/20 text-white rounded-xl">
+               <Wallet size={14} />
+             </span>
+           </div>
+           <div className="flex items-center justify-between">
+             <motion.div animate={{ rotate: showBudgetCard ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
+               <ChevronDown size={18} />
+             </motion.div>
+           </div>
+         </div>
+         
+         <div className="w-full sm:w-full">
+           <AnimatePresence>
+             {showBudgetCard && (
+               <motion.div
+                 initial={{ opacity: 0, height: 0 }}
+                 animate={{ opacity: 1, height: 'auto' }}
+                 exit={{ opacity: 0, height: 0 }}
+                 className="overflow-hidden bg-black/20"
+               >
+                 <div className="px-5 pb-5 pt-1 space-y-4">
+                    {(() => {
+                      const budgetInd = indicators.find(i => i.id === 'ind_14') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('budget'));
+                      const capexInd = indicators.find(i => i.id === 'ind_15') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('capital expenditure'));
+                      if (!budgetInd && !capexInd) {
+                        return (
+                          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center">
+                            <p className="text-xs text-white/70">
+                              {language === 'en' ? 'Budget data not configured' : 'बजेट डाटा कन्फिगर गरिएको छैन'}
+                            </p>
+                          </div>
+                        );
+                      }
                    return (
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                        {budgetInd && (() => {
@@ -1861,11 +1859,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   </div>
                 </motion.div>
               )}
-             </AnimatePresence>
-       </motion.div>
-      </AnimatePresence>
+              </AnimatePresence>
+            </div>
+           </motion.div>
+         </AnimatePresence>
 
-       {/* Card 6: Visual Insights */}
+        {/* Card 6: Visual Insights */}
           <AnimatePresence>
             <motion.div
             ref={insightsCardRef}
