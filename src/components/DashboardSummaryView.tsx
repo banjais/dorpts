@@ -79,6 +79,7 @@ interface DashboardSummaryViewProps {
   isFooterExpanded?: boolean;
   isAtBottom?: boolean;
   onCardsReachedHeader?: (reached: boolean) => void;
+  onCardsHidden?: (hidden: boolean) => void;
 }
 
 const toNepaliNumerals = (numStr: string | number): string => {
@@ -642,6 +643,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   isFooterExpanded,
   isAtBottom: _isAtBottomProp,
   onCardsReachedHeader,
+  onCardsHidden,
 }) => {
   const { language, setLanguage, t, translateUnit, translateOffice } = useLanguage();
   const { isAdmin } = useAuth();
@@ -672,6 +674,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showSystemHelpModal, setShowSystemHelpModal] = useState(false);
   const [showBudgetCard, setShowBudgetCard] = useState(false);
   const [showOverallProgress, setShowOverallProgress] = useState(false);
+  const [cardsHidden, setCardsHidden] = useState(false);
   const [showStatusDetails, setShowStatusDetails] = useState(false);
   const [showTotalIndicators, setShowTotalIndicators] = useState(false);
   const [showReportingOffices, setShowReportingOffices] = useState(false);
@@ -759,6 +762,18 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [onCardsReachedHeader]);
+
+  useEffect(() => {
+    if (cardsReachedHeader) {
+      const timer = setTimeout(() => {
+        setCardsHidden(true);
+        onCardsHidden?.(true);
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+    setCardsHidden(false);
+    onCardsHidden?.(false);
+  }, [cardsReachedHeader, onCardsHidden]);
 
   const weightedAchievementRate = useMemo(() => {
     const totalWeight = indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0) || 100;

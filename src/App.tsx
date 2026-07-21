@@ -2483,6 +2483,7 @@ function MainAppContent() {
   const chartRef = useRef<HTMLDivElement>(null);
   const [fabRevealed, setFabRevealed] = useState(false);
   const [cardsReachedHeader, setCardsReachedHeader] = useState(false);
+  const [cardsHidden, setCardsHidden] = useState(false);
   const fabHoverTimer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -3027,7 +3028,7 @@ function MainAppContent() {
            indicators={indicators}
            metadata={metadata}
             onMouseEnterFab={() => {
-              if (mainView === 'dashboard' && cardsReachedHeader) setFabRevealed(true);
+              if (mainView === 'dashboard' && cardsHidden) setFabRevealed(true);
             }}
             onMouseLeaveFab={() => {
               if (mainView === 'dashboard') setFabRevealed(false);
@@ -3203,6 +3204,7 @@ function MainAppContent() {
                                  isFooterExpanded={isFooterExpanded}
                                  isAtBottom={isAtBottom}
                                  onCardsReachedHeader={setCardsReachedHeader}
+                                 onCardsHidden={setCardsHidden}
                               />
                            </ErrorBoundary>
                          )}
@@ -3367,7 +3369,7 @@ function MainAppContent() {
         >
           <div
             className={`flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl pl-2 pr-1 py-1 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-2xl transition-all duration-700 ease-out ${
-              isReportBuilderOpen || !fabRevealed || !cardsReachedHeader
+              isReportBuilderOpen || !fabRevealed || !cardsHidden
                 ? "opacity-0 scale-90 translate-x-2 pointer-events-none"
                 : "opacity-100 scale-100 translate-x-0 pointer-events-auto"
             }`}
@@ -3495,7 +3497,7 @@ function MainAppContent() {
            {/* Always-visible small handle */}
            <motion.button
              onMouseEnter={() => {
-               if (mainView !== 'dashboard' || !cardsReachedHeader) return;
+               if (mainView !== 'dashboard' || !cardsHidden) return;
                fabHoverTimer.current = window.setTimeout(() => setFabRevealed(true), 400);
              }}
              onMouseLeave={() => {
@@ -3505,11 +3507,11 @@ function MainAppContent() {
              }}
              onClick={() => setFabRevealed(p => !p)}
              onTouchStart={() => {
-               if (mainView !== 'dashboard' || !cardsReachedHeader) return;
+               if (mainView !== 'dashboard' || !cardsHidden) return;
                setFabRevealed(true);
              }}
              onTouchEnd={() => setTimeout(() => setFabRevealed(false), 1200)}
-             className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all ${!cardsReachedHeader ? 'opacity-0 pointer-events-none' : ''}`}
+             className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all ${!cardsHidden ? 'opacity-0 pointer-events-none' : ''}`}
              title={language === "en" ? "Actions" : "कार्यहरू"}
            >
              <Menu size={14} />
@@ -3520,7 +3522,7 @@ function MainAppContent() {
          <div
            className="fixed top-3 right-3 z-[900] flex items-center gap-1.5"
            onMouseEnter={() => {
-             if (mainView === 'dashboard' && cardsReachedHeader) setFabRevealed(true);
+             if (mainView === 'dashboard' && cardsHidden) setFabRevealed(true);
            }}
            onMouseLeave={() => {
              if (mainView === 'dashboard') setFabRevealed(false);
