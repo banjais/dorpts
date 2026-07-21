@@ -3519,12 +3519,12 @@ function MainAppContent() {
                     className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                       isActive
                         ? item.id === 'chart'
-                          ? 'bg-violet-600 text-white shadow-md shadow-violet-500/30'
-                          : mainView === 'dashboard' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30'
-                          : mainView === 'trends' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30'
-                          : mainView === 'heatmap' ? 'bg-amber-600 text-white shadow-md shadow-amber-500/30'
-                          : 'bg-violet-600 text-white shadow-md shadow-violet-500/30'
-                        : 'text-slate-500 dark:text-slate-400 hover:text-white hover:bg-indigo-600 dark:hover:bg-indigo-500'
+                          ? 'text-violet-600 dark:text-violet-400 font-bold'
+                          : mainView === 'dashboard' ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+                          : mainView === 'trends' ? 'text-emerald-600 dark:text-emerald-400 font-bold'
+                          : mainView === 'heatmap' ? 'text-amber-600 dark:text-amber-400 font-bold'
+                          : 'text-violet-600 dark:text-violet-400 font-bold'
+                        : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                     }`}
                     title={language === 'en' ? item.labelEn : item.labelNp}
                   >
@@ -3543,7 +3543,7 @@ function MainAppContent() {
                     scrollToBottom();
                   }
                 }}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-white hover:bg-indigo-600 dark:hover:bg-indigo-500 transition-all active:scale-90 cursor-pointer overflow-hidden"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all active:scale-90 cursor-pointer overflow-hidden font-bold"
                 title={
                   isScrolled
                     ? language === "en"
@@ -3577,7 +3577,7 @@ function MainAppContent() {
                     triggerHaptic('light');
                     window.location.reload();
                   }}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-white hover:bg-indigo-600 dark:hover:bg-indigo-500 transition-all active:scale-90 cursor-pointer"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all active:scale-90 cursor-pointer font-bold"
                   title={language === "en" ? "Check for updates" : "अपडेटहरू जाँच्नुहोस्"}
                 >
                   <RefreshCw size={16} strokeWidth={2.5} />
@@ -3590,10 +3590,10 @@ function MainAppContent() {
                   triggerHaptic("success");
                   setIsAIAssistantOpen(true);
                 }}
-                className="w-9 h-9 rounded-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/25 active:scale-95 transition-all cursor-pointer relative"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-all active:scale-95 cursor-pointer relative font-bold"
                 title={language === "en" ? "AI assistant" : "एआई सहायक"}
               >
-                <Sparkles size={16} strokeWidth={2} />
+                <Sparkles size={18} strokeWidth={2.5} />
                 <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
