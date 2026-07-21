@@ -639,7 +639,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   addToast,
   highlightedCard,
   isFooterExpanded,
-  isAtBottom,
+  isAtBottom: _isAtBottomProp,
 }) => {
   const { language, setLanguage, t, translateUnit, translateOffice } = useLanguage();
   const { isAdmin } = useAuth();
@@ -649,6 +649,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
     return String(val);
   };
   const insightsCardRef = useRef<HTMLDivElement>(null);
+  const lastCardRef = useRef<HTMLDivElement>(null);
+  const [cardsReachedHeader, setCardsReachedHeader] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [sortType, setSortType] = useState<'default' | 'low' | 'high' | 'weight' | 'status'>('default');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -740,6 +742,19 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
     }, 150);
     return () => clearTimeout(timer);
   }, [highlightedCard]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!lastCardRef.current) return;
+      const headerHeight = window.innerWidth < 640 ? 150 : 170;
+      const cardRect = lastCardRef.current.getBoundingClientRect();
+      setCardsReachedHeader(cardRect.top <= headerHeight);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const weightedAchievementRate = useMemo(() => {
     const totalWeight = indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0) || 100;
@@ -928,14 +943,14 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
        {/* Summary Stats - Bold 3D Cards */}
        {/* Each card slot = sentinel (always in DOM) + AnimatePresence card */}
-       <motion.div
-         animate={{
-           y: isAtBottom ? -220 : 0,
-           opacity: isAtBottom ? 0 : 1,
-         }}
-         transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5"
-       >
+        <motion.div
+          animate={{
+            y: cardsReachedHeader ? -220 : 0,
+            opacity: cardsReachedHeader ? 0 : 1,
+          }}
+          transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5"
+        >
         {/* Card 0: Hero Overall Progress */}
          <AnimatePresence>
             <motion.button
@@ -1953,17 +1968,18 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       </AnimatePresence>
 
        {/* Card 7: All Indicators Overview */}
-         <AnimatePresence>
-          <motion.div
-            layout
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-             whileHover={{ scale: 1.02 }}
-             whileTap={{ scale: 0.98 }}
-             className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/30 border border-white/30 hover:shadow-2xl hover:shadow-indigo-500/50 active:shadow-2xl active:shadow-indigo-500/50 transition-all duration-200 overflow-hidden"
-          >
+          <AnimatePresence>
+           <motion.div
+             ref={lastCardRef}
+             layout
+             initial={{ opacity: 0, scale: 0.95 }}
+             animate={{ opacity: 1, scale: 1 }}
+             exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+             transition={{ duration: 0.3, ease: 'easeInOut' }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/30 border border-white/30 hover:shadow-2xl hover:shadow-indigo-500/50 active:shadow-2xl active:shadow-indigo-500/50 transition-all duration-200 overflow-hidden"
+           >
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <button
