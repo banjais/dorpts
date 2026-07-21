@@ -2479,7 +2479,6 @@ function MainAppContent() {
 
   const [isAtBottom, setIsAtBottom] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [headerCompact, setHeaderCompact] = useState(false);
   const [isChartFocusMode, setIsChartFocusMode] = useState(true);
   const chartRef = useRef<HTMLDivElement>(null);
   const [fabRevealed, setFabRevealed] = useState(false);
@@ -2504,7 +2503,6 @@ function MainAppContent() {
       const isBottom = currentY + windowHeight >= documentHeight - 120;
       setIsAtBottom(isBottom);
       setIsScrolled(currentY > 100 || isBottom);
-      setHeaderCompact(currentY > 20);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -3045,12 +3043,10 @@ function MainAppContent() {
           }`}
         >
           <OfflineStatusBar />
-          <main
-            className={`flex-1 container mx-auto px-4 md:pl-16 lg:pl-20 pb-8 max-w-7xl relative z-10 ${
-              headerCompact ? "pt-[60px] sm:pt-[68px]" : "pt-[134px] sm:pt-[152px]"
-            }`}
-            style={{ transition: "padding-top 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
-           >
+           <main
+             className="flex-1 container mx-auto px-4 md:pl-16 lg:pl-20 pb-8 max-w-7xl relative z-10 pt-[134px] sm:pt-[152px]"
+             style={{ transition: "padding-top 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
+            >
              {/* Pull to Refresh Visual Indicator */}
             <AnimatePresence>
               {(isPulling || isSyncing) && (

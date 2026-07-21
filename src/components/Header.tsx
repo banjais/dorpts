@@ -311,9 +311,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`w-full fixed top-0 left-0 right-0 z-[5000] backdrop-blur-xl smooth-header-transition ${headerBg} shadow-md ${
-        scrolled ? 'h-[56px] sm:h-[64px]' : 'h-[126px] sm:h-[144px]'
-      } flex flex-col justify-start overflow-hidden pt-0`}
+      className={`w-full fixed top-0 left-0 right-0 z-[5000] backdrop-blur-xl smooth-header-transition ${headerBg} shadow-md h-[126px] sm:h-[144px] flex flex-col justify-start overflow-hidden pt-0`}
     >
       {/* Small, persistent 'Offline' visual banner */}
       {!isOnline && (
@@ -337,13 +335,9 @@ export const Header: React.FC<HeaderProps> = ({
               </motion.button>
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className={`relative shrink-0 flex items-center justify-center smooth-branding-transition ${
-                  scrolled ? 'w-7 h-7 sm:w-9 sm:h-9' : 'w-9 h-9 sm:w-11 sm:h-11'
-                }`}
+                className="relative shrink-0 flex items-center justify-center smooth-branding-transition w-9 h-9 sm:w-11 sm:h-11"
               >
-                <div className={`w-full h-full rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-white/10 flex items-center justify-center shadow-md ${
-                  scrolled ? 'ring-1 ring-slate-900/5 dark:ring-white/10' : ''
-                }`}>
+                <div className="w-full h-full rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-white/10 flex items-center justify-center shadow-md">
                   <img
                     src="/GovtLogo.svg"
                     alt="Government of Nepal Logo"
@@ -448,32 +442,23 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          <div
-            className={`overflow-hidden pb-0.5 smooth-header-transition ${
-              scrolled
-                ? 'opacity-100 h-auto pointer-events-auto'
-                : 'opacity-100 h-[45px] sm:h-[60px] pointer-events-auto'
-            }`}
-            style={{
-              transform: scrolled ? 'translateY(-10px)' : 'translateY(0)'
-            }}
-          >
-            <div className="flex flex-row items-center justify-between gap-2 h-[45px] sm:h-[60px]">
-                <div className="border-l-2 border-[#0099DA]/70 dark:border-[#00ADF7]/70 pl-2.5 py-0.5 min-w-0">
-                <h1 className={`font-display font-extrabold text-slate-800 dark:text-white tracking-tight uppercase leading-none truncate ${
-                  scrolled ? 'text-[8px] sm:text-[9px]' : 'text-[0.72rem] sm:text-[0.95rem] md:text-[1.05rem]'
-                }`}>
-                  <span className="text-brand-gradient">{language === 'en' ? 'PERFORMANCE OVERVIEW' : 'कार्यसम्पादन अवलोकन'}</span>
-                </h1>
-                {!scrolled && fiscalYear && (
-                  <span className="text-[10px] sm:text-xs font-black text-[#0099DA] dark:text-[#00ADF7] bg-[#0099DA]/10 dark:bg-[#00ADF7]/10 px-2 py-1 rounded-md shrink-0">
-                    FY {fiscalYear}
-                  </span>
-                )}
-              </div>
+           <div
+             className="overflow-hidden pb-0.5 smooth-header-transition h-auto pointer-events-auto"
+           >
+             <div className="flex flex-row items-center justify-between gap-2 h-[45px] sm:h-[60px]">
+                 <div className="border-l-2 border-[#0099DA]/70 dark:border-[#00ADF7]/70 pl-2.5 py-0.5 min-w-0">
+                 <h1 className="font-display font-extrabold text-slate-800 dark:text-white tracking-tight uppercase leading-none truncate text-[0.72rem] sm:text-[0.95rem] md:text-[1.05rem]">
+                   <span className="text-brand-gradient">{language === 'en' ? 'PERFORMANCE OVERVIEW' : 'कार्यसम्पादन अवलोकन'}</span>
+                 </h1>
+                 {fiscalYear && (
+                   <span className="text-[10px] sm:text-xs font-black text-[#0099DA] dark:text-[#00ADF7] bg-[#0099DA]/10 dark:bg-[#00ADF7]/10 px-2 py-1 rounded-md shrink-0">
+                     FY {fiscalYear}
+                   </span>
+                 )}
+               </div>
 
-            </div>
-          </div>
+             </div>
+           </div>
         </div>
         </div>
       </header>
