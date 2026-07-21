@@ -682,6 +682,16 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
     setShowCategoryStatus(false);
     setShowBudgetCard(false);
     setShowInsights(false);
+    setShowStatusBreakdown(false);
+    setShowIndicatorsBreakdown(false);
+    setShowProgressLogic(false);
+    setShowOfficeLogicInfo(false);
+    setShowStatusLogicInline(false);
+    setShowIndicatorsLogicInline(false);
+    setShowOverallLogicInline(false);
+    setShowCategoryLogicInline(false);
+    setShowReportingOfficesLogicInline(false);
+    setExpandedId(null);
   }, []);
 
   const toggleCard = useCallback((setter: (value: boolean) => void, currentValue: boolean) => {
@@ -721,12 +731,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
   useEffect(() => {
     if (highlightedCard !== 'insights') return;
+    closeAllCards();
     setShowInsights(true);
-    setShowAllIndicators(false);
-    setShowBudgetCard(false);
-    setShowCategoryStatus(false);
-    setShowStatusBreakdown(false);
-    setShowIndicatorsBreakdown(false);
     const timer = setTimeout(() => {
       insightsCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 150);
@@ -931,7 +937,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               transition={{ duration: 0.3, ease: 'easeInOut' }}
              whileHover={{ scale: 1.02 }}
                whileTap={{ scale: 0.98 }}
-               onClick={() => setShowOverallProgress(p => !p)}
+                onClick={() => toggleCard(setShowOverallProgress, showOverallProgress)}
                className="group relative w-full cursor-pointer bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-emerald-500/25 border border-white/20 hover:shadow-2xl hover:shadow-emerald-500/40 active:shadow-2xl active:shadow-emerald-500/40 transition-all duration-200 overflow-hidden"
         >
           <div className="absolute inset-0 bg-black/10" />
@@ -1089,7 +1095,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => setShowStatusDetails(p => !p)}
+              onClick={() => toggleCard(setShowStatusDetails, showStatusDetails)}
           className="group relative cursor-pointer w-full bg-gradient-to-br from-violet-400 via-purple-400 to-fuchsia-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-violet-500/25 border border-white/20 hover:shadow-2xl hover:shadow-violet-500/40 active:shadow-2xl active:shadow-violet-500/40 transition-all duration-200 overflow-hidden"
         >
           <div className="absolute inset-0 bg-black/10" />
@@ -1285,7 +1291,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => setShowTotalIndicators(p => !p)}
+              onClick={() => toggleCard(setShowTotalIndicators, showTotalIndicators)}
               className="group relative cursor-pointer w-full bg-gradient-to-br from-indigo-400 via-blue-400 to-cyan-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
             >
           <div className="absolute inset-0 bg-black/10" />
@@ -1365,7 +1371,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => setShowCategoryStatus(p => !p)}
+              onClick={() => toggleCard(setShowCategoryStatus, showCategoryStatus)}
               className="group relative cursor-pointer w-full bg-gradient-to-br from-teal-400 via-emerald-400 to-green-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-teal-500/25 border border-white/20 hover:shadow-2xl hover:shadow-teal-500/40 active:shadow-2xl active:shadow-teal-500/40 transition-all duration-200 overflow-hidden"
             >
           <div className="absolute inset-0 bg-black/10" />
@@ -1553,7 +1559,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 <div className="absolute inset-0 bg-black/10" />
                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <button
-                  onClick={() => setShowReportingOffices(p => !p)}
+                  onClick={() => toggleCard(setShowReportingOffices, showReportingOffices)}
                   className="relative w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
                 >
                   <div className="flex items-center gap-2">
@@ -1622,7 +1628,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <button
-              onClick={() => setShowBudgetCard(p => !p)}
+              onClick={() => toggleCard(setShowBudgetCard, showBudgetCard)}
           className="relative w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
         >
           <div className="flex items-center gap-2">
@@ -1772,12 +1778,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     })}
                   </div>
                   <div className="mt-3 pt-3 border-t border-white/10">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowReportingOffices(false);
-                        setShowProgressLogic(true);
-                      }}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      closeAllCards();
+                      setShowProgressLogic(true);
+                    }}
                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
                     >
                       <Info size={12} />
@@ -1808,7 +1814,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="absolute inset-0 rounded-[28px] ring-4 ring-indigo-500/60 animate-pulse pointer-events-none z-20" />
         )}
         <button
-              onClick={() => setShowInsights(p => !p)}
+              onClick={() => toggleCard(setShowInsights, showInsights)}
           className="relative w-full flex items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-indigo-50/80 to-white dark:from-indigo-950/30 dark:to-slate-900 hover:from-indigo-50 dark:hover:from-indigo-950/40 transition-colors"
         >
           <div className="flex items-center gap-2">
@@ -1944,7 +1950,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <button
-              onClick={() => setShowAllIndicators(p => !p)}
+              onClick={() => toggleCard(setShowAllIndicators, showAllIndicators)}
           className="relative w-full flex items-center justify-between gap-3 px-5 sm:px-6 py-5 sm:py-6"
         >
           <div className="flex items-center gap-3">
