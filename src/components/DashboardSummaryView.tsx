@@ -1042,17 +1042,19 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       </div>
                     </div>
                   </div>
-                   <div className="mt-3 pt-3 border-t border-white/10">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowOverallLogicInline(!showOverallLogicInline);
-                        }}
-                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                      >
-                        <Info size={12} />
-                        {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
-                      </button>
+                    <div className="mt-3 pt-3 border-t border-white/10">
+                       <div
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           setShowOverallLogicInline(!showOverallLogicInline);
+                         }}
+                         role="button"
+                         tabIndex={0}
+                        className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors cursor-pointer"
+                       >
+                         <Info size={12} />
+                         {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
+                       </div>
                       <AnimatePresence>
                         {showOverallLogicInline && (
                           <motion.div
@@ -1226,16 +1228,18 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     </div>
                   </div>
                    <div className="mt-3 pt-3 border-t border-white/10">
-                       <button
+                       <div
                          onClick={(e) => {
                            e.stopPropagation();
                            setShowStatusLogicInline(!showStatusLogicInline);
                          }}
-                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                     >
-                       <Info size={12} />
-                       {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
-                     </button>
+                         role="button"
+                         tabIndex={0}
+                        className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors cursor-pointer"
+                       >
+                         <Info size={12} />
+                         {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
+                       </div>
                      <AnimatePresence>
                        {showStatusLogicInline && (
                          <motion.div
@@ -1489,16 +1493,18 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                      })}
                    </div>
                     <div className="mt-3 pt-3 border-t border-white/10">
-                       <button
+                       <div
                          onClick={(e) => {
                            e.stopPropagation();
                            setShowCategoryLogicInline(!showCategoryLogicInline);
                          }}
-                        className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                      >
-                        <Info size={12} />
-                        {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
-                      </button>
+                         role="button"
+                         tabIndex={0}
+                         className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors cursor-pointer"
+                       >
+                         <Info size={12} />
+                         {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
+                       </div>
                       <AnimatePresence>
                         {showCategoryLogicInline && (
                           <motion.div
@@ -1777,18 +1783,20 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       );
                     })}
                   </div>
-                  <div className="mt-3 pt-3 border-t border-white/10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      closeAllCards();
-                      setShowProgressLogic(true);
-                    }}
-                      className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
-                    >
-                      <Info size={12} />
-                      {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
-                    </button>
+                   <div className="mt-3 pt-3 border-t border-white/10">
+                   <div
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       closeAllCards();
+                       setShowProgressLogic(true);
+                     }}
+                     role="button"
+                     tabIndex={0}
+                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors cursor-pointer"
+                     >
+                       <Info size={12} />
+                       {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
+                   </div>
                   </div>
                 </motion.div>
               )}
