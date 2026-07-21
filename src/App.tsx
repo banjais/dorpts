@@ -2490,6 +2490,12 @@ function MainAppContent() {
   }, [viewMode]);
 
   useEffect(() => {
+    if (mainView !== 'dashboard') {
+      setFabRevealed(false);
+    }
+  }, [mainView]);
+
+  useEffect(() => {
     const handleScroll = () => {
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
@@ -3021,8 +3027,12 @@ function MainAppContent() {
            viewOptions={viewOptions as any}
            indicators={indicators}
            metadata={metadata}
-           onMouseEnterFab={() => setFabRevealed(true)}
-           onMouseLeaveFab={() => setFabRevealed(false)}
+           onMouseEnterFab={() => {
+             if (mainView === 'dashboard') setFabRevealed(true);
+           }}
+           onMouseLeaveFab={() => {
+             if (mainView === 'dashboard') setFabRevealed(false);
+           }}
            trackedIds={trackedIds}
           onToggleTrack={toggleTrack}
           updatesHistory={visibleHistory}
@@ -3598,6 +3608,7 @@ function MainAppContent() {
            {/* Always-visible small handle */}
            <motion.button
              onMouseEnter={() => {
+               if (mainView !== 'dashboard') return;
                fabHoverTimer.current = window.setTimeout(() => setFabRevealed(true), 400);
              }}
              onMouseLeave={() => {
@@ -3606,7 +3617,10 @@ function MainAppContent() {
                setFabRevealed(false);
              }}
              onClick={() => setFabRevealed(p => !p)}
-             onTouchStart={() => setFabRevealed(true)}
+             onTouchStart={() => {
+               if (mainView !== 'dashboard') return;
+               setFabRevealed(true);
+             }}
              onTouchEnd={() => setTimeout(() => setFabRevealed(false), 1200)}
              className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
              title={language === "en" ? "Actions" : "कार्यहरू"}
@@ -3616,11 +3630,15 @@ function MainAppContent() {
          </div>
 
          {/* Auth Toolbar */}
-         <div
-           className="fixed top-3 right-3 z-[900] flex items-center gap-1.5"
-           onMouseEnter={() => setFabRevealed(true)}
-           onMouseLeave={() => setFabRevealed(false)}
-         >
+          <div
+            className="fixed top-3 right-3 z-[900] flex items-center gap-1.5"
+            onMouseEnter={() => {
+              if (mainView === 'dashboard') setFabRevealed(true);
+            }}
+            onMouseLeave={() => {
+              if (mainView === 'dashboard') setFabRevealed(false);
+            }}
+          >
           <select
             value={selectedFiscalYear}
             onChange={(e) => setSelectedFiscalYear(e.target.value)}
