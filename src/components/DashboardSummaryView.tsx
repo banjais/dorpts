@@ -930,10 +930,10 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
        {/* Each card slot = sentinel (always in DOM) + AnimatePresence card */}
        <motion.div
          animate={{
-           y: isAtBottom ? -200 : 0,
+           y: isAtBottom ? -220 : 0,
            opacity: isAtBottom ? 0 : 1,
          }}
-         transition={{ duration: 0.4, ease: 'easeInOut' }}
+         transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5"
        >
         {/* Card 0: Hero Overall Progress */}

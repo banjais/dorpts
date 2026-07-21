@@ -3361,10 +3361,10 @@ function MainAppContent() {
 
         {/* Unified Floating Action Bar */}
         <div
-          className="fixed bottom-4 right-4 md:bottom-6 md:right-8 mb-[env(safe-area-inset-bottom)] z-[1000] flex items-center transition-all duration-300 ease-out"
+          className="fixed bottom-4 right-4 md:bottom-6 md:right-8 mb-[env(safe-area-inset-bottom)] z-[1000] flex items-center transition-all duration-500 ease-out"
         >
           <div
-            className={`flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl pl-2 pr-1 py-1 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-2xl transition-all duration-500 ease-out ${
+            className={`flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl pl-2 pr-1 py-1 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-2xl transition-all duration-700 ease-out ${
               isReportBuilderOpen || !fabRevealed
                 ? "opacity-0 scale-90 translate-x-2 pointer-events-none"
                 : "opacity-100 scale-100 translate-x-0 pointer-events-auto"
