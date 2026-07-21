@@ -2483,6 +2483,7 @@ function MainAppContent() {
   const [isChartFocusMode, setIsChartFocusMode] = useState(true);
   const chartRef = useRef<HTMLDivElement>(null);
   const [fabRevealed, setFabRevealed] = useState(false);
+  const fabHoverTimer = useRef<number | null>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -3016,11 +3017,13 @@ function MainAppContent() {
           onToggleMilestonesOnly={() =>
             setShowMilestonesOnly(!showMilestonesOnly)
           }
-          viewMode={viewMode}
-          viewOptions={viewOptions as any}
-          indicators={indicators}
-          metadata={metadata}
-          trackedIds={trackedIds}
+           viewMode={viewMode}
+           viewOptions={viewOptions as any}
+           indicators={indicators}
+           metadata={metadata}
+           onMouseEnterFab={() => setFabRevealed(true)}
+           onMouseLeaveFab={() => setFabRevealed(false)}
+           trackedIds={trackedIds}
           onToggleTrack={toggleTrack}
           updatesHistory={visibleHistory}
           fiscalYear={selectedFiscalYear}
@@ -3466,22 +3469,16 @@ function MainAppContent() {
           className="fixed bottom-4 right-4 md:bottom-6 md:right-8 mb-[env(safe-area-inset-bottom)] z-[1000] flex items-center transition-all duration-300 ease-out"
         >
           <div
-            onMouseEnter={() => setFabRevealed(true)}
-            onMouseLeave={() => setFabRevealed(false)}
-            onTouchStart={() => setFabRevealed(true)}
-            onTouchEnd={() => setTimeout(() => setFabRevealed(false), 1200)}
+            className={`flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl pl-2 pr-1 py-1 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-2xl transition-all duration-500 ease-out ${
+              isReportBuilderOpen || !fabRevealed
+                ? "opacity-0 scale-90 translate-x-2 pointer-events-none"
+                : "opacity-100 scale-100 translate-x-0 pointer-events-auto"
+            }`}
+            style={{
+              borderColor: mainView === 'dashboard' ? '#4f46e540' : mainView === 'trends' ? '#05966940' : mainView === 'heatmap' ? '#d9770640' : '#7c3aed40',
+              boxShadow: `0 8px 32px ${mainView === 'dashboard' ? '#4f46e512' : mainView === 'trends' ? '#05966912' : mainView === 'heatmap' ? '#d9770612' : '#7c3aed12'}`
+            }}
           >
-            <div
-              className={`flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl pl-2 pr-1 py-1 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-2xl transition-all duration-300 ease-out ${
-                isReportBuilderOpen || !fabRevealed
-                  ? "opacity-0 scale-90 translate-x-2 pointer-events-none"
-                  : "opacity-100 scale-100 translate-x-0 pointer-events-auto"
-              }`}
-              style={{
-                borderColor: mainView === 'dashboard' ? '#4f46e540' : mainView === 'trends' ? '#05966940' : mainView === 'heatmap' ? '#d9770640' : '#7c3aed40',
-                boxShadow: `0 8px 32px ${mainView === 'dashboard' ? '#4f46e512' : mainView === 'trends' ? '#05966912' : mainView === 'heatmap' ? '#d9770612' : '#7c3aed12'}`
-              }}
-            >
               <div className="pr-2 mr-1 border-r border-slate-200 dark:border-slate-700 hidden sm:block">
                 <span className="text-[0.5625rem] font-black uppercase tracking-[0.15em] text-indigo-600 dark:text-indigo-400">
                   {(() => {
@@ -3597,23 +3594,33 @@ function MainAppContent() {
                 </span>
               </button>
             </div>
-          </div>
 
-          {/* Always-visible small handle */}
-          <motion.button
-            onMouseEnter={() => setFabRevealed(true)}
-            onMouseLeave={() => setFabRevealed(false)}
-            onTouchStart={() => setFabRevealed(true)}
-            onTouchEnd={() => setTimeout(() => setFabRevealed(false), 1200)}
-            className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
-            title={language === "en" ? "Actions" : "कार्यहरू"}
-          >
-            <Menu size={14} />
-          </motion.button>
-        </div>
+           {/* Always-visible small handle */}
+           <motion.button
+             onMouseEnter={() => {
+               fabHoverTimer.current = window.setTimeout(() => setFabRevealed(true), 400);
+             }}
+             onMouseLeave={() => {
+               if (fabHoverTimer.current) clearTimeout(fabHoverTimer.current);
+               fabHoverTimer.current = null;
+               setFabRevealed(false);
+             }}
+             onClick={() => setFabRevealed(p => !p)}
+             onTouchStart={() => setFabRevealed(true)}
+             onTouchEnd={() => setTimeout(() => setFabRevealed(false), 1200)}
+             className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
+             title={language === "en" ? "Actions" : "कार्यहरू"}
+           >
+             <Menu size={14} />
+           </motion.button>
+         </div>
 
-        {/* Auth Toolbar */}
-        <div className="fixed top-3 right-3 z-[900] flex items-center gap-1.5">
+         {/* Auth Toolbar */}
+         <div
+           className="fixed top-3 right-3 z-[900] flex items-center gap-1.5"
+           onMouseEnter={() => setFabRevealed(true)}
+           onMouseLeave={() => setFabRevealed(false)}
+         >
           <select
             value={selectedFiscalYear}
             onChange={(e) => setSelectedFiscalYear(e.target.value)}

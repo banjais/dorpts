@@ -33,6 +33,8 @@ interface HeaderProps {
   mainView?: MainView;
   onViewChange?: (view: MainView) => void;
   fiscalYear?: string;
+  onMouseEnterFab?: () => void;
+  onMouseLeaveFab?: () => void;
 }
 
 const getSyncedAgoText = (diffMs: number, lang: 'en' | 'ne'): string => {
@@ -98,6 +100,8 @@ export const Header: React.FC<HeaderProps> = ({
   selectedOffice = 'All',
   onOfficeChange = (office: string) => {},
   fiscalYear,
+  onMouseEnterFab,
+  onMouseLeaveFab,
 }) => {
   const { language, setLanguage, t } = useLanguage();
   const [lastSyncedTime, setLastSyncedTime] = useState<Date>(() => new Date());
@@ -389,7 +393,11 @@ export const Header: React.FC<HeaderProps> = ({
                 )}
               </AnimatePresence>
 
-              <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-2xl glass-panel">
+              <div
+                className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-2xl glass-panel"
+                onMouseEnter={onMouseEnterFab}
+                onMouseLeave={onMouseLeaveFab}
+              >
                 {/* Theme Toggle Button */}
                 <motion.button
                   whileHover={{ scale: 1.06 }}
