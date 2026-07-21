@@ -988,12 +988,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl" />
           <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/5 rounded-full -ml-10 -mb-10 blur-3xl" />
           
-           <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6 sm:flex-wrap">
-            <div className="flex-1 text-center sm:text-left">
-              <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                <span className="p-2 bg-white/20 rounded-xl">
-                  <Target size={28} className="text-white" />
-                </span>
+            <div className="relative z-10 flex flex-col gap-4">
+              <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">
                     {language === 'en' ? 'Overall Progress' : 'समग्र प्रगति'}
@@ -1002,58 +998,68 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     {language === 'en' ? 'Department of Roads' : 'सडक विभाग'}
                   </p>
                 </div>
+                <span className="p-2 bg-white/20 rounded-xl">
+                  <Target size={28} className="text-white" />
+                </span>
               </div>
               
-              <div className="flex items-center justify-center sm:justify-start gap-6 mt-4">
-                <div className="text-center">
-                  <div className="text-2xl sm:text-3xl font-black text-white">{fmt(stats.total)}</div>
-                  <div className="text-[10px] font-bold text-white/80 uppercase tracking-wider">
-                    {language === 'en' ? 'Indicators' : 'सूचकहरू'}
+              <div className="flex items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                  <div className="text-center">
+                    <div className="text-2xl sm:text-3xl font-black text-white">{fmt(stats.total)}</div>
+                    <div className="text-[10px] font-bold text-white/80 uppercase tracking-wider">
+                      {language === 'en' ? 'Indicators' : 'सूचकहरू'}
+                    </div>
+                  </div>
+                  <div className="w-px h-10 bg-white/20" />
+                  <div className="text-center">
+                    <div className="text-2xl sm:text-3xl font-black text-white">{fmt(reportingOffices.length)}</div>
+                    <div className="text-[10px] font-bold text-white/80 uppercase tracking-wider">
+                      {language === 'en' ? 'Offices' : 'कार्यालय'}
+                    </div>
                   </div>
                 </div>
-                <div className="w-px h-10 bg-white/20" />
-                <div className="text-center">
-                  <div className="text-2xl sm:text-3xl font-black text-white">{fmt(reportingOffices.length)}</div>
-                  <div className="text-[10px] font-bold text-white/80 uppercase tracking-wider">
-                    {language === 'en' ? 'Offices' : 'कार्यालय'}
+                
+                <div className="relative w-36 h-36 sm:w-44 sm:h-44 flex-shrink-0">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="12" />
+                    <motion.circle 
+                      cx="60" cy="60" r="54" 
+                      fill="none" 
+                      stroke="white" 
+                      strokeWidth="12" 
+                      strokeLinecap="round"
+                      initial={{ strokeDasharray: `0 ${2 * Math.PI * 54}` }}
+                      animate={{ strokeDasharray: `${2 * Math.PI * 54 * stats.weightedRate / 100} ${2 * Math.PI * 54 * (100 - stats.weightedRate) / 100}` }}
+                      transition={{ duration: 1.5, ease: 'easeOut' }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-3xl sm:text-4xl font-black text-white">{fmt(stats.weightedRate)}%</div>
+                      <div className="text-[10px] font-bold text-white/60 uppercase tracking-wider">
+                        {language === 'en' ? 'Overall' : 'समग्र'}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="relative w-36 h-36 sm:w-44 sm:h-44 flex-shrink-0">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="12" />
-                <motion.circle 
-                  cx="60" cy="60" r="54" 
-                  fill="none" 
-                  stroke="white" 
-                  strokeWidth="12" 
-                  strokeLinecap="round"
-                  initial={{ strokeDasharray: `0 ${2 * Math.PI * 54}` }}
-                  animate={{ strokeDasharray: `${2 * Math.PI * 54 * stats.weightedRate / 100} ${2 * Math.PI * 54 * (100 - stats.weightedRate) / 100}` }}
-                  transition={{ duration: 1.5, ease: 'easeOut' }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-3xl sm:text-4xl font-black text-white">{fmt(stats.weightedRate)}%</div>
-                  <div className="text-[10px] font-bold text-white/60 uppercase tracking-wider">
-                    {language === 'en' ? 'Overall' : 'समग्र'}
-                  </div>
-                </div>
+              
+              <div className="flex items-center justify-between">
+                <motion.div animate={{ rotate: showOverallProgress ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
+                  <ChevronDown size={18} />
+                </motion.div>
               </div>
-            </div>
-            
-             <div className="w-full sm:w-full">
-               <AnimatePresence>
-                 {showOverallProgress && (
-                   <motion.div
-                     initial={{ opacity: 0, height: 0 }}
-                     animate={{ opacity: 1, height: 'auto' }}
-                     exit={{ opacity: 0, height: 0 }}
-                     className="overflow-hidden mt-4"
-                   >
+              
+              <div className="w-full sm:w-full">
+                <AnimatePresence>
+                  {showOverallProgress && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden mt-4"
+                    >
                   <div className="bg-white/10 rounded-xl p-3 space-y-2">
                     <div className="text-[10px] font-black text-white uppercase tracking-wider mb-2">
                       {language === 'en' ? 'Calculation Details' : 'गणना विवरण'}
@@ -1147,68 +1153,72 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
-                {language === 'en' ? 'Status Breakdown' : 'स्थिति विवरण'}
-              </span>
-              <div className="flex items-center gap-1">
-                <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
-                  <BarChart3 size={14} className="text-white/90" />
-                </span>
-                <motion.div animate={{ rotate: showStatusDetails ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
-                  <ChevronRight size={18} />
-                </motion.div>
-              </div>
-            </div>
-            <div className="text-[10px] sm:text-[11px] font-bold text-white/70 mb-3">
-              {language === 'en'
-                ? 'Indicators grouped by achievement level'
-                : 'उपलब्धि स्तर अनुसार वर्गीकृत सूचकहरू'}
-            </div>
-            <div className="flex items-end gap-3 mb-3">
+           <div className="relative z-10 flex flex-col gap-3">
+             <div className="flex items-center justify-between">
                <div>
-                 <div className="text-2xl sm:text-3xl font-black text-emerald-200 leading-none">{fmt(stats.meetingTarget)}</div>
-                 <div className="text-[10px] font-bold text-emerald-200 uppercase tracking-wider mt-0.5">
-                   {language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा'}
-                 </div>
+                 <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
+                   {language === 'en' ? 'Status Breakdown' : 'स्थिति विवरण'}
+                 </span>
+                 <p className="text-[10px] sm:text-[11px] font-bold text-white/70">
+                   {language === 'en'
+                     ? 'Indicators grouped by achievement level'
+                     : 'उपलब्धि स्तर अनुसार वर्गीकृत सूचकहरू'}
+                 </p>
                </div>
-               <div>
-                 <div className="text-2xl sm:text-3xl font-black text-amber-200 leading-none">{fmt(stats.belowTarget)}</div>
-                 <div className="text-[10px] font-bold text-amber-200 uppercase tracking-wider mt-0.5">
-                   {language === 'en' ? 'Below Target' : 'लक्ष्यमुनि'}
-                 </div>
-               </div>
-               <div>
-                 <div className="text-2xl sm:text-3xl font-black text-rose-200 leading-none">{fmt(stats.needsCritical)}</div>
-                 <div className="text-[10px] font-bold text-rose-200 uppercase tracking-wider mt-0.5">
-                   {language === 'en' ? 'Needs Attention' : 'ध्यान'}
-                 </div>
-               </div>
-            </div>
-
-            {/* Stacked mini bar */}
-            <div className="h-2 bg-white/10 rounded-full overflow-hidden flex">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${stats.total > 0 ? (stats.meetingTarget / stats.total) * 100 : 0}%` }}
-                className="h-full bg-emerald-300 rounded-l-full"
-              />
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${stats.total > 0 ? (stats.belowTarget / stats.total) * 100 : 0}%` }}
-                className="h-full bg-amber-300"
-              />
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${stats.total > 0 ? (stats.needsCritical / stats.total) * 100 : 0}%` }}
-                className="h-full bg-rose-300 rounded-r-full"
-              />
-            </div>
-
-            <AnimatePresence>
-              {showStatusDetails && (
-                <motion.div
+               <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
+                 <BarChart3 size={14} className="text-white/90" />
+               </span>
+             </div>
+             
+             <div className="flex items-end gap-3">
+                <div>
+                  <div className="text-2xl sm:text-3xl font-black text-emerald-200 leading-none">{fmt(stats.meetingTarget)}</div>
+                  <div className="text-[10px] font-bold text-emerald-200 uppercase tracking-wider mt-0.5">
+                    {language === 'en' ? 'Meeting Target' : 'लक्ष्य पूरा'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-2xl sm:text-3xl font-black text-amber-200 leading-none">{fmt(stats.belowTarget)}</div>
+                  <div className="text-[10px] font-bold text-amber-200 uppercase tracking-wider mt-0.5">
+                    {language === 'en' ? 'Below Target' : 'लक्ष्यमुनि'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-2xl sm:text-3xl font-black text-rose-200 leading-none">{fmt(stats.needsCritical)}</div>
+                  <div className="text-[10px] font-bold text-rose-200 uppercase tracking-wider mt-0.5">
+                    {language === 'en' ? 'Needs Attention' : 'ध्यान'}
+                  </div>
+                </div>
+             </div>
+ 
+             {/* Stacked mini bar */}
+             <div className="h-2 bg-white/10 rounded-full overflow-hidden flex">
+               <motion.div
+                 initial={{ width: 0 }}
+                 animate={{ width: `${stats.total > 0 ? (stats.meetingTarget / stats.total) * 100 : 0}%` }}
+                 className="h-full bg-emerald-300 rounded-l-full"
+               />
+               <motion.div
+                 initial={{ width: 0 }}
+                 animate={{ width: `${stats.total > 0 ? (stats.belowTarget / stats.total) * 100 : 0}%` }}
+                 className="h-full bg-amber-300"
+               />
+               <motion.div
+                 initial={{ width: 0 }}
+                 animate={{ width: `${stats.total > 0 ? (stats.needsCritical / stats.total) * 100 : 0}%` }}
+                 className="h-full bg-rose-300 rounded-r-full"
+               />
+             </div>
+             
+             <div className="flex items-center justify-between">
+               <motion.div animate={{ rotate: showStatusDetails ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
+                 <ChevronDown size={18} />
+               </motion.div>
+             </div>
+ 
+             <AnimatePresence>
+               {showStatusDetails && (
+                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
@@ -1345,35 +1355,38 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
-                {language === 'en' ? 'Total Indicators' : 'कुल सूचकहरू'}
-              </span>
-              <div className="flex items-center gap-1">
-                <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
-                  <LayoutGrid size={14} className="text-white/90" />
-                </span>
-                <motion.div animate={{ rotate: showTotalIndicators ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
-                  <ChevronRight size={18} />
-                </motion.div>
-              </div>
-            </div>
-            <div className="text-[10px] sm:text-[11px] font-bold text-white/70 mb-1">
-              {language === 'en' ? 'Total number of indicators being tracked' : 'अनुगमन गरिएका कुल सूचकहरूको संख्या'}
-            </div>
-              <div className="text-2xl sm:text-3xl font-black text-white mb-4 leading-none">
-                {fmt(stats.total)}
-              </div>
-
-              <AnimatePresence>
-                {showTotalIndicators && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
+           <div className="relative z-10 flex flex-col gap-3">
+             <div className="flex items-center justify-between">
+               <div>
+                 <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
+                   {language === 'en' ? 'Total Indicators' : 'कुल सूचकहरू'}
+                 </span>
+                 <p className="text-[10px] sm:text-[11px] font-bold text-white/70">
+                   {language === 'en' ? 'Total number of indicators being tracked' : 'अनुगमन गरिएका कुल सूचकहरूको संख्या'}
+                 </p>
+               </div>
+               <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
+                 <LayoutGrid size={14} className="text-white/90" />
+               </span>
+             </div>
+             <div className="text-2xl sm:text-3xl font-black text-white leading-none">
+               {fmt(stats.total)}
+             </div>
+             
+             <div className="flex items-center justify-between">
+               <motion.div animate={{ rotate: showTotalIndicators ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
+                 <ChevronDown size={18} />
+               </motion.div>
+             </div>
+ 
+             <AnimatePresence>
+               {showTotalIndicators && (
+                 <motion.div
+                   initial={{ opacity: 0, height: 0 }}
+                   animate={{ opacity: 1, height: 'auto' }}
+                   exit={{ opacity: 0, height: 0 }}
+                   className="overflow-hidden"
+                   >
                      <div className="space-y-2.5">
                        {indicators.filter(Boolean).map((ind) => {
                          const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
@@ -1425,63 +1438,66 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
             >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
-                {language === 'en' ? 'Category Status' : 'वर्ग स्थिति'}
-              </span>
-              <div className="flex items-center gap-1">
-                <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
-                  <LayoutGrid size={14} className="text-white/90" />
-                </span>
-                <motion.div animate={{ rotate: showCategoryStatus ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
-                  <ChevronRight size={18} />
-                </motion.div>
-              </div>
-            </div>
-            <div className="text-[10px] sm:text-[11px] font-bold text-white/70 mb-1">
-              {language === 'en' ? 'Completion by category' : 'वर्ग अनुसार पूरा प्रतिशत'}
-            </div>
-
+           <div className="relative z-10 flex flex-col gap-3">
+             <div className="flex items-center justify-between">
+               <div>
+                 <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
+                   {language === 'en' ? 'Category Status' : 'वर्ग स्थिति'}
+                 </span>
+                 <p className="text-[10px] sm:text-[11px] font-bold text-white/70">
+                   {language === 'en' ? 'Completion by category' : 'वर्ग अनुसार पूरा प्रतिशत'}
+                 </p>
+               </div>
+               <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
+                 <LayoutGrid size={14} className="text-white/90" />
+               </span>
+             </div>
+             
              {/* Mini category completion bars - hidden when expanded */}
-             <div className={`space-y-2 transition-opacity duration-200 ${showCategoryStatus ? 'opacity-0 pointer-events-none h-0 overflow-hidden' : 'opacity-100'}`}>
-              {STANDARD_CATEGORIES.map((cat) => {
-                const catIndicators = indicators.filter((ind) => ind && normalizeCategory(ind.category) === cat);
-                const total = catIndicators.length;
-                const avgCompletion = total > 0
-                  ? Math.round(catIndicators.reduce((sum, ind) => {
-                      const pct = ind.annualTarget > 0 ? Math.min(100, (ind.annualProgress / ind.annualTarget) * 100) : 0;
-                      return sum + pct;
-                    }, 0) / total)
-                  : 0;
-                
-                if (total === 0) return null;
-                
-                return (
-                   <div key={cat} className="flex items-center gap-2">
-                     <div className="w-20 sm:w-24">
-                       <span className="text-[10px] font-black uppercase tracking-wider text-white/70 truncate block">
-                         {language === 'en' ? (CATEGORY_SHORT_LABELS[cat]?.en || cat.split(' ')[0]) : (CATEGORY_SHORT_LABELS[cat]?.np || cat.split(' ')[0])}
-                       </span>
-                     </div>
-                     <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
-                       <motion.div
-                         initial={{ width: 0 }}
-                         animate={{ width: `${avgCompletion}%` }}
-                         transition={{ duration: 0.8, ease: 'easeOut' }}
-                         className="h-full rounded-full bg-emerald-400"
-                       />
-                     </div>
-                     <span className="text-[10px] font-black text-emerald-300 w-8 text-right">{fmt(avgCompletion)}%</span>
-                   </div>
-                );
-              })}
-            </div>
-
-            <AnimatePresence>
-              {showCategoryStatus && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
+              <div className={`space-y-2 transition-opacity duration-200 ${showCategoryStatus ? 'opacity-0 pointer-events-none h-0 overflow-hidden' : 'opacity-100'}`}>
+               {STANDARD_CATEGORIES.map((cat) => {
+                 const catIndicators = indicators.filter((ind) => ind && normalizeCategory(ind.category) === cat);
+                 const total = catIndicators.length;
+                 const avgCompletion = total > 0
+                   ? Math.round(catIndicators.reduce((sum, ind) => {
+                       const pct = ind.annualTarget > 0 ? Math.min(100, (ind.annualProgress / ind.annualTarget) * 100) : 0;
+                       return sum + pct;
+                     }, 0) / total)
+                   : 0;
+                 
+                 if (total === 0) return null;
+                 
+                 return (
+                    <div key={cat} className="flex items-center gap-2">
+                      <div className="w-20 sm:w-24">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-white/70 truncate block">
+                          {language === 'en' ? (CATEGORY_SHORT_LABELS[cat]?.en || cat.split(' ')[0]) : (CATEGORY_SHORT_LABELS[cat]?.np || cat.split(' ')[0])}
+                        </span>
+                      </div>
+                      <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${avgCompletion}%` }}
+                          transition={{ duration: 0.8, ease: 'easeOut' }}
+                          className="h-full rounded-full bg-emerald-400"
+                        />
+                      </div>
+                      <span className="text-[10px] font-black text-emerald-300 w-8 text-right">{fmt(avgCompletion)}%</span>
+                    </div>
+                 );
+               })}
+             </div>
+             
+             <div className="flex items-center justify-between">
+               <motion.div animate={{ rotate: showCategoryStatus ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
+                 <ChevronDown size={18} />
+               </motion.div>
+             </div>
+ 
+             <AnimatePresence>
+               {showCategoryStatus && (
+                 <motion.div
+                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden mt-4"
