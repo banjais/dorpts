@@ -988,7 +988,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl" />
           <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/5 rounded-full -ml-10 -mb-10 blur-3xl" />
           
-          <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+           <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6 sm:flex-wrap">
             <div className="flex-1 text-center sm:text-left">
               <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
                 <span className="p-2 bg-white/20 rounded-xl">
@@ -1045,14 +1045,15 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               </div>
             </div>
             
-            <AnimatePresence>
-              {showOverallProgress && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden mt-4"
-                >
+             <div className="w-full sm:w-full">
+               <AnimatePresence>
+                 {showOverallProgress && (
+                   <motion.div
+                     initial={{ opacity: 0, height: 0 }}
+                     animate={{ opacity: 1, height: 'auto' }}
+                     exit={{ opacity: 0, height: 0 }}
+                     className="overflow-hidden mt-4"
+                   >
                   <div className="bg-white/10 rounded-xl p-3 space-y-2">
                     <div className="text-[10px] font-black text-white uppercase tracking-wider mb-2">
                       {language === 'en' ? 'Calculation Details' : 'गणना विवरण'}
@@ -1126,11 +1127,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                             </div>
                           </motion.div>
                         )}
-                      </AnimatePresence>
-                    </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                       </AnimatePresence>
+                     </div>
+                 </motion.div>
+               )}
+              </AnimatePresence>
+            </div>
           </div>
         </motion.button>
         </AnimatePresence>
