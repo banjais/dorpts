@@ -3198,9 +3198,10 @@ function MainAppContent() {
                                 setIsHistoryDrawerOpen(true);
                               }}
                                onSelectIndicatorFromBreakdown={handleSelectIndicatorFromBreakdown}
-                               highlightedCard={highlightedCard}
-                               isFooterExpanded={isFooterExpanded}
-                            />
+                                highlightedCard={highlightedCard}
+                                isFooterExpanded={isFooterExpanded}
+                                isAtBottom={isAtBottom}
+                             />
                            </ErrorBoundary>
                          )}
  

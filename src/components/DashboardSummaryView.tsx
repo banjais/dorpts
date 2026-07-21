@@ -77,6 +77,7 @@ interface DashboardSummaryViewProps {
   addToast?: (message: string, messageEn?: string, type?: 'success' | 'info' | 'error' | 'warning', duration?: number) => void;
   highlightedCard?: 'insights' | null;
   isFooterExpanded?: boolean;
+  isAtBottom?: boolean;
 }
 
 const toNepaliNumerals = (numStr: string | number): string => {
@@ -638,6 +639,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   addToast,
   highlightedCard,
   isFooterExpanded,
+  isAtBottom,
 }) => {
   const { language, setLanguage, t, translateUnit, translateOffice } = useLanguage();
   const { isAdmin } = useAuth();
@@ -924,9 +926,16 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       
       {/* Sticky card stack — cards peel off and stack below the header as you scroll */}
 
-      {/* Summary Stats - Bold 3D Cards */}
-      {/* Each card slot = sentinel (always in DOM) + AnimatePresence card */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+       {/* Summary Stats - Bold 3D Cards */}
+       {/* Each card slot = sentinel (always in DOM) + AnimatePresence card */}
+       <motion.div
+         animate={{
+           y: isAtBottom ? -200 : 0,
+           opacity: isAtBottom ? 0 : 1,
+         }}
+         transition={{ duration: 0.4, ease: 'easeInOut' }}
+         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5"
+       >
         {/* Card 0: Hero Overall Progress */}
          <AnimatePresence>
             <motion.button
@@ -2077,10 +2086,10 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               </div>
              </motion.div>
            )}
-          </AnimatePresence>
-        </motion.div>
-      </AnimatePresence>
-      </div>
+           </AnimatePresence>
+         </motion.div>
+       </AnimatePresence>
+       </motion.div>
 
       <StatusBreakdownModal
         isOpen={showStatusBreakdown}
