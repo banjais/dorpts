@@ -311,7 +311,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`w-full fixed top-0 left-0 right-0 z-[5000] backdrop-blur-xl smooth-header-transition ${headerBg} shadow-md h-[126px] sm:h-[144px] flex flex-col justify-start overflow-hidden pt-0`}
+      className={`w-full fixed top-0 left-0 right-0 z-[5000] backdrop-blur-xl smooth-header-transition ${headerBg} shadow-md h-[150px] sm:h-[170px] flex flex-col justify-start overflow-hidden pt-0`}
     >
       {/* Small, persistent 'Offline' visual banner */}
       {!isOnline && (
@@ -320,56 +320,62 @@ export const Header: React.FC<HeaderProps> = ({
                   title={language === 'en' ? 'System offline' : 'प्रणाली अफलाइन'}
         />
       )}
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex flex-col gap-0.5 sm:gap-1">
-          <div className="flex items-center justify-between gap-4 h-14 sm:h-16">
-            <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-              <motion.button
-                whileHover={{ scale: 1.06 }}
-                whileTap={{ scale: 0.94 }}
-                onClick={onOpenDrawer}
-                className="shrink-0 w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/70 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm hover:bg-white dark:hover:bg-slate-800 transition-all"
-                title={language === 'en' ? 'Menu' : 'मेनु'}
-              >
-                <Menu size={20} />
-              </motion.button>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="relative shrink-0 flex items-center justify-center smooth-branding-transition w-9 h-9 sm:w-11 sm:h-11"
-              >
-                <div className="w-full h-full rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-white/10 flex items-center justify-center shadow-md">
-                  <img
-                    src="/GovtLogo.svg"
-                    alt="Government of Nepal Logo"
-                    className="w-[66%] h-[66%] object-contain drop-shadow-sm"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-                {isOnline ? (
-                  <span
-                    className="absolute -bottom-0.5 -right-0.5 rounded-full border-2 border-white dark:border-[#0c152e] bg-emerald-500 shadow-sm z-10 w-2.5 h-2.5"
-                    title={language === 'en' ? 'System online' : 'प्रणाली अनलाइन'}
-                  />
-                ) : (
-                  <span
-                    className="absolute -bottom-1 -right-1 w-4 h-4 z-10 flex items-center justify-center cursor-help"
-                    title={language === 'en' ? 'System offline - changes saved to local cache' : 'प्रणाली अफलाइन - परिवर्तनहरू स्थानीय क्यासमा सुरक्षित छन्'}
-                  >
-                    <span className="absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75 animate-ping" />
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-600 border border-white dark:border-[#0c152e] shadow-sm" />
-                  </span>
-                )}
-              </motion.div>
+       <div className="container mx-auto px-4 max-w-7xl">
+         <div className="flex flex-col gap-0.5 sm:gap-1">
+           <div className="flex items-center justify-between gap-2 sm:gap-4 h-12 sm:h-14">
+             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+               <motion.button
+                 whileHover={{ scale: 1.06 }}
+                 whileTap={{ scale: 0.94 }}
+                 onClick={onOpenDrawer}
+                 className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-white/80 dark:bg-slate-800/80 border border-slate-200/70 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm hover:bg-white dark:hover:bg-slate-800 transition-all"
+                 title={language === 'en' ? 'Menu' : 'मेनु'}
+               >
+                 <Menu size={18} />
+               </motion.button>
+               <motion.div
+                 whileHover={{ scale: 1.05 }}
+                 className="relative shrink-0 flex items-center justify-center smooth-branding-transition w-8 h-8 sm:w-9 sm:h-9"
+               >
+                 <div className="w-full h-full rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-white/10 flex items-center justify-center shadow-md">
+                   <img
+                     src="/GovtLogo.svg"
+                     alt="Government of Nepal Logo"
+                     className="w-[66%] h-[66%] object-contain drop-shadow-sm"
+                     referrerPolicy="no-referrer"
+                   />
+                 </div>
+                 {isOnline ? (
+                   <span
+                     className="absolute -bottom-0.5 -right-0.5 rounded-full border-2 border-white dark:border-[#0c152e] bg-emerald-500 shadow-sm z-10 w-2 h-2"
+                     title={language === 'en' ? 'System online' : 'प्रणाली अनलाइन'}
+                   />
+                 ) : (
+                   <span
+                     className="absolute -bottom-1 -right-1 w-3.5 h-3.5 z-10 flex items-center justify-center cursor-help"
+                     title={language === 'en' ? 'System offline - changes saved to local cache' : 'प्रणाली अफलाइन - परिवर्तनहरू स्थानीय क्यासमा सुरक्षित छन्'}
+                   >
+                     <span className="absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75 animate-ping" />
+                     <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600 border border-white dark:border-[#0c152e] shadow-sm" />
+                   </span>
+                 )}
+               </motion.div>
 
-              <div className="relative flex flex-col justify-center min-w-0 h-10 sm:h-12 overflow-hidden">
-                <div className="flex flex-col justify-center">
-                  <span className="font-display text-[0.62rem] sm:text-[0.8rem] md:text-[0.9rem] font-black tracking-wide whitespace-nowrap text-brand-gradient uppercase leading-none truncate">
-                    {language === 'ne' ? 'प्रगति ट्र्याकर' : APP_TITLES.shortAppName[language]}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 sm:gap-4 shrink-0 ml-auto">
+               <div className="relative flex flex-col justify-center min-w-0 flex-1">
+                 <span className="font-display text-[0.7rem] sm:text-[0.8rem] md:text-[0.9rem] font-black tracking-wide whitespace-nowrap text-brand-gradient uppercase leading-none truncate">
+                   {language === 'ne' ? 'प्रगति ट्र्याकर' : APP_TITLES.shortAppName[language]}
+                 </span>
+                 <span className="text-[0.6rem] sm:text-[0.7rem] md:text-[0.75rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">
+                   {language === 'en' ? 'Performance Overview' : 'कार्यसम्पादन अवलोकन'}
+                 </span>
+                 {fiscalYear && (
+                   <span className="text-[0.65rem] sm:text-xs font-black text-[#0099DA] dark:text-[#00ADF7] bg-[#0099DA]/10 dark:bg-[#00ADF7]/10 px-1.5 py-0.5 rounded-md shrink-0 inline-block w-fit mt-0.5">
+                     FY {fiscalYear}
+                   </span>
+                 )}
+               </div>
+             </div>
+             <div className="flex items-center gap-1 sm:gap-2 shrink-0">
               {/* Syncing Status */}
               <AnimatePresence>
                 {pendingWrites.length > 0 && isOnline && (
@@ -392,74 +398,58 @@ export const Header: React.FC<HeaderProps> = ({
                 onMouseEnter={onMouseEnterFab}
                 onMouseLeave={onMouseLeaveFab}
               >
-                {/* Theme Toggle Button */}
-                <motion.button
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.94 }}
-                  onClick={toggleTheme}
-                  className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all flex items-center gap-2 min-w-[44px] min-h-[44px] justify-center ${
-                    themePref === 'dark'
-                      ? 'bg-slate-900 text-amber-400 shadow'
-                      : themePref === 'system'
-                      ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300'
-                      : 'bg-white text-slate-900 dark:bg-white/10 dark:text-white shadow-sm'
-                  }`}
-                  title={language === 'en' ? `Theme: ${themePref}` : `थिम: ${themePref}`}
-                >
-                  {getThemeIcon()}
-                  <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider hidden sm:inline">{themePref}</span>
-                </motion.button>
+                 {/* Theme Toggle Button */}
+                 <motion.button
+                   whileHover={{ scale: 1.06 }}
+                   whileTap={{ scale: 0.94 }}
+                   onClick={toggleTheme}
+                   className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-1 min-w-[32px] sm:min-w-[44px] min-h-[32px] sm:min-h-[44px] ${
+                     themePref === 'dark'
+                       ? 'bg-slate-900 text-amber-400 shadow'
+                       : themePref === 'system'
+                       ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300'
+                       : 'bg-white text-slate-900 dark:bg-white/10 dark:text-white shadow-sm'
+                   }`}
+                   title={language === 'en' ? `Theme: ${themePref}` : `थिम: ${themePref}`}
+                 >
+                   {getThemeIcon()}
+                   <span className="text-[9px] sm:text-[10px] sm:hidden font-extrabold uppercase tracking-wider">{themePref[0].toUpperCase()}</span>
+                   <span className="hidden sm:inline text-[10px] sm:text-xs font-extrabold uppercase tracking-wider">{themePref}</span>
+                 </motion.button>
 
-                {/* Language Toggle */}
-                <motion.button
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.94 }}
-                  onClick={() => {
-                    triggerHaptic('light');
-                    setLanguage(language === 'ne' ? 'en' : 'ne');
-                  }}
-                  className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-brand-700 dark:text-brand-300 font-extrabold uppercase text-[10px] sm:text-xs tracking-wider flex items-center gap-2 transition-colors hover:bg-brand-50 dark:hover:bg-brand-500/10 min-w-[44px] min-h-[44px] justify-center"
-                  title={language === 'en' ? 'Switch to Nepali' : 'अंग्रेजीमा स्विच गर्नुहोस्'}
-                >
-                  <Languages size={16} />
-                  <span className="hidden sm:inline">{language === 'en' ? 'नेपाली' : 'EN'}</span>
-                </motion.button>
+                 {/* Language Toggle */}
+                 <motion.button
+                   whileHover={{ scale: 1.06 }}
+                   whileTap={{ scale: 0.94 }}
+                   onClick={() => {
+                     triggerHaptic('light');
+                     setLanguage(language === 'ne' ? 'en' : 'ne');
+                   }}
+                   className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl text-brand-700 dark:text-brand-300 font-extrabold uppercase text-[9px] sm:text-[10px] sm:text-xs tracking-wider flex items-center justify-center gap-1 transition-colors hover:bg-brand-50 dark:hover:bg-brand-500/10 min-w-[32px] sm:min-w-[44px] min-h-[32px] sm:min-h-[44px]"
+                   title={language === 'en' ? 'Switch to Nepali' : 'अंग्रेजीमा स्विच गर्नुहोस्'}
+                 >
+                   <Languages size={14} className="sm:w-4 sm:h-4" />
+                   <span className="sm:hidden">{language === 'en' ? 'N' : 'ने'}</span>
+                   <span className="hidden sm:inline">{language === 'en' ? 'नेपाली' : 'EN'}</span>
+                 </motion.button>
 
-                {/* Text Size (Cycle) */}
-                <motion.button
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.94 }}
-                  onClick={() => {
-                    triggerHaptic('light');
-                    cycleTextScale();
-                  }}
-                  className="p-2 sm:p-2.5 rounded-xl border transition-all flex items-center justify-center bg-white dark:bg-white/10 border-transparent text-slate-600 dark:text-brand-300 hover:text-brand-700 dark:hover:text-white min-w-[44px] min-h-[44px]"
-                  title={language === 'en' ? `Text Size: ${textScale}` : `पाठ आकार: ${textScale}`}
-                >
-                  <Type size={18} />
-                </motion.button>
+                 {/* Text Size (Cycle) */}
+                 <motion.button
+                   whileHover={{ scale: 1.06 }}
+                   whileTap={{ scale: 0.94 }}
+                   onClick={() => {
+                     triggerHaptic('light');
+                     cycleTextScale();
+                   }}
+                   className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl border transition-all flex items-center justify-center bg-white dark:bg-white/10 border-transparent text-slate-600 dark:text-brand-300 hover:text-brand-700 dark:hover:text-white min-w-[32px] sm:min-w-[44px] min-h-[32px] sm:min-h-[44px]"
+                   title={language === 'en' ? `Text Size: ${textScale}` : `पाठ आकार: ${textScale}`}
+                 >
+                   <Type size={14} className="sm:w-[18px] sm:h-[18px]" />
+                 </motion.button>
+                </div>
               </div>
             </div>
           </div>
-
-           <div
-             className="overflow-hidden pb-0.5 smooth-header-transition h-auto pointer-events-auto"
-           >
-             <div className="flex flex-row items-center justify-between gap-2 h-[45px] sm:h-[60px]">
-                 <div className="border-l-2 border-[#0099DA]/70 dark:border-[#00ADF7]/70 pl-2.5 py-0.5 min-w-0">
-                 <h1 className="font-display font-extrabold text-slate-800 dark:text-white tracking-tight uppercase leading-none truncate text-[0.72rem] sm:text-[0.95rem] md:text-[1.05rem]">
-                   <span className="text-brand-gradient">{language === 'en' ? 'PERFORMANCE OVERVIEW' : 'कार्यसम्पादन अवलोकन'}</span>
-                 </h1>
-                 {fiscalYear && (
-                   <span className="text-[10px] sm:text-xs font-black text-[#0099DA] dark:text-[#00ADF7] bg-[#0099DA]/10 dark:bg-[#00ADF7]/10 px-2 py-1 rounded-md shrink-0">
-                     FY {fiscalYear}
-                   </span>
-                 )}
-               </div>
-
-             </div>
-           </div>
-        </div>
         </div>
       </header>
     );
