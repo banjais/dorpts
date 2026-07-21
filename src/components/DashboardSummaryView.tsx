@@ -78,6 +78,7 @@ interface DashboardSummaryViewProps {
   highlightedCard?: 'insights' | null;
   isFooterExpanded?: boolean;
   isAtBottom?: boolean;
+  onCardsReachedHeader?: (reached: boolean) => void;
 }
 
 const toNepaliNumerals = (numStr: string | number): string => {
@@ -640,6 +641,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   highlightedCard,
   isFooterExpanded,
   isAtBottom: _isAtBottomProp,
+  onCardsReachedHeader,
 }) => {
   const { language, setLanguage, t, translateUnit, translateOffice } = useLanguage();
   const { isAdmin } = useAuth();
@@ -748,13 +750,15 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       if (!lastCardRef.current) return;
       const headerHeight = window.innerWidth < 640 ? 150 : 170;
       const cardRect = lastCardRef.current.getBoundingClientRect();
-      setCardsReachedHeader(cardRect.top <= headerHeight);
+      const reached = cardRect.bottom <= headerHeight;
+      setCardsReachedHeader(reached);
+      onCardsReachedHeader?.(reached);
     };
 
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [onCardsReachedHeader]);
 
   const weightedAchievementRate = useMemo(() => {
     const totalWeight = indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0) || 100;
