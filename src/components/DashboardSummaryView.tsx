@@ -1609,74 +1609,76 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
            </motion.button>
       </AnimatePresence>
 
-        {/* Card 4: Reporting Offices */}
-          <AnimatePresence>
-            <motion.div
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                className="group relative cursor-pointer bg-gradient-to-br from-slate-400 via-gray-400 to-zinc-400 rounded-[28px] shadow-xl shadow-slate-500/25 border border-white/20 hover:shadow-2xl hover:shadow-slate-500/40 active:shadow-2xl active:shadow-slate-500/40 transition-all duration-200 overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-black/10" />
-                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <button
-                  onClick={() => toggleCard(setShowReportingOffices, showReportingOffices)}
-                  className="relative w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="p-1.5 bg-white/20 text-white rounded-xl">
-                      <Building2 size={14} />
-                    </span>
-                    <div className="text-left">
-                      <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-tight">
-                        {language === 'en' ? 'Reporting Offices' : 'विवरण पठाउने कार्यालयहरू'}
-                      </h3>
-                      <p className="text-[10px] sm:text-[11px] font-bold text-white/70">
-                        {language === 'en' ? `${reportingOffices.length} offices reporting` : `${reportingOffices.length} कार्यालयहरूबाट रिपोर्टिङ`}
-                      </p>
-                    </div>
-                  </div>
-                  <motion.div animate={{ rotate: showReportingOffices ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
-                    <ChevronRight size={18} />
-                  </motion.div>
-                </button>
+         {/* Card 4: Reporting Offices */}
+           <AnimatePresence>
+             <motion.div
+                 layout
+                 initial={{ opacity: 0, scale: 0.95 }}
+                 animate={{ opacity: 1, scale: 1 }}
+                 exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+                 transition={{ duration: 0.3, ease: 'easeInOut' }}
+                 whileHover={{ scale: 1.02 }}
+                 whileTap={{ scale: 0.97 }}
+                 onClick={() => toggleCard(setShowReportingOffices, showReportingOffices)}
+                 className="group relative cursor-pointer bg-gradient-to-br from-slate-400 via-gray-400 to-zinc-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-slate-500/25 border border-white/20 hover:shadow-2xl hover:shadow-slate-500/40 active:shadow-2xl active:shadow-slate-500/40 transition-all duration-200 overflow-hidden"
+               >
+               <div className="absolute inset-0 bg-black/10" />
+               <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+               <div className="relative z-10 flex flex-col gap-3">
+                 <div className="flex items-center justify-between">
+                   <div>
+                     <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-tight">
+                       {language === 'en' ? 'Reporting Offices' : 'विवरण पठाउने कार्यालयहरू'}
+                     </h3>
+                     <p className="text-[10px] sm:text-[11px] font-bold text-white/70">
+                       {language === 'en' ? `${reportingOffices.length} offices reporting` : `${reportingOffices.length} कार्यालयहरूबाट रिपोर्टिङ`}
+                     </p>
+                   </div>
+                   <span className="p-1.5 bg-white/20 text-white rounded-xl">
+                     <Building2 size={14} />
+                   </span>
+                 </div>
+                 <div className="flex items-center justify-between">
+                   <motion.div animate={{ rotate: showReportingOffices ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
+                     <ChevronDown size={18} />
+                   </motion.div>
+                 </div>
+               </div>
 
-                <AnimatePresence>
-                  {showReportingOffices && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-5 pb-5 pt-1 space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
-                        {reportingOffices.map((officeData) => {
-                          const displayName = translateOffice(officeData.office);
-                          const emails = Array.from(officeData.emails);
-                          const adminEmail = emails[0] || '';
-                          return (
-                            <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5 space-y-0.5">
-                              <div className="text-[10px] font-black text-white/80 truncate">
-                                {displayName}
-                              </div>
-                              {adminEmail && (
-                                <div className="text-[10px] font-bold text-white/60 truncate">
-                                  {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </motion.div>
-                  )}
-              </AnimatePresence>
-           </motion.div>
-         </AnimatePresence>
+               <div className="w-full sm:w-full">
+                 <AnimatePresence>
+                   {showReportingOffices && (
+                     <motion.div
+                       initial={{ opacity: 0, height: 0 }}
+                       animate={{ opacity: 1, height: 'auto' }}
+                       exit={{ opacity: 0, height: 0 }}
+                       className="overflow-hidden"
+                     >
+                       <div className="pb-5 pt-1 space-y-2 overflow-y-auto custom-scrollbar pr-1">
+                         {reportingOffices.map((officeData) => {
+                           const displayName = translateOffice(officeData.office);
+                           const emails = Array.from(officeData.emails);
+                           const adminEmail = emails[0] || '';
+                           return (
+                             <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5 space-y-0.5">
+                               <div className="text-[10px] font-black text-white/80 truncate">
+                                 {displayName}
+                               </div>
+                               {adminEmail && (
+                                 <div className="text-[10px] font-bold text-white/60 truncate">
+                                   {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
+                                 </div>
+                               )}
+                             </div>
+                           );
+                         })}
+                       </div>
+                     </motion.div>
+                   )}
+               </AnimatePresence>
+             </div>
+            </motion.div>
+          </AnimatePresence>
 
          {/* Card 5: Budget & Capital Expenditure */}
            <AnimatePresence>
@@ -1893,7 +1895,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                  exit={{ opacity: 0, height: 0 }}
                  className="overflow-hidden bg-black/20"
                >
-                 <div className="px-5 pb-5 pt-1 space-y-4">
+                  <div className="pb-5 pt-1 space-y-4">
                     {(() => {
                       const empInd = indicators.find(i => i.id === 'ind_13') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('employment'));
                       if (!empInd) {
