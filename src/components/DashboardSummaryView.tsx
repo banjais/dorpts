@@ -952,7 +952,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   }, [showSplash]);
 
   return (
-    <div className="relative min-h-screen space-y-6 max-w-7xl mx-auto px-1 sm:px-4">
+     <div className="relative min-h-screen space-y-6 max-w-7xl mx-auto px-0 sm:px-4">
       {showSplash && (
         <SplashScreen
           progress={stats.weightedRate}
@@ -978,7 +978,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
              opacity: cardsReachedHeader ? 0 : 1,
            }}
            transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 pb-24 sm:pb-32"
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5 pb-24 sm:pb-32"
          >
         {/* Card 0: Hero Overall Progress */}
          <AnimatePresence>
@@ -1013,24 +1013,24 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 </span>
               </div>
               
-              <div className="flex items-center justify-between gap-6">
-                <div className="flex items-center gap-6">
-                  <div className="text-center">
-                    <div className="text-2xl sm:text-3xl font-black text-white">{fmt(stats.total)}</div>
-                    <div className="text-[10px] font-bold text-white/80 uppercase tracking-wider">
-                      {language === 'en' ? 'Indicators' : 'सूचकहरू'}
-                    </div>
-                  </div>
-                  <div className="w-px h-10 bg-white/20" />
-                  <div className="text-center">
-                    <div className="text-2xl sm:text-3xl font-black text-white">{fmt(reportingOffices.length)}</div>
-                    <div className="text-[10px] font-bold text-white/80 uppercase tracking-wider">
-                      {language === 'en' ? 'Offices' : 'कार्यालय'}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="relative w-36 h-36 sm:w-44 sm:h-44 flex-shrink-0">
+               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                 <div className="flex items-center justify-center sm:justify-start gap-4 sm:gap-6">
+                   <div className="text-center">
+                     <div className="text-2xl sm:text-3xl font-black text-white">{fmt(stats.total)}</div>
+                     <div className="text-[10px] font-bold text-white/80 uppercase tracking-wider">
+                       {language === 'en' ? 'Indicators' : 'सूचकहरू'}
+                     </div>
+                   </div>
+                   <div className="w-px h-10 bg-white/20 hidden sm:block" />
+                   <div className="text-center">
+                     <div className="text-2xl sm:text-3xl font-black text-white">{fmt(reportingOffices.length)}</div>
+                     <div className="text-[10px] font-bold text-white/80 uppercase tracking-wider">
+                       {language === 'en' ? 'Offices' : 'कार्यालय'}
+                     </div>
+                   </div>
+                 </div>
+                 
+                 <div className="relative w-28 h-28 sm:w-36 sm:h-44 md:w-40 md:h-48 flex-shrink-0 mx-auto sm:mx-0">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                     <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="12" />
                     <motion.circle 
@@ -1180,7 +1180,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                </span>
              </div>
              
-             <div className="flex items-end gap-3">
+              <div className="flex flex-wrap items-end justify-center sm:justify-between gap-3 sm:gap-3">
                 <div>
                   <div className="text-2xl sm:text-3xl font-black text-emerald-200 leading-none">{fmt(stats.meetingTarget)}</div>
                   <div className="text-[10px] font-bold text-emerald-200 uppercase tracking-wider mt-0.5">
@@ -1754,7 +1754,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                         );
                       }
                    return (
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                        {budgetInd && (() => {
                          const target = budgetInd.annualTarget || 0;
                          const progress = budgetInd.annualProgress || 0;
