@@ -745,17 +745,21 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   }, [highlightedCard]);
 
   useEffect(() => {
+    let lastY = window.scrollY;
     const handleScroll = () => {
-      if (!lastCardRef.current) return;
-      const headerHeight = window.innerWidth < 640 ? 150 : 170;
-      const cardRect = lastCardRef.current.getBoundingClientRect();
-      const reached = cardRect.bottom <= headerHeight;
-      setCardsReachedHeader(reached);
-      onCardsReachedHeader?.(reached);
+      const currentY = window.scrollY || document.documentElement.scrollTop;
+      if (currentY > lastY + 5) {
+        setCardsReachedHeader(true);
+        onCardsReachedHeader?.(true);
+      } else if (currentY < lastY - 5) {
+        setCardsReachedHeader(false);
+        onCardsReachedHeader?.(false);
+      }
+      lastY = currentY;
     };
 
-    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [onCardsReachedHeader]);
 
