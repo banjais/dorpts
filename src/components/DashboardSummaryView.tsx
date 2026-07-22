@@ -1141,14 +1141,19 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         </motion.button>
         </AnimatePresence>
 
-        {/* Card 2: Status Breakdown */}
+        {/* Card 1: Total Indicators */}
           <AnimatePresence>
             <motion.button
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
               whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => toggleCard(setShowStatusDetails, showStatusDetails)}
-          className="group relative w-full rounded-2xl border overflow-hidden transition-all duration-400 bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 shadow-sm hover:shadow-xl shadow-purple-500/20 active:scale-[0.98]"
-        >
+              whileTap={{ scale: 0.97 }}
+              onClick={() => toggleCard(setShowTotalIndicators, showTotalIndicators)}
+              className="group relative w-full rounded-2xl border overflow-hidden transition-all duration-400 bg-gradient-to-br from-indigo-500 via-blue-500 to-cyan-500 shadow-sm hover:shadow-xl shadow-indigo-500/20 active:scale-[0.98]"
+            >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
            <div className="relative z-10 flex flex-col gap-3">
@@ -1338,19 +1343,14 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           </motion.button>
     </AnimatePresence>
 
-        {/* Card 1: Total Indicators */}
+        {/* Card 2: Status Breakdown */}
           <AnimatePresence>
             <motion.button
-              layout
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
               whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => toggleCard(setShowTotalIndicators, showTotalIndicators)}
-              className="group relative w-full rounded-2xl border overflow-hidden transition-all duration-400 bg-gradient-to-br from-indigo-500 via-blue-500 to-cyan-500 shadow-sm hover:shadow-xl shadow-indigo-500/20 active:scale-[0.98]"
-            >
+              whileTap={{ scale: 0.98 }}
+              onClick={() => toggleCard(setShowStatusDetails, showStatusDetails)}
+          className="group relative w-full rounded-2xl border overflow-hidden transition-all duration-400 bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 shadow-sm hover:shadow-xl shadow-purple-500/20 active:scale-[0.98]"
+        >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
            <div className="relative z-10 flex flex-col gap-3">
