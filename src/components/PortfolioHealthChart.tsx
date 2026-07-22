@@ -81,8 +81,8 @@ export const PortfolioHealthChart: React.FC<Props> = ({ indicators, t, mode = 'b
                   data={chartData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={45}
-                  outerRadius={70}
+                  innerRadius={Math.round(height * 0.22)}
+                  outerRadius={Math.round(height * 0.33)}
                   paddingAngle={5}
                   dataKey="value"
                 >
@@ -92,7 +92,7 @@ export const PortfolioHealthChart: React.FC<Props> = ({ indicators, t, mode = 'b
                 </Pie>
                 <Legend 
                   verticalAlign="bottom" 
-                  height={36} 
+                  height={Math.round(height * 0.18)} 
                   iconType="circle" 
                   formatter={(value) => <span className="text-[7px] font-bold text-slate-500 tracking-tighter">{value}</span>}
                 />
