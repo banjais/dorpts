@@ -108,16 +108,16 @@ export const Footer: React.FC<FooterProps> = ({
   return (
     <>
       <footer 
-        id="app-footer"
-        onMouseEnter={() => { setIsHovered(true); onExpandChange?.(true); }}
-        onMouseLeave={() => { setIsHovered(false); onExpandChange?.(false); }}
-        onClick={(e) => { e.stopPropagation(); onExpandChange?.(!shouldExpand); }}
-        className={`fixed bottom-0 left-0 w-full z-[850] transition-all duration-500 ease-out cursor-pointer ${
-          shouldExpand
-            ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t border-slate-200/70 dark:border-white/[0.06] shadow-[0_-4px_24px_rgba(0,0,0,0.06)] py-10 sm:py-14'
-            : 'py-4 sm:py-5'
-        }`}
-      >
+         id="app-footer"
+         onMouseEnter={() => { setIsHovered(true); onExpandChange?.(true); }}
+         onMouseLeave={() => { setIsHovered(false); onExpandChange?.(false); }}
+         onClick={(e) => { e.stopPropagation(); onExpandChange?.(!shouldExpand); }}
+         className={`fixed bottom-0 left-0 w-full z-[850] transition-all duration-500 ease-out cursor-pointer ${
+           shouldExpand
+             ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t-2 border-indigo-500/40 dark:border-indigo-400/30 shadow-[0_-4px_32px_rgba(0,0,0,0.08)] py-10 sm:py-14'
+             : 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-300/60 dark:border-slate-700/60 shadow-[0_-2px_12px_rgba(0,0,0,0.04)] py-3 sm:py-4'
+         }`}
+       >
         <motion.div 
           className="max-w-7xl mx-auto px-6 flex flex-col items-center justify-center"
           animate={{ 
@@ -206,18 +206,15 @@ export const Footer: React.FC<FooterProps> = ({
           )}
 
           {!shouldExpand && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-center gap-2 py-1"
-            >
-              <div className="h-[1px] w-6 bg-slate-300 dark:bg-slate-700"></div>
-              <span className="text-[0.5rem] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1">
+            <div className="flex items-center justify-center gap-0">
+              <div className="h-1 w-1 rounded-full bg-indigo-400 dark:bg-indigo-500 animate-pulse"></div>
+              <div className="h-[2px] w-12 bg-slate-300 dark:bg-slate-700"></div>
+              <span className="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-[0.2em] flex items-center gap-2 px-3 py-1.5">
                 {language === 'en' ? 'Action Portal' : 'कार्य पोर्टल'}
                 <motion.span
                   animate={{ 
                     opacity: [0.4, 1, 0.4],
-                    y: [0, 2, 0]
+                    y: [0, 3, 0]
                   }}
                   transition={{ 
                     duration: 2,
@@ -225,11 +222,12 @@ export const Footer: React.FC<FooterProps> = ({
                     ease: "easeInOut"
                   }}
                 >
-                  <ChevronDown size={10} className="text-indigo-500 dark:text-indigo-400" />
+                  <ChevronDown size={16} className="text-indigo-600 dark:text-indigo-400" />
                 </motion.span>
               </span>
-              <div className="h-[1px] w-6 bg-slate-300 dark:bg-slate-700"></div>
-            </motion.div>
+              <div className="h-[2px] w-12 bg-slate-300 dark:bg-slate-700"></div>
+              <div className="h-1 w-1 rounded-full bg-indigo-400 dark:bg-indigo-500 animate-pulse"></div>
+            </div>
           )}
         </motion.div>
       </footer>

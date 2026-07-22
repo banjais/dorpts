@@ -972,14 +972,14 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
        {/* Summary Stats - Bold 3D Cards */}
        {/* Each card slot = sentinel (always in DOM) + AnimatePresence card */}
-        <motion.div
-          animate={{
-            y: cardsReachedHeader ? -220 : 0,
-            opacity: cardsReachedHeader ? 0 : 1,
-          }}
-          transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5"
-        >
+         <motion.div
+           animate={{
+             y: cardsReachedHeader ? -220 : 0,
+             opacity: cardsReachedHeader ? 0 : 1,
+           }}
+           transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 pb-24 sm:pb-32"
+         >
         {/* Card 0: Hero Overall Progress */}
          <AnimatePresence>
             <motion.button
