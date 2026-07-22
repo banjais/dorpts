@@ -1368,20 +1368,36 @@ function MainAppContent() {
     }
     triggerHaptic('light');
 
-    if (view === 'dashboard') {
-      setViewMode('dashboard');
-    } else if (view === 'insights') {
-      setViewMode('dashboard');
-    } else if (view === 'institutional') {
-      setViewMode('institutional');
-    } else if (view === 'trends') {
-      setViewMode('chart');
-      setChartSubView('trend');
-    } else if (view === 'heatmap') {
-      setViewMode('heatmap');
-    } else if (view === 'action-portal') {
-      setViewMode('dashboard');
-    }
+     if (view === 'dashboard') {
+       setViewMode('dashboard');
+       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+     } else if (view === 'insights') {
+       setViewMode('dashboard');
+       setTimeout(() => {
+         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+       }, 50);
+     } else if (view === 'institutional') {
+       setViewMode('institutional');
+       setTimeout(() => {
+         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+       }, 50);
+     } else if (view === 'trends') {
+       setViewMode('chart');
+       setChartSubView('trend');
+       setTimeout(() => {
+         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+       }, 50);
+     } else if (view === 'heatmap') {
+       setViewMode('heatmap');
+       setTimeout(() => {
+         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+       }, 50);
+     } else if (view === 'action-portal') {
+       setViewMode('dashboard');
+       setTimeout(() => {
+         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+       }, 50);
+     }
   }, [mainView]);
 
   const goToIndicators = useCallback(() => {
