@@ -2484,7 +2484,9 @@ function MainAppContent() {
   const [fabRevealed, setFabRevealed] = useState(false);
   const [cardsReachedHeader, setCardsReachedHeader] = useState(false);
   const [cardsHidden, setCardsHidden] = useState(false);
+   const [fabReadyToAppear, setFabReadyToAppear] = useState(false);
   const fabHoverTimer = useRef<number | null>(null);
+  const fabRevealTimer = useRef<number | null>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2495,6 +2497,20 @@ function MainAppContent() {
       setFabRevealed(false);
     }
   }, [mainView]);
+
+  useEffect(() => {
+    if (cardsHidden) {
+      fabRevealTimer.current = window.setTimeout(() => {
+        setFabReadyToAppear(true);
+      }, 400);
+    } else {
+      if (fabRevealTimer.current) clearTimeout(fabRevealTimer.current);
+      setFabReadyToAppear(false);
+    }
+    return () => {
+      if (fabRevealTimer.current) clearTimeout(fabRevealTimer.current);
+    };
+  }, [cardsHidden]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -3368,11 +3384,11 @@ function MainAppContent() {
           className="fixed bottom-4 right-4 md:bottom-6 md:right-8 mb-[env(safe-area-inset-bottom)] z-[1000] flex items-center transition-all duration-500 ease-out"
         >
           <div
-            className={`flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl pl-2 pr-1 py-1 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-2xl transition-all duration-700 ease-out ${
-              isReportBuilderOpen || !fabRevealed || !cardsHidden
-                ? "opacity-0 scale-90 translate-x-2 pointer-events-none"
-                : "opacity-100 scale-100 translate-x-0 pointer-events-auto"
-            }`}
+             className={`flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl pl-2 pr-1 py-1 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-2xl transition-all duration-700 ease-out ${
+               isReportBuilderOpen || !fabRevealed || !fabReadyToAppear
+                 ? "opacity-0 scale-90 translate-x-2 pointer-events-none"
+                 : "opacity-100 scale-100 translate-x-0 pointer-events-auto"
+             }`}
             style={{
               borderColor: mainView === 'dashboard' ? '#4f46e540' : mainView === 'trends' ? '#05966940' : mainView === 'heatmap' ? '#d9770640' : '#7c3aed40',
               boxShadow: `0 8px 32px ${mainView === 'dashboard' ? '#4f46e512' : mainView === 'trends' ? '#05966912' : mainView === 'heatmap' ? '#d9770612' : '#7c3aed12'}`
