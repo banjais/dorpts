@@ -97,8 +97,8 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
     {
       id: 'about',
       icon: <Info size={18} />,
-      labelEn: 'About',
-      labelNp: 'बारेमा',
+      labelEn: 'System Info',
+      labelNp: 'सिस्टम सूचना',
       onClick: () => {
         onOpenAbout?.();
         onClose();
