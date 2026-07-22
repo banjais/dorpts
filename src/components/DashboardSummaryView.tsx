@@ -876,7 +876,6 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
     });
 
     return (offices || [])
-      .filter((office) => office.name.includes('-'))
       .map((office) => {
         const avgCompletion = office.avgCompletion ?? 0;
         return {
@@ -1139,7 +1138,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         </motion.button>
         </AnimatePresence>
 
-        {/* Card 1: Status Breakdown */}
+        {/* Card 2: Status Breakdown */}
           <AnimatePresence>
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -1336,7 +1335,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           </motion.button>
     </AnimatePresence>
 
-        {/* Card 2: Total Indicators */}
+        {/* Card 1: Total Indicators */}
           <AnimatePresence>
             <motion.button
               layout
@@ -1678,16 +1677,17 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
          {/* Card 5: Budget & Capital Expenditure */}
            <AnimatePresence>
-             <motion.div
-             layout
-             initial={{ opacity: 0, scale: 0.95 }}
-             animate={{ opacity: 1, scale: 1 }}
-             exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
-             transition={{ duration: 0.3, ease: 'easeInOut' }}
-             whileHover={{ scale: 1.02 }}
-             whileTap={{ scale: 0.97 }}
-             className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
-           >
+              <motion.div
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => toggleCard(setShowBudgetCard, showBudgetCard)}
+              className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
+            >
          <div className="absolute inset-0 bg-black/10" />
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
          <div className="relative z-10 flex flex-col gap-3">
@@ -1837,28 +1837,13 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     </div>
                       );
                     })}
-                  </div>
-                   <div className="mt-3 pt-3 border-t border-white/10">
-                   <div
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       closeAllCards();
-                       setShowProgressLogic(true);
-                     }}
-                     role="button"
-                     tabIndex={0}
-                       className="flex items-center gap-2 text-[10px] font-bold text-white/60 hover:text-white transition-colors cursor-pointer"
-                     >
-                       <Info size={12} />
-                       {language === 'en' ? 'Calculation Logic' : 'गणना विधि'}
                    </div>
-                  </div>
-                </motion.div>
-              )}
-              </AnimatePresence>
-            </div>
-           </motion.div>
-         </AnimatePresence>
+                 </motion.div>
+               )}
+               </AnimatePresence>
+             </div>
+            </motion.div>
+          </AnimatePresence>
 
         {/* Card 6: Visual Insights */}
           <AnimatePresence>
