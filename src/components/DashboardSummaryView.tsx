@@ -1689,7 +1689,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => toggleCard(setShowBudgetCard, showBudgetCard)}
-              className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
+              className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
             >
          <div className="absolute inset-0 bg-black/10" />
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1721,12 +1721,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                  initial={{ opacity: 0, height: 0 }}
                  animate={{ opacity: 1, height: 'auto' }}
                  exit={{ opacity: 0, height: 0 }}
-                 className="overflow-hidden bg-black/20"
-               >
-                 <div className="px-5 pb-5 pt-1 space-y-4">
-                    {(() => {
-                      const budgetInd = indicators.find(i => i.id === 'ind_14') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('budget'));
-                      const capexInd = indicators.find(i => i.id === 'ind_15') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('capital expenditure'));
+                  className="overflow-hidden bg-black/20"
+                >
+                  <div className="pb-5 pt-1 space-y-4">
+                     {(() => {
+                       const budgetInd = indicators.find(i => i.id === 'ind_14') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('budget'));
+                       const capexInd = indicators.find(i => i.id === 'ind_15') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('capital expenditure'));
                       if (!budgetInd && !capexInd) {
                         return (
                           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center">
@@ -1970,8 +1970,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
              whileHover={{ scale: 1.02 }}
              whileTap={{ scale: 0.97 }}
              onClick={() => toggleCard(setShowInsights, showInsights)}
-             className="group relative cursor-pointer bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] shadow-xl shadow-indigo-500/10 dark:shadow-indigo-500/5 hover:shadow-2xl hover:shadow-indigo-500/20 dark:hover:shadow-indigo-500/10 active:shadow-2xl active:shadow-indigo-500/20 dark:active:shadow-indigo-500/10 transition-all duration-200 overflow-hidden"
-           >
+              className="group relative cursor-pointer bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] p-5 sm:p-6 shadow-xl shadow-indigo-500/10 dark:shadow-indigo-500/5 hover:shadow-2xl hover:shadow-indigo-500/20 dark:hover:shadow-indigo-500/10 active:shadow-2xl active:shadow-indigo-500/20 dark:active:shadow-indigo-500/10 transition-all duration-200 overflow-hidden"
+            >
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
          {highlightedCard === 'insights' && (
            <div className="absolute inset-0 rounded-[28px] ring-4 ring-indigo-500/60 animate-pulse pointer-events-none z-20" />
@@ -2006,7 +2006,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                  exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden bg-slate-900 dark:bg-indigo-950/30"
                >
-                <div className="px-5 pb-5 pt-1 space-y-4 relative">
+                 <div className="pb-5 pt-1 space-y-4 relative">
                   {highlightedCard === 'insights' && (
                     <div className="absolute inset-0 bg-indigo-500/5 pointer-events-none rounded-lg" />
                   )}
@@ -2109,8 +2109,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                whileHover={{ scale: 1.02 }}
                whileTap={{ scale: 0.98 }}
                onClick={() => toggleCard(setShowAllIndicators, showAllIndicators)}
-               className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/30 border border-white/30 hover:shadow-2xl hover:shadow-indigo-500/50 active:shadow-2xl active:shadow-indigo-500/50 transition-all duration-200 overflow-hidden"
-            >
+                className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] p-5 sm:p-6 shadow-xl shadow-indigo-500/30 border border-white/30 hover:shadow-2xl hover:shadow-indigo-500/50 active:shadow-2xl active:shadow-indigo-500/50 transition-all duration-200 overflow-hidden"
+             >
          <div className="absolute inset-0 bg-black/10" />
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
          <div className="relative z-10 flex flex-col gap-3">
@@ -2143,7 +2143,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                  exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden bg-white/10"
              >
-               <div className="px-5 sm:px-6 pb-5 pt-3 space-y-4">
+                <div className="pb-5 pt-3 space-y-4">
                   {/* Filters */}
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
                     <div className="flex flex-col sm:flex-row gap-3">
