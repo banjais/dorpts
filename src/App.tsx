@@ -3488,28 +3488,23 @@ function MainAppContent() {
               </button>
             </div>
 
-           {/* Always-visible small handle */}
-           <motion.button
-             onMouseEnter={() => {
-               if (mainView !== 'dashboard' || !cardsHidden) return;
-               fabHoverTimer.current = window.setTimeout(() => setFabRevealed(true), 400);
-             }}
-             onMouseLeave={() => {
-               if (fabHoverTimer.current) clearTimeout(fabHoverTimer.current);
-               fabHoverTimer.current = null;
-               setFabRevealed(false);
-             }}
-             onClick={() => setFabRevealed(p => !p)}
-             onTouchStart={() => {
-               if (mainView !== 'dashboard' || !cardsHidden) return;
-               setFabRevealed(true);
-             }}
-             onTouchEnd={() => setTimeout(() => setFabRevealed(false), 1200)}
-             className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all ${!cardsHidden ? 'opacity-0 pointer-events-none' : ''}`}
-             title={language === "en" ? "Actions" : "कार्यहरू"}
-           >
-             <Menu size={14} />
-           </motion.button>
+            {/* Always-visible small handle */}
+            <motion.button
+              onMouseEnter={() => {
+                if (mainView !== 'dashboard' || !cardsHidden) return;
+                fabHoverTimer.current = window.setTimeout(() => setFabRevealed(true), 400);
+              }}
+              onMouseLeave={() => {
+                if (fabHoverTimer.current) clearTimeout(fabHoverTimer.current);
+                fabHoverTimer.current = null;
+                setFabRevealed(false);
+              }}
+              onClick={() => setFabRevealed(p => !p)}
+              className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all ${!cardsHidden ? 'opacity-0 pointer-events-none' : ''}`}
+              title={language === "en" ? "Actions" : "कार्यहरू"}
+            >
+              <Menu size={14} />
+            </motion.button>
          </div>
 
           {/* Auth Toolbar */}
