@@ -206,7 +206,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         sessionStorage.removeItem('dor_session');
       }
       setEmailSession(null);
-      await logActivity('login', `User logged out: ${user?.email || emailSession?.email}`);
+      await logActivity('logout', `User logged out: ${user?.email || emailSession?.email}`);
       await signOut(auth);
     } catch (error) {
       console.error('Logout error:', error);

@@ -303,6 +303,8 @@ function MainAppContent() {
     sheetId: string;
     dashboardPublishedUrl: string;
     officesPublishedUrl: string;
+    dashboardTabId?: string;
+    officesTabId?: string;
   }>({
     fiscalYear: '2082/83',
     sheetUrl: '',
@@ -361,9 +363,9 @@ function MainAppContent() {
       if (metaTheme) metaTheme.setAttribute('content', appSettings.themeColor);
     }
     APP_TITLES.appName.en = appSettings.appNameEn;
-    APP_TITLES.appName.ne = 'प्रगति ट्र्याकर';
+    APP_TITLES.appName.ne = appSettings.appNameNp;
     APP_TITLES.subHeader.en = appSettings.subHeaderEn;
-    APP_TITLES.subHeader.ne = 'सम्पादन अनुगमन प्रणाली';
+    APP_TITLES.subHeader.ne = appSettings.subHeaderNp;
     APP_TITLES.shortAppName.en = appSettings.appNameEn.split(' ').slice(0, 2).join(' ') || 'DORPTS';
     APP_TITLES.shortAppName.ne = 'DORPTS';
   }, [appSettings, language]);
@@ -1342,6 +1344,8 @@ function MainAppContent() {
 
     if (view === 'dashboard') {
       setViewMode('dashboard');
+    } else if (view === 'insights') {
+      setViewMode('dashboard');
     } else if (view === 'institutional') {
       setViewMode('institutional');
     } else if (view === 'trends') {
@@ -2161,35 +2165,30 @@ function MainAppContent() {
     });
   }, [groupedIndicators, searchQuery, categoryFilter, showMilestonesOnly, selectedOffice, viewMode, t]);
 
-  const filteredIndicators = useMemo(() => {
-    return filteredGroupedEntries.flatMap(([_, inds]) => inds);
-  }, [filteredGroupedEntries]);
-
   const getProgressPercent = (ind: Indicator) => {
     if (!ind || ind.annualTarget <= 0) return 0;
     return (ind.annualProgress / ind.annualTarget) * 100;
   };
 
-  if (sortType === "low") {
-    filteredIndicators.sort(
-      (a, b) => getProgressPercent(a) - getProgressPercent(b),
-    );
-  } else if (sortType === "high") {
-    filteredIndicators.sort(
-      (a, b) => getProgressPercent(b) - getProgressPercent(a),
-    );
-  } else if (sortType === "weight") {
-    filteredIndicators.sort((a, b) => (b.weight || 0) - (a.weight || 0));
-  } else if (sortType === "status") {
-    // Critical first: Lower percentage items first, prioritizing higher weights if percentages are equal
-    filteredIndicators.sort((a, b) => {
-      const diff = getProgressPercent(a) - getProgressPercent(b);
-      if (Math.abs(diff) < 0.01) {
-        return (b.weight || 0) - (a.weight || 0);
-      }
-      return diff;
-    });
-  }
+  const filteredIndicators = useMemo(() => {
+    const list = filteredGroupedEntries.flatMap(([_, inds]) => inds);
+    if (sortType === "low") {
+      list.sort((a, b) => getProgressPercent(a) - getProgressPercent(b));
+    } else if (sortType === "high") {
+      list.sort((a, b) => getProgressPercent(b) - getProgressPercent(a));
+    } else if (sortType === "weight") {
+      list.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+    } else if (sortType === "status") {
+      list.sort((a, b) => {
+        const diff = getProgressPercent(a) - getProgressPercent(b);
+        if (Math.abs(diff) < 0.01) {
+          return (b.weight || 0) - (a.weight || 0);
+        }
+        return diff;
+      });
+    }
+    return list;
+  }, [filteredGroupedEntries, sortType]);
 
   const { totalWeightForAvg, weightedRateForAvg, averageValue } = useMemo(() => {
     const totalWeightForAvg =
