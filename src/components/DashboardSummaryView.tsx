@@ -91,7 +91,7 @@ interface DashboardSummaryViewProps {
   isAtBottom?: boolean;
   onCardsReachedHeader?: (reached: boolean) => void;
   onCardsHidden?: (hidden: boolean) => void;
-  onNavigateToView?: (view: string) => void;
+  onNavigateToView?: (view: string, defaultTab?: string) => void;
 }
 
 const toNepaliNumerals = (numStr: string | number): string => {
@@ -748,6 +748,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       if (index !== openedIndex) setter(false);
     });
   }, [showOverallProgress, showStatusDetails, showTotalIndicators, showReportingOffices, showAllIndicators, showCategoryStatus, showBudgetCard, showInsights]);
+
+  useEffect(() => {
+    if (showInsights) {
+      setInsightTab('category');
+    }
+  }, [showInsights]);
 
   useEffect(() => {
     if (highlightedCard !== 'insights') return;
@@ -2057,7 +2063,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                          {language === 'en' ? 'Category' : 'वर्ग'}
                        </button>
                        <button
-                         onClick={(e) => { e.stopPropagation(); if (onNavigateToView) onNavigateToView('insights'); }}
+                         onClick={(e) => { e.stopPropagation(); if (onNavigateToView) onNavigateToView('insights', 'indicators'); }}
                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
                            insightTab === 'indicators' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'
                          }`}

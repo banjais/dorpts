@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Indicator, SystemMetadata } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -21,6 +21,7 @@ interface VisualInsightsViewProps {
   metadata?: SystemMetadata | null;
   updatesHistory?: any[];
   onOpenAbout?: (tab?: string) => void;
+  defaultInsightTab?: 'health' | 'category' | 'indicators' | 'trends' | 'heatmap';
 }
 
 export const VisualInsightsView: React.FC<VisualInsightsViewProps> = ({
@@ -28,10 +29,15 @@ export const VisualInsightsView: React.FC<VisualInsightsViewProps> = ({
   metadata,
   updatesHistory = [],
   onOpenAbout,
+  defaultInsightTab = 'health',
 }) => {
   const { language, t } = useLanguage();
-  const [insightTab, setInsightTab] = useState<'health' | 'category' | 'indicators' | 'trends' | 'heatmap'>('health');
+  const [insightTab, setInsightTab] = useState<'health' | 'category' | 'indicators' | 'trends' | 'heatmap'>(defaultInsightTab);
   const [portfolioMode, setPortfolioMode] = useState<'bar' | 'pie'>('bar');
+
+  useEffect(() => {
+    setInsightTab(defaultInsightTab);
+  }, [defaultInsightTab]);
 
   return (
     <motion.div

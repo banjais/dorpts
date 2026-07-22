@@ -1078,6 +1078,7 @@ function MainAppContent() {
 
   const [mainView, setMainView] = useState<MainView>("dashboard");
   const [highlightedCard, setHighlightedCard] = useState<'insights' | null>(null);
+  const [insightsDefaultTab, setInsightsDefaultTab] = useState<'health' | 'category' | 'indicators' | 'trends' | 'heatmap'>('health');
 
   const [direction, setDirection] = useState(0);
   const [portfolioHealthMode, setPortfolioHealthMode] = useState<'bar' | 'pie'>('bar');
@@ -1356,12 +1357,15 @@ function MainAppContent() {
   const [chartSubView, setChartSubView] = useState<"performance" | "trend">(
     "performance",
   );
-  const handleMainViewChange = useCallback((view: MainView) => {
-    if (view === mainView) return;
+  const handleMainViewChange = useCallback((view: MainView, defaultTab?: string) => {
+    if (view === mainView && !defaultTab) return;
 
     const newDirection = viewOrder[view] - viewOrder[mainView];
     setDirection(newDirection);
     setMainView(view);
+    if (defaultTab) {
+      setInsightsDefaultTab(defaultTab as any);
+    }
     triggerHaptic('light');
 
     if (view === 'dashboard') {
@@ -3239,6 +3243,7 @@ function MainAppContent() {
                                   if (tab) setAboutModalTab(tab as any);
                                   setIsAboutModalOpen(true);
                                 }}
+                                defaultInsightTab={insightsDefaultTab}
                               />
                             </ErrorBoundary>
                           )}
