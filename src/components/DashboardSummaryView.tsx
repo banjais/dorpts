@@ -675,6 +675,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showSplash, setShowSplash] = useState(true);
   const [insightTab, setInsightTab] = useState<'health' | 'category' | 'indicators' | 'trends' | 'heatmap'>('health');
   const [portfolioMode, setPortfolioMode] = useState<'bar' | 'pie'>('bar');
+  const [categoryMode, setCategoryMode] = useState<'bar' | 'pie'>('bar');
   const [showStatusBreakdown, setShowStatusBreakdown] = useState(false);
   const [showIndicatorsBreakdown, setShowIndicatorsBreakdown] = useState(false);
   const [showProgressLogic, setShowProgressLogic] = useState(false);
@@ -2092,31 +2093,49 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                        </button>
                     </div>
 
-                    {insightTab === 'health' && (
-                      <div className="flex bg-white/10 p-0.5 rounded-xl border border-white/10">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setPortfolioMode('bar'); }}
-                          className={`p-1.5 rounded-lg transition-all ${portfolioMode === 'bar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'}`}
-                          title={language === 'en' ? 'Bar' : 'बार'}
-                        >
-                          <BarChart3 size={12} />
-                        </button>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setPortfolioMode('pie'); }}
-                          className={`p-1.5 rounded-lg transition-all ${portfolioMode === 'pie' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'}`}
-                          title={language === 'en' ? 'Pie' : 'पाई'}
-                        >
-                          <PieChartIcon size={12} />
-                        </button>
-                      </div>
-                    )}
-                 </div>
+                     {insightTab === 'health' && (
+                       <div className="flex bg-white/10 p-0.5 rounded-xl border border-white/10">
+                         <button
+                           onClick={(e) => { e.stopPropagation(); setPortfolioMode('bar'); }}
+                           className={`p-1.5 rounded-lg transition-all ${portfolioMode === 'bar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'}`}
+                           title={language === 'en' ? 'Bar' : 'बार'}
+                         >
+                           <BarChart3 size={12} />
+                         </button>
+                         <button
+                           onClick={(e) => { e.stopPropagation(); setPortfolioMode('pie'); }}
+                           className={`p-1.5 rounded-lg transition-all ${portfolioMode === 'pie' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'}`}
+                           title={language === 'en' ? 'Pie' : 'पाई'}
+                         >
+                           <PieChartIcon size={12} />
+                         </button>
+                       </div>
+                     )}
+                     {insightTab === 'category' && (
+                       <div className="flex bg-white/10 p-0.5 rounded-xl border border-white/10">
+                         <button
+                           onClick={(e) => { e.stopPropagation(); setCategoryMode('bar'); }}
+                           className={`p-1.5 rounded-lg transition-all ${categoryMode === 'bar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'}`}
+                           title={language === 'en' ? 'Bar' : 'बार'}
+                         >
+                           <BarChart3 size={12} />
+                         </button>
+                         <button
+                           onClick={(e) => { e.stopPropagation(); setCategoryMode('pie'); }}
+                           className={`p-1.5 rounded-lg transition-all ${categoryMode === 'pie' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'}`}
+                           title={language === 'en' ? 'Pie' : 'पाई'}
+                         >
+                           <PieChartIcon size={12} />
+                         </button>
+                       </div>
+                     )}
+                  </div>
 
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
-                   {insightTab === 'health' && (
-                     <PortfolioHealthChart indicators={indicators} t={t} mode={portfolioMode} height={220} />
-                   )}
-                   {insightTab === 'category' && <CategoryInsightsChart indicators={indicators} t={t} language={language} height={220} />}
+                   <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
+                    {insightTab === 'health' && (
+                      <PortfolioHealthChart indicators={indicators} t={t} mode={portfolioMode} height={220} />
+                    )}
+                    {insightTab === 'category' && <CategoryInsightsChart indicators={indicators} t={t} language={language} height={220} mode={categoryMode} />}
                    {insightTab === 'indicators' && <MetricsChart indicators={indicators} />}
                    {insightTab === 'trends' && <TrendAnalysisView indicators={indicators} metadata={metadata} onOpenAbout={onOpenAbout} />}
                    {insightTab === 'heatmap' && <IndicatorHeatmap indicators={indicators} updatesHistory={updatesHistory} />}
