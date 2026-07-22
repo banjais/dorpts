@@ -1958,55 +1958,54 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         </motion.div>
       </AnimatePresence>
 
-         {/* Card 6: Visual Insights */}
+         {/* Card 7: Visual Insights */}
            <AnimatePresence>
              <motion.div
              ref={insightsCardRef}
              layout
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            className="group relative cursor-pointer bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] shadow-xl shadow-indigo-500/10 dark:shadow-indigo-500/5 hover:shadow-2xl hover:shadow-indigo-500/20 dark:hover:shadow-indigo-500/10 active:shadow-2xl active:shadow-indigo-500/20 dark:active:shadow-indigo-500/10 transition-all duration-200 overflow-hidden"
-          >
-        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        {highlightedCard === 'insights' && (
-          <div className="absolute inset-0 rounded-[28px] ring-4 ring-indigo-500/60 animate-pulse pointer-events-none z-20" />
-        )}
-        <button
-              onClick={() => toggleCard(setShowInsights, showInsights)}
-          className="relative w-full flex items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-indigo-50/80 to-white dark:from-indigo-950/30 dark:to-slate-900 hover:from-indigo-50 dark:hover:from-indigo-950/40 transition-colors"
-        >
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 bg-indigo-500 text-white rounded-xl">
-              <BarChart3 size={14} />
-            </span>
-            <div className="text-left">
-              <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                {language === 'en' ? 'Visual Insights' : 'दृश्यात्मक अन्तर्दृष्टि'}
-              </h3>
-               <p className="text-[10px] font-bold text-slate-600 dark:text-white/70">
-                {language === 'en' ? 'Optional charts & analytics' : 'वैकल्पिक चार्ट र विश्लेषण'}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <motion.div animate={{ rotate: showInsights ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-slate-500 dark:text-white/70">
-              <ChevronRight size={18} />
-            </motion.div>
-          </div>
-        </button>
-
-        <AnimatePresence>
-          {showInsights && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-               className="overflow-hidden bg-slate-900 dark:bg-indigo-950/30"
-              >
+             initial={{ opacity: 0, scale: 0.95 }}
+             animate={{ opacity: 1, scale: 1 }}
+             exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+             transition={{ duration: 0.3, ease: 'easeInOut' }}
+             whileHover={{ scale: 1.02 }}
+             whileTap={{ scale: 0.97 }}
+             onClick={() => toggleCard(setShowInsights, showInsights)}
+             className="group relative cursor-pointer bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] shadow-xl shadow-indigo-500/10 dark:shadow-indigo-500/5 hover:shadow-2xl hover:shadow-indigo-500/20 dark:hover:shadow-indigo-500/10 active:shadow-2xl active:shadow-indigo-500/20 dark:active:shadow-indigo-500/10 transition-all duration-200 overflow-hidden"
+           >
+         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+         {highlightedCard === 'insights' && (
+           <div className="absolute inset-0 rounded-[28px] ring-4 ring-indigo-500/60 animate-pulse pointer-events-none z-20" />
+         )}
+         <div className="relative z-10 flex flex-col gap-3">
+           <div className="flex items-center justify-between">
+             <div>
+               <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                 {language === 'en' ? 'Visual Insights' : 'दृश्यात्मक अन्तर्दृष्टि'}
+               </h3>
+                <p className="text-[10px] font-bold text-slate-600 dark:text-white/70">
+                 {language === 'en' ? 'Optional charts & analytics' : 'वैकल्पिक चार्ट र विश्लेषण'}
+               </p>
+             </div>
+             <span className="p-1 bg-indigo-500 text-white rounded-xl">
+               <BarChart3 size={14} />
+             </span>
+           </div>
+           <div className="flex items-center justify-between">
+             <motion.div animate={{ rotate: showInsights ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-slate-500 dark:text-white/70">
+               <ChevronDown size={18} />
+             </motion.div>
+           </div>
+         </div>
+         
+         <div className="w-full sm:w-full">
+           <AnimatePresence>
+             {showInsights && (
+               <motion.div
+                 initial={{ opacity: 0, height: 0 }}
+                 animate={{ opacity: 1, height: 'auto' }}
+                 exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden bg-slate-900 dark:bg-indigo-950/30"
+               >
                 <div className="px-5 pb-5 pt-1 space-y-4 relative">
                   {highlightedCard === 'insights' && (
                     <div className="absolute inset-0 bg-indigo-500/5 pointer-events-none rounded-lg" />
@@ -2090,60 +2089,60 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   {insightTab === 'trends' && <TrendAnalysisView indicators={indicators} metadata={metadata} onOpenAbout={onOpenAbout} />}
                   {insightTab === 'heatmap' && <IndicatorHeatmap indicators={indicators} updatesHistory={updatesHistory} />}
                 </div>
-              </div>
-            </motion.div>
-          )}
-         </AnimatePresence>
-       </motion.div>
-      </AnimatePresence>
+               </div>
+             </motion.div>
+           )}
+          </AnimatePresence>
+         </div>
+        </motion.div>
+       </AnimatePresence>
 
-       {/* Card 7: All Indicators Overview */}
-          <AnimatePresence>
-           <motion.div
-             ref={lastCardRef}
-             layout
-             initial={{ opacity: 0, scale: 0.95 }}
-             animate={{ opacity: 1, scale: 1 }}
-             exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
-             transition={{ duration: 0.3, ease: 'easeInOut' }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/30 border border-white/30 hover:shadow-2xl hover:shadow-indigo-500/50 active:shadow-2xl active:shadow-indigo-500/50 transition-all duration-200 overflow-hidden"
-           >
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <button
-              onClick={() => toggleCard(setShowAllIndicators, showAllIndicators)}
-          className="relative w-full flex items-center justify-between gap-3 px-5 sm:px-6 py-5 sm:py-6"
-        >
-          <div className="flex items-center gap-3">
-            <span className="p-2 bg-white/20 hover:bg-white/30 transition-colors rounded-xl">
-              <LayoutGrid size={18} className="text-white" />
-            </span>
-            <div className="text-left">
-              <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight">
-                {language === 'en' ? 'All Indicators' : 'सबै सूचकहरू'}
-              </h3>
-               <p className="text-[10px] sm:text-xs font-bold text-white/80">
-                {language === 'en' ? `${indicators.length} indicators tracked — click to explore` : `${indicators.length} सूचकहरू ट्र्याक गरिएको — अन्वेषणका लागि क्लिक गर्नुहोस्`}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <motion.div animate={{ rotate: showAllIndicators ? 90 : 0 }} transition={{ duration: 0.2 }} className="text-white/90">
-              <ChevronRight size={20} />
-            </motion.div>
-          </div>
-        </button>
-
-        <AnimatePresence>
-          {showAllIndicators && (
+         {/* Card 8: All Indicators Overview */}
+           <AnimatePresence>
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-               className="overflow-hidden bg-white/10"
+              ref={lastCardRef}
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+               whileHover={{ scale: 1.02 }}
+               whileTap={{ scale: 0.98 }}
+               onClick={() => toggleCard(setShowAllIndicators, showAllIndicators)}
+               className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/30 border border-white/30 hover:shadow-2xl hover:shadow-indigo-500/50 active:shadow-2xl active:shadow-indigo-500/50 transition-all duration-200 overflow-hidden"
             >
+         <div className="absolute inset-0 bg-black/10" />
+         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+         <div className="relative z-10 flex flex-col gap-3">
+           <div className="flex items-center justify-between">
+             <div>
+               <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight">
+                 {language === 'en' ? 'All Indicators' : 'सबै सूचकहरू'}
+               </h3>
+                <p className="text-[10px] sm:text-xs font-bold text-white/80">
+                 {language === 'en' ? `${indicators.length} indicators tracked — click to explore` : `${indicators.length} सूचकहरू ट्र्याक गरिएको — अन्वेषणका लागि क्लिक गर्नुहोस्`}
+               </p>
+             </div>
+             <span className="p-2 bg-white/20 hover:bg-white/30 transition-colors rounded-xl">
+               <LayoutGrid size={18} className="text-white" />
+             </span>
+           </div>
+           <div className="flex items-center justify-between">
+             <motion.div animate={{ rotate: showAllIndicators ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-white/90">
+               <ChevronDown size={20} />
+             </motion.div>
+           </div>
+         </div>
+
+         <div className="w-full sm:w-full">
+           <AnimatePresence>
+             {showAllIndicators && (
+               <motion.div
+                 initial={{ opacity: 0, height: 0 }}
+                 animate={{ opacity: 1, height: 'auto' }}
+                 exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden bg-white/10"
+             >
                <div className="px-5 sm:px-6 pb-5 pt-3 space-y-4">
                   {/* Filters */}
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
@@ -2228,13 +2227,14 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       })}
                     </AnimatePresence>
                   </div>
-                )}
-              </div>
-             </motion.div>
-           )}
+                 )}
+               </div>
+              </motion.div>
+            )}
            </AnimatePresence>
+          </div>
          </motion.div>
-       </AnimatePresence>
+         </AnimatePresence>
        </motion.div>
 
       <StatusBreakdownModal
