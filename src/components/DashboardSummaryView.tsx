@@ -38,6 +38,7 @@ import {
   Calculator,
   Database,
   Briefcase,
+  ExternalLink,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -2044,8 +2045,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                      <div className="absolute inset-0 bg-indigo-500/5 pointer-events-none rounded-lg" />
                    )}
                    {/* Chart type options */}
-                  <div className="flex flex-wrap items-center gap-2">
-                     <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                        <button
                          onClick={(e) => { e.stopPropagation(); setInsightTab('health'); }}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
@@ -2064,6 +2065,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                          <LayoutGrid size={12} />
                          {language === 'en' ? 'Category' : 'वर्ग'}
                        </button>
+                       <span className="w-px h-4 bg-white/20 mx-1 hidden sm:inline-block" />
                        <button
                          onClick={(e) => { e.stopPropagation(); if (onNavigateToView) onNavigateToView('insights', 'indicators'); }}
                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
@@ -2072,6 +2074,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                        >
                          <BarChart3 size={12} />
                          {language === 'en' ? 'Indicators' : 'सूचकहरू'}
+                         <ExternalLink size={10} className="opacity-60" />
                        </button>
                        <button
                          onClick={(e) => { e.stopPropagation(); if (onNavigateToView) onNavigateToView('trends'); }}
@@ -2081,6 +2084,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                        >
                          <LineChartIcon size={12} />
                          {language === 'en' ? 'Trends' : 'प्रवृत्तिहरू'}
+                         <ExternalLink size={10} className="opacity-60" />
                        </button>
                        <button
                          onClick={(e) => { e.stopPropagation(); if (onNavigateToView) onNavigateToView('heatmap'); }}
@@ -2090,6 +2094,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                        >
                          <Activity size={12} />
                          {language === 'en' ? 'Heatmap' : 'हिटम्याप'}
+                         <ExternalLink size={10} className="opacity-60" />
                        </button>
                     </div>
 
