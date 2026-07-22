@@ -2477,7 +2477,6 @@ function MainAppContent() {
     };
   }, [isFooterExpanded]);
 
-  const [isAtBottom, setIsAtBottom] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isChartFocusMode, setIsChartFocusMode] = useState(true);
   const chartRef = useRef<HTMLDivElement>(null);
@@ -2503,7 +2502,6 @@ function MainAppContent() {
       const currentY = window.scrollY || document.documentElement.scrollTop;
 
       const isBottom = currentY + windowHeight >= documentHeight - 120;
-      setIsAtBottom(isBottom);
       setIsScrolled(currentY > 100 || isBottom);
     };
 
@@ -2999,9 +2997,8 @@ function MainAppContent() {
            onMouseEnterAbout={() => setIsHoveringAbout(true)}
            onMouseLeaveAbout={() => setIsHoveringAbout(false)}
            mainView={mainView}
-          onViewChange={handleMainViewChange}
-          isAtBottom={isAtBottom}
-          searchQuery={searchQuery}
+           onViewChange={handleMainViewChange}
+           searchQuery={searchQuery}
           onSearch={setSearchQuery}
           sortType={sortType}
           onSortChange={setSortType}
@@ -3196,10 +3193,9 @@ function MainAppContent() {
                                 onSelectIndicatorFromBreakdown={handleSelectIndicatorFromBreakdown}
                                  highlightedCard={highlightedCard}
                                  isFooterExpanded={isFooterExpanded}
-                                 isAtBottom={isAtBottom}
                                  onCardsReachedHeader={setCardsReachedHeader}
                                  onCardsHidden={setCardsHidden}
-                              />
+                               />
                            </ErrorBoundary>
                          )}
  
@@ -3327,20 +3323,19 @@ function MainAppContent() {
         </div>
 
         {/* Footer */}
-        <Footer
-          onOpenReportBuilder={() => setIsReportBuilderOpen(true)}
-          onOpenHelp={() => setIsHelpOpen(true)}
-          onOpenFeedback={() => setIsFeedbackModalOpen(true)}
-          onScrollTop={scrollToTop}
-          onScrollBottom={scrollToBottom}
-          onOpenAI={() => setIsAIAssistantOpen(true)}
-          isScrolled={isScrolled}
-          viewMode={viewMode}
-          fiscalYear={selectedFiscalYear}
-          isExpanded={isFooterExpanded}
-          onExpandChange={setIsFooterExpanded}
-          isAtBottom={isAtBottom}
-        />
+         <Footer
+           onOpenReportBuilder={() => setIsReportBuilderOpen(true)}
+           onOpenHelp={() => setIsHelpOpen(true)}
+           onOpenFeedback={() => setIsFeedbackModalOpen(true)}
+           onScrollTop={scrollToTop}
+           onScrollBottom={scrollToBottom}
+           onOpenAI={() => setIsAIAssistantOpen(true)}
+           isScrolled={isScrolled}
+           viewMode={viewMode}
+           fiscalYear={selectedFiscalYear}
+           isExpanded={isFooterExpanded}
+           onExpandChange={setIsFooterExpanded}
+         />
 
         {/* Dim Overlay - Outside scaled content */}
         <AnimatePresence>

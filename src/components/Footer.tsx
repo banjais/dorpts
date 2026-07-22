@@ -16,7 +16,6 @@ interface FooterProps {
   fiscalYear?: string;
   isExpanded?: boolean;
   onExpandChange?: (expanded: boolean) => void;
-  isAtBottom?: boolean;
 }
 
 export const Footer: React.FC<FooterProps> = ({ 
@@ -30,7 +29,6 @@ export const Footer: React.FC<FooterProps> = ({
   fiscalYear,
   isExpanded = false,
   onExpandChange,
-  isAtBottom = false,
 }) => {
   const { language, t } = useLanguage();
   const [showQr, setShowQr] = useState(false);
@@ -40,7 +38,7 @@ export const Footer: React.FC<FooterProps> = ({
   const [minutesAgo, setMinutesAgo] = useState<number | null>(null);
   const [isHovered, setIsHovered] = useState(false);
   
-  const shouldExpand = isExpanded || isHovered || isAtBottom;
+  const shouldExpand = isExpanded || isHovered;
   
   useEffect(() => {
     const updateMinutesAgo = () => {
