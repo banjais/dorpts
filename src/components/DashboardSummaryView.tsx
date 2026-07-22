@@ -979,7 +979,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
              whileHover={{ scale: 1.02 }}
                whileTap={{ scale: 0.98 }}
                 onClick={() => toggleCard(setShowOverallProgress, showOverallProgress)}
-                className="group relative w-full cursor-pointer bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-emerald-500/25 border border-white/20 hover:shadow-2xl hover:shadow-emerald-500/40 active:shadow-2xl active:shadow-emerald-500/40 transition-all duration-200 overflow-hidden"
+                className="group relative w-full rounded-2xl border overflow-hidden transition-all duration-400 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 shadow-sm hover:shadow-xl shadow-emerald-500/20 active:scale-[0.98]"
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1145,9 +1145,9 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
           <AnimatePresence>
             <motion.button
               whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => toggleCard(setShowStatusDetails, showStatusDetails)}
-          className="group relative cursor-pointer w-full bg-gradient-to-br from-violet-400 via-purple-400 to-fuchsia-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-violet-500/25 border border-white/20 hover:shadow-2xl hover:shadow-violet-500/40 active:shadow-2xl active:shadow-violet-500/40 transition-all duration-200 overflow-hidden"
+          className="group relative w-full rounded-2xl border overflow-hidden transition-all duration-400 bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 shadow-sm hover:shadow-xl shadow-purple-500/20 active:scale-[0.98]"
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1349,7 +1349,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => toggleCard(setShowTotalIndicators, showTotalIndicators)}
-              className="group relative cursor-pointer w-full bg-gradient-to-br from-indigo-400 via-blue-400 to-cyan-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
+              className="group relative w-full rounded-2xl border overflow-hidden transition-all duration-400 bg-gradient-to-br from-indigo-500 via-blue-500 to-cyan-500 shadow-sm hover:shadow-xl shadow-indigo-500/20 active:scale-[0.98]"
             >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1432,7 +1432,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => toggleCard(setShowCategoryStatus, showCategoryStatus)}
-              className="group relative cursor-pointer w-full bg-gradient-to-br from-teal-400 via-emerald-400 to-green-400 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-teal-500/25 border border-white/20 hover:shadow-2xl hover:shadow-teal-500/40 active:shadow-2xl active:shadow-teal-500/40 transition-all duration-200 overflow-hidden"
+              className="group relative w-full rounded-2xl border overflow-hidden transition-all duration-400 bg-gradient-to-br from-teal-500 via-emerald-500 to-green-500 shadow-sm hover:shadow-xl shadow-emerald-500/20 active:scale-[0.98]"
             >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1619,7 +1619,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
-                className="group relative cursor-pointer bg-gradient-to-br from-slate-400 via-gray-400 to-zinc-400 rounded-[28px] shadow-xl shadow-slate-500/25 border border-white/20 hover:shadow-2xl hover:shadow-slate-500/40 active:shadow-2xl active:shadow-slate-500/40 transition-all duration-200 overflow-hidden"
+                className="group relative w-full rounded-2xl border overflow-hidden transition-all duration-400 bg-gradient-to-br from-slate-500 via-gray-500 to-zinc-500 shadow-sm hover:shadow-xl shadow-slate-500/20 active:scale-[0.98]"
               >
                 <div className="absolute inset-0 bg-black/10" />
                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1689,7 +1689,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => toggleCard(setShowBudgetCard, showBudgetCard)}
-              className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/25 border border-white/20 hover:shadow-2xl hover:shadow-indigo-500/40 active:shadow-2xl active:shadow-indigo-500/40 transition-all duration-200 overflow-hidden"
+              className="group relative w-full rounded-2xl border overflow-hidden transition-all duration-400 bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 shadow-sm hover:shadow-xl shadow-indigo-500/20 active:scale-[0.98]"
             >
          <div className="absolute inset-0 bg-black/10" />
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1859,7 +1859,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
              whileHover={{ scale: 1.02 }}
              whileTap={{ scale: 0.97 }}
              onClick={() => toggleCard(setShowEmploymentCard, showEmploymentCard)}
-             className="group relative cursor-pointer bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-[28px] shadow-xl shadow-orange-500/25 border border-white/20 hover:shadow-2xl hover:shadow-orange-500/40 active:shadow-2xl active:shadow-orange-500/40 transition-all duration-200 overflow-hidden"
+             className="group relative w-full rounded-2xl border overflow-hidden transition-all duration-400 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 shadow-sm hover:shadow-xl shadow-orange-500/20 active:scale-[0.98]"
            >
          <div className="absolute inset-0 bg-black/10" />
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1970,7 +1970,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
              whileHover={{ scale: 1.02 }}
              whileTap={{ scale: 0.97 }}
              onClick={() => toggleCard(setShowInsights, showInsights)}
-             className="group relative cursor-pointer bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] shadow-xl shadow-indigo-500/10 dark:shadow-indigo-500/5 hover:shadow-2xl hover:shadow-indigo-500/20 dark:hover:shadow-indigo-500/10 active:shadow-2xl active:shadow-indigo-500/20 dark:active:shadow-indigo-500/10 transition-all duration-200 overflow-hidden"
+             className="group relative cursor-pointer bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm hover:shadow-xl shadow-indigo-500/10 dark:hover:shadow-indigo-500/20 active:scale-[0.98] transition-all duration-400 overflow-hidden"
            >
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
          {highlightedCard === 'insights' && (
@@ -2109,7 +2109,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                whileHover={{ scale: 1.02 }}
                whileTap={{ scale: 0.98 }}
                onClick={() => toggleCard(setShowAllIndicators, showAllIndicators)}
-               className="group relative cursor-pointer bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 rounded-[28px] shadow-xl shadow-indigo-500/30 border border-white/30 hover:shadow-2xl hover:shadow-indigo-500/50 active:shadow-2xl active:shadow-indigo-500/50 transition-all duration-200 overflow-hidden"
+               className="group relative w-full rounded-2xl border overflow-hidden transition-all duration-400 bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 shadow-sm hover:shadow-xl shadow-indigo-500/20 active:scale-[0.98]"
             >
          <div className="absolute inset-0 bg-black/10" />
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

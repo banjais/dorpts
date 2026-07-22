@@ -112,8 +112,10 @@ export const Footer: React.FC<FooterProps> = ({
         onMouseEnter={() => { setIsHovered(true); onExpandChange?.(true); }}
         onMouseLeave={() => { setIsHovered(false); onExpandChange?.(false); }}
         onClick={(e) => { e.stopPropagation(); onExpandChange?.(!shouldExpand); }}
-        className={`fixed bottom-0 left-0 w-full bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-900 text-slate-900 dark:text-white transition-all duration-500 ease-out cursor-pointer z-[850] ${
-          shouldExpand ? 'py-8 sm:py-12' : 'py-3 sm:py-4'
+        className={`fixed bottom-0 left-0 w-full z-[850] transition-all duration-500 ease-out cursor-pointer ${
+          shouldExpand
+            ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t border-slate-200/70 dark:border-white/[0.06] shadow-[0_-4px_24px_rgba(0,0,0,0.06)] py-10 sm:py-14'
+            : 'py-4 sm:py-5'
         }`}
       >
         <motion.div 
