@@ -4,18 +4,14 @@ import {
   X, Calculator, Building2, Database, RefreshCw, 
   Scale, ChevronRight, ChevronLeft, Navigation, 
   Layers, Printer, Compass, MousePointerClick, Trash2, 
-  Settings2, Smartphone, Sparkles, Clock, LayoutGrid, Target,
+  Settings2, Smartphone, Sparkles, Clock, Target,
   Search, Activity, Mic, Filter, Monitor, Wifi, WifiOff
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { triggerHaptic } from '../utils/haptic';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { formatDisplayDate } from '../utils/date';
-import { getBreakdownStatus } from '../utils/status';
 import { Indicator } from '../types';
-import { DOR_OFFICES_LIST } from '../data';
-import { OfficeCard } from './OfficeCard';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip as RechartsTooltip } from 'recharts';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
 interface SystemHelpModalProps {
@@ -25,7 +21,7 @@ interface SystemHelpModalProps {
   offices: { name: string; updated: string }[];
   onSync?: () => Promise<void>;
   isSyncing?: boolean;
-  defaultTab?: 'tour' | 'logic' | 'offices' | 'indicators' | 'status' | 'sync' | 'settings' | 'voice';
+  defaultTab?: 'tour' | 'logic' | 'voice' | 'sync' | 'settings' | 'app';
   isAdmin?: boolean;
   lastUpdateDate?: string;
   pendingWritesCount?: number;
@@ -62,11 +58,11 @@ export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
   isOnline = true, fiscalYear: _fiscalYear, onStartVoice, selectedIndicatorId,
   addToast,
 }) => {
-  const { language, translateOffice } = useLanguage();
+  const { language } = useLanguage();
   useRegisterSW();
   useBodyScrollLock(isOpen);
 
-  const [activeTab, setActiveTab] = useState<'tour' | 'logic' | 'offices' | 'indicators' | 'status' | 'sync' | 'settings' | 'voice'>(defaultTab);
+  const [activeTab, setActiveTab] = useState<'tour' | 'logic' | 'sync' | 'settings' | 'voice'>(defaultTab);
   const [step, setStep] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [storageInfo, setStorageInfo] = useState({ size: '0 KB', totalBytes: 0, timestamp: 'N/A' });
@@ -225,38 +221,7 @@ export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
     }
   };
 
-  // Offices Aggregation
-  const uniqueOffices = offices.length > 0 ? offices : DOR_OFFICES_LIST;
-
-  // Status Breakdown Aggregation (matches the Status Breakdown card / StatusBreakdownModal)
-  const statusBreakdown = useMemo(() => {
-    const map = { onTrack: 0, needsAttention: 0, stale: 0 };
-    indicators.forEach((ind) => {
-      if (!ind) return;
-      const status = getBreakdownStatus(ind);
-      map[status] += 1;
-    });
-    return map;
-  }, [indicators]);
-
-   const statusTotal = indicators.length || 1;
-
-   const statusConfig = [
-     { key: 'onTrack', labelEn: 'On Track', labelNp: 'अनुसरण', color: '#10b981' },
-     { key: 'needsAttention', labelEn: 'Needs Attention', labelNp: 'ध्यान', color: '#f59e0b' },
-     { key: 'stale', labelEn: 'Stale', labelNp: 'पुरानो', color: '#ef4444' },
-   ] as const;
-
-   const statusChartData = statusConfig.map((c) => ({
-     name: c.labelEn,
-     value: statusBreakdown[c.key],
-     color: c.color,
-   }));
-
-   const filteredOffices = uniqueOffices.filter(o => 
-     (language === 'en' ? translateOffice(o.name) : o.name).toLowerCase().includes(searchQuery.toLowerCase())
-   );
-
+  // Status Breakdown Aggregation
    if (!isOpen) return null;
 
     return (
@@ -308,18 +273,15 @@ export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
 
                {/* Navigation Tabs - Modern Pill Style */}
                <div className="px-3 sm:px-4 py-2.5 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-white/5 shrink-0">
-                 <div className="flex items-center justify-center flex-wrap gap-1.5 py-1">
-                    {[
-                      { id: 'tour', icon: <Compass size={13} />, labelEn: 'Tour', labelNp: 'टुर' },
-                      { id: 'logic', icon: <Calculator size={13} />, labelEn: 'Logic', labelNp: 'विधि' },
-                      { id: 'voice', icon: <Mic size={13} />, labelEn: 'Voice', labelNp: 'आवाज' },
-                      { id: 'offices', icon: <Building2 size={13} />, labelEn: 'Offices', labelNp: 'कार्यालय' },
-                       { id: 'indicators', icon: <LayoutGrid size={13} />, labelEn: 'INDICATORS', labelNp: 'सूचक' },
-                       { id: 'status', icon: <Activity size={13} />, labelEn: 'STATUS', labelNp: 'स्थिति' },
+                  <div className="flex items-center justify-center flex-wrap gap-1.5 py-1">
+                     {[
+                       { id: 'tour', icon: <Compass size={13} />, labelEn: 'Tour', labelNp: 'टुर' },
+                       { id: 'logic', icon: <Calculator size={13} />, labelEn: 'Logic', labelNp: 'विधि' },
+                       { id: 'voice', icon: <Mic size={13} />, labelEn: 'Voice', labelNp: 'आवाज' },
                        { id: 'sync', icon: <Database size={13} />, labelEn: 'Data', labelNp: 'डाटा' },
-                      { id: 'settings', icon: <Settings2 size={13} />, labelEn: 'Config', labelNp: 'सेटिङ' },
-                      { id: 'app', icon: <Smartphone size={13} />, labelEn: 'App', labelNp: 'एप' }
-                    ].map((tab) => (
+                       { id: 'settings', icon: <Settings2 size={13} />, labelEn: 'Config', labelNp: 'सेटिङ' },
+                       { id: 'app', icon: <Smartphone size={13} />, labelEn: 'App', labelNp: 'एप' }
+                     ].map((tab) => (
                      <button
                        key={tab.id}
                        onClick={() => {
@@ -506,216 +468,7 @@ export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
                 )}
 
 
-                {/* TAB: ENGAGED OFFICES */}
-                {activeTab === 'offices' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="space-y-6 text-left pb-6"
-                  >
-                    <div className="bg-indigo-50 dark:bg-indigo-950/20 rounded-2xl p-4 border border-indigo-100/50 dark:border-indigo-500/20">
-                       <p className="text-[11px] text-indigo-700 dark:text-indigo-300 leading-relaxed">
-                         {language === 'en'
-                           ? 'All DoR project offices and their assigned indicators.'
-                           : 'सडक विभागका सबै आयोजना कार्यालयहरू र तिनलाई असाइन गरिएका सूचकहरू।'}
-                       </p>
-                     </div>
-
-                    {/* Search bar */}
-                    <div className="relative group">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={16} />
-                      <input
-                        type="text"
-                        placeholder={language === 'en' ? 'Search engaged offices...' : 'कार्यालयहरू खोज्नुहोस्...'}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-950 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
-                      {filteredOffices.map((office, idx) => (
-                        <OfficeCard key={`${office.name}-${idx}`} office={office} variant="grid" index={idx} />
-                      ))}
-                      {filteredOffices.length === 0 && (
-                        <div className="col-span-full text-center py-12">
-                          <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto text-slate-400 mb-4">
-                            <Search size={20} />
-                          </div>
-                          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                            {language === 'en' ? 'No results matched your query' : 'कुनै नतिजा फेला परेन'}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* TAB: INDICATORS LIST */}
-                {activeTab === 'indicators' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="space-y-6 text-left pb-6"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-sm">
-                        {language === 'en'
-                          ? 'All tracked KPIs by sector and SDG goal.'
-                          : 'क्षेत्र र SDG लक्ष्य अनुसार सबै ट्र्याक गरिएका KPIs।'}
-                      </p>
-                      
-                      <div className="relative group shrink-0 sm:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-                        <input
-                          type="text"
-                          placeholder={language === 'en' ? 'Filter KPIs...' : 'सूचक फिल्टर...'}
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-950 text-[11px] text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 max-h-[45vh] overflow-y-auto pr-2 custom-scrollbar">
-                      {indicators
-                        .filter(Boolean)
-                        .filter(ind => 
-                          (ind.nameEn || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          (ind.nameNp || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          (ind.id || "").toLowerCase().includes(searchQuery.toLowerCase())
-                        )
-                        .map((ind, idx) => (
-                           <motion.div
-                             key={ind.id}
-                             id={`indicator-${ind.id}`}
-                             initial={{ opacity: 0, x: -10 }}
-                             animate={{ opacity: 1, x: 0 }}
-                             transition={{ delay: idx * 0.01 }}
-                             className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 flex items-center gap-4 hover:border-indigo-500/20 transition-colors shadow-sm"
-                           >
-                            <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-white/5 flex flex-col items-center justify-center shrink-0">
-                              <span className="text-[9px] font-black text-slate-400 leading-none mb-0.5">#{ind.id.replace('ind_', '')}</span>
-                              <LayoutGrid size={12} className="text-indigo-500" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-black text-slate-900 dark:text-white truncate">
-                                {language === 'en' ? ind.nameEn : ind.nameNp}
-                              </p>
-                              <div className="flex items-center gap-1.5 mt-1">
-                                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
-                                  ind.category === 'Road' ? 'bg-blue-50 border-blue-100 text-blue-600 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400' :
-                                  ind.category === 'Bridge' ? 'bg-indigo-50 border-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:border-indigo-800 dark:text-indigo-400' :
-                                  ind.category === 'Safety' ? 'bg-emerald-50 border-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:border-emerald-800 dark:text-emerald-400' :
-                                  'bg-slate-50 border-slate-200 text-slate-600 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400'
-                                }`}>
-                                  {ind.category}
-                                </span>
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Weight: {ind.weight}%</span>
-                              </div>
-                            </div>
-                          </motion.div>
-                        ))}
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* TAB: STATUS BREAKDOWN */}
-                {activeTab === 'status' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="space-y-6 text-left pb-6"
-                  >
-                    <div>
-                      <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                        {language === 'en' ? 'Status Breakdown' : 'स्थिति विवरण'}
-                      </h3>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                        {language === 'en'
-                          ? 'How many indicators are On Track, need Attention, or have Stale data.'
-                          : 'कति सूचकहरू अनुसरणमा छन्, ध्यान आवश्यक छ, वा पुरानो डाटा भएका छन्।'}
-                      </p>
-                    </div>
-
-                    {/* Stacked Breakdown Bar */}
-                    <div className="w-full flex h-5 rounded-full overflow-hidden border border-slate-100 dark:border-white/5">
-                      {statusConfig.map((c) => {
-                        const count = statusBreakdown[c.key];
-                        const pct = Math.round((count / statusTotal) * 100);
-                        if (count === 0) return null;
-                        return (
-                          <div
-                            key={c.key}
-                            className="h-full flex items-center justify-center text-[9px] font-black text-white transition-all duration-500"
-                            style={{ width: `${pct}%`, backgroundColor: c.color }}
-                            title={`${language === 'en' ? c.labelEn : c.labelNp}: ${count}`}
-                          >
-                            {pct >= 10 ? `${pct}%` : ''}
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
-                      {/* Donut Chart */}
-                      <div className="flex flex-col items-center justify-center">
-                        <div className="w-full max-w-[220px]">
-                          <ResponsiveContainer width="100%" height={220}>
-                            <PieChart>
-                              <Pie
-                                data={statusChartData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={60}
-                                outerRadius={90}
-                                paddingAngle={3}
-                                dataKey="value"
-                                stroke="none"
-                              >
-                                {statusChartData.map((entry, index) => (
-                                  <Cell key={index} fill={entry.color} />
-                                ))}
-                              </Pie>
-                              <RechartsTooltip
-                                formatter={(value: number, name: string) => [`${value} ${language === 'en' ? 'indicators' : 'सूचक'}`, name]}
-                                contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '11px' }}
-                              />
-                            </PieChart>
-                          </ResponsiveContainer>
-                          <div className="text-center mt-2">
-                            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                              {language === 'en' ? 'Total' : 'कुल'}
-                            </p>
-                            <p className="text-2xl font-black text-slate-800 dark:text-white">{indicators.length}</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Legend with real values */}
-                      <div className="space-y-2">
-                        {statusConfig.map((c) => {
-                          const count = statusBreakdown[c.key];
-                          const pct = Math.round((count / statusTotal) * 100);
-                          return (
-                            <div key={c.key} className="flex items-center gap-3 rounded-2xl p-3 border border-slate-100 dark:border-white/5 bg-white dark:bg-slate-900">
-                              <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: c.color }} />
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-black text-slate-800 dark:text-white">
-                                  {language === 'en' ? c.labelEn : c.labelNp}
-                                </p>
-                                <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400">{pct}% of indicators</p>
-                              </div>
-                              <span className="text-lg font-black text-slate-900 dark:text-white">{count}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* TAB: DATA CORE & SYNC */}
+                 {/* TAB: DATA CORE & SYNC */}
                 {activeTab === 'sync' && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}

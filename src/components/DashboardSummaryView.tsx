@@ -1876,8 +1876,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
              whileHover={{ scale: 1.02 }}
              whileTap={{ scale: 0.97 }}
              onClick={() => toggleCard(setShowEmploymentCard, showEmploymentCard)}
-             className="group relative cursor-pointer bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-[28px] shadow-xl shadow-orange-500/25 border border-white/20 hover:shadow-2xl hover:shadow-orange-500/40 active:shadow-2xl active:shadow-orange-500/40 transition-all duration-200 overflow-hidden"
-           >
+              className="group relative cursor-pointer bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-orange-500/25 border border-white/20 hover:shadow-2xl hover:shadow-orange-500/40 active:shadow-2xl active:shadow-orange-500/40 transition-all duration-200 overflow-hidden"
+            >
          <div className="absolute inset-0 bg-black/10" />
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
          <div className="relative z-10 flex flex-col gap-3">
