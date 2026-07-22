@@ -1030,29 +1030,29 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                    </div>
                  </div>
                  
-                 <div className="relative w-28 h-28 sm:w-36 sm:h-44 md:w-40 md:h-48 flex-shrink-0 mx-auto sm:mx-0">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                    <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="12" />
-                    <motion.circle 
-                      cx="60" cy="60" r="54" 
-                      fill="none" 
-                      stroke="white" 
-                      strokeWidth="12" 
-                      strokeLinecap="round"
-                      initial={{ strokeDasharray: `0 ${2 * Math.PI * 54}` }}
-                      animate={{ strokeDasharray: `${2 * Math.PI * 54 * stats.weightedRate / 100} ${2 * Math.PI * 54 * (100 - stats.weightedRate) / 100}` }}
-                      transition={{ duration: 1.5, ease: 'easeOut' }}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-3xl sm:text-4xl font-black text-white">{fmt(stats.weightedRate)}%</div>
-                      <div className="text-[10px] font-bold text-white/60 uppercase tracking-wider">
-                        {language === 'en' ? 'Overall' : 'समग्र'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex-shrink-0 mx-auto sm:mx-0">
+                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                     <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="10" />
+                     <motion.circle 
+                       cx="50" cy="50" r="44" 
+                       fill="none" 
+                       stroke="white" 
+                       strokeWidth="10" 
+                       strokeLinecap="round"
+                       initial={{ strokeDasharray: `0 ${2 * Math.PI * 44}` }}
+                       animate={{ strokeDasharray: `${2 * Math.PI * 44 * stats.weightedRate / 100} ${2 * Math.PI * 44 * (100 - stats.weightedRate) / 100}` }}
+                       transition={{ duration: 1.5, ease: 'easeOut' }}
+                     />
+                   </svg>
+                   <div className="absolute inset-0 flex items-center justify-center">
+                     <div className="text-center">
+                       <div className="text-xl sm:text-2xl font-black text-white">{fmt(stats.weightedRate)}%</div>
+                       <div className="text-[9px] font-bold text-white/60 uppercase tracking-wider">
+                         {language === 'en' ? 'Overall' : 'समग्र'}
+                       </div>
+                     </div>
+                   </div>
+                 </div>
               </div>
               
               <div className="flex items-center justify-between">
