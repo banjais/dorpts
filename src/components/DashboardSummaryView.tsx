@@ -1740,10 +1740,10 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                  exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden bg-black/20"
                 >
-                  <div className="pb-5 pt-1 space-y-4">
-                     {(() => {
-                       const budgetInd = indicators.find(i => i.id === 'ind_14') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('budget'));
-                       const capexInd = indicators.find(i => i.id === 'ind_15') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('capital expenditure'));
+                  <div className="pb-5 pt-1">
+                    {(() => {
+                      const budgetInd = indicators.find(i => i.id === 'ind_14') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('budget') || (i.name || '').toLowerCase().includes('बजेट'));
+                      const capexInd = indicators.find(i => i.id === 'ind_15') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('capital expenditure') || (i.name || '').toLowerCase().includes('पुँजीगत'));
                       if (!budgetInd && !capexInd) {
                         return (
                           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center">
@@ -1753,111 +1753,111 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                           </div>
                         );
                       }
-                   return (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                       {budgetInd && (() => {
-                         const target = budgetInd.annualTarget || 0;
-                         const progress = budgetInd.annualProgress || 0;
-                         const pct = target > 0 ? Math.round((progress / target) * 100) : 0;
-                         const remaining = Math.max(0, target - progress);
-                         return (
-                           <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
-                             <div className="flex items-center gap-2 mb-3">
-                               <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
-                                 <Wallet size={16} className="text-white" />
-                               </div>
-                               <div>
-                                 <h4 className="text-[11px] font-black text-white uppercase tracking-tight">
-                                   {language === 'en' ? budgetInd.nameEn : budgetInd.name}
-                                 </h4>
-                                 <p className="text-[10px] text-white/70">
-                                   {language === 'en' ? 'Total Budget Allocated' : 'कुल बजेट वितरण'}
-                                 </p>
-                               </div>
-                             </div>
-                              <div className="flex items-end justify-between mb-2">
-                                <div>
-                                  <span className="text-2xl font-black text-white leading-none">{fmt(progress)}</span>
-                                   <span className="text-[10px] font-bold text-white/60 ml-1">/ {fmt(target)} {translateUnit(budgetInd.unit)}</span>
+                      return (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {budgetInd && (() => {
+                            const target = budgetInd.annualTarget || 0;
+                            const progress = budgetInd.annualProgress || 0;
+                            const pct = target > 0 ? Math.round((progress / target) * 100) : 0;
+                            const remaining = Math.max(0, target - progress);
+                            return (
+                              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
+                                    <Wallet size={16} className="text-white" />
+                                  </div>
+                                  <div>
+                                    <h4 className="text-[11px] font-black text-white uppercase tracking-tight">
+                                      {language === 'en' ? budgetInd.nameEn : budgetInd.name}
+                                    </h4>
+                                    <p className="text-[10px] text-white/70">
+                                      {language === 'en' ? 'Total Budget Allocated' : 'कुल बजेट वितरण'}
+                                    </p>
+                                  </div>
                                 </div>
-                                <span className="text-xs font-black text-white">{fmt(pct)}%</span>
-                              </div>
-                              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                                <motion.div
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${pct}%` }}
-                                  transition={{ duration: 0.8, ease: 'easeOut' }}
-                                  className="h-full bg-white rounded-full"
-                                />
-                              </div>
-                               <div className="flex items-center justify-between mt-2 min-w-0">
-                                 <span className="text-[10px] font-bold text-white/60 truncate">
+                                <div className="flex items-end justify-between mb-2">
+                                  <div>
+                                    <span className="text-2xl font-black text-white leading-none">{fmt(progress)}</span>
+                                    <span className="text-[10px] font-bold text-white/60 ml-1">/ {fmt(target)} {translateUnit(budgetInd.unit)}</span>
+                                  </div>
+                                  <span className="text-xs font-black text-white">{fmt(pct)}%</span>
+                                </div>
+                                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                                  <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${pct}%` }}
+                                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                                    className="h-full bg-white rounded-full"
+                                  />
+                                </div>
+                                <div className="flex items-center justify-between mt-2 min-w-0">
+                                  <span className="text-[10px] font-bold text-white/60 truncate">
                                     {language === 'en' ? 'Remaining' : 'बाँकी'}: {fmt(remaining)} {translateUnit(budgetInd.unit)}
-                                 </span>
-                                 <span className="text-[10px] font-bold text-white/60 truncate">
-                                   {language === 'en' ? 'Weight' : 'भार'}: {fmt(budgetInd.weight)}%
-                                 </span>
-                               </div>
-                           </div>
-                         );
-                       })()}
-                       {capexInd && (() => {
-                         const target = capexInd.annualTarget || 0;
-                         const progress = capexInd.annualProgress || 0;
-                         const baseline = typeof capexInd.baseline === 'number' ? capexInd.baseline : parseFloat(String(capexInd.baseline || '0'));
-                         const baselinePct = baseline > 0 ? Math.round((progress / baseline) * 100) : 0;
-                         const pct = target > 0 ? Math.round((progress / target) * 100) : 0;
-                         const remaining = Math.max(0, target - progress);
-                         return (
-                           <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
-                             <div className="flex items-center gap-2 mb-3">
-                               <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
-                                 <PiggyBank size={16} className="text-white" />
-                               </div>
-                               <div>
-                                 <h4 className="text-[11px] font-black text-white uppercase tracking-tight">
-                                   {language === 'en' ? capexInd.nameEn : capexInd.name}
-                                 </h4>
-                                 <p className="text-[10px] text-white/70">
-                                   {language === 'en' ? 'Capital Expenditure' : 'पुँजीगत खर्च'}
-                                 </p>
-                               </div>
-                             </div>
-                              <div className="flex items-end justify-between mb-2">
-                                <div>
-                                  <span className="text-2xl font-black text-white leading-none">{fmt(progress)}</span>
-                                   <span className="text-[10px] font-bold text-white/60 ml-1">/ {fmt(target)} {translateUnit(capexInd.unit)}</span>
+                                  </span>
+                                  <span className="text-[10px] font-bold text-white/60 truncate">
+                                    {language === 'en' ? 'Weight' : 'भार'}: {fmt(budgetInd.weight)}%
+                                  </span>
                                 </div>
-                                <span className="text-xs font-black text-white">{fmt(pct)}%</span>
                               </div>
-                              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                                <motion.div
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${pct}%` }}
-                                  transition={{ duration: 0.8, ease: 'easeOut' }}
-                                  className="h-full bg-white rounded-full"
-                                />
+                            );
+                          })()}
+                          {capexInd && (() => {
+                            const target = capexInd.annualTarget || 0;
+                            const progress = capexInd.annualProgress || 0;
+                            const baseline = typeof capexInd.baseline === 'number' ? capexInd.baseline : parseFloat(String(capexInd.baseline || '0'));
+                            const baselinePct = baseline > 0 ? Math.round((progress / baseline) * 100) : 0;
+                            const pct = target > 0 ? Math.round((progress / target) * 100) : 0;
+                            const remaining = Math.max(0, target - progress);
+                            return (
+                              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
+                                    <PiggyBank size={16} className="text-white" />
+                                  </div>
+                                  <div>
+                                    <h4 className="text-[11px] font-black text-white uppercase tracking-tight">
+                                      {language === 'en' ? capexInd.nameEn : capexInd.name}
+                                    </h4>
+                                    <p className="text-[10px] text-white/70">
+                                      {language === 'en' ? 'Capital Expenditure' : 'पुँजीगत खर्च'}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex items-end justify-between mb-2">
+                                  <div>
+                                    <span className="text-2xl font-black text-white leading-none">{fmt(progress)}</span>
+                                    <span className="text-[10px] font-bold text-white/60 ml-1">/ {fmt(target)} {translateUnit(capexInd.unit)}</span>
+                                  </div>
+                                  <span className="text-xs font-black text-white">{fmt(pct)}%</span>
+                                </div>
+                                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                                  <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${pct}%` }}
+                                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                                    className="h-full bg-white rounded-full"
+                                  />
+                                </div>
+                                <div className="flex items-center justify-between mt-2 min-w-0">
+                                  <span className="text-[10px] font-bold text-white/60 truncate">
+                                    {language === 'en' ? 'Baseline' : 'आधारभूत'}: {fmt(baseline)}%
+                                  </span>
+                                  <span className={`text-[10px] font-bold flex items-center gap-0.5 ${
+                                    progress >= baseline
+                                      ? 'text-emerald-400'
+                                      : 'text-rose-400'
+                                  }`}>
+                                    {progress >= baseline ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
+                                    {fmt(baselinePct)}% {language === 'en' ? 'of baseline' : 'आधारभूत'}
+                                  </span>
+                                </div>
                               </div>
-                               <div className="flex items-center justify-between mt-2 min-w-0">
-                                 <span className="text-[10px] font-bold text-white/60 truncate">
-                                   {language === 'en' ? 'Baseline' : 'आधारभूत'}: {fmt(baseline)}%
-                                 </span>
-                                 <span className={`text-[10px] font-bold flex items-center gap-0.5 ${
-                                  progress >= baseline
-                                    ? 'text-emerald-400'
-                                    : 'text-rose-400'
-                                }`}>
-                                  {progress >= baseline ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
-                                  {fmt(baselinePct)}% {language === 'en' ? 'of baseline' : 'आधारभूत'}
-                               </span>
-                             </div>
-                           </div>
-                        );
-                      })()}
-                    </div>
+                            );
+                          })()}
+                        </div>
                       );
-                    })}
-                   </div>
+                    })()}
+                  </div>
                  </motion.div>
                )}
                </AnimatePresence>
