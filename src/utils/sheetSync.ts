@@ -70,7 +70,14 @@ export async function syncPublishedSheets(urls?: { dashboard?: string; offices?:
   const { indicators, metadata } = parseSheetCsv(dashboardCsv);
   const finalIndicators = resolveOfficesFromSheet(indicators);
 
-  const parsedOffices: { name: string; updated: string; avgCompletion?: number; total?: number }[] = [];
+  const parsedOffices: { 
+    name: string; 
+    officeId: string; 
+    shortName: string; 
+    updated: string; 
+    avgCompletion?: number; 
+    total?: number 
+  }[] = [];
   if (officesCsv) {
     const officesLines = officesCsv.split('\n').map((line) => line.trim()).filter((line) => line.length > 0);
     let headerRowIdx = -1;
@@ -93,16 +100,29 @@ export async function syncPublishedSheets(urls?: { dashboard?: string; offices?:
       if (!cols || cols.length <= officeColIdx) continue;
       const officeName = String(cols[officeColIdx] || '').trim();
       if (
-        officeName &&
-        officeName !== 'Total' &&
-        officeName !== 'कुल' &&
-        !officeName.toLowerCase().includes('note:') &&
-        !officeName.includes('To be updated') &&
-        !officeName.startsWith('=') &&
-        officeName.length > 3
+        !officeName ||
+        officeName === 'Total' ||
+        officeName === 'कुल' ||
+        officeName.toLowerCase().includes('note:') ||
+        officeName.includes('To be updated') ||
+        officeName.startsWith('=') ||
+        officeName.length <= 3
       ) {
-        parsedOffices.push({ name: officeName, updated: 'Updated recently' });
+        continue;
       }
+
+      const dashIdx = officeName.indexOf('-');
+      const officeId = dashIdx !== -1 ? officeName.slice(0, dashIdx).trim() : '';
+      const shortName = dashIdx !== -1 ? officeName.slice(dashIdx + 1).trim() : officeName;
+
+      if (!officeId) continue;
+
+      parsedOffices.push({ 
+        name: officeName, 
+        officeId, 
+        shortName, 
+        updated: 'Updated recently' 
+      });
       if (officeName === 'Total' || officeName === 'कुल') {
         totalRowValues = cols.map((val: string) => {
           const num = parseFloat(String(val || '').replace(/,/g, ''));

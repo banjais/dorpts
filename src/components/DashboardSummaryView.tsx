@@ -67,7 +67,17 @@ import { SplashScreen } from './SplashScreen';
 interface DashboardSummaryViewProps {
   indicators: Indicator[];
   metadata: SystemMetadata | null;
-  offices: { name: string; updated: string; avgCompletion?: number; total?: number; onTrack?: number; attention?: number; stale?: number }[];
+  offices: { 
+    name: string; 
+    officeId: string; 
+    shortName:string; 
+    updated: string; 
+    avgCompletion?: number; 
+    total?: number; 
+    onTrack?: number; 
+    attention?: number; 
+    stale?: number 
+  }[];
   updatesHistory?: any[];
   onOpenAbout?: (tab?: string) => void;
   onOpenDataHealth?: () => void;
@@ -883,6 +893,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
         const avgCompletion = office.avgCompletion ?? 0;
         return {
           office: office.name,
+          officeId: office.officeId,
+          shortName: office.shortName,
           emails: emailMap.get(office.name) || new Set(),
           score: avgCompletion,
           avgCompletion,
@@ -1654,25 +1666,28 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                        exit={{ opacity: 0, height: 0 }}
                        className="overflow-hidden"
                      >
-                       <div className="pb-5 pt-1 space-y-2 overflow-y-auto custom-scrollbar pr-1">
-                         {reportingOffices.map((officeData) => {
-                           const displayName = translateOffice(officeData.office);
-                           const emails = Array.from(officeData.emails);
-                           const adminEmail = emails[0] || '';
-                           return (
-                             <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5 space-y-0.5">
-                               <div className="text-[10px] font-black text-white/80 truncate">
-                                 {displayName}
-                               </div>
-                               {adminEmail && (
-                                 <div className="text-[10px] font-bold text-white/60 truncate">
-                                   {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
-                                 </div>
-                               )}
-                             </div>
-                           );
-                         })}
-                       </div>
+                        <div className="pb-5 pt-1 space-y-2 overflow-y-auto custom-scrollbar pr-1">
+                          {reportingOffices.filter((officeData) => officeData.officeId).map((officeData) => {
+                            const displayName = translateOffice(officeData.office);
+                            const emails = Array.from(officeData.emails);
+                            const adminEmail = emails[0] || '';
+                            return (
+                              <div key={officeData.office} className="bg-white/5 border border-white/10 rounded-xl p-2.5 space-y-0.5">
+                                <div className="text-[10px] font-black text-white/80 break-words leading-tight">
+                                  {displayName}
+                                </div>
+                                <div className="text-[10px] font-bold text-white/60">
+                                  {officeData.officeId}
+                                </div>
+                                {adminEmail && (
+                                  <div className="text-[10px] font-bold text-white/60 truncate">
+                                    {language === 'en' ? 'Admin: ' : 'एडमिन: '}{adminEmail}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
                      </motion.div>
                    )}
                </AnimatePresence>

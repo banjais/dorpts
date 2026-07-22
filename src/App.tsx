@@ -746,6 +746,8 @@ function MainAppContent() {
   const [loading, setLoading] = useState(true);
   const [offices, setOffices] = useState<{ 
     name: string; 
+    officeId: string; 
+    shortName: string; 
     updated: string; 
     avgCompletion?: number; 
     total?: number; 
@@ -820,23 +822,43 @@ function MainAppContent() {
           break;
         }
       }
-      const parsedOffices: { name: string; updated: string; avgCompletion?: number; total?: number }[] = [];
+      const parsedOffices: { 
+        name: string; 
+        officeId: string; 
+        shortName: string; 
+        updated: string; 
+        avgCompletion?: number; 
+        total?: number 
+      }[] = [];
       const startRowIdx = headerRowIdx !== -1 ? headerRowIdx + 1 : 0;
       for (let i = startRowIdx; i < rows.length; i++) {
         const row = rows[i];
         if (!row || row.length <= officeColIdx) continue;
         const officeName = String(row[officeColIdx] || "").trim();
         if (
-          officeName &&
-          officeName !== "Total" &&
-          officeName !== "कुल" &&
-          !officeName.toLowerCase().includes("note:") &&
-          !officeName.includes("To be updated") &&
-          !officeName.startsWith("=") &&
-          officeName.length > 3
+          !officeName ||
+          officeName === "Total" ||
+          officeName === "कुल" ||
+          officeName.toLowerCase().includes("note:") ||
+          officeName.includes("To be updated") ||
+          officeName.startsWith("=") ||
+          officeName.length <= 3
         ) {
-          parsedOffices.push({ name: officeName, updated: "Updated recently" });
+          continue;
         }
+
+        const dashIdx = officeName.indexOf('-');
+        const officeId = dashIdx !== -1 ? officeName.slice(0, dashIdx).trim() : '';
+        const shortName = dashIdx !== -1 ? officeName.slice(dashIdx + 1).trim() : officeName;
+        
+        if (!officeId) continue;
+
+        parsedOffices.push({ 
+          name: officeName, 
+          officeId, 
+          shortName, 
+          updated: "Updated recently" 
+        });
         if (officeName === "Total" || officeName === "कुल") {
           totalRowValues = row.map((val: any) => {
             const num = parseFloat(String(val || "").replace(/,/g, ""));
