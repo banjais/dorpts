@@ -2484,9 +2484,7 @@ function MainAppContent() {
   const [fabRevealed, setFabRevealed] = useState(false);
   const [cardsReachedHeader, setCardsReachedHeader] = useState(false);
   const [cardsHidden, setCardsHidden] = useState(false);
-   const [fabReadyToAppear, setFabReadyToAppear] = useState(false);
   const fabHoverTimer = useRef<number | null>(null);
-  const fabRevealTimer = useRef<number | null>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2497,20 +2495,6 @@ function MainAppContent() {
       setFabRevealed(false);
     }
   }, [mainView]);
-
-  useEffect(() => {
-    if (cardsHidden) {
-      fabRevealTimer.current = window.setTimeout(() => {
-        setFabReadyToAppear(true);
-      }, 400);
-    } else {
-      if (fabRevealTimer.current) clearTimeout(fabRevealTimer.current);
-      setFabReadyToAppear(false);
-    }
-    return () => {
-      if (fabRevealTimer.current) clearTimeout(fabRevealTimer.current);
-    };
-  }, [cardsHidden]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -3043,17 +3027,11 @@ function MainAppContent() {
            viewOptions={viewOptions as any}
            indicators={indicators}
            metadata={metadata}
-            onMouseEnterFab={() => {
-              if (mainView === 'dashboard' && cardsHidden) setFabRevealed(true);
-            }}
-            onMouseLeaveFab={() => {
-              if (mainView === 'dashboard') setFabRevealed(false);
-            }}
            trackedIds={trackedIds}
-          onToggleTrack={toggleTrack}
-          updatesHistory={visibleHistory}
-          fiscalYear={selectedFiscalYear}
-        />
+           onToggleTrack={toggleTrack}
+           updatesHistory={visibleHistory}
+           fiscalYear={selectedFiscalYear}
+         />
 
         <div
           className={`flex flex-col min-h-[100dvh] transition-all duration-700 ease-in-out pt-2 sm:pt-4 pb-28 sm:pb-32 ${
@@ -3385,7 +3363,7 @@ function MainAppContent() {
         >
           <div
              className={`flex items-center gap-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl pl-2 pr-1 py-1 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-2xl transition-all duration-700 ease-out ${
-               isReportBuilderOpen || !fabRevealed || !fabReadyToAppear
+               isReportBuilderOpen || !fabRevealed || !cardsHidden
                  ? "opacity-0 scale-90 translate-x-2 pointer-events-none"
                  : "opacity-100 scale-100 translate-x-0 pointer-events-auto"
              }`}
@@ -3534,16 +3512,10 @@ function MainAppContent() {
            </motion.button>
          </div>
 
-         {/* Auth Toolbar */}
-         <div
-           className="fixed top-3 right-3 z-[900] flex items-center gap-1.5"
-           onMouseEnter={() => {
-             if (mainView === 'dashboard' && cardsHidden) setFabRevealed(true);
-           }}
-           onMouseLeave={() => {
-             if (mainView === 'dashboard') setFabRevealed(false);
-           }}
-         >
+          {/* Auth Toolbar */}
+          <div
+            className="fixed top-3 right-3 z-[900] flex items-center gap-1.5"
+          >
           <select
             value={selectedFiscalYear}
             onChange={(e) => setSelectedFiscalYear(e.target.value)}
