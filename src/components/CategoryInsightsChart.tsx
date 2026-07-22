@@ -8,6 +8,7 @@ interface Props {
   indicators: Indicator[];
   t: (key: string) => string;
   language: string;
+  height?: number;
 }
 
 const CATEGORY_LABELS: Record<string, { en: string; np: string }> = {
@@ -18,7 +19,7 @@ const CATEGORY_LABELS: Record<string, { en: string; np: string }> = {
   'Governance': { en: 'Governance', np: 'सुशासन' },
 };
 
-export default function CategoryInsightsChart({ indicators, t, language }: Props) {
+export default function CategoryInsightsChart({ indicators, t, language, height = 220 }: Props) {
   const data = STANDARD_CATEGORIES.map((cat) => {
     const catIndicators = indicators.filter((ind) => normalizeCategory(ind.category) === cat);
     const avgPercent = catIndicators.length > 0
@@ -40,7 +41,7 @@ export default function CategoryInsightsChart({ indicators, t, language }: Props
   });
 
   return (
-    <div className="h-64 w-full">
+    <div style={{ height: `${height}px` }} className="w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 30 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.5} />

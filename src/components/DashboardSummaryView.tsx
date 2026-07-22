@@ -2016,10 +2016,11 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               </span>
             </div>
             
-            {/* Always-visible mini chart */}
-            <div className="w-full h-20 sm:h-24 bg-white/5 dark:bg-slate-800/50 border border-white/10 rounded-xl overflow-hidden">
-              <PortfolioHealthChart indicators={indicators} t={t} mode={portfolioMode} height={80} />
-            </div>
+            {!showInsights && (
+              <div className="w-full h-20 sm:h-24 bg-white/5 dark:bg-slate-800/50 border border-white/10 rounded-xl overflow-hidden">
+                <PortfolioHealthChart indicators={indicators} t={t} mode={portfolioMode} height={80} />
+              </div>
+            )}
             
             <div className="flex items-center justify-between">
               <motion.div animate={{ rotate: showInsights ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-slate-500 dark:text-white/70">
@@ -2037,7 +2038,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   exit={{ opacity: 0, height: 0 }}
                    className="overflow-hidden bg-slate-900 dark:bg-indigo-950/30"
                 >
-                  <div className="pb-5 pt-1 space-y-4 relative">
+                   <div className="pb-2 pt-1 space-y-2 relative">
                    {highlightedCard === 'insights' && (
                      <div className="absolute inset-0 bg-indigo-500/5 pointer-events-none rounded-lg" />
                    )}
@@ -2111,15 +2112,15 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                     )}
                  </div>
 
-                 <div className="bg-white/5 border border-white/10 rounded-2xl p-4 min-h-[320px]">
-                  {insightTab === 'health' && (
-                    <PortfolioHealthChart indicators={indicators} t={t} mode={portfolioMode} />
-                  )}
-                  {insightTab === 'category' && <CategoryInsightsChart indicators={indicators} t={t} language={language} />}
-                  {insightTab === 'indicators' && <MetricsChart indicators={indicators} />}
-                  {insightTab === 'trends' && <TrendAnalysisView indicators={indicators} metadata={metadata} onOpenAbout={onOpenAbout} />}
-                  {insightTab === 'heatmap' && <IndicatorHeatmap indicators={indicators} updatesHistory={updatesHistory} />}
-                </div>
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
+                   {insightTab === 'health' && (
+                     <PortfolioHealthChart indicators={indicators} t={t} mode={portfolioMode} height={220} />
+                   )}
+                   {insightTab === 'category' && <CategoryInsightsChart indicators={indicators} t={t} language={language} height={220} />}
+                   {insightTab === 'indicators' && <MetricsChart indicators={indicators} />}
+                   {insightTab === 'trends' && <TrendAnalysisView indicators={indicators} metadata={metadata} onOpenAbout={onOpenAbout} />}
+                   {insightTab === 'heatmap' && <IndicatorHeatmap indicators={indicators} updatesHistory={updatesHistory} />}
+                 </div>
                </div>
              </motion.div>
            )}
