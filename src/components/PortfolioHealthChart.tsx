@@ -8,9 +8,10 @@ interface Props {
   indicators: Indicator[];
   t: (key: string) => string;
   mode?: 'pie' | 'bar';
+  height?: number;
 }
 
-export const PortfolioHealthChart: React.FC<Props> = ({ indicators, t, mode = 'bar' }) => {
+export const PortfolioHealthChart: React.FC<Props> = ({ indicators, t, mode = 'bar', height = 192 }) => {
   const stats = (indicators || []).reduce((acc, ind) => {
     if (!ind) return acc;
     const percent = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
@@ -31,7 +32,7 @@ export const PortfolioHealthChart: React.FC<Props> = ({ indicators, t, mode = 'b
   const chartData = data.filter(d => d.value > 0 || mode === 'bar');
 
   return (
-    <div className="h-48 w-full overflow-hidden relative">
+    <div style={{ height: `${height}px` }} className="w-full overflow-hidden relative">
       <AnimatePresence mode="wait" initial={false}>
         {mode === 'bar' ? (
           <motion.div

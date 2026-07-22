@@ -3211,12 +3211,13 @@ function MainAppContent() {
                                 setSelectedHistoryIndicator(ind);
                                 setIsHistoryDrawerOpen(true);
                               }}
-                                onSelectIndicatorFromBreakdown={handleSelectIndicatorFromBreakdown}
-                                 highlightedCard={highlightedCard}
-                                 isFooterExpanded={isFooterExpanded}
-                                 onCardsReachedHeader={setCardsReachedHeader}
-                                 onCardsHidden={setCardsHidden}
-                               />
+                                 onSelectIndicatorFromBreakdown={handleSelectIndicatorFromBreakdown}
+                                  highlightedCard={highlightedCard}
+                                  isFooterExpanded={isFooterExpanded}
+                                  onCardsReachedHeader={setCardsReachedHeader}
+                                  onCardsHidden={setCardsHidden}
+                                  onNavigateToView={handleMainViewChange}
+                                />
                            </ErrorBoundary>
                          )}
  

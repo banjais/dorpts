@@ -91,6 +91,7 @@ interface DashboardSummaryViewProps {
   isAtBottom?: boolean;
   onCardsReachedHeader?: (reached: boolean) => void;
   onCardsHidden?: (hidden: boolean) => void;
+  onNavigateToView?: (view: string) => void;
 }
 
 const toNepaliNumerals = (numStr: string | number): string => {
@@ -655,6 +656,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   isAtBottom: _isAtBottomProp,
   onCardsReachedHeader,
   onCardsHidden,
+  onNavigateToView,
 }) => {
   const { language, setLanguage, t, translateUnit, translateOffice } = useLanguage();
   const { isAdmin } = useAuth();
@@ -1993,45 +1995,51 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
          {highlightedCard === 'insights' && (
            <div className="absolute inset-0 rounded-[28px] ring-4 ring-indigo-500/60 animate-pulse pointer-events-none z-20" />
          )}
-         <div className="relative z-10 flex flex-col gap-3">
-           <div className="flex items-center justify-between">
-             <div>
-               <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                 {language === 'en' ? 'Visual Insights' : 'दृश्यात्मक अन्तर्दृष्टि'}
-               </h3>
-                <p className="text-[10px] font-bold text-slate-600 dark:text-white/70">
-                 {language === 'en' ? 'Optional charts & analytics' : 'वैकल्पिक चार्ट र विश्लेषण'}
-               </p>
-             </div>
-             <span className="p-1 bg-indigo-500 text-white rounded-xl">
-               <BarChart3 size={14} />
-             </span>
-           </div>
-           <div className="flex items-center justify-between">
-             <motion.div animate={{ rotate: showInsights ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-slate-500 dark:text-white/70">
-               <ChevronDown size={18} />
-             </motion.div>
-           </div>
-         </div>
-         
-         <div className="w-full sm:w-full">
-           <AnimatePresence>
-             {showInsights && (
-               <motion.div
-                 initial={{ opacity: 0, height: 0 }}
-                 animate={{ opacity: 1, height: 'auto' }}
-                 exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden bg-slate-900 dark:bg-indigo-950/30"
-               >
-                 <div className="pb-5 pt-1 space-y-4 relative">
-                  {highlightedCard === 'insights' && (
-                    <div className="absolute inset-0 bg-indigo-500/5 pointer-events-none rounded-lg" />
-                  )}
-                  {/* Chart type options */}
-                 <div className="flex flex-wrap items-center gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <button
-                        onClick={() => setInsightTab('health')}
+          <div className="relative z-10 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                  {language === 'en' ? 'Visual Insights' : 'दृश्यात्मक अन्तर्दृष्टि'}
+                </h3>
+                 <p className="text-[10px] font-bold text-slate-600 dark:text-white/70">
+                  {language === 'en' ? 'Optional charts & analytics' : 'वैकल्पिक चार्ट र विश्लेषण'}
+                </p>
+              </div>
+              <span className="p-1 bg-indigo-500 text-white rounded-xl">
+                <BarChart3 size={14} />
+              </span>
+            </div>
+            
+            {/* Always-visible mini chart */}
+            <div className="w-full h-20 sm:h-24 bg-white/5 dark:bg-slate-800/50 border border-white/10 rounded-xl overflow-hidden">
+              <PortfolioHealthChart indicators={indicators} t={t} mode={portfolioMode} height={80} />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <motion.div animate={{ rotate: showInsights ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-slate-500 dark:text-white/70">
+                <ChevronDown size={18} />
+              </motion.div>
+            </div>
+          </div>
+          
+          <div className="w-full sm:w-full">
+            <AnimatePresence>
+              {showInsights && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                   className="overflow-hidden bg-slate-900 dark:bg-indigo-950/30"
+                >
+                  <div className="pb-5 pt-1 space-y-4 relative">
+                   {highlightedCard === 'insights' && (
+                     <div className="absolute inset-0 bg-indigo-500/5 pointer-events-none rounded-lg" />
+                   )}
+                   {/* Chart type options */}
+                  <div className="flex flex-wrap items-center gap-2">
+                     <div className="flex flex-wrap items-center gap-2">
+                       <button
+                         onClick={(e) => { e.stopPropagation(); setInsightTab('health'); }}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
                           insightTab === 'health' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'
                         }`}
@@ -2039,62 +2047,62 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                         <PieChartIcon size={12} />
                         {language === 'en' ? 'Health' : 'पोर्टफोलियो'}
                       </button>
-                      <button
-                        onClick={() => setInsightTab('category')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
-                          insightTab === 'category' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'
-                        }`}
-                      >
-                        <LayoutGrid size={12} />
-                        {language === 'en' ? 'Category' : 'वर्ग'}
-                      </button>
-                      <button
-                        onClick={() => setInsightTab('indicators')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
-                          insightTab === 'indicators' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'
-                        }`}
-                      >
-                        <BarChart3 size={12} />
-                        {language === 'en' ? 'Indicators' : 'सूचकहरू'}
-                      </button>
-                      <button
-                        onClick={() => setInsightTab('trends')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
-                          insightTab === 'trends' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'
-                        }`}
-                      >
-                        <LineChartIcon size={12} />
-                        {language === 'en' ? 'Trends' : 'प्रवृत्तिहरू'}
-                      </button>
-                      <button
-                        onClick={() => setInsightTab('heatmap')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
-                          insightTab === 'heatmap' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'
-                        }`}
-                      >
-                        <Activity size={12} />
-                        {language === 'en' ? 'Heatmap' : 'हिटम्याप'}
-                      </button>
-                    </div>
-
-                   {insightTab === 'health' && (
-                     <div className="flex bg-white/10 p-0.5 rounded-xl border border-white/10">
                        <button
-                         onClick={() => setPortfolioMode('bar')}
-                         className={`p-1.5 rounded-lg transition-all ${portfolioMode === 'bar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'}`}
-                         title={language === 'en' ? 'Bar' : 'बार'}
+                         onClick={(e) => { e.stopPropagation(); setInsightTab('category'); }}
+                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
+                           insightTab === 'category' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'
+                         }`}
+                       >
+                         <LayoutGrid size={12} />
+                         {language === 'en' ? 'Category' : 'वर्ग'}
+                       </button>
+                       <button
+                         onClick={(e) => { e.stopPropagation(); if (onNavigateToView) onNavigateToView('insights'); }}
+                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
+                           insightTab === 'indicators' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'
+                         }`}
                        >
                          <BarChart3 size={12} />
+                         {language === 'en' ? 'Indicators' : 'सूचकहरू'}
                        </button>
                        <button
-                         onClick={() => setPortfolioMode('pie')}
-                         className={`p-1.5 rounded-lg transition-all ${portfolioMode === 'pie' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'}`}
-                         title={language === 'en' ? 'Pie' : 'पाई'}
+                         onClick={(e) => { e.stopPropagation(); if (onNavigateToView) onNavigateToView('trends'); }}
+                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
+                           insightTab === 'trends' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'
+                         }`}
                        >
-                         <PieChartIcon size={12} />
+                         <LineChartIcon size={12} />
+                         {language === 'en' ? 'Trends' : 'प्रवृत्तिहरू'}
                        </button>
-                     </div>
-                   )}
+                       <button
+                         onClick={(e) => { e.stopPropagation(); if (onNavigateToView) onNavigateToView('heatmap'); }}
+                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider transition-all ${
+                           insightTab === 'heatmap' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'
+                         }`}
+                       >
+                         <Activity size={12} />
+                         {language === 'en' ? 'Heatmap' : 'हिटम्याप'}
+                       </button>
+                    </div>
+
+                    {insightTab === 'health' && (
+                      <div className="flex bg-white/10 p-0.5 rounded-xl border border-white/10">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setPortfolioMode('bar'); }}
+                          className={`p-1.5 rounded-lg transition-all ${portfolioMode === 'bar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'}`}
+                          title={language === 'en' ? 'Bar' : 'बार'}
+                        >
+                          <BarChart3 size={12} />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setPortfolioMode('pie'); }}
+                          className={`p-1.5 rounded-lg transition-all ${portfolioMode === 'pie' ? 'bg-white text-indigo-600 shadow-sm' : 'text-white/70 hover:text-white'}`}
+                          title={language === 'en' ? 'Pie' : 'पाई'}
+                        >
+                          <PieChartIcon size={12} />
+                        </button>
+                      </div>
+                    )}
                  </div>
 
                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 min-h-[320px]">
