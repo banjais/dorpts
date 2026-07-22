@@ -76,7 +76,7 @@ import { LoginScreen } from "./components/LoginScreen";
 import { AdminPanelModal } from "./components/AdminPanelModal";
 import { SettingsPanelModal } from "./components/SettingsPanelModal";
 import { motion, AnimatePresence } from "motion/react";
-import { useDashboardLayout, useWidgetSpan } from "./hooks/useDashboardLayout";
+import { useDashboardLayout } from "./hooks/useDashboardLayout";
 
 import {
   Filter,

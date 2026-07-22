@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, Calculator, Building2, Database, RefreshCw, 
   Scale, ChevronRight, ChevronLeft, Navigation, 
   Layers, Printer, Compass, MousePointerClick, Trash2, 
   Settings2, Smartphone, Sparkles, Clock, LayoutGrid, Target,
-  Search, Activity, Mic, Filter, Download, Monitor, Wifi, WifiOff
+  Search, Activity, Mic, Filter, Monitor, Wifi, WifiOff
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { triggerHaptic } from '../utils/haptic';
@@ -59,34 +59,18 @@ const VOICE_FILTER_COMMANDS = [
 export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
   isOpen, onClose, indicators = [], offices = [], onSync,
   isSyncing = false, defaultTab = 'tour', lastUpdateDate = 'N/A',
-  isOnline = true, fiscalYear, onStartVoice, selectedIndicatorId,
+  isOnline = true, fiscalYear: _fiscalYear, onStartVoice, selectedIndicatorId,
   addToast,
 }) => {
   const { language, translateOffice } = useLanguage();
-  const { offlineReady } = useRegisterSW();
+  useRegisterSW();
   useBodyScrollLock(isOpen);
-  const [isInstalled, setIsInstalled] = useState(false);
-  const [canInstall, setIsInstallable] = useState(false);
 
-  useEffect(() => {
-    const mq = window.matchMedia('(display-mode: standalone)');
-    const updateStandalone = () => setIsInstalled(mq.matches);
-    updateStandalone();
-    mq.addEventListener('change', updateStandalone);
-    const onBeforeInstall = () => setIsInstallable(true);
-    window.addEventListener('beforeinstallprompt', onBeforeInstall);
-    return () => {
-      mq.removeEventListener('change', updateStandalone);
-      window.removeEventListener('beforeinstallprompt', onBeforeInstall);
-    };
-  }, []);
   const [activeTab, setActiveTab] = useState<'tour' | 'logic' | 'offices' | 'indicators' | 'status' | 'sync' | 'settings' | 'voice'>(defaultTab);
   const [step, setStep] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [storageInfo, setStorageInfo] = useState({ size: '0 KB', totalBytes: 0, timestamp: 'N/A' });
   const [hapticPref, setHapticPref] = useState<'light' | 'medium' | 'heavy' | 'off'>('medium');
-
-  const isVoiceTab = activeTab === 'voice';
 
   const handleMicClick = useCallback(() => {
     triggerHaptic('medium');
@@ -94,12 +78,14 @@ export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
   }, [onStartVoice]);
 
   // Sync tab selection with defaultTab when the modal opens
+  const prevIsOpenRef = useRef(isOpen);
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !prevIsOpenRef.current) {
       setActiveTab(defaultTab);
       setStep(0);
       setSearchQuery('');
     }
+    prevIsOpenRef.current = isOpen;
   }, [isOpen, defaultTab]);
 
   useEffect(() => {
@@ -113,11 +99,6 @@ export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
     }, 120);
     return () => clearTimeout(timer);
   }, [isOpen, selectedIndicatorId, activeTab]);
-
-  // Initialize haptic preference on mount
-  useEffect(() => {
-    // Already initialized in useState, no need to set here
-  }, []);
 
   const handleHapticChange = (intensity: 'light' | 'medium' | 'heavy' | 'off') => {
     setHapticPref(intensity);
@@ -147,7 +128,7 @@ export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
         totalBytes,
         timestamp: lastSync
       });
-    } catch (e) {
+    } catch (_e) {
       // Failed to calculate storage silently
     }
   }, []);
@@ -176,7 +157,7 @@ export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
       }
       
       return formatDisplayDate(isoString, language === 'en' ? 'en' : 'np');
-    } catch (e) {
+    } catch (_e) {
       return 'N/A';
     }
   }, [language]);

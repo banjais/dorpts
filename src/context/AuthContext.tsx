@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { User, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where, getDocs as firestoreGetDocs } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../firebase';
 import { AdminUser, UserActivity, EmailOTPSession } from '../types';
 import { validateSession, destroySession } from '../services/otpService';
@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (email === SUPERADMIN_EMAIL) return 'superadmin';
     try {
       const q = query(collection(db, 'users'), where('email', '==', email));
-      const snap = await firestoreGetDocs(q);
+      const snap = await getDocs(q);
       if (!snap.empty) {
         const data = snap.docs[0].data();
         const r = data.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer';
@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (email === SUPERADMIN_EMAIL) return null;
     try {
       const q = query(collection(db, 'admins'), where('email', '==', email));
-      const snap = await firestoreGetDocs(q);
+      const snap = await getDocs(q);
       if (!snap.empty) {
         const data = snap.docs[0].data();
         const office = data.office as string | undefined;
@@ -140,7 +140,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     checkSession();
     return () => { cancelled = true; };
-  }, [lookupEmailRole, setRoleAndLoadAdmins, logActivity]);
+  }, [lookupEmailRole, setRoleAndLoadAdmins, logActivity, loadUserAssignedOffice]);
 
   // Google auth state listener
   useEffect(() => {
@@ -184,7 +184,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
     return unsubscribe;
-  }, [setRoleAndLoadAdmins, logActivity]);
+  }, [setRoleAndLoadAdmins, logActivity, loadUserAssignedOffice]);
 
   const loginWithGoogle = async () => {
     try {

@@ -18,7 +18,6 @@ import {
   TrendingUp, 
   Target, 
   Award, 
-  Calendar, 
   AlertCircle, 
   CheckCircle2, 
   Activity, 
@@ -27,7 +26,6 @@ import {
   Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { formatNepaliDate } from '../utils/date';
 
 interface Metadata {
   lastUpdateDate?: string;
@@ -143,12 +141,6 @@ const CustomTrendTooltip = ({ active, payload, language, trendData, activeUnit }
   }
   return null;
 };
-
-interface CustomSeasonalTooltipProps {
-  active?: boolean;
-  payload?: { payload: { interval: string | number; avgDailyProgress: number }; value?: number }[];
-  language: string;
-}
 
 export const TrendAnalysisView: React.FC<TrendAnalysisViewProps> = ({ indicators, metadata, onOpenAbout }) => {
   const { language, t, translateUnit } = useLanguage();

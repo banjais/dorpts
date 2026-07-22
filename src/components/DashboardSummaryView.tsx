@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Indicator, SystemMetadata, Toast } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -667,10 +667,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showProgressLogic, setShowProgressLogic] = useState(false);
   const [showOfficeLogicInfo, setShowOfficeLogicInfo] = useState(false);
   const [showStatusLogicInline, setShowStatusLogicInline] = useState(false);
-  const [showIndicatorsLogicInline, setShowIndicatorsLogicInline] = useState(false);
   const [showOverallLogicInline, setShowOverallLogicInline] = useState(false);
   const [showCategoryLogicInline, setShowCategoryLogicInline] = useState(false);
-  const [showReportingOfficesLogicInline, setShowReportingOfficesLogicInline] = useState(false);
   const [showSystemHelpModal, setShowSystemHelpModal] = useState(false);
   const [showBudgetCard, setShowBudgetCard] = useState(false);
   const [showOverallProgress, setShowOverallProgress] = useState(false);
@@ -696,10 +694,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
     setShowProgressLogic(false);
     setShowOfficeLogicInfo(false);
     setShowStatusLogicInline(false);
-    setShowIndicatorsLogicInline(false);
     setShowOverallLogicInline(false);
     setShowCategoryLogicInline(false);
-    setShowReportingOfficesLogicInline(false);
     setExpandedId(null);
   }, []);
 

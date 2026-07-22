@@ -8,7 +8,7 @@ import { EmailOTPSession } from '../types';
 const SESSION_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000;
 const OTP_EXPIRY_MS = 10 * 60 * 1000;
 const API_BASE = typeof window !== 'undefined' ? (
-  (window as any).__API_BASE__ || ''
+  (window as unknown as { __API_BASE__?: string }).__API_BASE__ || ''
 ) : '';
 
 function hashEmail(email: string): string {
@@ -93,12 +93,12 @@ export async function validateSession(token: string): Promise<EmailOTPSession | 
 
   if (!snap.exists()) return null;
 
-  const raw = snap.data() as Record<string, any>;
+  const raw = snap.data() as { expiresAt?: { toMillis?: () => number } | string | number; email?: string; role?: string; token?: string; createdAt?: string; userAgent?: string };
   let expiresAtMs = 0;
-  if (raw.expiresAt && typeof raw.expiresAt.toMillis === 'function') {
-    expiresAtMs = raw.expiresAt.toMillis();
+  if (raw.expiresAt && typeof (raw.expiresAt as { toMillis?: () => number }).toMillis === 'function') {
+    expiresAtMs = (raw.expiresAt as { toMillis: () => number }).toMillis();
   } else if (raw.expiresAt) {
-    expiresAtMs = new Date(raw.expiresAt).getTime();
+    expiresAtMs = new Date(raw.expiresAt as string | number).getTime();
   }
 
   if (expiresAtMs > 0 && expiresAtMs < Date.now()) {
@@ -108,7 +108,7 @@ export async function validateSession(token: string): Promise<EmailOTPSession | 
 
   return {
     email: raw.email || '',
-    role: raw.role || 'viewer',
+    role: (raw.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer') || 'viewer',
     token: raw.token || token,
     createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : new Date().toISOString(),
     expiresAt: expiresAtMs > 0 ? new Date(expiresAtMs).toISOString() : undefined,

@@ -1,12 +1,8 @@
-import { fetchSheetData } from '../sheets';
 import {
   parseGoogleSheetsCSV,
   parseCSVLine,
-  DEFAULT_INDICATORS,
 } from '../data';
 import { getOfficeByEmail } from './officeDetector';
-
-const SPREADSHEET_ID = '1ohBXufi7WEvKVAdMavbM5ZQfWnjxveFxgR0FJZf4EJM';
 
 export const PUBLISHED_CSV_URLS = {
   dashboard: `https://docs.google.com/spreadsheets/d/e/2PACX-1vQElDgCZtxw83cOi2p7MPCASAVlt1jFC0QnEW3LagOZeu4ecVCKcqrG9M2IumCgeyi4vgvhYTSn2mTl/pub?output=csv&gid=0`,
@@ -23,7 +19,7 @@ export async function fetchPublishedCsv(url: string): Promise<string | null> {
   }
 }
 
-export function buildCsvText(values: any[][]): string {
+export function buildCsvText(values: unknown[][]): string {
   return values
     .map((row) =>
       row
@@ -52,10 +48,10 @@ export function parseSheetCsv(csvText: string) {
   return parseGoogleSheetsCSV(body);
 }
 
-export function resolveOfficesFromSheet(indicators: any[]) {
-  indicators.forEach((ind: any) => {
+export function resolveOfficesFromSheet(indicators: Array<{ office?: string; gmail?: string; updatedBy?: string }>) {
+  indicators.forEach((ind) => {
     if ((!ind.office || ind.office.trim() === '') && (ind.gmail || ind.updatedBy)) {
-      ind.office = getOfficeByEmail(ind.gmail || ind.updatedBy) || ind.office;
+      ind.office = getOfficeByEmail(ind.gmail || ind.updatedBy || '') || ind.office;
     }
   });
   return indicators;

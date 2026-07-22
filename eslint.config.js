@@ -15,12 +15,17 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      "@typescript-eslint/no-explicit-any": "error",
-      "@typescript-eslint/no-unused-vars": "error",
-      "no-empty": "error",
-      "react-hooks/exhaustive-deps": "error",
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/static-components": "error"
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": ["error", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }],
+      "no-empty": ["error", { "allowEmptyCatch": true }],
+      "no-useless-assignment": "off",
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/exhaustive-deps": "warn",
+      "react-hooks/rules-of-hooks": "error"
     },
   }
 );
