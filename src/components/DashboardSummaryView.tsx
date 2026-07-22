@@ -37,6 +37,7 @@ import {
   X,
   Calculator,
   Database,
+  Briefcase,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -671,6 +672,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showCategoryLogicInline, setShowCategoryLogicInline] = useState(false);
   const [showSystemHelpModal, setShowSystemHelpModal] = useState(false);
   const [showBudgetCard, setShowBudgetCard] = useState(false);
+  const [showEmploymentCard, setShowEmploymentCard] = useState(false);
   const [showOverallProgress, setShowOverallProgress] = useState(false);
   const [cardsHidden, setCardsHidden] = useState(false);
   const [showStatusDetails, setShowStatusDetails] = useState(false);
@@ -688,6 +690,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
     setShowAllIndicators(false);
     setShowCategoryStatus(false);
     setShowBudgetCard(false);
+    setShowEmploymentCard(false);
     setShowInsights(false);
     setShowStatusBreakdown(false);
     setShowIndicatorsBreakdown(false);
@@ -1842,14 +1845,124 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                )}
                </AnimatePresence>
              </div>
-            </motion.div>
-          </AnimatePresence>
+           </motion.div>
+         </AnimatePresence>
 
-        {/* Card 6: Visual Insights */}
-          <AnimatePresence>
-            <motion.div
-            ref={insightsCardRef}
-            layout
+        {/* Card 6: Employment Creation */}
+           <AnimatePresence>
+             <motion.div
+             layout
+             initial={{ opacity: 0, scale: 0.95 }}
+             animate={{ opacity: 1, scale: 1 }}
+             exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+             transition={{ duration: 0.3, ease: 'easeInOut' }}
+             whileHover={{ scale: 1.02 }}
+             whileTap={{ scale: 0.97 }}
+             onClick={() => toggleCard(setShowEmploymentCard, showEmploymentCard)}
+             className="group relative cursor-pointer bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-[28px] shadow-xl shadow-orange-500/25 border border-white/20 hover:shadow-2xl hover:shadow-orange-500/40 active:shadow-2xl active:shadow-orange-500/40 transition-all duration-200 overflow-hidden"
+           >
+         <div className="absolute inset-0 bg-black/10" />
+         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+         <div className="relative z-10 flex flex-col gap-3">
+           <div className="flex items-center justify-between">
+             <div>
+               <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-tight">
+                 {language === 'en' ? 'Employment Creation' : 'रोजगारी सिर्जना'}
+               </h3>
+                <p className="text-[10px] sm:text-[11px] font-bold text-white/70">
+                 {language === 'en' ? 'Man-days generated (in thousands)' : 'कुल सिर्जित कार्यदिन (हजारमा)'}
+               </p>
+             </div>
+             <span className="p-1.5 bg-white/20 text-white rounded-xl">
+               <Briefcase size={14} />
+             </span>
+           </div>
+           <div className="flex items-center justify-between">
+             <motion.div animate={{ rotate: showEmploymentCard ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-white/70">
+               <ChevronDown size={18} />
+             </motion.div>
+           </div>
+         </div>
+         
+         <div className="w-full sm:w-full">
+           <AnimatePresence>
+             {showEmploymentCard && (
+               <motion.div
+                 initial={{ opacity: 0, height: 0 }}
+                 animate={{ opacity: 1, height: 'auto' }}
+                 exit={{ opacity: 0, height: 0 }}
+                 className="overflow-hidden bg-black/20"
+               >
+                 <div className="px-5 pb-5 pt-1 space-y-4">
+                    {(() => {
+                      const empInd = indicators.find(i => i.id === 'ind_13') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('employment'));
+                      if (!empInd) {
+                        return (
+                          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center">
+                            <p className="text-xs text-white/70">
+                              {language === 'en' ? 'Employment data not configured' : 'रोजगारी डाटा कन्फिगर गरिएको छैन'}
+                            </p>
+                          </div>
+                        );
+                      }
+                      const target = empInd.annualTarget || 0;
+                      const progress = empInd.annualProgress || 0;
+                      const pct = target > 0 ? Math.round((progress / target) * 100) : 0;
+                      const remaining = Math.max(0, target - progress);
+                      return (
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
+                              <Briefcase size={16} className="text-white" />
+                            </div>
+                            <div>
+                              <h4 className="text-[11px] font-black text-white uppercase tracking-tight">
+                                {language === 'en' ? empInd.nameEn : empInd.name}
+                              </h4>
+                              <p className="text-[10px] text-white/70">
+                                {language === 'en' ? 'Total Employment Generated' : 'कुल रोजगारी सिर्जना'}
+                              </p>
+                            </div>
+                          </div>
+                           <div className="flex items-end justify-between mb-2">
+                             <div>
+                               <span className="text-2xl font-black text-white leading-none">{fmt(progress)}</span>
+                                <span className="text-[10px] font-bold text-white/60 ml-1">/ {fmt(target)} {translateUnit(empInd.unit)}</span>
+                             </div>
+                             <span className="text-xs font-black text-white">{fmt(pct)}%</span>
+                           </div>
+                           <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                             <motion.div
+                               initial={{ width: 0 }}
+                               animate={{ width: `${pct}%` }}
+                               transition={{ duration: 0.8, ease: 'easeOut' }}
+                               className="h-full bg-white rounded-full"
+                             />
+                           </div>
+                            <div className="flex items-center justify-between mt-2 min-w-0">
+                              <span className="text-[10px] font-bold text-white/60 truncate">
+                                 {language === 'en' ? 'Remaining' : 'बाँकी'}: {fmt(remaining)} {translateUnit(empInd.unit)}
+                              </span>
+                              <span className="text-[10px] font-bold text-white/60 truncate">
+                                {language === 'en' ? 'Weight' : 'भार'}: {fmt(empInd.weight)}%
+                              </span>
+                            </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+               </motion.div>
+             )}
+           </AnimatePresence>
+         </div>
+        </motion.div>
+      </AnimatePresence>
+
+         {/* Card 6: Visual Insights */}
+           <AnimatePresence>
+             <motion.div
+             ref={insightsCardRef}
+             layout
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
