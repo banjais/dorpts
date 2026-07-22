@@ -751,7 +751,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
 
   useEffect(() => {
     if (showInsights) {
-      setInsightTab('category');
+      setInsightTab('health');
     }
   }, [showInsights]);
 
