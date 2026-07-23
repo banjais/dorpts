@@ -3075,11 +3075,13 @@ function MainAppContent() {
            viewOptions={viewOptions as any}
            indicators={indicators}
            metadata={metadata}
-           trackedIds={trackedIds}
-           onToggleTrack={toggleTrack}
-           updatesHistory={visibleHistory}
-           fiscalYear={selectedFiscalYear}
-         />
+            trackedIds={trackedIds}
+            onToggleTrack={toggleTrack}
+            updatesHistory={visibleHistory}
+            fiscalYear={selectedFiscalYear}
+            hasNewUpdate={hasNewUpdate}
+            onRefresh={handleManualSync}
+          />
 
         <div
           className={`flex flex-col min-h-[100dvh] transition-all duration-700 ease-in-out pt-2 sm:pt-4 pb-28 sm:pb-32 ${

@@ -105,6 +105,7 @@ export const Footer: React.FC<FooterProps> = ({
         await Promise.all(regs.map(r => r.update()));
       } catch (_) {}
     }
+    await onManualSync?.();
     onGoHome?.();
   };
 
