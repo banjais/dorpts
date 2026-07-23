@@ -1181,12 +1181,12 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
            <div className="relative z-10 flex flex-col gap-3">
              <div className="flex items-center justify-between">
                <div>
-                 <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
-                   {language === 'en' ? 'Total Indicators' : 'कुल सूचकहरू'}
-                 </span>
-                 <p className="text-[10px] sm:text-[11px] font-bold text-white/70">
-                   {language === 'en' ? 'Total number of indicators being tracked' : 'अनुगमन गरिएका कुल सूचकहरूको संख्या'}
-                 </p>
+                  <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-white/70">
+                    {language === 'en' ? 'INDICATOR OVERVIEW' : 'सूचक अवलोकन'}
+                  </span>
+                  <p className="text-[10px] sm:text-[11px] font-bold text-white/70">
+                    {language === 'en' ? 'Key Performance Indicators (KPIs)' : 'मुख्य कार्यसम्पादन सूचकहरू (KPIs)'}
+                  </p>
                </div>
                <span className="p-1 bg-white/10 hover:bg-white/20 transition-colors rounded-lg">
                  <LayoutGrid size={14} className="text-white/90" />
