@@ -287,7 +287,7 @@ export const Footer: React.FC<FooterProps> = ({
                     }}
                     className="shrink-0 text-[0.55rem] sm:text-[0.6rem] font-black uppercase tracking-[0.2em] text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 animate-pulse cursor-pointer"
                   >
-                    {language === 'en' ? 'Update available' : 'अपडेट उपलब्ध'}
+                     {language === 'en' ? 'Update' : 'अपडेट'}
                   </motion.button>
                 )}
                 {updateBannerVisible && (
@@ -344,10 +344,10 @@ export const Footer: React.FC<FooterProps> = ({
                    <motion.span
                      initial={{ opacity: 0, scale: 0.8, x: 10 }}
                      animate={{ opacity: 1, scale: 1, x: 0 }}
-                     className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 border border-rose-300 dark:border-rose-500/40 text-[0.6rem] font-black uppercase tracking-wider text-rose-700 dark:text-rose-400 animate-pulse"
-                   >
+                      className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 border border-rose-300 dark:border-rose-500/40 text-[0.6rem] font-black uppercase tracking-wider text-rose-700 dark:text-rose-400 animate-pulse"
+                    >
                      {language === 'en' ? 'Update available' : 'अपडेट उपलब्ध'}
-                   </motion.span>
+                    </motion.span>
                  )}
                  <motion.span
                    animate={{ 
