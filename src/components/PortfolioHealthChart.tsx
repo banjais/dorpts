@@ -11,7 +11,7 @@ interface Props {
   height?: number;
 }
 
-export const PortfolioHealthChart: React.FC<Props> = ({ indicators, t, mode = 'bar', height = 192 }) => {
+export const PortfolioHealthChart: React.FC<Props> = ({ indicators, t, mode = 'bar', height = 220 }) => {
   const stats = (indicators || []).reduce((acc, ind) => {
     if (!ind) return acc;
     const percent = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;

@@ -34,6 +34,7 @@ export const VisualInsightsView: React.FC<VisualInsightsViewProps> = ({
   const { language, t } = useLanguage();
   const [insightTab, setInsightTab] = useState<'health' | 'category' | 'indicators' | 'trends' | 'heatmap'>(defaultInsightTab);
   const [portfolioMode, setPortfolioMode] = useState<'bar' | 'pie'>('bar');
+  const [categoryMode, setCategoryMode] = useState<'bar' | 'pie'>('bar');
 
   useEffect(() => {
     setInsightTab(defaultInsightTab);
@@ -127,14 +128,32 @@ export const VisualInsightsView: React.FC<VisualInsightsViewProps> = ({
               </button>
             </div>
           )}
+          {insightTab === 'category' && (
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-100 dark:border-white/5">
+              <button
+                onClick={() => setCategoryMode('bar')}
+                className={`p-1.5 rounded-lg transition-all ${categoryMode === 'bar' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:text-white/50 dark:hover:text-white'}`}
+                title={language === 'en' ? 'Bar' : 'बार'}
+              >
+                <BarChart3 size={12} />
+              </button>
+              <button
+                onClick={() => setCategoryMode('pie')}
+                className={`p-1.5 rounded-lg transition-all ${categoryMode === 'pie' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:text-white/50 dark:hover:text-white'}`}
+                title={language === 'en' ? 'Pie' : 'पाई'}
+              >
+                <PieChartIcon size={12} />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Chart content */}
         <div className="bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-white/5 rounded-2xl p-4 sm:p-6">
           {insightTab === 'health' && (
-            <PortfolioHealthChart indicators={indicators} t={t} mode={portfolioMode} />
+            <PortfolioHealthChart indicators={indicators} t={t} mode={portfolioMode} height={220} />
           )}
-          {insightTab === 'category' && <CategoryInsightsChart indicators={indicators} t={t} language={language} />}
+          {insightTab === 'category' && <CategoryInsightsChart indicators={indicators} t={t} language={language} height={220} mode={categoryMode} />}
           {insightTab === 'indicators' && <MetricsChart indicators={indicators} />}
           {insightTab === 'trends' && <TrendAnalysisView indicators={indicators} metadata={metadata} onOpenAbout={onOpenAbout} />}
           {insightTab === 'heatmap' && <IndicatorHeatmap indicators={indicators} updatesHistory={updatesHistory} />}
