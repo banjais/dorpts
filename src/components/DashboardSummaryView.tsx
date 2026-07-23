@@ -673,7 +673,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [sortType, setSortType] = useState<'default' | 'low' | 'high' | 'weight' | 'status'>('default');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showInsights, setShowInsights] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(!localStorage.getItem("language"));
   const [insightTab, setInsightTab] = useState<'health' | 'category' | 'indicators' | 'trends' | 'heatmap'>('health');
   const [portfolioMode, setPortfolioMode] = useState<'bar' | 'pie'>('bar');
   const [categoryMode, setCategoryMode] = useState<'bar' | 'pie'>('bar');
@@ -952,31 +952,22 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
     };
   }, [showAllIndicators]);
 
-  useEffect(() => {
-    if (!showSplash) return;
-    const hasLang = localStorage.getItem("language");
-    if (hasLang) {
-      const timer = setTimeout(() => setShowSplash(false), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [showSplash]);
-
-  return (
-     <div className="relative min-h-screen space-y-6 max-w-7xl mx-auto px-0 sm:px-4">
-      {showSplash && (
-        <SplashScreen
-          progress={stats.weightedRate}
-          requireLanguageSelect={true}
-          onLanguageSelect={(lang) => {
-            triggerHaptic('light');
-            setLanguage(lang);
-            localStorage.setItem("language", lang);
-            setTimeout(() => {
-              setShowSplash(false);
-            }, 1200);
-          }}
-        />
-      )}
+   return (
+      <div className="relative min-h-screen space-y-6 max-w-7xl mx-auto px-0 sm:px-4">
+       {showSplash && (
+         <SplashScreen
+           progress={stats.weightedRate}
+           requireLanguageSelect={true}
+           onLanguageSelect={(lang) => {
+             triggerHaptic('light');
+             setLanguage(lang);
+             localStorage.setItem("language", lang);
+             setTimeout(() => {
+               setShowSplash(false);
+             }, 1200);
+           }}
+         />
+       )}
       
       {/* Sticky card stack — cards peel off and stack below the header as you scroll */}
 
