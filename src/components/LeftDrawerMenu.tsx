@@ -62,6 +62,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       labelEn: 'Visual Insights',
       labelNp: 'दृश्यात्मक अन्तर्दृष्टि',
       onClick: onOpenVisualInsights,
+      active: activeView === 'insights',
     },
     {
       id: 'trends',
