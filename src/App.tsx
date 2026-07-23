@@ -62,7 +62,7 @@ import {
   DEFAULT_INDICATORS,
   setOfficesList,
 } from "./data";
-import { detectUserOffice } from "./utils/officeDetector";
+import { getOfficeByEmail } from "./utils/officeDetector";
 import { ToastContainer } from "./components/ToastContainer";
 import { VoiceUpdateModal } from "./components/VoiceUpdateModal";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -690,7 +690,6 @@ function MainAppContent() {
   const [sortType, setSortType] = useState<"default" | "low" | "high" | "weight" | "status">("default");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [selectedOffice, setSelectedOffice] = useState<string>("All");
-  const [hasAutoDetectedOffice, setHasAutoDetectedOffice] = useState(false);
   const [showMilestonesOnly, setShowMilestonesOnly] = useState(false);
   const [isDataHealthModalOpen, setIsDataHealthModalOpen] = useState(false);
   const [healthRetryKey, setHealthRetryKey] = useState(0);
@@ -700,37 +699,6 @@ function MainAppContent() {
   const [expandedHeatmapCategory, setExpandedHeatmapCategory] = useState<string | null>(null);
   const [heatmapSearchQuery, setHeatmapSearchQuery] = useState("");
   const [dashboardSubTab, setDashboardSubTab] = useState<"trends" | "diagnostics" | "offices">("trends");
-
-  useEffect(() => {
-    if (hasAutoDetectedOffice) return;
-
-    let isMounted = true;
-
-    async function performOfficeDetection() {
-      const result = await detectUserOffice(user?.email);
-      if (!isMounted) return;
-
-      if (result.office) {
-        setHasAutoDetectedOffice(true);
-        addToast(
-          `स्वचालित रूपमा स्थानीय कार्यालय पहिचान भयो: ${result.office}`,
-          `Automatically detected your DoR office: ${result.office}. Select it from the office filter to apply.`,
-          "info",
-          6000
-        );
-      } else {
-        setHasAutoDetectedOffice(true); // Don't retry continuously
-      }
-    }
-
-    if (!authLoading) {
-      performOfficeDetection();
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [user, authLoading, hasAutoDetectedOffice, addToast]);
 
   const [loading, setLoading] = useState(true);
   const [offices, setOffices] = useState<{ 
