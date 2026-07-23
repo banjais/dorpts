@@ -5,7 +5,7 @@ import {
   Scale, ChevronRight, ChevronLeft, Navigation, 
   Layers, Printer, Compass, MousePointerClick, Trash2, 
   Settings2, Smartphone, Sparkles, Clock, Target,
-  Search, Activity, Mic, Filter, Monitor, Wifi, WifiOff
+  Search, Activity, Mic, Filter, Monitor, Wifi, WifiOff, Check
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { triggerHaptic } from '../utils/haptic';
@@ -59,7 +59,7 @@ export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
   addToast,
 }) => {
   const { language } = useLanguage();
-  useRegisterSW();
+  const { offlineReady } = useRegisterSW({ onRegisterError: () => {} });
   useBodyScrollLock(isOpen);
 
   const [activeTab, setActiveTab] = useState<'tour' | 'logic' | 'sync' | 'settings' | 'voice'>(defaultTab);
@@ -297,9 +297,17 @@ export const SystemHelpModal: React.FC<SystemHelpModalProps> = ({
                        {tab.icon}
                        <span>{language === 'en' ? tab.labelEn : tab.labelNp}</span>
                      </button>
-                   ))}
-                 </div>
-                </div>
+                         ))}
+                       </div>
+                       {offlineReady && (
+                         <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-2.5 relative z-10 mt-4">
+                           <Check size={14} className="text-emerald-400 shrink-0" />
+                           <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">
+                             {language === 'en' ? 'App ready for offline use' : 'अफलाइन प्रयोगको लागि एप तयार छ'}
+                           </span>
+                         </div>
+                       )}
+                     </div>
 
               {/* Content Area */}
               <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">

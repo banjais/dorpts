@@ -69,7 +69,6 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { FeedbackModal } from "./components/FeedbackModal";
 import { AIAssistantModal } from "./components/AIAssistantModal";
 import { PWAInstallBanner } from "./components/PWAInstallBanner";
-import { PWAUpdatePrompt } from "./components/PWAUpdatePrompt";
 import { OfflineStatusBar } from "./components/OfflineStatusBar";
 import { LoginScreen } from "./components/LoginScreen";
 import { AdminPanelModal } from "./components/AdminPanelModal";
@@ -3896,7 +3895,6 @@ function MainAppContent() {
         </AnimatePresence>
 
         <PWAInstallBanner />
-        <PWAUpdatePrompt />
 
         {/* Login Overlay */}
         {showLogin && (
