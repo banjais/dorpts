@@ -715,7 +715,7 @@ function MainAppContent() {
         setHasAutoDetectedOffice(true);
         addToast(
           `स्वचालित रूपमा स्थानीय कार्यालय पहिचान भयो: ${result.office}`,
-          `Automatically detected and set filter for your DoR office: ${result.office} (${result.method === 'email' ? 'via login email' : result.method === 'gps' ? 'via location coordinates' : 'via network IP'})`,
+          `Automatically detected and set filter for your DoR office: ${result.office}`,
           "success",
           6000
         );
