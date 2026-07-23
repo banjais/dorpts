@@ -4,7 +4,7 @@ import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where
 import { auth, db, googleProvider } from '../firebase';
 import { AdminUser, UserActivity, EmailOTPSession } from '../types';
 import { validateSession, destroySession } from '../services/otpService';
-import { getOfficeByEmail, detectUserOffice } from '../utils/officeDetector';
+import { getOfficeByEmail } from '../utils/officeDetector';
 import { SUPERADMIN_EMAIL } from '../config/superadmin';
 
 interface AuthContextType {
@@ -164,10 +164,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await logActivity('role_change', `Bootstrapped ${SUPERADMIN_EMAIL} as Initial Superadmin`);
           } else {
             await setRoleAndLoadAdmins('viewer');
-          }
-          const detected = await detectUserOffice(currentUser.email);
-          if (detected.office) {
-            await setDoc(adminRef, { office: detected.office, officeDetectionMethod: detected.method }, { merge: true });
           }
           const assignedOffice = await loadUserAssignedOffice(currentUser.email);
           setUserAssignedOffice(assignedOffice);

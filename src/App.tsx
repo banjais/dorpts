@@ -711,12 +711,11 @@ function MainAppContent() {
       if (!isMounted) return;
 
       if (result.office) {
-        setSelectedOffice(result.office);
         setHasAutoDetectedOffice(true);
         addToast(
           `स्वचालित रूपमा स्थानीय कार्यालय पहिचान भयो: ${result.office}`,
-          `Automatically detected and set filter for your DoR office: ${result.office}`,
-          "success",
+          `Automatically detected your DoR office: ${result.office}. Select it from the office filter to apply.`,
+          "info",
           6000
         );
       } else {
@@ -732,13 +731,6 @@ function MainAppContent() {
       isMounted = false;
     };
   }, [user, authLoading, hasAutoDetectedOffice, addToast]);
-
-  useEffect(() => {
-    if (!userAssignedOffice || isSuperadmin) return;
-    if (selectedOffice !== userAssignedOffice) {
-      setSelectedOffice(userAssignedOffice);
-    }
-  }, [userAssignedOffice, isSuperadmin, selectedOffice]);
 
   const [loading, setLoading] = useState(true);
   const [offices, setOffices] = useState<{ 
