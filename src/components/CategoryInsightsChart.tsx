@@ -86,8 +86,6 @@ export default function CategoryInsightsChart({ indicators, t, language, height 
               paddingAngle={4}
               dataKey="count"
               nameKey="name"
-              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-              labelLine={{ stroke: '#94a3b8', strokeWidth: 1 }}
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
