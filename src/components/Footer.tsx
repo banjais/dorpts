@@ -120,6 +120,7 @@ export const Footer: React.FC<FooterProps> = ({
       'searchHistory',
       'dor_search_history',
       'last_search_query',
+      'dor_app_version',
     ];
     keysToRemove.forEach(key => {
       try { localStorage.removeItem(key); } catch (_) {}
