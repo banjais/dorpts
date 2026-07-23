@@ -25,6 +25,7 @@ interface LeftDrawerMenuProps {
   onOpenVisualInsights: () => void;
   onOpenAbout?: () => void;
   onOpenLogin?: () => void;
+  onExpandFooter?: () => void;
 }
 
 export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
@@ -36,6 +37,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
   onOpenVisualInsights,
   onOpenAbout,
   onOpenLogin,
+  onExpandFooter,
 }) => {
   const { user, isAdmin, loginWithGoogle, logout } = useAuth();
 
@@ -93,7 +95,10 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       icon: <ShieldCheck size={18} />,
       labelEn: 'Action Portal',
       labelNp: 'कार्य पोर्टल',
-      onClick: () => onNavigate('action-portal'),
+      onClick: () => {
+        onExpandFooter?.();
+        onClose();
+      },
     },
     {
       id: 'about',

@@ -31,7 +31,6 @@ import { IndicatorTable } from "./components/IndicatorTable";
 import { MetricsChart } from "./components/MetricsChart";
 import { TrendAnalysisView } from "./components/TrendAnalysisView";
 import { VisualInsightsView } from "./components/VisualInsightsView";
-import { ActionPortalView } from "./components/ActionPortalView";
 import { ZoomableChartContainer } from "./components/ZoomableChartContainer";
 
 import { InstitutionalView } from "./components/InstitutionalView";
@@ -231,7 +230,6 @@ const viewOrder: Record<MainView, number> = {
   institutional: 2,
   trends: 3,
   heatmap: 4,
-  'action-portal': 5,
 };
 
 const viewVariants = {
@@ -1387,17 +1385,12 @@ function MainAppContent() {
        setTimeout(() => {
          try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
        }, 50);
-     } else if (view === 'heatmap') {
-       setViewMode('heatmap');
-       setTimeout(() => {
-         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
-       }, 50);
-     } else if (view === 'action-portal') {
-       setViewMode('dashboard');
-       setTimeout(() => {
-         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
-       }, 50);
-     }
+      } else if (view === 'heatmap') {
+        setViewMode('heatmap');
+        setTimeout(() => {
+          try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+        }, 50);
+      }
   }, [mainView]);
 
   const goToIndicators = useCallback(() => {
@@ -2679,6 +2672,7 @@ function MainAppContent() {
         onOpenVisualInsights={goToVisualInsights}
         onOpenAbout={() => setIsAboutModalOpen(true)}
         onOpenLogin={() => setShowLogin(true)}
+        onExpandFooter={() => setIsFooterExpanded(true)}
       />
       <BudgetModal
         isOpen={isBudgetOpen}
@@ -3274,39 +3268,14 @@ function MainAppContent() {
                                retryKey={healthRetryKey}
                               />
                             </ErrorBoundary>
-                          )}
-
-                          {mainView === "action-portal" && (
-                            <ErrorBoundary
-                              fallback={
-                                <div className="p-8 text-center">
-                                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                                    Action Portal temporarily unavailable.
-                                  </p>
-                                </div>
-                              }
-                            >
-                              <div className="p-4 sm:p-6 md:p-8 w-full max-w-3xl mx-auto">
-                                <ActionPortalView
-                                  onOpenReportBuilder={() => setIsReportBuilderOpen(true)}
-                                  onOpenHelp={() => setIsHelpOpen(true)}
-                                  onOpenFeedback={() => setIsFeedbackModalOpen(true)}
-                                  onScrollTop={scrollToTop}
-                                  onScrollBottom={scrollToBottom}
-                                  onOpenAI={() => setIsAIAssistantOpen(true)}
-                                  isScrolled={isScrolled}
-                                  fiscalYear={selectedFiscalYear}
-                                />
-                              </div>
-                            </ErrorBoundary>
-                          )}
-                     </motion.div>
-                  </AnimatePresence>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </main>
-        </div>
+                           )}
+                      </motion.div>
+                   </AnimatePresence>
+                 </motion.div>
+               )}
+             </AnimatePresence>
+           </main>
+         </div>
 
         {/* Footer */}
          <Footer
