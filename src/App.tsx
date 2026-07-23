@@ -3281,8 +3281,15 @@ function MainAppContent() {
             onOpenDrawer={() => setIsDrawerOpen(true)}
             hasNewUpdate={hasNewUpdate}
             onRefresh={async () => {
+              if ('serviceWorker' in navigator) {
+                try {
+                  const regs = await navigator.serviceWorker.getRegistrations();
+                  await Promise.all(regs.map(r => r.update()));
+                } catch (_) {}
+              }
               await handleManualSync();
               markVersionUpdated();
+              setTimeout(() => window.location.reload(), 800);
             }}
           />
 
