@@ -1577,21 +1577,39 @@ function MainAppContent() {
     setIsSyncing(true);
     let isOfflineFallback = !isOnline;
     try {
-      // 1. Force fetch metadata or fallback to cached snapshot
-      let metadataSnap;
-      if (isOfflineFallback) {
-        metadataSnap = await getDoc(doc(db, "metadata", "current"));
-      } else {
+      let metadataSnap: any = null;
+      let indicatorsSnap: any = null;
+      let historySnap: any = null;
+
+      if (!isOfflineFallback) {
         try {
-          metadataSnap = await getDocFromServer(doc(db, "metadata", "current"));
+          const metaPromise = getDocFromServer(doc(db, "metadata", "current")).catch(() => null);
+          const indPromise = getDocsFromServer(query(collection(db, "indicators"), orderBy("id"))).catch(() => null);
+          const historyPromise = getDocsFromServer(query(collection(db, "updates_history"), orderBy("id", "desc"))).catch(() => null);
+
+          const [metaResult, indResult, historyResult] = await Promise.all([metaPromise, indPromise, historyPromise]);
+
+          if (metaResult) metadataSnap = metaResult;
+          if (indResult) indicatorsSnap = indResult;
+          if (historyResult) historySnap = historyResult;
+
+          if (!metaResult || !indResult || !historyResult) {
+            console.warn("Some parallel server fetches failed, falling back to cached getDocs:");
+            isOfflineFallback = true;
+          }
         } catch (_) {
-          console.warn("getDocFromServer failed, falling back to cached getDoc:");
+          console.warn("Parallel server fetch failed, falling back to cached getDocs:");
           isOfflineFallback = true;
-          metadataSnap = await getDoc(doc(db, "metadata", "current"));
         }
       }
 
-      if (metadataSnap.exists()) {
+      if (isOfflineFallback) {
+        metadataSnap = await getDoc(doc(db, "metadata", "current"));
+        indicatorsSnap = await getDocs(query(collection(db, "indicators"), orderBy("id")));
+        historySnap = await getDocs(query(collection(db, "updates_history"), orderBy("id", "desc")));
+      }
+
+      if (metadataSnap?.exists()) {
         const data = metadataSnap.data() as SystemMetadata;
         setMetadata(data);
         if (data.lastUpdateDate) {
@@ -1600,62 +1618,28 @@ function MainAppContent() {
         markVersionUpdated();
         try {
           localStorage.setItem("dor_metadata_cache", JSON.stringify(data));
-        } catch (_) {
-          // Suppress redundant log
-        }
+        } catch (_) {}
       }
 
-      // 2. Force fetch indicators or fallback to cached snapshot
-      const q = query(collection(db, "indicators"), orderBy("id"));
-      let indicatorsSnap;
-      if (isOfflineFallback) {
-        indicatorsSnap = await getDocs(q);
-      } else {
-        try {
-          indicatorsSnap = await getDocsFromServer(q);
-        } catch (_) {
-          console.warn("getDocsFromServer failed, falling back to cached getDocs:");
-          isOfflineFallback = true;
-          indicatorsSnap = await getDocs(q);
-        }
-      }
-
-      if (!indicatorsSnap.empty) {
+      if (!indicatorsSnap?.empty) {
         const list: Indicator[] = [];
-        indicatorsSnap.forEach((d) => {
+        indicatorsSnap.forEach((d: any) => {
           list.push(d.data() as Indicator);
         });
         setIndicators(list);
         try {
           localStorage.setItem("dor_indicators_cache", JSON.stringify(list));
-        } catch (_) {
-          // Suppress redundant log
-        }
+        } catch (_) {}
       }
 
-      // 3. Force fetch history or fallback to cached snapshot
-      const qHistory = query(
-        collection(db, "updates_history"),
-        orderBy("id", "desc"),
-      );
-      let historySnap;
-      if (isOfflineFallback) {
-        historySnap = await getDocs(qHistory);
-      } else {
-        try {
-          historySnap = await getDocsFromServer(qHistory);
-        } catch (_) {
-          console.warn("getDocsFromServer for history failed, falling back to cached getDocs:");
-          isOfflineFallback = true;
-          historySnap = await getDocs(qHistory);
-        }
+      if (!historySnap?.empty) {
+        const history: any[] = [];
+        historySnap.forEach((d: any) => {
+          history.push(d.data());
+        });
+        setUpdatesHistory(history);
       }
 
-      const history: any[] = [];
-      historySnap.forEach((d) => history.push(d.data()));
-      setUpdatesHistory(history);
-
-      // Always refresh from published Sheets so Sync reflects Sheet edits too
       try {
         const published = await syncPublishedSheets({
           dashboard: appSettings.dashboardPublishedUrl,
@@ -1698,9 +1682,7 @@ function MainAppContent() {
           "dor_last_sync_timestamp",
           new Date().toISOString(),
         );
-      } catch (_) {
-        // Suppress redundant log
-      }
+      } catch (_) {}
 
       if (isOfflineFallback) {
         addToast(
@@ -1739,6 +1721,7 @@ function MainAppContent() {
       setIsSyncing(false);
     }
   };
+
 
   // Auto-Retry Sync when connection is restored
   const prevIsOnlineRef = useRef(isOnline);
