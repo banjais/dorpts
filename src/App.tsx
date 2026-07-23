@@ -3323,6 +3323,8 @@ function MainAppContent() {
             onExpandChange={setIsFooterExpanded}
             isSyncing={isSyncing}
             onManualSync={handleManualSync}
+            isActionPortalActive={mainView === 'action-portal'}
+            onOpenDrawer={() => setIsDrawerOpen(true)}
           />
 
         {/* Dim Overlay - Outside scaled content */}

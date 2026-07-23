@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, HelpCircle, ChevronUp, FileText, Share2, Sparkles, ChevronDown, ChevronRight, MessageSquare, RefreshCw } from 'lucide-react';
+import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, HelpCircle, ChevronUp, FileText, Share2, Sparkles, ChevronDown, ChevronRight, MessageSquare, RefreshCw, Menu } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
@@ -18,6 +18,8 @@ interface FooterProps {
   onExpandChange?: (expanded: boolean) => void;
   isSyncing?: boolean;
   onManualSync?: () => void;
+  isActionPortalActive?: boolean;
+  onOpenDrawer?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ 
@@ -33,6 +35,8 @@ export const Footer: React.FC<FooterProps> = ({
   onExpandChange,
   isSyncing = false,
   onManualSync,
+  isActionPortalActive = false,
+  onOpenDrawer,
 }) => {
   const { language, t } = useLanguage();
   const [showQr, setShowQr] = useState(false);
@@ -98,22 +102,39 @@ export const Footer: React.FC<FooterProps> = ({
     },
   ];
 
-  const actionItems = [
-    {
-      id: 'btn-scroll',
-      icon: isScrolled ? ChevronUp : ChevronDown,
-      label: isScrolled ? (language === 'en' ? 'MOVE UP' : 'माथि जानुहोस्') : (language === 'en' ? 'Down' : 'तल'),
-      action: isScrolled ? onScrollTop : onScrollBottom,
-      highlight: false
-    },
-    {
-      id: 'btn-ai',
-      icon: Sparkles,
-      label: 'AI',
-      action: onOpenAI,
-      highlight: true
-    }
-  ];
+  const actionItems = isActionPortalActive
+    ? [
+        {
+          id: 'btn-menu',
+          icon: Menu,
+          label: language === 'en' ? 'MENU' : 'मेनु',
+          action: onOpenDrawer || (() => {}),
+          highlight: false
+        },
+        {
+          id: 'btn-ai',
+          icon: Sparkles,
+          label: 'AI',
+          action: onOpenAI,
+          highlight: true
+        }
+      ]
+    : [
+        {
+          id: 'btn-scroll',
+          icon: isScrolled ? ChevronUp : ChevronDown,
+          label: isScrolled ? (language === 'en' ? 'UP' : 'माथि') : (language === 'en' ? 'DOWN' : 'तल'),
+          action: isScrolled ? onScrollTop : onScrollBottom,
+          highlight: false
+        },
+        {
+          id: 'btn-ai',
+          icon: Sparkles,
+          label: 'AI',
+          action: onOpenAI,
+          highlight: true
+        }
+      ];
 
   return (
     <>
