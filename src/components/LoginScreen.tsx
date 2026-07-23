@@ -53,6 +53,27 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
        return;
      }
 
+    const isSuper = email.toLowerCase().trim() === SUPERADMIN_EMAIL.toLowerCase().trim();
+    if (isSuper) {
+      setStep('loading');
+      try {
+        const { createSession } = await import('../services/otpService');
+        const token = await Promise.race([
+          createSession(email),
+          new Promise<string>((_, reject) => setTimeout(() => reject(new Error('Session creation timed out')), 8000))
+        ]);
+        sessionStorage.setItem('dor_session', token);
+        sessionStorage.setItem('dor_superadmin_bypass', 'true');
+        setStep('success');
+        setTimeout(() => window.location.reload(), 800);
+      } catch (err) {
+        console.error('Superadmin auto-login failed:', err);
+        setError(language === 'en' ? 'Superadmin login failed. Try again.' : 'सुपरएडमिन लगइन असफल भयो। पुनः प्रयास गर्नुहोस्।');
+        setStep('email');
+      }
+      return;
+    }
+
      setStep('loading');
 
      try {
@@ -66,22 +87,6 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
        }
        setStep('otp');
        setCooldown(30);
-
-       const isSuper = email.toLowerCase().trim() === SUPERADMIN_EMAIL.toLowerCase().trim();
-       if (isSuper) {
-         const otpStr = generatedOtp;
-         const otpArray = otpStr.split('');
-         setTimeout(() => {
-           setOtp(otpArray as any);
-           setTimeout(async () => {
-             const { createSession } = await import('../services/otpService');
-             const token = await createSession(email);
-             sessionStorage.setItem('dor_session', token);
-             setStep('success');
-             setTimeout(() => window.location.reload(), 800);
-           }, 400);
-         }, 600);
-       }
      } catch (err) {
        setError(language === 'en' ? 'Failed to send OTP. Try again.' : 'ओटीपी पठाउन सकिएन। पुनः प्रयास गर्नुहोस्।');
        setStep('email');
