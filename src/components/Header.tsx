@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sun, Moon, Monitor, Languages, CloudUpload, Type, Info, X, Menu } from 'lucide-react';
+import { Sun, Moon, Languages, CloudUpload, Type, Info, X, Menu } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
 import { triggerHaptic } from '../utils/haptic';
@@ -139,7 +139,7 @@ export const Header: React.FC<HeaderProps> = ({
     return () => clearInterval(interval);
   }, [lastSyncedTime, language]);
 
-  type ThemePref = 'light' | 'dark' | 'system';
+  type ThemePref = 'light' | 'dark';
   const { user } = useAuth();
   const [hasLoadedFromFirestore, setHasLoadedFromFirestore] = useState(false);
 
@@ -147,12 +147,12 @@ export const Header: React.FC<HeaderProps> = ({
     if (typeof window !== 'undefined') {
       try {
         const saved = localStorage.getItem('theme');
-        if (saved === 'light' || saved === 'dark' || saved === 'system') {
+        if (saved === 'light' || saved === 'dark') {
           return saved as ThemePref;
         }
       } catch (_) {}
     }
-    return 'system';
+    return 'light';
   });
 
   // Sync theme with Firestore when authenticated user logs in
@@ -169,7 +169,7 @@ export const Header: React.FC<HeaderProps> = ({
         const userSnap = await getDoc(userRef);
         if (userSnap.exists() && isSubscribed) {
           const data = userSnap.data();
-          if (data && (data.theme === 'light' || data.theme === 'dark' || data.theme === 'system')) {
+          if (data && (data.theme === 'light' || data.theme === 'dark')) {
             setThemePref(data.theme);
           }
         }
@@ -207,17 +207,9 @@ export const Header: React.FC<HeaderProps> = ({
 
   useEffect(() => {
     const root = window.document.documentElement;
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
     const applyTheme = () => {
-      let isDark = false;
       if (themePref === 'dark') {
-        isDark = true;
-      } else if (themePref === 'system') {
-        isDark = mediaQuery.matches;
-      }
-
-      if (isDark) {
         root.classList.add('dark');
       } else {
         root.classList.remove('dark');
@@ -231,15 +223,6 @@ export const Header: React.FC<HeaderProps> = ({
     };
 
     applyTheme();
-
-    const handleChange = () => {
-      if (themePref === 'system') {
-        applyTheme();
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
   }, [themePref]);
 
   const [scrolled, setScrolled] = useState(false);
@@ -275,18 +258,11 @@ export const Header: React.FC<HeaderProps> = ({
 
   const toggleTheme = () => {
     triggerHaptic('medium');
-    if (themePref === 'light') {
-      setThemePref('dark');
-    } else if (themePref === 'dark') {
-      setThemePref('system');
-    } else {
-      setThemePref('light');
-    }
+    setThemePref(prev => prev === 'light' ? 'dark' : 'light');
   };
 
   const getThemeIcon = () => {
     if (themePref === 'dark') return <Moon className="w-3 sm:w-4 h-3 sm:h-4" fill="currentColor" />;
-    if (themePref === 'system') return <Monitor className="w-3 sm:w-4 h-3 sm:h-4" />;
     return <Sun className="w-3 sm:w-4 h-3 sm:h-4" />;
   };
 
@@ -364,19 +340,19 @@ export const Header: React.FC<HeaderProps> = ({
                 )}
               </motion.div>
 
-              <div className="relative flex flex-col justify-center min-w-0 flex-1">
-                <span className="text-sm sm:text-base font-black tracking-tight whitespace-nowrap uppercase leading-none truncate bg-gradient-to-r from-slate-900 via-indigo-700 to-violet-700 dark:from-white dark:via-indigo-200 dark:to-violet-200 bg-clip-text text-transparent">
-                  {language === 'ne' ? 'प्रगति ट्र्याकर' : APP_TITLES.shortAppName[language]}
-                </span>
-                <span className="text-[0.65rem] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">
-                  {language === 'en' ? 'Performance Overview' : 'कार्यसम्पादन अवलोकन'}
-                </span>
-                {fiscalYear && (
-                  <span className="text-[0.65rem] sm:text-xs font-black text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded-lg shrink-0 inline-block w-fit mt-1">
-                    FY {fiscalYear}
-                  </span>
-                )}
-              </div>
+               <div className="relative flex flex-col justify-center min-w-0 flex-1">
+                 <span className="text-sm sm:text-base font-black tracking-tight whitespace-nowrap uppercase leading-none truncate text-slate-500 dark:text-slate-400">
+                   {language === 'ne' ? 'प्रगति ट्र्याकर' : APP_TITLES.shortAppName[language]}
+                 </span>
+                 <span className="text-[0.65rem] sm:text-[0.7rem] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">
+                   {language === 'en' ? 'Performance Tracking System' : 'प्रगति ट्र्याकिङ सिस्टम'}
+                 </span>
+                 {fiscalYear && (
+                   <span className="text-[0.65rem] sm:text-[0.7rem] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-lg shrink-0 inline-block w-fit mt-1">
+                     FY: {fiscalYear}
+                   </span>
+                 )}
+               </div>
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                {/* Syncing Status */}
@@ -401,23 +377,21 @@ export const Header: React.FC<HeaderProps> = ({
                  onMouseEnter={onMouseEnterFab}
                  onMouseLeave={onMouseLeaveFab}
                >
-                  {/* Theme Toggle Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.08 }}
-                    whileTap={{ scale: 0.92 }}
-                    onClick={toggleTheme}
-                    className={`p-2 sm:p-2.5 rounded-xl transition-all flex items-center justify-center gap-1 min-w-[36px] sm:min-w-[44px] min-h-[36px] sm:min-h-[44px] active:scale-95 ${
-                      themePref === 'dark'
-                        ? 'bg-slate-900 text-amber-400 shadow-lg shadow-slate-900/20'
-                        : themePref === 'system'
-                        ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300'
-                        : 'bg-white text-slate-900 shadow-sm dark:bg-white/10 dark:text-white'
-                    }`}
-                    title={language === 'en' ? `Theme: ${themePref}` : `थिम: ${themePref}`}
-                  >
-                    {getThemeIcon()}
-                    <span className="text-[0.65rem] font-extrabold uppercase tracking-wider hidden sm:inline">{themePref}</span>
-                  </motion.button>
+                   {/* Theme Toggle Button */}
+                   <motion.button
+                     whileHover={{ scale: 1.08 }}
+                     whileTap={{ scale: 0.92 }}
+                     onClick={toggleTheme}
+                     className={`p-2 sm:p-2.5 rounded-xl transition-all flex items-center justify-center gap-1 min-w-[36px] sm:min-w-[44px] min-h-[36px] sm:min-h-[44px] active:scale-95 ${
+                       themePref === 'dark'
+                         ? 'bg-slate-900 text-amber-400 shadow-lg shadow-slate-900/20'
+                         : 'bg-white text-slate-900 shadow-sm dark:bg-white/10 dark:text-white'
+                     }`}
+                     title={language === 'en' ? `Theme: ${themePref}` : `थिम: ${themePref}`}
+                   >
+                     {getThemeIcon()}
+                     <span className="text-[0.65rem] font-extrabold uppercase tracking-wider hidden sm:inline">{themePref}</span>
+                   </motion.button>
 
                   {/* Language Toggle */}
                   <motion.button
