@@ -108,9 +108,19 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ progress, requireLan
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.6 }}
-          className="text-xs sm:text-sm text-white/70 mb-6 max-w-md"
+          className="text-xs sm:text-sm text-white/70 mb-1 max-w-md"
         >
           {t('kpisSubtitle')}
+        </motion.p>
+
+        {/* Purpose brief */}
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.65, duration: 0.6 }}
+          className="text-[10px] sm:text-[11px] text-white/50 max-w-sm mb-6"
+        >
+          {t('splashPurpose')}
         </motion.p>
 
         {/* Circular Progress */}
@@ -156,32 +166,39 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ progress, requireLan
           </div>
         </motion.div>
 
-        {requireLanguageSelect && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.0, duration: 0.6 }}
-            className="flex flex-col items-center gap-4 mb-8 z-20"
-          >
-            <p className="text-xs font-bold text-white/70 uppercase tracking-widest">
-              Choose Language / भाषा चयन गर्नुहोस्
-            </p>
-            <div className="flex gap-4">
-              <button
-                onClick={() => onLanguageSelect?.('en')}
-                className="px-6 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs font-black uppercase tracking-wider transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer shadow-lg hover:border-indigo-500/50 hover:shadow-indigo-500/10"
-              >
-                <span className="text-lg">🇺🇸</span> English
-              </button>
-              <button
-                onClick={() => onLanguageSelect?.('ne')}
-                className="px-6 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs font-black uppercase tracking-wider transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer shadow-lg hover:border-indigo-500/50 hover:shadow-indigo-500/10"
-              >
-                <span className="text-lg">🇳🇵</span> नेपाली
-              </button>
-            </div>
-          </motion.div>
-        )}
+        {/* Language Toggle - Always visible */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0, duration: 0.6 }}
+          className="flex flex-col items-center gap-4 mb-6 z-20"
+        >
+          <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">
+            {language === 'en' ? 'Language / भाषा' : 'भाषा / Language'}
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => onLanguageSelect?.('en')}
+              className={`px-5 py-2.5 rounded-2xl border text-[11px] font-black uppercase tracking-wider transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer shadow-lg ${
+                language === 'en'
+                  ? 'border-white/30 bg-white/15 text-white shadow-white/20'
+                  : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:border-indigo-500/50 hover:shadow-indigo-500/10'
+              }`}
+            >
+              <span className="text-base">🇺🇸</span> EN
+            </button>
+            <button
+              onClick={() => onLanguageSelect?.('ne')}
+              className={`px-5 py-2.5 rounded-2xl border text-[11px] font-black uppercase tracking-wider transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer shadow-lg ${
+                language === 'ne'
+                  ? 'border-white/30 bg-white/15 text-white shadow-white/20'
+                  : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:border-indigo-500/50 hover:shadow-indigo-500/10'
+              }`}
+            >
+              <span className="text-base">🇳🇵</span> नेपाली
+            </button>
+          </div>
+        </motion.div>
 
         {/* Branding - 3 lines at bottom */}
         <motion.div

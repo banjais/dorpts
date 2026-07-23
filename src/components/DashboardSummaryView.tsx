@@ -966,7 +966,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       {showSplash && (
         <SplashScreen
           progress={stats.weightedRate}
-          requireLanguageSelect={!localStorage.getItem("language")}
+          requireLanguageSelect={true}
           onLanguageSelect={(lang) => {
             triggerHaptic('light');
             setLanguage(lang);

@@ -80,10 +80,13 @@ export function StartupScreen({ onComplete, fiscalYear }: StartupScreenProps) {
             <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0099DA] dark:text-[#00ADF7] shimmer-underline pb-1.5">
               {t('systemTitle')}
             </h1>
-            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-[0.24em] mt-2 uppercase">
-              {t('kpisSubtitle')}
-            </p>
-          </motion.div>
+          <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-[0.24em] mt-2 uppercase">
+            {t('kpisSubtitle')}
+          </p>
+          <p className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 tracking-wide text-center max-w-xs mt-1">
+            {t('splashPurpose')}
+          </p>
+        </motion.div>
         </motion.div>
 
         {/* Progress */}
