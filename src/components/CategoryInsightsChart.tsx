@@ -13,11 +13,11 @@ interface Props {
 }
 
 const CATEGORY_LABELS: Record<string, { en: string; np: string }> = {
-  'Infrastructure Creation': { en: 'Infrastructure', np: 'पूर्वाधार' },
-  'Maintenance': { en: 'Maintenance', np: 'अनुगमन' },
-  'Employment Creation': { en: 'Employment', np: 'रोजगारी' },
+  'Infrastructure Creation': { en: 'Infra', np: 'पूर्वाधार' },
+  'Maintenance': { en: 'Maint.', np: 'अनुगमन' },
+  'Employment Creation': { en: 'Employ.', np: 'रोजगारी' },
   'Budget Utilization': { en: 'Budget', np: 'बजेट' },
-  'Governance': { en: 'Governance', np: 'सुशासन' },
+  'Governance': { en: 'Govern.', np: 'सुशासन' },
 };
 
 export default function CategoryInsightsChart({ indicators, t, language, height = 220, mode = 'bar' }: Props) {
@@ -45,13 +45,13 @@ export default function CategoryInsightsChart({ indicators, t, language, height 
     <div style={{ height: `${height}px` }} className="w-full">
       <ResponsiveContainer width="100%" height="100%">
         {mode === 'bar' ? (
-          <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 30 }}>
+          <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 35 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.5} />
             <XAxis
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 8, fill: '#64748b', fontWeight: 700 }}
+              tick={{ fontSize: 9, fill: '#64748b', fontWeight: 700 }}
               interval={0}
             />
             <YAxis
