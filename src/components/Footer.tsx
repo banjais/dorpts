@@ -41,8 +41,19 @@ export const Footer: React.FC<FooterProps> = ({
   const currentUrl = window.location.href;
   const [minutesAgo, setMinutesAgo] = useState<number | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
+  const prevSyncingRef = React.useRef(isSyncing);
   
   const shouldExpand = isExpanded || isHovered;
+  
+  useEffect(() => {
+    if (!isSyncing && prevSyncingRef.current) {
+      setSyncSuccess(true);
+      const timer = setTimeout(() => setSyncSuccess(false), 3000);
+      return () => clearTimeout(timer);
+    }
+    prevSyncingRef.current = isSyncing;
+  }, [isSyncing]);
   
   useEffect(() => {
     const updateMinutesAgo = () => {
@@ -242,7 +253,7 @@ export const Footer: React.FC<FooterProps> = ({
             </>
           )}
 
-          {!shouldExpand && (
+           {!shouldExpand && (
             <div className="flex items-center justify-center gap-0">
               <div className="h-1 w-1 rounded-full bg-indigo-400 dark:bg-indigo-500 animate-pulse"></div>
               {isSyncing && (
@@ -257,7 +268,24 @@ export const Footer: React.FC<FooterProps> = ({
                   </span>
                 </motion.div>
               )}
-              <div className="h-[2px] w-12 bg-slate-300 dark:bg-slate-700"></div>
+              {syncSuccess && !isSyncing && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="ml-1.5 flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/30"
+                >
+                  <span className="text-[0.5rem] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                    {language === 'en' ? 'Updated' : 'अपडेट भयो'}
+                  </span>
+                </motion.div>
+              )}
+              {minutesAgo !== null && !isSyncing && !syncSuccess && (
+                <span className="text-[0.5rem] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1.5">
+                  {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
+                </span>
+              )}
+              <div className="h-[2px] w-12 bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
               <span className="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-[0.2em] flex items-center gap-2 px-3 py-1.5">
                 {language === 'en' ? 'Action Portal' : 'कार्य पोर्टल'}
                 <motion.span
