@@ -256,43 +256,45 @@ export const Footer: React.FC<FooterProps> = ({
                  </div>
                </div>
 
-              <div className="flex flex-col items-center gap-2 mt-4">
-              <div className="flex items-center gap-3">
-                <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
-                <p className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                  © DOR | 2082/83 B.S
+               <div className="flex flex-col items-center gap-2 mt-4">
+               <div className="flex items-center gap-3">
+                 <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
+                 <p className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                   © DOR | 2082/83 B.S
+                 </p>
+                 <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
+               </div>
+               <div className="flex items-center justify-center gap-3">
+                <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
+                  v{APP_VERSION}
                 </p>
-                <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
-              </div>
-               <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
-                 v{APP_VERSION}
-               </p>
-               {hasNewUpdate && !updateBannerVisible && (
-                 <motion.button
-                   initial={{ opacity: 0, y: 5 }}
-                   animate={{ opacity: 1, y: 0 }}
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     setUpdateBannerVisible(true);
-                     onExpandChange?.(true);
-                     onRefresh?.();
-                   }}
-                   className="text-[0.55rem] sm:text-[0.6rem] font-black uppercase tracking-[0.2em] text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 mt-1 animate-pulse cursor-pointer"
-                 >
-                   {language === 'en' ? 'Update available' : 'अपडेट उपलब्ध'}
-                 </motion.button>
-               )}
-               {updateBannerVisible && (
-                 <p className="text-[0.55rem] sm:text-[0.6rem] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400 mt-1">
-                   {language === 'en' ? `Updated to v${APP_VERSION}` : `v${APP_VERSION} मा अपडेट भयो`}
+                {hasNewUpdate && !updateBannerVisible && (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setUpdateBannerVisible(true);
+                      onExpandChange?.(true);
+                      onRefresh?.();
+                    }}
+                    className="shrink-0 text-[0.55rem] sm:text-[0.6rem] font-black uppercase tracking-[0.2em] text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 animate-pulse cursor-pointer"
+                  >
+                    {language === 'en' ? 'Update available' : 'अपडेट उपलब्ध'}
+                  </motion.button>
+                )}
+                {updateBannerVisible && (
+                  <p className="text-[0.55rem] sm:text-[0.6rem] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">
+                    {language === 'en' ? `Updated to v${APP_VERSION}` : `v${APP_VERSION} मा अपडेट भयो`}
+                  </p>
+                )}
+                {minutesAgo !== null && (
+                 <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium truncate">
+                   {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
                  </p>
                )}
-               {minutesAgo !== null && (
-                <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium mt-1 truncate">
-                  {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
-                </p>
-              )}
-            </div>
+              </div>
+             </div>
             </>
           )}
 
@@ -329,22 +331,31 @@ export const Footer: React.FC<FooterProps> = ({
                 </span>
               )}
               <div className="h-[2px] w-12 bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
-              <span className="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-[0.2em] flex items-center gap-2 px-3 py-1.5">
-                {language === 'en' ? 'Action Portal' : 'कार्य पोर्टल'}
-                <motion.span
-                  animate={{ 
-                    opacity: [0.4, 1, 0.4],
-                    y: [0, 3, 0]
-                  }}
-                  transition={{ 
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                >
-                  <ChevronDown size={16} className="text-indigo-600 dark:text-indigo-400" />
-                </motion.span>
-              </span>
+               <span className="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-[0.2em] flex items-center gap-2 px-3 py-1.5">
+                 {language === 'en' ? 'Action Portal' : 'कार्य पोर्टल'}
+                 {hasNewUpdate && !updateBannerVisible && (
+                   <motion.span
+                     initial={{ opacity: 0, scale: 0.8, x: 10 }}
+                     animate={{ opacity: 1, scale: 1, x: 0 }}
+                     className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 border border-rose-300 dark:border-rose-500/40 text-[0.6rem] font-black uppercase tracking-wider text-rose-700 dark:text-rose-400 animate-pulse"
+                   >
+                     {language === 'en' ? 'Update available' : 'अपडेट उपलब्ध'}
+                   </motion.span>
+                 )}
+                 <motion.span
+                   animate={{ 
+                     opacity: [0.4, 1, 0.4],
+                     y: [0, 3, 0]
+                   }}
+                   transition={{ 
+                     duration: 2,
+                     repeat: Infinity,
+                     ease: "easeInOut"
+                   }}
+                 >
+                   <ChevronDown size={16} className="text-indigo-600 dark:text-indigo-400" />
+                 </motion.span>
+               </span>
               <div className="h-[2px] w-12 bg-slate-300 dark:bg-slate-700"></div>
               <div className="h-1 w-1 rounded-full bg-indigo-400 dark:bg-indigo-500 animate-pulse"></div>
             </div>
