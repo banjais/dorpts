@@ -743,34 +743,11 @@ function MainAppContent() {
     onTrack?: number; 
     attention?: number; 
     stale?: number; 
-  }[]>(
+    }[]>(
     () => {
-      if (typeof window !== "undefined") {
-        try {
-          const saved = localStorage.getItem("dor_offices_cache");
-          if (saved) {
-            return JSON.parse(saved);
-          }
-        } catch (_) {
-          // Suppress redundant log
-        }
-      }
       return [];
     }
   );
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const saved = localStorage.getItem("dor_offices_cache");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setOfficesList(parsed);
-      }
-    } catch (_) {
-      // ignore
-    }
-  }, []);
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -881,11 +858,6 @@ function MainAppContent() {
       if (parsedOffices.length > 0) {
         setOffices(parsedOffices);
         setOfficesList(parsedOffices);
-        try {
-          localStorage.setItem("dor_offices_cache", JSON.stringify(parsedOffices));
-        } catch (_) {
-          // Suppress redundant log
-        }
       }
     };
 
@@ -923,11 +895,6 @@ function MainAppContent() {
           if (fallback.offices.length > 0) {
             setOffices(fallback.offices);
             setOfficesList(fallback.offices);
-            try {
-              localStorage.setItem("dor_offices_cache", JSON.stringify(fallback.offices));
-            } catch (_) {
-              // ignore
-            }
           }
           done(fallback.indicators);
         })
@@ -994,11 +961,6 @@ function MainAppContent() {
           if (fallback.offices.length > 0) {
             setOffices(fallback.offices);
             setOfficesList(fallback.offices);
-            try {
-              localStorage.setItem("dor_offices_cache", JSON.stringify(fallback.offices));
-            } catch (_) {
-              // ignore
-            }
           }
           done(fallback.indicators);
           return;
@@ -1642,9 +1604,6 @@ function MainAppContent() {
         if (published.offices.length > 0) {
           setOffices(published.offices);
           setOfficesList(published.offices);
-          try {
-            localStorage.setItem("dor_offices_cache", JSON.stringify(published.offices));
-          } catch (_) {}
         }
         const newSheetUpdates = published.indicators
           .filter((i: any) => i.updatedAt)

@@ -127,7 +127,6 @@ export const Footer: React.FC<FooterProps> = ({
     const keysToRemove = [
       'dor_indicators_cache',
       'dor_metadata_cache', 
-      'dor_offices_cache',
       'dor_last_sync_timestamp',
       'dor_last_seen_update',
       'dor_chart_type_pref',
