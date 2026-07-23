@@ -2552,31 +2552,47 @@ function MainAppContent() {
   }, []);
 
   const scrollToTop = () => {
+    const prevOverflow = document.body.style.overflow;
+    if (prevOverflow === 'hidden') {
+      document.body.style.overflow = '';
+    }
     try {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (_) {
       window.scrollTo(0, 0);
     }
-    // Safeguard for nested scrolling containers and iframe constraints
     try {
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     } catch (_) {}
+    if (prevOverflow === 'hidden') {
+      setTimeout(() => {
+        document.body.style.overflow = prevOverflow;
+      }, 600);
+    }
   };
 
   const scrollToBottom = () => {
     const targetY =
       document.documentElement.scrollHeight || document.body.scrollHeight;
+    const prevOverflow = document.body.style.overflow;
+    if (prevOverflow === 'hidden') {
+      document.body.style.overflow = '';
+    }
     try {
       window.scrollTo({ top: targetY, behavior: "smooth" });
     } catch (_) {
       window.scrollTo(0, targetY);
     }
-    // Safeguard for nested scrolling containers and iframe constraints
     try {
       document.documentElement.scrollTop = targetY;
       document.body.scrollTop = targetY;
     } catch (_) {}
+    if (prevOverflow === 'hidden') {
+      setTimeout(() => {
+        document.body.style.overflow = prevOverflow;
+      }, 600);
+    }
   };
 
   return (
