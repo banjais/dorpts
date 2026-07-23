@@ -17,6 +17,7 @@ interface FooterProps {
   isSyncing?: boolean;
   onManualSync?: () => void;
   onOpenDrawer?: () => void;
+  onGoHome?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ 
@@ -31,6 +32,7 @@ export const Footer: React.FC<FooterProps> = ({
   isSyncing = false,
   onManualSync,
   onOpenDrawer,
+  onGoHome,
 }) => {
   const { language, t } = useLanguage();
   const [showQr, setShowQr] = useState(false);
@@ -103,7 +105,7 @@ export const Footer: React.FC<FooterProps> = ({
         await Promise.all(regs.map(r => r.update()));
       } catch (_) {}
     }
-    window.location.reload();
+    onGoHome?.();
   };
 
   const menuItems = [
