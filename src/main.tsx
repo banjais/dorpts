@@ -21,6 +21,10 @@ const ignoredWarnings = [
   'Failed to execute \'put\' on \'Cache\'',
   'Entry was not found',
   'NotFoundError',
+  'ERR_BLOCKED_BY_CLIENT',
+  'save-page',
+  'CrepeSdk',
+  'data_backup/config',
 ];
 
 const originalWarn = console.warn;
@@ -51,7 +55,13 @@ createRoot(document.getElementById('root')!).render(
 
 if (typeof window !== 'undefined') {
   window.addEventListener('unhandledrejection', (event) => {
-    console.debug('[DORPTS] Unhandled promise rejection:', event.reason);
+    const reason = event.reason;
+    const reasonStr = typeof reason === 'string' ? reason : (reason && typeof reason === 'object' && 'message' in reason ? String((reason as { message: unknown }).message) : String(reason));
+    if (ignoredWarnings.some(w => reasonStr.includes(w))) {
+      event.preventDefault();
+      return;
+    }
+    console.debug('[DORPTS] Unhandled promise rejection:', reason);
     event.preventDefault();
   });
 }
