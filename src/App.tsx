@@ -280,6 +280,14 @@ function MainAppContent() {
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminRole, setNewAdminRole] = useState<'admin' | 'data_updater'>('admin');
   const [isSavingSettings, setIsSavingSettings] = useState(false);
+  const adminPanelAutoOpenedRef = useRef(false);
+
+  useEffect(() => {
+    if (isSuperadmin && !authLoading && !showAdminPanel && !adminPanelAutoOpenedRef.current) {
+      adminPanelAutoOpenedRef.current = true;
+      setShowAdminPanel(true);
+    }
+  }, [isSuperadmin, authLoading, showAdminPanel]);
 
   const [pwaDismissed, setPwaDismissed] = useState(() => sessionStorage.getItem('pwa-update-dismissed') === 'true');
 
