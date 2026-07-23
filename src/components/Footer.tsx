@@ -48,6 +48,7 @@ export const Footer: React.FC<FooterProps> = ({
   const [syncSuccess, setSyncSuccess] = useState(false);
   const prevSyncingRef = React.useRef(isSyncing);
   const [updateBannerVisible, setUpdateBannerVisible] = useState(false);
+  const [showLastSynced, setShowLastSynced] = useState(false);
   
   const shouldExpand = isExpanded || isHovered;
   
@@ -65,8 +66,12 @@ export const Footer: React.FC<FooterProps> = ({
 
   useEffect(() => {
     updateMinutesAgo();
+    const timer = setTimeout(() => setShowLastSynced(true), 500);
     const interval = setInterval(updateMinutesAgo, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
   }, []);
 
   useEffect(() => {
@@ -76,6 +81,8 @@ export const Footer: React.FC<FooterProps> = ({
         setTimeout(() => setUpdateBannerVisible(false), 5000);
       }
       setTimeout(() => setSyncSuccess(false), 4000);
+      setShowLastSynced(true);
+      setTimeout(() => setShowLastSynced(false), 5000);
       setTimeout(updateMinutesAgo, 500);
       setTimeout(updateMinutesAgo, 1500);
     }
@@ -325,7 +332,7 @@ export const Footer: React.FC<FooterProps> = ({
                   </span>
                 </motion.div>
               )}
-              {minutesAgo !== null && !isSyncing && !syncSuccess && (
+              {minutesAgo !== null && !isSyncing && !syncSuccess && showLastSynced && (
                 <span className="text-[0.5rem] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1.5">
                   {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
                 </span>
