@@ -4,7 +4,7 @@ import { Indicator, SystemMetadata, ViewMode, Toast } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { DataHealthMonitor } from './DataHealthMonitor';
-import { Target, Info, LayoutGrid, Shield, TrendingUp, Building2, CheckCircle2, ExternalLink, X, ChevronRight, Activity, Volume2, Mic, MicOff } from 'lucide-react';
+import { Target, Info, LayoutGrid, Shield, TrendingUp, Building2, ExternalLink, ChevronRight, Activity, Mic } from 'lucide-react';
 import { speak, getMuted } from '../utils/speech';
 import { ResponsiveContainer, LineChart, Line, YAxis, Tooltip, AreaChart, Area, XAxis, CartesianGrid, BarChart, Bar, Cell } from 'recharts';
 import { HISTORICAL_DATA } from '../historicalData';
@@ -183,9 +183,10 @@ interface StatCardProps {
   variant?: 'summary' | 'sector' | 'indicator';
   delay?: number;
   onClick?: () => void;
+  onVoiceClick?: () => void;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ stat, activeMetric, language, translateUnit, variant = 'indicator', delay = 0, onClick }) => {
+const StatCard: React.FC<StatCardProps> = ({ stat, activeMetric, language, translateUnit, variant = 'indicator', delay = 0, onClick, onVoiceClick }) => {
   const isSummary = variant === 'summary';
   const isSector = variant === 'sector';
   const isClickable = !!onClick;
@@ -228,6 +229,15 @@ const StatCard: React.FC<StatCardProps> = ({ stat, activeMetric, language, trans
           {React.cloneElement(stat.icon as React.ReactElement, { size: 16 })}
         </div>
         <div className="flex items-center gap-1.5">
+          {onVoiceClick && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onVoiceClick(); }}
+              className={`p-1 rounded-full shrink-0 ${isSummary ? 'bg-white/10 text-white/70 hover:text-white hover:bg-white/20' : 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 hover:text-indigo-700'} transition-colors cursor-pointer`}
+              title={language === 'en' ? 'Voice control' : 'आवाज नियन्त्रण'}
+            >
+              <Mic size={10} />
+            </button>
+          )}
           {isClickable && (
             <div className={`p-1 rounded-full ${isSummary ? 'bg-white/10' : 'bg-indigo-50 dark:bg-indigo-900/30'} opacity-0 group-hover/card:opacity-100 transition-opacity`}>
               <ExternalLink size={10} className={isSummary ? 'text-white' : 'text-indigo-500'} />
@@ -947,10 +957,6 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
     recognition.onstart = () => {
       setIsListeningVoice(true);
       setVoiceError(null);
-      const startMsg = language === 'en' 
-        ? "Voice control active. Say a command like 'Navigate to Table View'." 
-        : "आवाज नियन्त्रण सक्रिय भयो। जस्तै: 'तालिका दृश्यमा जानुहोस्' भन्नुहोस्।";
-      setVoiceFeedback(startMsg);
     };
 
     recognition.onresult = (event: any) => {
@@ -1037,110 +1043,12 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
                 <h2 className="text-4xl sm:text-6xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
                   {language === 'en' ? 'System Dashboard' : 'प्रणाली ड्यासबोर्ड'}
                 </h2>
-                <div className="flex flex-wrap items-center gap-3">
-                  <button 
-                    onClick={speakDashboardSummary}
-                    className={`px-4 py-2 rounded-2xl border transition-all duration-300 flex items-center gap-2 text-xs sm:text-sm font-bold uppercase tracking-wider hover:scale-[1.03] active:scale-95 cursor-pointer shadow-sm ${
-                      isSpeaking 
-                        ? 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 animate-pulse' 
-                        : 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-100 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20'
-                    }`}
-                    title={language === 'en' ? 'Listen to summary' : 'सारांश सुन्नुहोस्'}
-                  >
-                    <Volume2 size={16} className={isSpeaking ? 'animate-bounce' : 'animate-pulse'} />
-                    <span>
-                      {isSpeaking 
-                        ? (language === 'en' ? 'Stop Listening' : 'सुन्न रोक्नुहोस्') 
-                        : (language === 'en' ? 'Listen to Summary' : 'सारांश सुन्नुहोस्')
-                      }
-                    </span>
-                  </button>
-
-                  <button 
-                    onClick={toggleVoiceListening}
-                    className={`px-4 py-2 rounded-2xl border transition-all duration-300 flex items-center gap-2 text-xs sm:text-sm font-bold uppercase tracking-wider hover:scale-[1.03] active:scale-95 cursor-pointer shadow-sm relative overflow-hidden ${
-                      voiceSuccessTrigger
-                        ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400'
-                        : isListeningVoice 
-                          ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 animate-pulse' 
-                          : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
-                    }`}
-                    title={language === 'en' ? 'Voice control' : 'आवाज नियन्त्रण'}
-                  >
-                    {voiceSuccessTrigger ? (
-                      <CheckCircle2 size={16} className="text-emerald-500 animate-bounce" />
-                    ) : isListeningVoice ? (
-                      <Mic size={16} className="animate-bounce text-emerald-500" />
-                    ) : (
-                      <MicOff size={16} />
-                    )}
-                    <span>
-                      {voiceSuccessTrigger
-                        ? (language === 'en' ? 'Success!' : 'सफल भयो!')
-                        : isListeningVoice 
-                          ? (language === 'en' ? 'Listening...' : 'सुन्दैछ...') 
-                          : (language === 'en' ? 'Voice Control' : 'आवाज नियन्त्रण')
-                      }
-                    </span>
-                    {(voiceSuccessTrigger || isListeningVoice) && (
-                      <span className="absolute -inset-[1px] rounded-2xl border-2 border-emerald-500/30 animate-ping pointer-events-none" />
-                    )}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      triggerHaptic('light');
-                      setIsVoiceHelpOpen(true);
-                    }}
-                    className="px-3.5 py-2 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-100 dark:hover:border-indigo-500/20 transition-all duration-300 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider hover:scale-[1.03] active:scale-95 cursor-pointer shadow-sm"
-                    title={language === 'en' ? 'Voice commands help' : 'आवाज आदेश मद्दत'}
-                  >
-                    <Info size={14} />
-                    <span>
-                      {language === 'en' ? 'Commands' : 'आदेशहरू'}
-                    </span>
-                  </button>
+                <div className="flex items-center gap-3 text-slate-500 dark:text-indigo-300/70 text-[11px] font-black uppercase tracking-[0.15em] pl-1">
+                  <div className="w-10 h-[2px] bg-indigo-500 dark:bg-indigo-400/50" />
+                  <span>{language === 'en' ? 'Updated' : 'अद्यावधिक'}: {metadata?.lastUpdateDate || '2083/02/15'}</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-slate-500 dark:text-indigo-300/70 text-[11px] font-black uppercase tracking-[0.15em] pl-1">
-                <div className="w-10 h-[2px] bg-indigo-500 dark:bg-indigo-400/50" />
-                <span>{language === 'en' ? 'Updated' : 'अद्यावधिक'}: {metadata?.lastUpdateDate || '2083/02/15'}</span>
-              </div>
-
-              <AnimatePresence>
-                {(voiceFeedback || voiceError) && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-[10px] sm:text-xs font-bold uppercase tracking-wider border shadow-sm max-w-xl transition-colors duration-300 ${
-                      voiceError 
-                        ? 'bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/50 text-red-600 dark:text-red-400' 
-                        : 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/50 text-emerald-600 dark:text-emerald-400'
-                    }`}
-                  >
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${voiceError ? 'bg-red-500' : 'bg-emerald-500 animate-pulse'}`} />
-                    <span>{voiceFeedback || voiceError}</span>
-                    <button 
-                      onClick={() => { setVoiceFeedback(null); setVoiceError(null); }}
-                      className="ml-auto p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
-                    >
-                      <X size={12} />
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
-
-            <div className="flex items-center gap-3 text-slate-500 dark:text-indigo-200/60 text-[10px] font-black uppercase tracking-widest bg-slate-50/50 dark:bg-black/20 backdrop-blur-sm border border-slate-100 dark:border-white/5 rounded-xl px-4 py-2 w-fit">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
-                <span className="text-slate-600 dark:text-indigo-100">{language === 'en' ? 'Operational' : 'सञ्चालनमा'}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
             <button
               onClick={() => setViewMode && setViewMode("card")}
               className="group relative flex items-center gap-4 px-10 py-5 bg-slate-900 dark:bg-white text-white dark:text-indigo-900 rounded-[24px] font-black text-[13px] uppercase tracking-widest transition-all cursor-pointer shadow-xl shadow-slate-900/10 dark:shadow-indigo-500/20 transform hover:-translate-y-1 active:scale-95 overflow-hidden"
@@ -1175,6 +1083,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
               translateUnit={translateUnit} 
               variant="summary"
               onClick={() => handleStatClick(stat.tab)}
+              onVoiceClick={idx === 0 ? toggleVoiceListening : undefined}
               className={idx === 1 ? 'ring-2 ring-indigo-500/20 dark:ring-indigo-400/20 bg-indigo-50/30 dark:bg-indigo-500/5' : ''}
             />
           </motion.div>

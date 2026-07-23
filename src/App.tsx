@@ -1241,8 +1241,8 @@ function MainAppContent() {
     }
 
     const fallbackMsg = isEn
-      ? `Not recognized: "${text}". Try: table, card, chart, trend, heatmap, dashboard, offices, report.`
-      : `चिनिएन: "${text}"। प्रयास गर्नुहोस्: table, card, chart, trend, heatmap, dashboard, offices, report.`;
+      ? `Not recognized: "${text}".`
+      : `चिनिएन: "${text}"।`;
     setVoiceError(fallbackMsg);
     speakFeedback(fallbackMsg);
   };
@@ -1286,11 +1286,6 @@ function MainAppContent() {
     recognition.onstart = () => {
       setIsListeningVoice(true);
       setVoiceError(null);
-    const startMsg =
-      language === "en"
-        ? "Listening... Try: table, chart, heatmap, dashboard, offices, report."
-        : "सुन्दैछ... जस्तै: table, chart, heatmap, dashboard, offices, report भन्नुहोस्।";
-    setVoiceFeedback(startMsg);
     };
 
     recognition.onresult = (event: any) => {
