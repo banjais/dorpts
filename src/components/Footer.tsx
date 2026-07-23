@@ -107,7 +107,7 @@ export const Footer: React.FC<FooterProps> = ({
         {
           id: 'btn-menu',
           icon: Menu,
-          label: language === 'en' ? 'MENU' : 'मेनु',
+          label: language === 'en' ? 'Open Menu' : 'मेनु खोल्नुहोस्',
           action: onOpenDrawer || (() => {}),
           highlight: false
         },
