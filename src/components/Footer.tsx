@@ -9,8 +9,6 @@ interface FooterProps {
   onOpenReportBuilder?: () => void;
   onOpenHelp?: () => void;
   onOpenFeedback?: () => void;
-  onScrollTop?: () => void;
-  onScrollBottom?: () => void;
   onOpenAI?: () => void;
   isScrolled?: boolean;
   fiscalYear?: string;
@@ -18,7 +16,6 @@ interface FooterProps {
   onExpandChange?: (expanded: boolean) => void;
   isSyncing?: boolean;
   onManualSync?: () => void;
-  isActionPortalActive?: boolean;
   onOpenDrawer?: () => void;
 }
 
@@ -26,8 +23,6 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenReportBuilder, 
   onOpenHelp,
   onOpenFeedback,
-  onScrollTop,
-  onScrollBottom,
   onOpenAI,
   isScrolled,
   fiscalYear,
@@ -35,7 +30,6 @@ export const Footer: React.FC<FooterProps> = ({
   onExpandChange,
   isSyncing = false,
   onManualSync,
-  isActionPortalActive = false,
   onOpenDrawer,
 }) => {
   const { language, t } = useLanguage();
@@ -102,39 +96,22 @@ export const Footer: React.FC<FooterProps> = ({
     },
   ];
 
-  const actionItems = isActionPortalActive
-    ? [
-        {
-          id: 'btn-menu',
-          icon: Menu,
-          label: language === 'en' ? 'Open Menu' : 'मेनु खोल्नुहोस्',
-          action: onOpenDrawer || (() => {}),
-          highlight: false
-        },
-        {
-          id: 'btn-ai',
-          icon: Sparkles,
-          label: 'AI',
-          action: onOpenAI,
-          highlight: true
-        }
-      ]
-    : [
-        {
-          id: 'btn-scroll',
-          icon: isScrolled ? ChevronUp : ChevronDown,
-          label: isScrolled ? (language === 'en' ? 'UP' : 'माथि') : (language === 'en' ? 'DOWN' : 'तल'),
-          action: isScrolled ? onScrollTop : onScrollBottom,
-          highlight: false
-        },
-        {
-          id: 'btn-ai',
-          icon: Sparkles,
-          label: 'AI',
-          action: onOpenAI,
-          highlight: true
-        }
-      ];
+  const actionItems = [
+    {
+      id: 'btn-menu',
+      icon: Menu,
+      label: language === 'en' ? 'Open Menu' : 'मेनु खोल्नुहोस्',
+      action: onOpenDrawer || (() => {}),
+      highlight: false
+    },
+    {
+      id: 'btn-ai',
+      icon: Sparkles,
+      label: 'AI',
+      action: onOpenAI,
+      highlight: true
+    }
+  ];
 
   return (
     <>
@@ -168,51 +145,62 @@ export const Footer: React.FC<FooterProps> = ({
 
               <div className="w-full flex flex-col items-center gap-4 sm:gap-6">
                 <div className="w-full flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 px-2 pb-4">
-                  {[...menuItems, ...actionItems].map((item) => (
-                    <div key={item.id} className="relative shrink-0">
-                      {item.id === 'btn-share' && (
-                        <AnimatePresence>
-                          {isQrHovered && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 15, scale: 0.8 }}
-                              animate={{ opacity: 1, y: 0, scale: 1 }}
-                              exit={{ opacity: 0, y: 10, scale: 0.8 }}
-                              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 flex flex-col items-center gap-2 pointer-events-none"
-                            >
-                              <div className="p-2 bg-white rounded-xl border border-slate-100">
-                                <QRCodeCanvas value={currentUrl} size={110} />
-                              </div>
-                              <span className="text-[0.5rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center whitespace-nowrap">
-                                {t('scanToOpen') || 'Scan to Open'}
-                              </span>
-                            </motion.div>
+                   {[...menuItems, ...actionItems].map((item) => (
+                     <div key={item.id} className="relative shrink-0">
+                       {item.id === 'btn-share' && (
+                         <AnimatePresence>
+                           {isQrHovered && (
+                             <motion.div
+                               initial={{ opacity: 0, y: 15, scale: 0.8 }}
+                               animate={{ opacity: 1, y: 0, scale: 1 }}
+                               exit={{ opacity: 0, y: 10, scale: 0.8 }}
+                               className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 flex flex-col items-center gap-2 pointer-events-none"
+                             >
+                               <div className="p-2 bg-white rounded-xl border border-slate-100">
+                                 <QRCodeCanvas value={currentUrl} size={110} />
+                               </div>
+                               <span className="text-[0.5rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center whitespace-nowrap">
+                                 {t('scanToOpen') || 'Scan to Open'}
+                               </span>
+                             </motion.div>
+                           )}
+                         </AnimatePresence>
+                       )}
+                        {item.id === 'btn-menu' ? (
+                          <button
+                            id={item.id}
+                            onClick={(e) => { e.stopPropagation(); item.action(); }}
+                            className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all active:scale-95 cursor-pointer"
+                            title={language === 'en' ? 'Open Menu' : 'मेनु खोल्नुहोस्'}
+                          >
+                            <Menu size={18} strokeWidth={2.5} />
+                          </button>
+                        ) : (
+                        <button
+                          id={item.id}
+                          onClick={(e) => { e.stopPropagation(); item.action(); }}
+                          onMouseEnter={() => { if (item.id === 'btn-share') setIsQrHovered(true); }}
+                          onMouseLeave={() => { if (item.id === 'btn-share') setIsQrHovered(false); }}
+                           className={`flex flex-col items-center justify-center gap-1 w-[3.5rem] sm:w-[4.5rem] px-2 sm:px-3 py-2 rounded-xl transition-all active:scale-95 cursor-pointer border ${
+                             'highlight' in item && (item as any).highlight 
+                               ? 'bg-indigo-600 text-white border-indigo-700 shadow-lg shadow-indigo-600/20 hover:bg-indigo-700' 
+                               : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
+                           }`}
+                        >
+                          {item.id === 'btn-ai' && (
+                            <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                            </span>
                           )}
-                        </AnimatePresence>
-                      )}
-                       <button
-                         id={item.id}
-                         onClick={(e) => { e.stopPropagation(); item.action(); }}
-                         onMouseEnter={() => { if (item.id === 'btn-share') setIsQrHovered(true); }}
-                         onMouseLeave={() => { if (item.id === 'btn-share') setIsQrHovered(false); }}
-                          className={`flex flex-col items-center justify-center gap-1 w-[3.5rem] sm:w-[4.5rem] px-2 sm:px-3 py-2 rounded-xl transition-all active:scale-95 cursor-pointer border ${
-                            'highlight' in item && (item as any).highlight 
-                              ? 'bg-indigo-600 text-white border-indigo-700 shadow-lg shadow-indigo-600/20 hover:bg-indigo-700' 
-                              : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
-                          }`}
-                       >
-                         {item.id === 'btn-ai' && (
-                           <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                             <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                           <item.icon size={12} strokeWidth={2.5} className={`${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'} sm:size-[15px] transition-colors shrink-0 ${item.id === 'btn-sync' && isSyncing ? 'animate-spin' : ''}`} />
+                           <span className={`text-[0.5rem] sm:text-[0.55rem] leading-tight font-black uppercase tracking-tighter text-center line-clamp-2 ${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`}>
+                             {item.label}
                            </span>
-                         )}
-                          <item.icon size={12} strokeWidth={2.5} className={`${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'} sm:size-[15px] transition-colors shrink-0 ${item.id === 'btn-sync' && isSyncing ? 'animate-spin' : ''}`} />
-                          <span className={`text-[0.5rem] sm:text-[0.55rem] leading-tight font-black uppercase tracking-tighter text-center line-clamp-2 ${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`}>
-                            {item.label}
-                          </span>
-                       </button>
-                    </div>
-                  ))}
+                        </button>
+                        )}
+                     </div>
+                   ))}
                 </div>
               </div>
 

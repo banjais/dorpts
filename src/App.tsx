@@ -3313,8 +3313,6 @@ function MainAppContent() {
             onOpenReportBuilder={() => setIsReportBuilderOpen(true)}
             onOpenHelp={() => setIsHelpOpen(true)}
             onOpenFeedback={() => setIsFeedbackModalOpen(true)}
-            onScrollTop={scrollToTop}
-            onScrollBottom={scrollToBottom}
             onOpenAI={() => setIsAIAssistantOpen(true)}
             isScrolled={isScrolled}
             viewMode={viewMode}
@@ -3323,7 +3321,6 @@ function MainAppContent() {
             onExpandChange={setIsFooterExpanded}
             isSyncing={isSyncing}
             onManualSync={handleManualSync}
-            isActionPortalActive={mainView === 'action-portal'}
             onOpenDrawer={() => setIsDrawerOpen(true)}
           />
 
