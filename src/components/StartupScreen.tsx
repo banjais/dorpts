@@ -42,13 +42,13 @@ export function StartupScreen({ onComplete, fiscalYear }: StartupScreenProps) {
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center font-sans overflow-hidden aurora-bg">
       {/* Center Content */}
-      <div className="flex flex-col items-center justify-center gap-10 relative z-10">
+      <div className="flex flex-col items-center justify-center gap-8 relative z-10">
         {/* Logo + Branding */}
         <motion.div
           initial={{ opacity: 0, y: -14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center gap-6"
+          className="flex flex-col items-center gap-5"
         >
           {/* Emblem medallion */}
           <motion.div
@@ -57,14 +57,14 @@ export function StartupScreen({ onComplete, fiscalYear }: StartupScreenProps) {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
             className="relative flex items-center justify-center"
           >
-            <div className="emblem-halo absolute w-48 h-48 rounded-full" />
-            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-[32px] flex items-center justify-center bg-white dark:bg-slate-800 shadow-2xl shadow-indigo-500/30">
-              <div className="absolute -inset-2 rounded-[36px] conic-ring opacity-70 blur-[2px]" />
-              <div className="absolute -inset-[3px] rounded-[38px] bg-white/10" />
+            <div className="emblem-halo absolute w-36 h-36 rounded-full" />
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-[28px] flex items-center justify-center bg-white dark:bg-slate-800 shadow-2xl shadow-indigo-500/30">
+              <div className="absolute -inset-2 rounded-[32px] conic-ring opacity-70 blur-[2px]" />
+              <div className="absolute -inset-[3px] rounded-[36px] bg-white/10" />
               <img
                 src="/GovtLogo.svg"
                 alt="Government of Nepal"
-                className="relative w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow"
+                className="relative w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow"
                 referrerPolicy="no-referrer"
               />
             </div>
@@ -78,52 +78,44 @@ export function StartupScreen({ onComplete, fiscalYear }: StartupScreenProps) {
             className="text-center"
           >
             <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0099DA] dark:text-[#00ADF7] shimmer-underline pb-1.5">
-              {t('deptOfRoads')}
+              {t('systemTitle')}
             </h1>
-            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-600 dark:text-slate-300 tracking-[0.28em] mt-2.5 uppercase">
-              {t('govOfNepal')}
+            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-[0.24em] mt-2 uppercase">
+              {t('kpisSubtitle')}
             </p>
           </motion.div>
         </motion.div>
-
-        {/* Tagline */}
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
-          className="text-[13px] sm:text-base text-slate-500 dark:text-slate-400 font-medium tracking-wide text-center max-w-md px-6"
-        >
-          {t('splashSubtext')}
-        </motion.p>
 
         {/* Progress */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.6 }}
-          className="w-64 sm:w-72 flex flex-col items-center gap-3.5"
+          className="w-64 sm:w-72 flex flex-col items-center gap-3"
         >
-          <div className="w-full h-[3px] bg-slate-300/60 dark:bg-slate-700/60 rounded-full overflow-hidden">
+          <div className="w-full h-[6px] bg-slate-300/60 dark:bg-slate-700/60 rounded-full overflow-hidden shadow-inner">
             <motion.div
-              className="h-full rounded-full brand-gradient"
+              className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-400"
               style={{ width: `${Math.min(progress, 100)}%` }}
             />
           </div>
-          <span className="text-[10px] font-mono font-semibold text-slate-500 dark:text-slate-400 tracking-[0.35em] uppercase">
-            {String(Math.round(progress)).padStart(3, '0')}%
+          <span className="text-[10px] font-mono font-semibold text-slate-500 dark:text-slate-400 tracking-[0.3em] uppercase">
+            {Math.round(progress)}%
           </span>
         </motion.div>
       </div>
 
-      {/* Footer */}
-      <motion.p
+      {/* Footer Branding */}
+      <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.5 }}
+        animate={{ opacity: 0.9 }}
         transition={{ duration: 0.8, delay: 0.8 }}
-        className="absolute bottom-8 text-[9px] text-slate-500 dark:text-slate-500 tracking-[0.20em] font-semibold uppercase"
+        className="absolute bottom-8 flex flex-col items-center gap-1 text-[9px] text-slate-500 dark:text-slate-500 tracking-[0.20em] font-semibold uppercase"
       >
-        © DOR | 2082/83 B.S
-      </motion.p>
+        <p className="text-[11px] font-bold text-slate-600 dark:text-slate-300">{t('govOfNepal')}</p>
+        <p className="text-[9px] font-semibold text-slate-500 dark:text-slate-400">{t('ministryOfPhysical')}</p>
+        <p className="text-[10px] font-black text-slate-600 dark:text-slate-300">{t('deptOfRoads')}</p>
+      </motion.div>
     </div>
   );
 }
