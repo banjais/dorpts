@@ -18,6 +18,8 @@ interface FooterProps {
   onManualSync?: () => void;
   onOpenDrawer?: () => void;
   onGoHome?: () => void;
+  hasNewUpdate?: boolean;
+  onRefresh?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ 
@@ -33,6 +35,8 @@ export const Footer: React.FC<FooterProps> = ({
   onManualSync,
   onOpenDrawer,
   onGoHome,
+  hasNewUpdate = false,
+  onRefresh,
 }) => {
   const { language, t } = useLanguage();
   const [showQr, setShowQr] = useState(false);
@@ -43,6 +47,7 @@ export const Footer: React.FC<FooterProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
   const prevSyncingRef = React.useRef(isSyncing);
+  const [updateBannerVisible, setUpdateBannerVisible] = useState(false);
   
   const shouldExpand = isExpanded || isHovered;
   
@@ -67,6 +72,9 @@ export const Footer: React.FC<FooterProps> = ({
   useEffect(() => {
     if (!isSyncing && prevSyncingRef.current) {
       setSyncSuccess(true);
+      if (updateBannerVisible) {
+        setTimeout(() => setUpdateBannerVisible(false), 5000);
+      }
       setTimeout(() => setSyncSuccess(false), 4000);
       setTimeout(updateMinutesAgo, 500);
       setTimeout(updateMinutesAgo, 1500);
@@ -256,10 +264,30 @@ export const Footer: React.FC<FooterProps> = ({
                 </p>
                 <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
               </div>
-              <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
+               <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
                  v{APP_VERSION}
-              </p>
-              {minutesAgo !== null && (
+               </p>
+               {hasNewUpdate && !updateBannerVisible && (
+                 <motion.button
+                   initial={{ opacity: 0, y: 5 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     setUpdateBannerVisible(true);
+                     onExpandChange?.(true);
+                     onRefresh?.();
+                   }}
+                   className="text-[0.55rem] sm:text-[0.6rem] font-black uppercase tracking-[0.2em] text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 mt-1 animate-pulse cursor-pointer"
+                 >
+                   {language === 'en' ? 'Update available' : 'अपडेट उपलब्ध'}
+                 </motion.button>
+               )}
+               {updateBannerVisible && (
+                 <p className="text-[0.55rem] sm:text-[0.6rem] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400 mt-1">
+                   {language === 'en' ? `Updated to v${APP_VERSION}` : `v${APP_VERSION} मा अपडेट भयो`}
+                 </p>
+               )}
+               {minutesAgo !== null && (
                 <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium mt-1 truncate">
                   {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
                 </p>

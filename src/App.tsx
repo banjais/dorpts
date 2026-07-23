@@ -3068,11 +3068,6 @@ function MainAppContent() {
             onToggleTrack={toggleTrack}
             updatesHistory={visibleHistory}
             fiscalYear={selectedFiscalYear}
-            hasNewUpdate={hasNewUpdate}
-            onRefresh={async () => {
-              await handleManualSync();
-              markVersionUpdated();
-            }}
           />
 
         <div
@@ -3285,6 +3280,11 @@ function MainAppContent() {
             isSyncing={isSyncing}
             onManualSync={handleManualSync}
             onOpenDrawer={() => setIsDrawerOpen(true)}
+            hasNewUpdate={hasNewUpdate}
+            onRefresh={async () => {
+              await handleManualSync();
+              markVersionUpdated();
+            }}
           />
 
         {/* Dim Overlay - Outside scaled content */}

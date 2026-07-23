@@ -35,8 +35,6 @@ interface HeaderProps {
   fiscalYear?: string;
   onMouseEnterFab?: () => void;
   onMouseLeaveFab?: () => void;
-  hasNewUpdate?: boolean;
-  onRefresh?: () => void;
 }
 
 const getSyncedAgoText = (diffMs: number, lang: 'en' | 'ne'): string => {
@@ -104,8 +102,6 @@ export const Header: React.FC<HeaderProps> = ({
   fiscalYear,
   onMouseEnterFab,
   onMouseLeaveFab,
-  hasNewUpdate = false,
-  onRefresh,
 }) => {
   const { language, setLanguage, t } = useLanguage();
   const [lastSyncedTime, setLastSyncedTime] = useState<Date>(() => new Date());
@@ -355,15 +351,6 @@ export const Header: React.FC<HeaderProps> = ({
                     <span className="text-[0.65rem] sm:text-[0.7rem] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-lg shrink-0 inline-block w-fit mt-1">
                       FY: {fiscalYear}
                     </span>
-                  )}
-                  {hasNewUpdate && onRefresh && (
-                    <button
-                      onClick={onRefresh}
-                      className="text-[0.55rem] sm:text-[0.6rem] font-black uppercase tracking-wider text-white bg-rose-500 hover:bg-rose-600 dark:bg-rose-500 dark:hover:bg-rose-600 px-2 py-0.5 rounded-lg shadow-sm mt-1 animate-pulse"
-                      title={language === 'en' ? 'New version available. Tap to refresh.' : 'नयाँ संस्करण उपलब्ध छ। रिफ्रेस गर्न ट्याप गर्नुहोस्।'}
-                    >
-                      {language === 'en' ? 'Update available' : 'अपडेट उपलब्ध'}
-                    </button>
                   )}
                 </div>
             </div>
