@@ -3077,85 +3077,12 @@ function MainAppContent() {
           }`}
         >
           <OfflineStatusBar />
-           <main
-             className="flex-1 container mx-auto px-4 md:pl-16 lg:pl-20 pb-8 max-w-7xl relative z-10 pt-[134px] sm:pt-[152px]"
-             style={{ transition: "padding-top 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
-            >
-             {/* Pull to Refresh Visual Indicator */}
-            <AnimatePresence>
-              {(isPulling || isSyncing) && (
-                <motion.div
-                  id="pull-to-refresh-indicator"
-                  initial={{ height: 0, opacity: 0, marginBottom: 0 }}
-                  animate={{
-                    height: isSyncing
-                      ? 56
-                      : Math.max(48, Math.min(pullDistance, 56)),
-                    opacity: isSyncing
-                      ? 1
-                      : Math.max(0.75, Math.min(pullDistance / 45, 1)),
-                    marginBottom: isSyncing
-                      ? 16
-                      : Math.max(8, Math.min(pullDistance / 3, 16)),
-                  }}
-                  exit={{ height: 0, opacity: 0, marginBottom: 0 }}
-                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                  className="w-full flex items-center justify-center overflow-hidden rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white/60 dark:bg-slate-900/40 backdrop-blur-md shadow-sm"
-                >
-                  <div className="flex items-center gap-2.5 py-2 px-4 select-none">
-                    <div className="relative w-5 h-5 flex items-center justify-center">
-                      {isSyncing ? (
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{
-                            repeat: Infinity,
-                            duration: 0.8,
-                            ease: "linear",
-                          }}
-                          className="w-4 h-4 rounded-full border-2 border-indigo-600 border-t-transparent dark:border-indigo-400 dark:border-t-transparent"
-                        />
-                      ) : (
-                        <motion.div
-                          style={{
-                            rotate: `${Math.min(pullDistance * 3.2, 180)}deg`,
-                          }}
-                          className="text-indigo-600 dark:text-indigo-400"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                            />
-                          </svg>
-                        </motion.div>
-                      )}
-                    </div>
-                    <span className="text-[0.6875rem] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                      {isSyncing
-                        ? language === "en"
-                          ? "Synchronizing..."
-                          : "सिंक्रोनाइज गर्दै..."
-                        : pullDistance > 45
-                          ? language === "en"
-                            ? "Release to refresh"
-                            : "छोड्नुहोस् रिफ्रेस गर्न"
-                          : language === "en"
-                            ? "Pull to refresh"
-                            : "रिफ्रेस गर्न तान्नुहोस्"}
-                    </span>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <main
+              className="flex-1 container mx-auto px-4 md:pl-16 lg:pl-20 pb-8 max-w-7xl relative z-10 pt-[134px] sm:pt-[152px]"
+              style={{ transition: "padding-top 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
+             >
 
-            <AnimatePresence mode="wait">
+             <AnimatePresence mode="wait">
               {loading ? (
                 <motion.div
                   key="loading"
@@ -3367,18 +3294,20 @@ function MainAppContent() {
 
         {/* Footer */}
          <Footer
-           onOpenReportBuilder={() => setIsReportBuilderOpen(true)}
-           onOpenHelp={() => setIsHelpOpen(true)}
-           onOpenFeedback={() => setIsFeedbackModalOpen(true)}
-           onScrollTop={scrollToTop}
-           onScrollBottom={scrollToBottom}
-           onOpenAI={() => setIsAIAssistantOpen(true)}
-           isScrolled={isScrolled}
-           viewMode={viewMode}
-           fiscalYear={selectedFiscalYear}
-           isExpanded={isFooterExpanded}
-           onExpandChange={setIsFooterExpanded}
-         />
+            onOpenReportBuilder={() => setIsReportBuilderOpen(true)}
+            onOpenHelp={() => setIsHelpOpen(true)}
+            onOpenFeedback={() => setIsFeedbackModalOpen(true)}
+            onScrollTop={scrollToTop}
+            onScrollBottom={scrollToBottom}
+            onOpenAI={() => setIsAIAssistantOpen(true)}
+            isScrolled={isScrolled}
+            viewMode={viewMode}
+            fiscalYear={selectedFiscalYear}
+            isExpanded={isFooterExpanded}
+            onExpandChange={setIsFooterExpanded}
+            isSyncing={isSyncing}
+            onManualSync={handleManualSync}
+          />
 
         {/* Dim Overlay - Outside scaled content */}
         <AnimatePresence>

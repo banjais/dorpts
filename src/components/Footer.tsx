@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, HelpCircle, ChevronUp, FileText, Share2, Sparkles, ChevronDown, ChevronRight, MessageSquare } from 'lucide-react';
+import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, HelpCircle, ChevronUp, FileText, Share2, Sparkles, ChevronDown, ChevronRight, MessageSquare, RefreshCw } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
@@ -16,6 +16,8 @@ interface FooterProps {
   fiscalYear?: string;
   isExpanded?: boolean;
   onExpandChange?: (expanded: boolean) => void;
+  isSyncing?: boolean;
+  onManualSync?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ 
@@ -29,6 +31,8 @@ export const Footer: React.FC<FooterProps> = ({
   fiscalYear,
   isExpanded = false,
   onExpandChange,
+  isSyncing = false,
+  onManualSync,
 }) => {
   const { language, t } = useLanguage();
   const [showQr, setShowQr] = useState(false);
@@ -86,6 +90,12 @@ export const Footer: React.FC<FooterProps> = ({
     { id: 'btn-share', icon: Share2, label: language === 'en' ? 'SHARE APP' : (t('share') || 'साझा गर्नुहोस्'), action: () => setShowQr(true) },
     { id: 'btn-help', icon: HelpCircle, label: language === 'en' ? 'SYSTEM INFO' : (t('help') || 'सहायता'), action: onOpenHelp || (() => {}) },
     { id: 'btn-feedback', icon: MessageSquare, label: language === 'en' ? 'FEEDBACK' : 'प्रतिक्रिया', action: onOpenFeedback || (() => {}) },
+    { 
+      id: 'btn-sync', 
+      icon: RefreshCw, 
+      label: language === 'en' ? 'SYNC NOW' : 'सिंक गर्नुहोस्', 
+      action: onManualSync || (() => {}) 
+    },
   ];
 
   const actionItems = [
@@ -175,7 +185,7 @@ export const Footer: React.FC<FooterProps> = ({
                              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
                            </span>
                          )}
-                         <item.icon size={12} strokeWidth={2.5} className={`${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'} sm:size-[15px] transition-colors shrink-0`} />
+                          <item.icon size={12} strokeWidth={2.5} className={`${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'} sm:size-[15px] transition-colors shrink-0 ${item.id === 'btn-sync' && isSyncing ? 'animate-spin' : ''}`} />
                           <span className={`text-[0.5rem] sm:text-[0.55rem] leading-tight font-black uppercase tracking-tighter text-center line-clamp-2 ${'highlight' in item && (item as any).highlight ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`}>
                             {item.label}
                           </span>
@@ -208,6 +218,18 @@ export const Footer: React.FC<FooterProps> = ({
           {!shouldExpand && (
             <div className="flex items-center justify-center gap-0">
               <div className="h-1 w-1 rounded-full bg-indigo-400 dark:bg-indigo-500 animate-pulse"></div>
+              {isSyncing && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="ml-1.5 flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-500/15 border border-indigo-200 dark:border-indigo-500/30"
+                >
+                  <RefreshCw size={10} className="animate-spin text-indigo-600 dark:text-indigo-400" />
+                  <span className="text-[0.5rem] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                    {language === 'en' ? 'Syncing' : 'सिंक'}
+                  </span>
+                </motion.div>
+              )}
               <div className="h-[2px] w-12 bg-slate-300 dark:bg-slate-700"></div>
               <span className="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-[0.2em] flex items-center gap-2 px-3 py-1.5">
                 {language === 'en' ? 'Action Portal' : 'कार्य पोर्टल'}
