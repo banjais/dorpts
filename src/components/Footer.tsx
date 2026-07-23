@@ -3,7 +3,7 @@ import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, Hel
 import { QRCodeCanvas } from 'qrcode.react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
-import { APP_TITLES } from '../constants/appTitles';
+import { APP_TITLES, APP_VERSION } from '../constants/appTitles';
 
 interface FooterProps {
   onOpenReportBuilder?: () => void;
@@ -46,28 +46,33 @@ export const Footer: React.FC<FooterProps> = ({
   
   const shouldExpand = isExpanded || isHovered;
   
-  useEffect(() => {
-    if (!isSyncing && prevSyncingRef.current) {
-      setSyncSuccess(true);
-      const timer = setTimeout(() => setSyncSuccess(false), 3000);
-      return () => clearTimeout(timer);
-    }
-    prevSyncingRef.current = isSyncing;
-  }, [isSyncing]);
-  
-  useEffect(() => {
-    const updateMinutesAgo = () => {
+  const updateMinutesAgo = () => {
+    try {
       const timestamp = localStorage.getItem('dor_last_sync_timestamp');
       if (timestamp) {
         const diffMs = Date.now() - new Date(timestamp).getTime();
         setMinutesAgo(Math.max(0, Math.floor(diffMs / 60000)));
       }
-    };
-    
+    } catch (_) {
+      // suppress
+    }
+  };
+
+  useEffect(() => {
     updateMinutesAgo();
-    const interval = setInterval(updateMinutesAgo, 60000);
+    const interval = setInterval(updateMinutesAgo, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!isSyncing && prevSyncingRef.current) {
+      setSyncSuccess(true);
+      setTimeout(() => setSyncSuccess(false), 4000);
+      setTimeout(updateMinutesAgo, 500);
+      setTimeout(updateMinutesAgo, 1500);
+    }
+    prevSyncingRef.current = isSyncing;
+  }, [isSyncing]);
   
   const shareText = language === 'en' 
     ? `Check out ${APP_TITLES.shortAppName.en}!` 
@@ -104,12 +109,21 @@ export const Footer: React.FC<FooterProps> = ({
         }
       }
     } catch (_) {}
-    try {
-      localStorage.clear();
-    } catch (_) {}
-    try {
-      sessionStorage.clear();
-    } catch (_) {}
+    const keysToRemove = [
+      'dor_indicators_cache',
+      'dor_metadata_cache', 
+      'dor_offices_cache',
+      'dor_last_sync_timestamp',
+      'dor_last_seen_update',
+      'dor_chart_type_pref',
+      'syncInterval',
+      'searchHistory',
+      'dor_search_history',
+      'last_search_query',
+    ];
+    keysToRemove.forEach(key => {
+      try { localStorage.removeItem(key); } catch (_) {}
+    });
     if ('serviceWorker' in navigator) {
       try {
         const regs = await navigator.serviceWorker.getRegistrations();
@@ -242,7 +256,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
               </div>
               <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
-                v2.4.0
+                 v{APP_VERSION}
               </p>
               {minutesAgo !== null && (
                 <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium mt-1 truncate">

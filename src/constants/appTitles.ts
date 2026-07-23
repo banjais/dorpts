@@ -12,3 +12,5 @@ export const APP_TITLES = {
     ne: "DORPTS"
   }
 };
+
+export const APP_VERSION = '2.5.1';

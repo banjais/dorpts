@@ -56,7 +56,7 @@ import { fetchSheetData, fetchSpreadsheetMeta } from "./sheets";
 import { syncPublishedSheets, buildCsvText } from "./utils/sheetSync";
 import { useAuth } from "./context/AuthContext";
 import { Indicator, SystemMetadata, Toast } from "./types";
-import { APP_TITLES } from "./constants/appTitles";
+import { APP_TITLES, APP_VERSION } from "./constants/appTitles";
 import {
   parseGoogleSheetsCSV,
   DEFAULT_INDICATORS,
@@ -1531,17 +1531,24 @@ function MainAppContent() {
   const [isSyncing, setIsSyncing] = useState(false);
 
   const [hasNewUpdate, setHasNewUpdate] = useState(false);
-  const [lastSeenUpdate, setLastSeenUpdate] = useState<string | null>(null);
 
   useEffect(() => {
-    if (metadata?.lastUpdateDate) {
-      if (!lastSeenUpdate) {
-        setLastSeenUpdate(metadata.lastUpdateDate);
-      } else if (metadata.lastUpdateDate !== lastSeenUpdate) {
+    try {
+      const stored = localStorage.getItem('dor_app_version');
+      if (stored !== APP_VERSION) {
         setHasNewUpdate(true);
       }
+    } catch (_) {
+      setHasNewUpdate(true);
     }
-  }, [metadata?.lastUpdateDate, lastSeenUpdate]);
+  }, []);
+
+  const markVersionUpdated = () => {
+    try {
+      localStorage.setItem('dor_app_version', APP_VERSION);
+    } catch (_) {}
+    setHasNewUpdate(false);
+  };
 
   const pullDistanceRef = React.useRef(0);
   const isSyncingRef = React.useRef(false);
@@ -1588,10 +1595,9 @@ function MainAppContent() {
         const data = metadataSnap.data() as SystemMetadata;
         setMetadata(data);
         if (data.lastUpdateDate) {
-          setLastSeenUpdate(data.lastUpdateDate);
           localStorage.setItem("dor_last_seen_update", data.lastUpdateDate);
-          setHasNewUpdate(false);
         }
+        markVersionUpdated();
         try {
           localStorage.setItem("dor_metadata_cache", JSON.stringify(data));
         } catch (_) {
@@ -3036,51 +3042,54 @@ function MainAppContent() {
         id="applet-frame"
       >
 
-        <Header
-          lastUpdateDate={metadata?.lastUpdateDate}
-          pulseKey={pulseKey}
-          onOpenMap={() => setIsMapModalOpen(true)}
-           isOnline={isOnline}
-           pendingWrites={pendingWrites}
-           offices={offices}
-           onOpenAbout={() => setIsAboutModalOpen(true)}
-           onOpenDrawer={() => setIsDrawerOpen(true)}
-           onMouseEnterAbout={() => setIsHoveringAbout(true)}
-           onMouseLeaveAbout={() => setIsHoveringAbout(false)}
-           mainView={mainView}
-           onViewChange={handleMainViewChange}
-           searchQuery={searchQuery}
-          onSearch={setSearchQuery}
-          sortType={sortType}
-          onSortChange={setSortType}
-          selectedCategory={categoryFilter}
-          onCategoryChange={(cat) => {
-            setSearchQuery("");
-            setCategoryFilter(cat);
-          }}
-          selectedOffice={selectedOffice}
-          isOfficeLocked={!isSuperadmin && !!userAssignedOffice}
-          onOfficeChange={(off) => {
-            if (!isSuperadmin && userAssignedOffice && off !== userAssignedOffice) {
-              return;
-            }
-            setSearchQuery("");
-            setSelectedOffice(off);
-          }}
-          showMilestonesOnly={showMilestonesOnly}
-          onToggleMilestonesOnly={() =>
-            setShowMilestonesOnly(!showMilestonesOnly)
-          }
-           viewMode={viewMode}
-           viewOptions={viewOptions as any}
-           indicators={indicators}
-           metadata={metadata}
+         <Header
+           lastUpdateDate={metadata?.lastUpdateDate}
+           pulseKey={pulseKey}
+           onOpenMap={() => setIsMapModalOpen(true)}
+            isOnline={isOnline}
+            pendingWrites={pendingWrites}
+            offices={offices}
+            onOpenAbout={() => setIsAboutModalOpen(true)}
+            onOpenDrawer={() => setIsDrawerOpen(true)}
+            onMouseEnterAbout={() => setIsHoveringAbout(true)}
+            onMouseLeaveAbout={() => setIsHoveringAbout(false)}
+            mainView={mainView}
+            onViewChange={handleMainViewChange}
+            searchQuery={searchQuery}
+           onSearch={setSearchQuery}
+           sortType={sortType}
+           onSortChange={setSortType}
+           selectedCategory={categoryFilter}
+           onCategoryChange={(cat) => {
+             setSearchQuery("");
+             setCategoryFilter(cat);
+           }}
+           selectedOffice={selectedOffice}
+           isOfficeLocked={!isSuperadmin && !!userAssignedOffice}
+           onOfficeChange={(off) => {
+             if (!isSuperadmin && userAssignedOffice && off !== userAssignedOffice) {
+               return;
+             }
+             setSearchQuery("");
+             setSelectedOffice(off);
+           }}
+           showMilestonesOnly={showMilestonesOnly}
+           onToggleMilestonesOnly={() =>
+             setShowMilestonesOnly(!showMilestonesOnly)
+           }
+            viewMode={viewMode}
+            viewOptions={viewOptions as any}
+            indicators={indicators}
+            metadata={metadata}
             trackedIds={trackedIds}
             onToggleTrack={toggleTrack}
             updatesHistory={visibleHistory}
             fiscalYear={selectedFiscalYear}
             hasNewUpdate={hasNewUpdate}
-            onRefresh={handleManualSync}
+            onRefresh={async () => {
+              await handleManualSync();
+              markVersionUpdated();
+            }}
           />
 
         <div
