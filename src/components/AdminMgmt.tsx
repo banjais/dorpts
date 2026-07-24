@@ -3,21 +3,17 @@ import { useAuth } from '../context/AuthContext';
 import { AdminUser } from '../types';
 import { doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Shield, Trash2, UserPlus, CheckCircle, AlertCircle, Building2, Users, Mail, RefreshCw } from 'lucide-react';
+import { Shield, Trash2, UserPlus, CheckCircle, AlertCircle, Building2 } from 'lucide-react';
 import { getOfficeByEmail } from '../utils/officeDetector';
-import { fetchSheetPermissions } from '../sheets';
 
 export const AdminMgmt: React.FC = () => {
-  const { adminsList, isSuperadmin, logActivity, refreshAdmins, user, accessToken } = useAuth();
+  const { adminsList, isSuperadmin, logActivity, refreshAdmins, user } = useAuth();
   const [newEmail, setNewEmail] = useState('');
   const [newUid, setNewUid] = useState('');
   const [newRole, setNewRole] = useState<'admin' | 'superadmin'>('admin');
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [sheetPermissions, setSheetPermissions] = useState<{ dashboard: any[]; offices: any[] }>({ dashboard: [], offices: [] });
-  const [isLoadingPermissions, setIsLoadingPermissions] = useState(false);
-  const [permissionsError, setPermissionsError] = useState('');
 
   // Promote action handler
   const handleAddAdmin = async (e: React.FormEvent) => {
@@ -79,31 +75,6 @@ export const AdminMgmt: React.FC = () => {
     } catch (err) {
       console.error(err);
       setErrorMsg('Failed to delete administrator role.');
-    }
-  };
-
-  const SHEET_IDS = {
-    dashboard: '2PACX-1vQElDgCZtxw83cOi2p7MPCASAVlt1jFC0QnEW3LagOZeu4ecVCKcqrG9M2IumCgeyi4vgvhYTSn2mTl',
-    offices: '2PACX-1vQElDgCZtxw83cOi2p7MPCASAVlt1jFC0QnEW3LagOZeu4ecVCKcqrG9M2IumCgeyi4vgvhYTSn2mTl',
-  };
-
-  const loadSheetPermissions = async () => {
-    if (!accessToken) {
-      setPermissionsError('No access token available. Please sign in again.');
-      return;
-    }
-    setIsLoadingPermissions(true);
-    setPermissionsError('');
-    try {
-      const [dashboardPerms, officesPerms] = await Promise.all([
-        fetchSheetPermissions(SHEET_IDS.dashboard, accessToken),
-        fetchSheetPermissions(SHEET_IDS.offices, accessToken),
-      ]);
-      setSheetPermissions({ dashboard: dashboardPerms, offices: officesPerms });
-    } catch (err: any) {
-      setPermissionsError(err?.message || 'Failed to load sheet permissions');
-    } finally {
-      setIsLoadingPermissions(false);
     }
   };
 
@@ -275,99 +246,6 @@ export const AdminMgmt: React.FC = () => {
               </div>
             ))}
         </div>
-      </div>
-
-      {/* GOOGLE SHEET SHARING PERMISSIONS */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm" id="sheet-sharing-module">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-          <div className="flex items-center gap-2">
-            <Users size={18} className="text-indigo-600" />
-            <h3 className="text-sm font-bold text-slate-800 font-display">Google Sheet Sharing (Sheet Permissions)</h3>
-          </div>
-          <button
-            onClick={loadSheetPermissions}
-            disabled={isLoadingPermissions}
-            className="flex items-center gap-1.5 text-[10px] sm:text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl font-bold transition-all disabled:opacity-50"
-          >
-            <RefreshCw size={12} className={isLoadingPermissions ? 'animate-spin' : ''} />
-            Refresh
-          </button>
-        </div>
-
-        {permissionsError && (
-          <div className="bg-rose-50 border border-rose-100 text-rose-700 p-2.5 rounded-lg text-xs font-sans mb-3 flex items-center gap-2">
-            <AlertCircle size={14} className="shrink-0" />
-            <span>{permissionsError}</span>
-          </div>
-        )}
-
-        {!isLoadingPermissions && sheetPermissions.dashboard.length === 0 && sheetPermissions.offices.length === 0 && !permissionsError && (
-          <p className="text-[11px] text-slate-400 text-center py-4">
-            Click <strong>Refresh</strong> to load the list of emails this sheet is shared with.
-          </p>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Dashboard Sheet Permissions */}
-          <div>
-            <h4 className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Dashboard Sheet</h4>
-            <div className="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar pr-1">
-              {sheetPermissions.dashboard.map((perm, idx) => (
-                <div key={idx} className="flex items-center justify-between bg-slate-50 rounded-lg px-3 py-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Mail size={12} className="text-slate-400 shrink-0" />
-                    <span className="text-[11px] font-medium text-slate-700 truncate">
-                      {perm.emailAddress || perm.displayName || 'Unknown'}
-                    </span>
-                  </div>
-                  <span className={`text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded shrink-0 ${
-                    perm.role === 'owner' ? 'bg-indigo-50 text-indigo-700' :
-                    perm.role === 'writer' ? 'bg-emerald-50 text-emerald-700' :
-                    perm.role === 'commenter' ? 'bg-amber-50 text-amber-700' :
-                    'bg-slate-100 text-slate-600'
-                  }`}>
-                    {perm.role}
-                  </span>
-                </div>
-              ))}
-              {sheetPermissions.dashboard.length === 0 && !isLoadingPermissions && (
-                <p className="text-[10px] text-slate-400 italic">No permissions loaded</p>
-              )}
-            </div>
-          </div>
-
-          {/* Offices Sheet Permissions */}
-          <div>
-            <h4 className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Offices Sheet</h4>
-            <div className="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar pr-1">
-              {sheetPermissions.offices.map((perm, idx) => (
-                <div key={idx} className="flex items-center justify-between bg-slate-50 rounded-lg px-3 py-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Mail size={12} className="text-slate-400 shrink-0" />
-                    <span className="text-[11px] font-medium text-slate-700 truncate">
-                      {perm.emailAddress || perm.displayName || 'Unknown'}
-                    </span>
-                  </div>
-                  <span className={`text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded shrink-0 ${
-                    perm.role === 'owner' ? 'bg-indigo-50 text-indigo-700' :
-                    perm.role === 'writer' ? 'bg-emerald-50 text-emerald-700' :
-                    perm.role === 'commenter' ? 'bg-amber-50 text-amber-700' :
-                    'bg-slate-100 text-slate-600'
-                  }`}>
-                    {perm.role}
-                  </span>
-                </div>
-              ))}
-              {sheetPermissions.offices.length === 0 && !isLoadingPermissions && (
-                <p className="text-[10px] text-slate-400 italic">No permissions loaded</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <p className="text-[9px] text-slate-400 mt-3 italic">
-          Only users with explicit Google account access are listed above. Public viewers via link are not shown here.
-        </p>
       </div>
 
     </div>

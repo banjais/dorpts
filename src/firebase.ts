@@ -30,8 +30,6 @@ export const db = firestoreDb;
 
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
-googleProvider.addScope('https://www.googleapis.com/auth/spreadsheets.readonly');
-googleProvider.addScope('https://www.googleapis.com/auth/drive.readonly');
 
 export enum OperationType {
   CREATE = 'create',
