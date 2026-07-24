@@ -157,9 +157,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (credential?.accessToken) {
         setAccessToken(credential.accessToken);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login action encountered error:', error);
-      throw error;
+      const message = error?.message || error?.code || String(error);
+      const friendly = message.includes('popup')
+        ? 'Popup blocked. Please allow popups for this site.'
+        : message.includes('auth/')
+          ? message
+          : 'Google sign-in failed.';
+      throw new Error(friendly);
     }
   };
 

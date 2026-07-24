@@ -18,8 +18,9 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
     setIsLoading(true);
     try {
       await loginWithGoogle();
-    } catch {
-      setError(language === 'en' ? 'Google sign-in failed.' : 'गूगल साइन-इन असफल।');
+    } catch (err: any) {
+      const msg = err?.message || 'Google sign-in failed.';
+      setError(msg);
       setIsLoading(false);
     }
   };
