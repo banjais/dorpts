@@ -57,15 +57,10 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
     if (isSuper) {
       setStep('loading');
       try {
-        const { createSession } = await import('../services/otpService');
-        const token = await Promise.race([
-          createSession(email),
-          new Promise<string>((_, reject) => setTimeout(() => reject(new Error('Session creation timed out')), 8000))
-        ]);
-        sessionStorage.setItem('dor_session', token);
+        sessionStorage.setItem('dor_superadmin_session', email);
         sessionStorage.setItem('dor_superadmin_bypass', 'true');
         setStep('success');
-        setTimeout(() => window.location.reload(), 800);
+        setTimeout(() => window.location.reload(), 600);
       } catch (err) {
         console.error('Superadmin auto-login failed:', err);
         setError(language === 'en' ? 'Superadmin login failed. Try again.' : 'सुपरएडमिन लगइन असफल भयो। पुनः प्रयास गर्नुहोस्।');
@@ -100,11 +95,10 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
     if (email.toLowerCase().trim() === SUPERADMIN_EMAIL.toLowerCase().trim()) {
       setStep('loading');
       try {
-        const { createSession } = await import('../services/otpService');
-        const token = await createSession(email);
-        sessionStorage.setItem('dor_session', token);
+        sessionStorage.setItem('dor_superadmin_session', email);
+        sessionStorage.setItem('dor_superadmin_bypass', 'true');
         setStep('success');
-        setTimeout(() => window.location.reload(), 800);
+        setTimeout(() => window.location.reload(), 600);
       } catch (err) {
         setError(language === 'en' ? 'Login failed. Try again.' : 'लगइन असफल भयो। पुनः प्रयास गर्नुहोस्।');
         setStep('otp');
