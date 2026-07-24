@@ -86,18 +86,17 @@ export const SuperAdminPanel: React.FC<SuperAdminPanelProps> = ({
               {NAV_ITEMS.map((item) => {
                 const isActive = activeTab === item.id;
                 return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      onTabChange(item.id);
-                      onClose();
-                    }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left group ${
-                      isActive
-                        ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-200'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                    }`}
-                  >
+                   <button
+                     key={item.id}
+                     onClick={() => {
+                       onTabChange(item.id);
+                     }}
+                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left group ${
+                       isActive
+                         ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-200'
+                         : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                     }`}
+                   >
                     <span
                       className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
                         isActive

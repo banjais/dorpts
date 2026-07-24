@@ -18,6 +18,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
     setIsLoading(true);
     try {
       await loginWithGoogle();
+      onClose?.();
     } catch (err: any) {
       const msg = err?.message || 'Google sign-in failed.';
       setError(msg);

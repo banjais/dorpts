@@ -292,6 +292,12 @@ function MainAppContent() {
     }
   }, [isSuperadmin, authLoading, showSuperAdminPanel]);
 
+  useEffect(() => {
+    if (user && showLogin) {
+      setShowLogin(false);
+    }
+  }, [user, showLogin]);
+
   const [pwaDismissed, setPwaDismissed] = useState(() => sessionStorage.getItem('pwa-update-dismissed') === 'true');
 
   useEffect(() => {
