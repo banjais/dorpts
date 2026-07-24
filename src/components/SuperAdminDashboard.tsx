@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import {
   Users, Activity, MapPin, Shield, BarChart3, Globe, UserCheck, TrendingUp,
   RefreshCw, Bell, Lock, FileText, Gauge,
-  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown
+  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn
 } from 'lucide-react';
 import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -127,6 +127,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [dataInputValues, setDataInputValues] = useState<Record<string, string>>({});
   const [dataInputLoading, setDataInputLoading] = useState(false);
   const [dataInputSaving, setDataInputSaving] = useState(false);
+  const [analyticsCardIndex, setAnalyticsCardIndex] = useState(0);
+  const analyticsCardRef = useRef<HTMLDivElement>(null);
   const [internalActiveTab, setInternalActiveTab] = useState('analytics');
 
   const activeTab = externalActiveTab || internalActiveTab;
@@ -134,6 +136,62 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
 
   const totalAdmins = useMemo(() => adminsList.length + 1, [adminsList]);
   const adminEmails = useMemo(() => adminsList.map(a => a.email), [adminsList]);
+
+  const analyticsCards = useMemo(() => [
+    {
+      label: language === 'en' ? 'Total Users' : 'कुल प्रयोगकर्ता',
+      value: analyticsData?.totalAdmins ?? totalAdmins,
+      sublabel: language === 'en' ? 'Registered admins' : 'दर्ता प्रशासकहरू',
+      color: 'text-slate-900 dark:text-white',
+      bgColor: 'bg-slate-50 dark:bg-slate-950',
+      borderColor: 'border-slate-100 dark:border-white/5',
+      icon: <Users size={20} className="text-slate-400" />,
+    },
+    {
+      label: language === 'en' ? 'Active Sessions' : 'सक्रिय सत्रहरू',
+      value: analyticsData?.activeSessions ?? 1,
+      sublabel: language === 'en' ? 'Current session' : 'हालको सत्र',
+      color: 'text-emerald-600',
+      bgColor: 'bg-slate-50 dark:bg-slate-950',
+      borderColor: 'border-slate-100 dark:border-white/5',
+      icon: <Activity size={20} className="text-emerald-400" />,
+    },
+    {
+      label: language === 'en' ? 'Superadmin' : 'सुपरप्रशासक',
+      value: 1,
+      sublabel: analyticsData?.superadminEmail ?? (user?.email || ''),
+      color: 'text-indigo-600',
+      bgColor: 'bg-slate-50 dark:bg-slate-950',
+      borderColor: 'border-slate-100 dark:border-white/5',
+      icon: <ShieldCheck size={20} className="text-indigo-400" />,
+    },
+    {
+      label: language === 'en' ? "Today's Logins" : "आजको लगइनहरू",
+      value: analyticsData?.todayLogins ?? 0,
+      sublabel: language === 'en' ? 'Login events today' : 'आजको लगइन घटनाहरू',
+      color: 'text-slate-900 dark:text-white',
+      bgColor: 'bg-slate-50 dark:bg-slate-950',
+      borderColor: 'border-slate-100 dark:border-white/5',
+      icon: <LogIn size={20} className="text-slate-400" />,
+    },
+    {
+      label: language === 'en' ? "Today's Activities" : "आजको गतिविधिहरू",
+      value: analyticsData?.todayActivities ?? 0,
+      sublabel: language === 'en' ? 'Total events today' : 'आजको कुल घटनाहरू',
+      color: 'text-slate-900 dark:text-white',
+      bgColor: 'bg-slate-50 dark:bg-slate-950',
+      borderColor: 'border-slate-100 dark:border-white/5',
+      icon: <BarChart3 size={20} className="text-slate-400" />,
+    },
+  ], [analyticsData, totalAdmins, user?.email, language]);
+
+  const handleAnalyticsSwipe = (direction: 'left' | 'right') => {
+    if (direction === 'left') {
+      setAnalyticsCardIndex(prev => Math.min(prev + 1, analyticsCards.length - 1));
+    } else {
+      setAnalyticsCardIndex(prev => Math.max(prev - 1, 0));
+    }
+  };
 
   const tabs = [
     { id: 'analytics', labelEn: 'User Analytics', labelNp: 'प्रयोगकर्ता विश्लेषण', icon: <BarChart3 size={16} /> },
@@ -535,49 +593,81 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
       </div>
 
       {/* Content based on active tab */}
-      {activeTab === 'analytics' && (
+        {activeTab === 'analytics' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
               {language === 'en' ? 'User Analytics Overview' : 'प्रयोगकर्ता विश्लेषण सारांश'}
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Total Users</div>
-                <div className="text-2xl font-black text-slate-900 dark:text-white">{analyticsData?.totalAdmins ?? totalAdmins}</div>
-                <div className="text-[10px] text-slate-500 mt-1">{language === 'en' ? 'Registered admins' : 'दर्ता प्रशासकहरू'}</div>
+            <div
+              ref={analyticsCardRef}
+              className="relative w-full overflow-hidden rounded-2xl"
+              style={{ height: 'calc(100vh - 200px)' }}
+            >
+              <div
+                className="flex transition-transform duration-500 ease-out h-full"
+                style={{ transform: `translateX(-${analyticsCardIndex * 100}%)` }}
+              >
+                {analyticsCards.map((card, idx) => (
+                  <div
+                    key={idx}
+                    className="w-full flex-shrink-0 px-2"
+                    style={{ height: '100%' }}
+                  >
+                    <div className={`${card.bgColor} rounded-2xl p-6 border ${card.borderColor} h-full flex flex-col justify-between`}>
+                      <div>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
+                            {card.icon}
+                          </div>
+                          <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+                            {card.label}
+                          </span>
+                        </div>
+                        <div className={`text-5xl font-black ${card.color} mb-2`}>
+                          {card.value}
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          {card.sublabel}
+                        </div>
+                      </div>
+                      <div className="mt-4">
+                        <div className="flex gap-1.5 justify-center">
+                          {analyticsCards.map((_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setAnalyticsCardIndex(i)}
+                              className={`h-1.5 rounded-full transition-all duration-300 ${
+                                i === analyticsCardIndex
+                                  ? 'bg-indigo-500 w-6'
+                                  : 'bg-slate-200 dark:bg-slate-700 w-1.5'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Active Sessions</div>
-                <div className="text-2xl font-black text-emerald-600">{analyticsData?.activeSessions ?? 1}</div>
-                <div className="text-[10px] text-slate-500 mt-1">{language === 'en' ? 'Current session' : 'हालको सत्र'}</div>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Superadmin</div>
-                <div className="text-2xl font-black text-indigo-600">1</div>
-                <div className="text-[10px] text-slate-500 mt-1">{analyticsData?.superadminEmail ?? user?.email}</div>
-              </div>
-            </div>
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Today's Logins</div>
-                <div className="text-2xl font-black text-slate-900 dark:text-white">{analyticsData?.todayLogins ?? 0}</div>
-                <div className="text-[10px] text-slate-500 mt-1">{language === 'en' ? 'Login events today' : 'आजको लगइन घटनाहरू'}</div>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Today's Activities</div>
-                <div className="text-2xl font-black text-slate-900 dark:text-white">{analyticsData?.todayActivities ?? 0}</div>
-                <div className="text-[10px] text-slate-500 mt-1">{language === 'en' ? 'Total events today' : 'आजको कुल घटनाहरू'}</div>
-              </div>
-            </div>
-            <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/50 rounded-xl">
-              <p className="text-[11px] text-amber-800 dark:text-amber-300">
-                {language === 'en'
-                  ? 'Detailed user analytics, login patterns, and activity heatmaps will be available here.'
-                  : 'विस्तृत प्रयोगकर्ता विश्लेषण, लगइन पैटर्न, र गतिविधि हिटम्यापहरू यहाँ उपलब्ध हुनेछन्।'}
-              </p>
+              {analyticsCardIndex > 0 && (
+                <button
+                  onClick={() => handleAnalyticsSwipe('right')}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors z-10"
+                >
+                  <ChevronDown size={16} className="rotate-90" />
+                </button>
+              )}
+              {analyticsCardIndex < analyticsCards.length - 1 && (
+                <button
+                  onClick={() => handleAnalyticsSwipe('left')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors z-10"
+                >
+                  <ChevronDown size={16} className="-rotate-90" />
+                </button>
+              )}
             </div>
           </motion.div>
-         )}
+        )}
 
         {activeTab === 'data-input' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
