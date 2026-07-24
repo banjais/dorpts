@@ -72,7 +72,6 @@ import { PWAInstallBanner } from "./components/PWAInstallBanner";
 import { OfflineStatusBar } from "./components/OfflineStatusBar";
 import { LoginScreen } from "./components/LoginScreen";
 import { SuperAdminDashboard } from "./components/SuperAdminDashboard";
-import { SuperAdminPanel } from "./components/SuperAdminPanel";
 import { SettingsPanelModal } from "./components/SettingsPanelModal";
 import { motion, AnimatePresence } from "motion/react";
 import { useDashboardLayout } from "./hooks/useDashboardLayout";
@@ -277,20 +276,11 @@ function MainAppContent() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const [showLogin, setShowLogin] = useState(false);
-  const [showSuperAdminPanel, setShowSuperAdminPanel] = useState(false);
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [superAdminActiveTab, setSuperAdminActiveTab] = useState('analytics');
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminRole, setNewAdminRole] = useState<'admin' | 'data_updater'>('admin');
   const [isSavingSettings, setIsSavingSettings] = useState(false);
-  const adminPanelAutoOpenedRef = useRef(false);
-
-  useEffect(() => {
-    if (isSuperadmin && !authLoading && !showSuperAdminPanel && !adminPanelAutoOpenedRef.current) {
-      adminPanelAutoOpenedRef.current = true;
-      setShowSuperAdminPanel(true);
-    }
-  }, [isSuperadmin, authLoading, showSuperAdminPanel]);
 
   useEffect(() => {
     if (user && showLogin) {
@@ -2610,7 +2600,6 @@ function MainAppContent() {
         onExpandFooter={() => setIsFooterExpanded(true)}
         onOpenDetailedGallery={goToDetailedGallery}
         isSuperadmin={isSuperadmin}
-        onOpenSuperAdminPanel={() => setShowSuperAdminPanel(true)}
       />
       <BudgetModal
         isOpen={isBudgetOpen}
@@ -3217,9 +3206,9 @@ function MainAppContent() {
                                </div>
                              }
                            >
-                             <div className="p-4 sm:p-6 md:p-8 w-full max-w-7xl mx-auto">
-                               <SuperAdminDashboard language={language} />
-                             </div>
+                              <div className="p-4 sm:p-6 md:p-8 w-full max-w-7xl mx-auto">
+                                <SuperAdminDashboard language={language} activeTab={superAdminActiveTab} onTabChange={setSuperAdminActiveTab} />
+                              </div>
                            </ErrorBoundary>
                          )}
                        </motion.div>
@@ -3451,7 +3440,7 @@ function MainAppContent() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowSuperAdminPanel(true)}
+                   onClick={() => handleMainViewChange('superadmin')}
                   className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[10px] font-black text-slate-700 dark:text-slate-300 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition-all flex items-center gap-1.5"
                   title={language === "en" ? "User management" : "प्रयोगकर्ता व्यवस्थापन"}
                 >
@@ -3477,7 +3466,6 @@ function MainAppContent() {
                 onClick={async () => {
                   await logout();
                   setShowLogin(false);
-                  setShowSuperAdminPanel(false);
                   setShowSettingsPanel(false);
                 }}
                 className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[10px] font-black text-slate-700 dark:text-slate-300 shadow-sm hover:border-rose-300 dark:hover:border-rose-700 transition-all flex items-center gap-1.5"
@@ -3865,17 +3853,6 @@ function MainAppContent() {
         {showLogin && (
           <LoginScreen onClose={() => setShowLogin(false)} />
         )}
-
-        {/* Super Admin Panel */}
-        <SuperAdminPanel
-          isOpen={showSuperAdminPanel}
-          onClose={() => setShowSuperAdminPanel(false)}
-          language={language}
-          activeTab={superAdminActiveTab}
-          onTabChange={setSuperAdminActiveTab}
-        >
-          <SuperAdminDashboard language={language} activeTab={superAdminActiveTab} onTabChange={setSuperAdminActiveTab} />
-        </SuperAdminPanel>
 
         {/* Superadmin Settings */}
         {showSettingsPanel && (

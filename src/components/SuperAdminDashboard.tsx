@@ -44,11 +44,11 @@ const SystemCard: React.FC<{ label: string; status: string; isText?: boolean; la
 
 interface SuperAdminDashboardProps {
   language: 'en' | 'ne';
-  activeTab: string;
-  onTabChange: (tab: string) => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }
 
-export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ language, activeTab, onTabChange }) => {
+export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ language, activeTab: externalActiveTab, onTabChange }) => {
   const { adminsList, user, isSuperadmin } = useAuth();
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [logs, setLogs] = useState<any[]>([]);
@@ -62,6 +62,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [bulkSending, setBulkSending] = useState(false);
   const [collaborators, setCollaborators] = useState<any[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
+  const [internalActiveTab, setInternalActiveTab] = useState('analytics');
+
+  const activeTab = externalActiveTab || internalActiveTab;
+  const handleTabChange = onTabChange || setInternalActiveTab;
 
   const totalAdmins = useMemo(() => adminsList.length + 1, [adminsList]);
   const adminEmails = useMemo(() => adminsList.map(a => a.email), [adminsList]);
@@ -338,6 +342,39 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
+      {/* Tab Navigation */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl p-1.5 overflow-x-auto custom-scrollbar">
+        <div className="flex items-center gap-1 min-w-max">
+          {tabs.map((item) => {
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleTabChange(item.id)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-left whitespace-nowrap ${
+                  isActive
+                    ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-200'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <span
+                  className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                    isActive
+                      ? 'bg-rose-600 text-white'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                  }`}
+                >
+                  {item.icon}
+                </span>
+                <span className="block text-[11px] font-bold leading-tight">
+                  {language === 'en' ? item.labelEn : item.labelNp}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Content based on active tab */}
       {activeTab === 'analytics' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
