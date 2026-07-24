@@ -7,7 +7,6 @@ import {
   BarChart3,
   TrendingUp,
   Activity,
-  Building2,
   ShieldCheck,
   LogIn,
   LogOut,
@@ -106,14 +105,6 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       labelNp: 'हिटम्याप',
       onClick: () => onNavigate('heatmap'),
       active: activeView === 'heatmap',
-    },
-    {
-      id: 'institutional',
-      icon: <Building2 size={18} />,
-      labelEn: 'Institutional',
-      labelNp: 'संस्थागत',
-      onClick: () => onNavigate('institutional'),
-      active: activeView === 'institutional',
     },
     {
       id: 'action-portal',
