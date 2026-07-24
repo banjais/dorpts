@@ -70,7 +70,6 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [newUserOffice, setNewUserOffice] = useState('');
   const [userSearch, setUserSearch] = useState('');
   const [dataInputOffice, setDataInputOffice] = useState('');
-  const [dataInputSearch, setDataInputSearch] = useState('');
   const [dataInputValues, setDataInputValues] = useState<Record<string, string>>({});
   const [dataInputLoading, setDataInputLoading] = useState(false);
   const [dataInputSaving, setDataInputSaving] = useState(false);
@@ -536,44 +535,19 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
               <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
                 {language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}
               </div>
-              <input
-                type="text"
-                value={dataInputSearch}
-                onChange={(e) => setDataInputSearch(e.target.value)}
-                placeholder={language === 'en' ? 'Search office...' : 'कार्यालय खोज्नुहोस्...'}
+              <select
+                value={dataInputOffice}
+                onChange={(e) => {
+                  setDataInputOffice(e.target.value);
+                  setDataInputValues({});
+                }}
                 className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-              />
-              <div className="max-h-[200px] overflow-y-auto custom-scrollbar space-y-1">
-                {dataInputSheetOffices.filter(o => {
-                  if (!dataInputSearch) return true;
-                  const q = dataInputSearch.toLowerCase();
-                  return o.toLowerCase().includes(q);
-                }).map((o) => (
-                  <button
-                    key={o}
-                    onClick={() => {
-                      setDataInputOffice(o);
-                      setDataInputValues({});
-                    }}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-colors ${
-                      dataInputOffice === o
-                        ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
-                        : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    {o}
-                  </button>
+              >
+                <option value="">{language === 'en' ? 'Choose an office...' : 'कार्यालय छान्नुहोस्...'}</option>
+                {dataInputSheetOffices.map((o) => (
+                  <option key={o} value={o}>{o}</option>
                 ))}
-                {dataInputSheetOffices.filter(o => {
-                  if (!dataInputSearch) return true;
-                  const q = dataInputSearch.toLowerCase();
-                  return o.toLowerCase().includes(q);
-                }).length === 0 && (
-                  <p className="text-[11px] text-slate-400 text-center py-3">
-                    {language === 'en' ? 'No offices found' : 'कार्यालय फेला परेन'}
-                  </p>
-                )}
-              </div>
+              </select>
             </div>
 
             {dataInputOffice && (
