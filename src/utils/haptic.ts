@@ -24,14 +24,14 @@ export const triggerHaptic = (pattern: 'light' | 'medium' | 'heavy' | 'success' 
     try {
       const intensity = getHapticIntensity();
       if (intensity === 'off') return;
-      
+
       if (typeof document !== 'undefined') {
         if (document.visibilityState === 'hidden') return;
         if (typeof document.hasFocus === 'function' && !document.hasFocus()) return;
       }
-      
+
       let multiplier = 1;
-      
+
       if (intensity === 'light') multiplier = 0.5;
       else if (intensity === 'heavy') multiplier = 2;
 
