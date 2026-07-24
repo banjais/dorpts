@@ -11,6 +11,7 @@ import { formatNepaliDate } from '../utils/date';
 import {
   Filter,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   Target,
   MessageSquare,
@@ -694,6 +695,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   const [showReportingOffices, setShowReportingOffices] = useState(false);
   const [showAllIndicators, setShowAllIndicators] = useState(false);
   const [showCategoryStatus, setShowCategoryStatus] = useState(false);
+  const [expandedCardIndex, setExpandedCardIndex] = useState<number | null>(null);
   const allIndicatorsRef = useRef<HTMLDivElement>(null);
 
   const closeAllCards = useCallback(() => {
@@ -971,16 +973,38 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
       
       {/* Sticky card stack — cards peel off and stack below the header as you scroll */}
 
-       {/* Summary Stats - Bold 3D Cards */}
-       {/* Each card slot = sentinel (always in DOM) + AnimatePresence card */}
-         <motion.div
-           animate={{
-             y: cardsReachedHeader ? -220 : 0,
-             opacity: cardsReachedHeader ? 0 : 1,
-           }}
-           transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5 pb-24 sm:pb-32"
-         >
+        {/* Summary Stats - Bold 3D Cards */}
+        {/* Each card slot = sentinel (always in DOM) + AnimatePresence card */}
+          <motion.div
+            animate={{
+              y: cardsReachedHeader ? -220 : 0,
+              opacity: cardsReachedHeader ? 0 : 1,
+            }}
+            transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+             className="dashboard-cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5 pb-24 sm:pb-32"
+          >
+            <style>{`
+              @media (max-width: 768px) {
+                .dashboard-cards-grid {
+                  display: flex;
+                  overflow-x: auto;
+                  scroll-snap-type: x mandatory;
+                  -webkit-overflow-scrolling: touch;
+                  gap: 0.75rem;
+                  padding-bottom: 6rem;
+                  margin-left: -1rem;
+                  margin-right: -1rem;
+                  padding-left: 1rem;
+                  padding-right: 1rem;
+                }
+                .dashboard-cards-grid > * {
+                  scroll-snap-align: start;
+                  flex-shrink: 0;
+                  width: 100%;
+                  min-height: 100vh;
+                }
+              }
+            `}</style>
         {/* Card 0: Hero Overall Progress */}
          <AnimatePresence>
             <motion.button
