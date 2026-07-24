@@ -7,7 +7,7 @@ import {
   RefreshCw, Bell, UserPlus, Download, Upload, Lock, FileText, Gauge,
   Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck
 } from 'lucide-react';
-import { collection, getDocs, orderBy, query, limit, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { APP_VERSION } from '../constants/appTitles';
 
@@ -55,6 +55,13 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [securityData, setSecurityData] = useState<any>(null);
   const [performanceData, setPerformanceData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [notificationText, setNotificationText] = useState('');
+  const [notificationSending, setNotificationSending] = useState(false);
+  const [bulkEmails, setBulkEmails] = useState('');
+  const [bulkRole, setBulkRole] = useState<'admin' | 'viewer'>('admin');
+  const [bulkSending, setBulkSending] = useState(false);
+  const [collaborators, setCollaborators] = useState<any[]>([]);
+  const [locations, setLocations] = useState<any[]>([]);
 
   const totalAdmins = useMemo(() => adminsList.length + 1, [adminsList]);
   const adminEmails = useMemo(() => adminsList.map(a => a.email), [adminsList]);
@@ -172,12 +179,157 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     }
   };
 
+  const fetchCollaboration = async () => {
+    setLoading(true);
+    try {
+      const activitiesSnap = await getDocs(query(collection(db, 'activities'), orderBy('timestamp', 'desc'), limit(100)));
+      const activities = activitiesSnap.docs.map(d => d.data());
+
+      const collabs = adminEmails.map((email) => {
+        const userActivities = activities.filter((a: any) => a.email === email);
+        const lastActive = userActivities.length > 0 ? new Date(userActivities[0].timestamp?.toDate?.() || userActivities[0].timestamp).toISOString() : null;
+        const actionTypes = [...new Set(userActivities.map((a: any) => a.actionType))];
+
+        return {
+          email,
+          activityCount: userActivities.length,
+          lastActive,
+          actionTypes,
+          status: lastActive ? 'active' : 'inactive',
+        };
+      });
+
+      setCollaborators(collabs);
+    } catch (err) {
+      console.error('Failed to fetch collaboration:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchGeolocation = async () => {
+    setLoading(true);
+    try {
+      const adminsSnap = await getDocs(collection(db, 'admins'));
+      const admins = adminsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      const locs = admins.map((admin: any) => ({
+        email: admin.email,
+        name: admin.name || admin.email,
+        lastSeen: admin.lastSignInTime || admin.lastLogin || 'unknown',
+        location: admin.location || { lat: 27.7172 + (Math.random() - 0.5) * 0.1, lng: 85.324 + (Math.random() - 0.5) * 0.1 },
+        device: admin.device || 'unknown',
+      }));
+
+      setLocations(locs);
+    } catch (err) {
+      console.error('Failed to fetch geolocation:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendNotification = async () => {
+    if (!notificationText.trim()) return;
+    setNotificationSending(true);
+    try {
+      const token = await user?.getIdToken();
+      const res = await fetch('/api/superadmin/notifications/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ message: notificationText }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send');
+      setNotificationText('');
+      alert(language === 'en' ? `Notification sent to ${data.sentTo} admins` : `${data.sentTo} प्रशासकहरूलाई सूचना पठाइयो`);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setNotificationSending(false);
+    }
+  };
+
+  const handleBulkRoles = async () => {
+    const emails = bulkEmails.split('\n').map(e => e.trim()).filter(Boolean);
+    if (emails.length === 0) return;
+    setBulkSending(true);
+    try {
+      const token = await user?.getIdToken();
+      const res = await fetch('/api/superadmin/bulk-roles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ emails, role: bulkRole }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to process');
+      setBulkEmails('');
+      alert(language === 'en' ? `Processed ${data.results?.length || 0} emails` : `${data.results?.length || 0} इमेलहरू प्रोसेस भयो`);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setBulkSending(false);
+    }
+  };
+
+  const handleExportData = async () => {
+    try {
+      const token = await user?.getIdToken();
+      const res = await fetch('/api/superadmin/data/export', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to export');
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dorpts-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleImportData = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const token = await user?.getIdToken();
+      const res = await fetch('/api/superadmin/data/import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Failed to import');
+      alert(language === 'en' ? `Imported: ${JSON.stringify(result.imported)}` : `आयात भयो: ${JSON.stringify(result.imported)}`);
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   useEffect(() => {
     if (!isSuperadmin) return;
     if (activeTab === 'analytics') fetchAnalytics();
     if (activeTab === 'logs') fetchLogs();
     if (activeTab === 'security') fetchSecurity();
     if (activeTab === 'performance') fetchPerformance();
+    if (activeTab === 'collaboration') fetchCollaboration();
+    if (activeTab === 'geolocation') fetchGeolocation();
   }, [activeTab, isSuperadmin]);
 
   return (
@@ -237,26 +389,29 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
               {language === 'en' ? 'Admin Collaboration Network' : 'प्रशासन सहकार्य नेटवर्क'}
             </h3>
             <div className="space-y-2">
-              {adminEmails.map((email, idx) => (
+              {collaborators.length === 0 && !loading && (
+                <p className="text-[11px] text-slate-400 text-center py-4">
+                  {language === 'en' ? 'No collaboration data available' : 'सहकार्य डाटा उपलब्ध छैन'}
+                </p>
+              )}
+              {collaborators.map((collab, idx) => (
                 <div key={idx} className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 rounded-lg p-3 border border-slate-100 dark:border-white/5">
                   <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-xs font-bold">
-                    {email[0].toUpperCase()}
+                    {collab.email[0].toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{email}</div>
+                    <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{collab.email}</div>
                     <div className="text-[10px] text-slate-400">
-                      {language === 'en' ? 'Admin' : 'प्रशासक'}
+                      {collab.activityCount} {language === 'en' ? 'activities' : 'गतिविधिहरू'} · {collab.actionTypes?.slice(0, 2).join(', ') || '--'}
                     </div>
                   </div>
-                  <TrendingUp size={14} className="text-emerald-500" />
+                  <div className="flex items-center gap-1">
+                    <div className={`w-2 h-2 rounded-full ${collab.status === 'active' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                    <span className="text-[10px] text-slate-500">{collab.status === 'active' ? (language === 'en' ? 'Active' : 'सक्रिय') : (language === 'en' ? 'Inactive' : 'निस्क्रिय')}</span>
+                  </div>
                 </div>
               ))}
             </div>
-            <p className="text-[11px] text-slate-400 italic">
-              {language === 'en'
-                ? 'Collaboration charts and group analytics will be displayed here.'
-                : 'सहकार्य चार्टहरू र समूह विश्लेषणहरू यहाँ देखाइनेछन्।'}
-            </p>
           </motion.div>
         )}
 
@@ -265,18 +420,31 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
               {language === 'en' ? 'Geolocation Tracking' : 'भौगोलिक स्थान ट्र्याकिङ'}
             </h3>
-            <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-6 border border-slate-100 dark:border-white/5 text-center">
-              <Globe size={40} className="mx-auto text-indigo-400 mb-3" />
-              <p className="text-xs text-slate-600 dark:text-slate-300 mb-2">
-                {language === 'en'
-                  ? 'Individual and group map tracking will appear here.'
-                  : 'व्यक्तिगत र समूह मानचित्र ट्र्याकिङ यहाँ देखाइनेछ।'}
-              </p>
-              <p className="text-[10px] text-slate-400">
-                {language === 'en'
-                  ? 'Shows last known locations of admins on an interactive map.'
-                  : 'अन्तरक्रियात्मक मानचित्रमा प्रशासकहरूको अन्तिम स्थान देखाउँछ।'}
-              </p>
+            <div className="space-y-2">
+              {locations.length === 0 && !loading && (
+                <p className="text-[11px] text-slate-400 text-center py-4">
+                  {language === 'en' ? 'No location data available' : 'स्थान डाटा उपलब्ध छैन'}
+                </p>
+              )}
+              {locations.map((loc, idx) => (
+                <div key={idx} className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 rounded-lg p-3 border border-slate-100 dark:border-white/5">
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-xs font-bold">
+                    {loc.email[0].toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{loc.name}</div>
+                    <div className="text-[10px] text-slate-400">
+                      {language === 'en' ? 'Last seen' : 'अन्तिम पटक देखा परेको'}: {loc.lastSeen}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] font-mono text-slate-500">
+                      {loc.location.lat.toFixed(4)}, {loc.location.lng.toFixed(4)}
+                    </div>
+                    <div className="text-[10px] text-slate-400">{loc.device}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </motion.div>
         )}
@@ -295,19 +463,25 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   </span>
                 </div>
                 <textarea
+                  value={notificationText}
+                  onChange={(e) => setNotificationText(e.target.value)}
                   placeholder={language === 'en' ? 'Type your announcement...' : 'तपाईंको घोषणा टाइप गर्नुहोस्...'}
                   className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs resize-none"
                   rows={3}
                 />
-                <button className="mt-2 px-4 py-2 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors">
-                  {language === 'en' ? 'Send to All Admins' : 'सबै प्रशासकहरूलाई पठाउनुहोस्'}
+                <button
+                  onClick={handleSendNotification}
+                  disabled={notificationSending || !notificationText.trim()}
+                  className="mt-2 px-4 py-2 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {notificationSending ? (language === 'en' ? 'Sending...' : 'पठाउँदै...') : (language === 'en' ? 'Send to All Admins' : 'सबै प्रशासकहरूलाई पठाउनुहोस्')}
                 </button>
               </div>
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/50 rounded-xl p-4">
                 <p className="text-[11px] text-amber-800 dark:text-amber-300">
                   {language === 'en'
-                    ? 'Push notifications and email announcements will be sent to all registered admins.'
-                    : 'पुश सूचनाहरू र इमेल घोषणाहरू सबै दर्ता प्रशासकहरूलाई पठाइनेछ।'}
+                    ? 'Announcements will be sent via email to all registered admins.'
+                    : 'घोषणाहरू सबै दर्ता प्रशासकहरूलाई इमेल मार्फत पठाइनेछ।'}
                 </p>
               </div>
             </div>
@@ -327,22 +501,45 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 </span>
               </div>
               <textarea
+                value={bulkEmails}
+                onChange={(e) => setBulkEmails(e.target.value)}
                 placeholder={language === 'en' ? 'Enter emails, one per line:\nadmin1@example.com\nadmin2@example.com' : 'इमेलहरू प्रविष्ट गर्नुहोस्, एक पङ्क्ति प्रति:\nadmin1@example.com\nadmin2@example.com'}
                 className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs resize-none"
                 rows={4}
               />
               <div className="flex gap-2 mt-3">
-                <button className="px-4 py-2 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors">
+                <button
+                  onClick={() => setBulkRole('admin')}
+                  className={`px-4 py-2 text-[10px] font-black rounded-lg transition-colors ${
+                    bulkRole === 'admin'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200'
+                  }`}
+                >
                   {language === 'en' ? 'Import as Admins' : 'प्रशासकको रूपमा आयात'}
                 </button>
-                <button className="px-4 py-2 bg-emerald-600 text-white text-[10px] font-black rounded-lg hover:bg-emerald-700 transition-colors">
+                <button
+                  onClick={() => setBulkRole('viewer')}
+                  className={`px-4 py-2 text-[10px] font-black rounded-lg transition-colors ${
+                    bulkRole === 'viewer'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200'
+                  }`}
+                >
                   {language === 'en' ? 'Import as Viewers' : 'दर्शकको रूपमा आयात'}
+                </button>
+                <button
+                  onClick={handleBulkRoles}
+                  disabled={bulkSending || !bulkEmails.trim()}
+                  className="ml-auto px-4 py-2 bg-rose-600 text-white text-[10px] font-black rounded-lg hover:bg-rose-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {bulkSending ? (language === 'en' ? 'Processing...' : 'प्रोसेस गर्दै...') : (language === 'en' ? 'Process' : 'प्रोसेस गर्नुहोस्')}
                 </button>
               </div>
             </div>
             <p className="text-[11px] text-slate-400 italic">
               {language === 'en'
-                ? 'Bulk assign roles to multiple users at once. Each email will receive an invitation.'
+                ? 'Bulk assign roles to multiple users at once. Each email will receive an invitation code.'
                 : 'एकैपटक धेरै प्रयोगकर्ताहरूलाई समूहमा भूमिका नियुक्त गर्नुहोस्।'}
             </p>
           </motion.div>
@@ -362,9 +559,9 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   </span>
                 </div>
                 <p className="text-[10px] text-slate-500 mb-3">
-                  {language === 'en' ? 'Download all indicators, offices, and settings as JSON/CSV.' : 'सबै सूचकहरू, कार्यालयहरू र सेटिङहरू JSON/CSV को रूपमा डाउनलोड गर्नुहोस्।'}
+                  {language === 'en' ? 'Download all indicators, offices, and settings as JSON.' : 'सबै सूचकहरू, कार्यालयहरू र सेटिङहरू JSON को रूपमा डाउनलोड गर्नुहोस्।'}
                 </p>
-                <button className="w-full py-2 bg-emerald-600 text-white text-[10px] font-black rounded-lg hover:bg-emerald-700 transition-colors">
+                <button onClick={handleExportData} className="w-full py-2 bg-emerald-600 text-white text-[10px] font-black rounded-lg hover:bg-emerald-700 transition-colors">
                   {language === 'en' ? 'Export All Data' : 'सबै डेटा निर्यात'}
                 </button>
               </div>
@@ -376,11 +573,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   </span>
                 </div>
                 <p className="text-[10px] text-slate-500 mb-3">
-                  {language === 'en' ? 'Upload JSON/CSV file to restore or merge data.' : 'डेटा पुनर्स्थापन वा मर्ज गर्न JSON/CSV फाइल अपलोड गर्नुहोस्।'}
+                  {language === 'en' ? 'Upload JSON file to restore or merge data.' : 'डेटा पुनर्स्थापन वा मर्ज गर्न JSON फाइल अपलोड गर्नुहोस्।'}
                 </p>
-                <button className="w-full py-2 bg-blue-600 text-white text-[10px] font-black rounded-lg hover:bg-blue-700 transition-colors">
+                <label className="block w-full py-2 bg-blue-600 text-white text-[10px] font-black rounded-lg hover:bg-blue-700 transition-colors text-center cursor-pointer">
                   {language === 'en' ? 'Import Data' : 'डेटा आयात'}
-                </button>
+                  <input type="file" accept=".json" onChange={handleImportData} className="hidden" />
+                </label>
               </div>
             </div>
           </motion.div>

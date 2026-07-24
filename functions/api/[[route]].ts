@@ -451,3 +451,68 @@ Keep explanationEn and explanationNp concise, precise, and highly professional. 
 
   return withCors(new Response("Not Found", { status: 404 }));
 }
+
+// ---------------------------------------------------------------------------
+// Superadmin API endpoints
+// ---------------------------------------------------------------------------
+
+// POST /api/superadmin/notifications/send
+if (path === '/api/superadmin/notifications/send' && method === 'POST') {
+  const auth = request.headers.get('authorization');
+  if (!auth) return withCors(Response.json({ error: 'Unauthorized' }, { status: 401 }));
+
+  try {
+    const token = auth.replace('Bearer ', '');
+    const sessionRes = await fetch(`${url.origin}/api/verify-session`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const session = await sessionRes.json();
+    if (session.role !== 'superadmin') {
+      return withCors(Response.json({ error: 'Forbidden' }, { status: 403 }));
+    }
+
+    const { message, recipients } = await request.json();
+    if (!message || typeof message !== 'string') {
+      return withCors(Response.json({ error: 'Message is required' }, { status: 400 }));
+    }
+
+    const appName = env.APP_NAME || 'DORPTS';
+    const apiKey = env.RESEND_API_KEY || process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      return withCors(Response.json({ error: 'Email service not configured' }, { status: 500 }));
+    }
+
+    const resendClient = new Resend(apiKey);
+    const targetEmails = recipients && Array.isArray(recipients) && recipients.length > 0
+      ? recipients
+      : (session.adminEmails || []);
+
+    const sendPromises = targetEmails.map((email: string) =>
+      resendClient.emails.send({
+        from: `${appName} <noreply@dorpts.app>`,
+        to: email,
+        subject: `${appName} - Announcement from Superadmin`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: #0099DA; color: white; padding: 16px 24px; border-radius: 12px 12px 0 0; font-size: 18px; font-weight: bold;">
+              ${appName}
+            </div>
+            <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;">
+              <p style="color: #334155; font-size: 14px; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</p>
+              <p style="color: #64748b; font-size: 12px; margin-top: 16px;">Sent by: ${session.email}</p>
+            </div>
+          </div>
+        `,
+      })
+    );
+
+    await Promise.all(sendPromises);
+
+    return withCors(Response.json({ success: true, sentTo: targetEmails.length }));
+  } catch (error: any) {
+    return withCors(Response.json({ error: error.message || 'Failed to send notifications' }, { status: 500 }));
+  }
+}
+
+  return withCors(new Response("Not Found", { status: 404 }));
+}
