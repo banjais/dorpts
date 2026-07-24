@@ -64,8 +64,15 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [showAddUser, setShowAddUser] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [newUserEmail, setNewUserEmail] = useState('');
-  const [newUserRole, setNewUserRole] = useState<'admin' | 'viewer'>('admin');
+  const [newUserRole, setNewUserRole] = useState<'superadmin' | 'admin' | 'viewer'>('admin');
   const [newUserOffice, setNewUserOffice] = useState('');
+  const [userSearch, setUserSearch] = useState('');
+  const [dataInputOffice, setDataInputOffice] = useState('');
+  const [dataInputSearch, setDataInputSearch] = useState('');
+  const [dataInputIndicators, setDataInputIndicators] = useState<any[]>([]);
+  const [dataInputValues, setDataInputValues] = useState<Record<string, string>>({});
+  const [dataInputLoading, setDataInputLoading] = useState(false);
+  const [dataInputSaving, setDataInputSaving] = useState(false);
   const [internalActiveTab, setInternalActiveTab] = useState('analytics');
 
   const activeTab = externalActiveTab || internalActiveTab;
@@ -77,6 +84,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const tabs = [
     { id: 'analytics', labelEn: 'User Analytics', labelNp: 'प्रयोगकर्ता विश्लेषण', icon: <BarChart3 size={16} /> },
     { id: 'user-management', labelEn: 'User Management', labelNp: 'प्रयोगकर्ता व्यवस्थापन', icon: <Users size={16} /> },
+    { id: 'data-input', labelEn: 'Data Input', labelNp: 'डाटा इनपुट', icon: <FileText size={16} /> },
     { id: 'collaboration', labelEn: 'Collaboration', labelNp: 'सहकार्य', icon: <Globe size={16} /> },
     { id: 'geolocation', labelEn: 'Geolocation', labelNp: 'भौगोलिक स्थान', icon: <MapPin size={16} /> },
     { id: 'notifications', labelEn: 'Notifications', labelNp: 'सूचनाहरू', icon: <Bell size={16} /> },
@@ -346,10 +354,24 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     }
   };
 
+  const fetchIndicators = async () => {
+    setDataInputLoading(true);
+    try {
+      const snap = await getDocs(query(collection(db, 'indicators'), orderBy('id')));
+      const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setDataInputIndicators(list);
+    } catch (err) {
+      console.error('Failed to fetch indicators:', err);
+    } finally {
+      setDataInputLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!isSuperadmin) return;
     if (activeTab === 'analytics') fetchAnalytics();
     if (activeTab === 'user-management') fetchUsers();
+    if (activeTab === 'data-input') fetchIndicators();
     if (activeTab === 'logs' || activeTab === 'security') { fetchLogs(); fetchSecurity(); }
     if (activeTab === 'security-logs') { fetchLogs(); fetchSecurity(); }
     if (activeTab === 'performance') fetchPerformance();
@@ -438,6 +460,134 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   : 'विस्तृत प्रयोगकर्ता विश्लेषण, लगइन पैटर्न, र गतिविधि हिटम्यापहरू यहाँ उपलब्ध हुनेछन्।'}
               </p>
             </div>
+          </motion.div>
+         )}
+
+        {activeTab === 'data-input' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+              {language === 'en' ? 'Data Input / Update' : 'डाटा इनपुट / अपडेट'}
+            </h3>
+
+            <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5 space-y-3">
+              <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                {language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}
+              </div>
+              <input
+                type="text"
+                value={dataInputSearch}
+                onChange={(e) => setDataInputSearch(e.target.value)}
+                placeholder={language === 'en' ? 'Search office...' : 'कार्यालय खोज्नुहोस्...'}
+                className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+              />
+              <div className="max-h-[200px] overflow-y-auto custom-scrollbar space-y-1">
+                {offices.filter(o => {
+                  if (!dataInputSearch) return true;
+                  const q = dataInputSearch.toLowerCase();
+                  return o.name.toLowerCase().includes(q) || o.shortName.toLowerCase().includes(q) || o.officeId.toLowerCase().includes(q);
+                }).map((o) => (
+                  <button
+                    key={o.officeId}
+                    onClick={() => {
+                      setDataInputOffice(o.name);
+                      setDataInputValues({});
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-colors ${
+                      dataInputOffice === o.name
+                        ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
+                        : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {o.name}
+                  </button>
+                ))}
+                {offices.filter(o => {
+                  if (!dataInputSearch) return true;
+                  const q = dataInputSearch.toLowerCase();
+                  return o.name.toLowerCase().includes(q) || o.shortName.toLowerCase().includes(q) || o.officeId.toLowerCase().includes(q);
+                }).length === 0 && (
+                  <p className="text-[11px] text-slate-400 text-center py-3">
+                    {language === 'en' ? 'No offices found' : 'कार्यालय फेला परेन'}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {dataInputOffice && (
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {language === 'en' ? 'Office' : 'कार्यालय'}: {dataInputOffice}
+                  </span>
+                  <span className="text-[10px] text-slate-400">
+                    {language === 'en' ? 'Update indicator values below' : 'तलका सूचक मान अपडेट गर्नुहोस्'}
+                  </span>
+                </div>
+
+                {dataInputLoading && (
+                  <div className="text-[11px] text-slate-400 text-center py-4">
+                    {language === 'en' ? 'Loading indicators...' : 'सूचकहरू लोड गर्दै...'}
+                  </div>
+                )}
+
+                {!dataInputLoading && dataInputIndicators.length === 0 && (
+                  <div className="text-[11px] text-slate-400 text-center py-4">
+                    {language === 'en' ? 'No indicators available. Click an office to load data.' : 'सूचकहरू उपलब्ध छैनन्। डाटा लोड गर्न कार्यालय क्लिक गर्नुहोस्।'}
+                  </div>
+                )}
+
+                {dataInputIndicators.length > 0 && (
+                  <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
+                    {dataInputIndicators.map((ind: any) => {
+                      const indId = ind.id || ind.indicatorId || ind.name;
+                      const label = language === 'en' ? (ind.nameEn || ind.name || indId) : (ind.nameNp || ind.name || indId);
+                      const currentValue = dataInputValues[indId] ?? (ind.value ?? ind.currentValue ?? '');
+                      return (
+                        <div key={indId} className="flex items-center gap-3 bg-white dark:bg-slate-900 rounded-lg px-3 py-2.5 border border-slate-100 dark:border-white/5">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{label}</div>
+                            <div className="text-[10px] text-slate-400">{ind.category || ''}</div>
+                          </div>
+                          <input
+                            type="number"
+                            value={currentValue}
+                            onChange={(e) => setDataInputValues(prev => ({ ...prev, [indId]: e.target.value }))}
+                            className="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-right"
+                            placeholder="0"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <button
+                  onClick={async () => {
+                    if (!dataInputOffice) return;
+                    setDataInputSaving(true);
+                    try {
+                      const officeDoc = doc(db, 'offices', dataInputOffice);
+                      const existing = await getDoc(officeDoc);
+                      const updates: any = { ...dataInputValues, updatedAt: Timestamp.now(), updatedBy: user?.email };
+                      if (existing.exists()) {
+                        await setDoc(officeDoc, updates, { merge: true });
+                      } else {
+                        await setDoc(officeDoc, { name: dataInputOffice, ...updates });
+                      }
+                      alert(language === 'en' ? 'Data saved successfully' : 'डाटा सफलतापूर्वक सुरक्षित भयो');
+                    } catch (err: any) {
+                      alert(err.message);
+                    } finally {
+                      setDataInputSaving(false);
+                    }
+                  }}
+                  disabled={dataInputSaving || Object.keys(dataInputValues).length === 0}
+                  className="w-full py-2 bg-emerald-600 text-white text-[10px] font-black rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {dataInputSaving ? (language === 'en' ? 'Saving...' : 'सुरक्षित गर्दै...') : (language === 'en' ? 'Save Data' : 'डाटा सुरक्षित गर्नुहोस्')}
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -587,16 +737,18 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   <option value="admin">{language === 'en' ? 'Admin' : 'प्रशासक'}</option>
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
-                <select
-                  value={newUserOffice}
-                  onChange={(e) => setNewUserOffice(e.target.value)}
-                  className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                >
-                  <option value="">{language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}</option>
-                  {offices.map((o) => (
-                    <option key={o.name} value={o.name}>{o.name}</option>
-                  ))}
-                </select>
+                {newUserRole !== 'superadmin' && newUserRole !== 'viewer' && (
+                  <select
+                    value={newUserOffice}
+                    onChange={(e) => setNewUserOffice(e.target.value)}
+                    className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                  >
+                    <option value="">{language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}</option>
+                    {offices.map((o) => (
+                      <option key={o.name} value={o.name}>{o.name}</option>
+                    ))}
+                  </select>
+                )}
                 <button
                   onClick={handleAddUser}
                   disabled={!newUserEmail.trim()}
@@ -608,18 +760,31 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
             )}
 
             <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+              <input
+                type="text"
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
+                placeholder={language === 'en' ? 'Search users...' : 'प्रयोगकर्ता खोज्नुहोस्...'}
+                className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs mb-3"
+              />
               <div className="space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar">
                 {users.length === 0 && !loading && (
                   <p className="text-[11px] text-slate-400 text-center py-4">
                     {language === 'en' ? 'No users found' : 'प्रयोगकर्ता फेला परेन'}
                   </p>
                 )}
-                {users.map((u) => (
+                {users.filter(u => {
+                  if (!userSearch) return true;
+                  const q = userSearch.toLowerCase();
+                  return u.email.toLowerCase().includes(q) || (u.office || '').toLowerCase().includes(q) || (u.role || '').toLowerCase().includes(q);
+                }).map((u) => (
                   <div key={u.id} className="flex items-center justify-between bg-white dark:bg-slate-900 rounded-lg px-3 py-2.5 border border-slate-100 dark:border-white/5">
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{u.email}</div>
                       <div className="text-[10px] text-slate-400">
-                        {u.role === 'admin' ? (language === 'en' ? 'Admin' : 'प्रशासक') : (language === 'en' ? 'Viewer' : 'दर्शक')}
+                        {u.role === 'superadmin' ? (language === 'en' ? 'Superadmin' : 'सुपरप्रशासक') :
+                         u.role === 'admin' ? (language === 'en' ? 'Admin' : 'प्रशासक') :
+                         (language === 'en' ? 'Viewer' : 'दर्शक')}
                         {u.office ? ` · ${u.office}` : ''}
                       </div>
                     </div>
@@ -669,28 +834,30 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   <option value="admin">{language === 'en' ? 'Admin' : 'प्रशासक'}</option>
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
-                <select
-                  value={editingUser.office || ''}
-                  onChange={(e) => setEditingUser({ ...editingUser, office: e.target.value })}
-                  className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                >
-                  <option value="">{language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}</option>
-                  {offices.map((o) => (
-                    <option key={o.name} value={o.name}>{o.name}</option>
-                  ))}
-                </select>
+                {editingUser.role !== 'superadmin' && editingUser.role !== 'viewer' && (
+                  <select
+                    value={editingUser.office || ''}
+                    onChange={(e) => setEditingUser({ ...editingUser, office: e.target.value })}
+                    className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                  >
+                    <option value="">{language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}</option>
+                    {offices.map((o) => (
+                      <option key={o.name} value={o.name}>{o.name}</option>
+                    ))}
+                  </select>
+                )}
                 <button
                   onClick={handleUpdateUser}
                   className="w-full py-2 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors"
                 >
                   {language === 'en' ? 'Save Changes' : 'परिवर्तनहरू सुरक्षित गर्नुहोस्'}
                 </button>
-              </div>
-            )}
-          </motion.div>
-        )}
+               </div>
+             )}
+           </motion.div>
+         )}
 
-        {activeTab === 'security-logs' && (
+         {activeTab === 'security-logs' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
               {language === 'en' ? 'Security & System Logs' : 'सुरक्षा र सिस्टम लग'}
