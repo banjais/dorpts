@@ -1050,7 +1050,12 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
               </div>
             </div>
             <button
-              onClick={() => setViewMode && setViewMode("card")}
+              onClick={() => {
+                const el = document.getElementById('detailed-gallery');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }}
               className="group relative flex items-center gap-4 px-10 py-5 bg-slate-900 dark:bg-white text-white dark:text-indigo-900 rounded-[24px] font-black text-[13px] uppercase tracking-widest transition-all cursor-pointer shadow-xl shadow-slate-900/10 dark:shadow-indigo-500/20 transform hover:-translate-y-1 active:scale-95 overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-slate-800 to-slate-900 dark:from-indigo-50 dark:to-white opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -1092,6 +1097,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
 
       {/* PRIORITIZED OVERALL PERFORMANCE GRAPH */}
       <motion.div 
+        id="detailed-gallery"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}

@@ -1328,6 +1328,17 @@ function MainAppContent() {
     setIsDrawerOpen(false);
   }, []);
 
+  const goToDetailedGallery = useCallback(() => {
+    handleMainViewChange('dashboard');
+    setIsDrawerOpen(false);
+    setTimeout(() => {
+      const el = document.getElementById('detailed-gallery');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  }, []);
+
   const handleViewChange = useCallback((view: ViewMode | "trend") => {
     setSearchQuery(""); // Clear search history/query on view change
     setCategoryFilter("All");
@@ -2583,6 +2594,7 @@ function MainAppContent() {
         onOpenAbout={() => setIsAboutModalOpen(true)}
         onOpenLogin={() => setShowLogin(true)}
         onExpandFooter={() => setIsFooterExpanded(true)}
+        onOpenDetailedGallery={goToDetailedGallery}
       />
       <BudgetModal
         isOpen={isBudgetOpen}

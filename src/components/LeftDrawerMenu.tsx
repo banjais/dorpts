@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
   LayoutDashboard,
+  Image,
   BarChart3,
   TrendingUp,
   Activity,
@@ -26,6 +27,7 @@ interface LeftDrawerMenuProps {
   onOpenAbout?: () => void;
   onOpenLogin?: () => void;
   onExpandFooter?: () => void;
+  onOpenDetailedGallery?: () => void;
 }
 
 export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
@@ -38,6 +40,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
   onOpenAbout,
   onOpenLogin,
   onExpandFooter,
+  onOpenDetailedGallery,
 }) => {
   const { user, isAdmin, loginWithGoogle, logout } = useAuth();
 
@@ -56,6 +59,17 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       labelEn: 'Overview',
       labelNp: 'अवलोकन',
       onClick: () => onNavigate('dashboard'),
+      active: activeView === 'dashboard',
+    },
+    {
+      id: 'detailed-gallery',
+      icon: <Image size={18} />,
+      labelEn: 'Detailed Gallery',
+      labelNp: 'विस्तृत ग्यालरी',
+      onClick: () => {
+        onOpenDetailedGallery?.();
+        onClose();
+      },
       active: activeView === 'dashboard',
     },
     {
