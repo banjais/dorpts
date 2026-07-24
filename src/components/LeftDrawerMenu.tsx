@@ -30,6 +30,7 @@ interface LeftDrawerMenuProps {
   onExpandFooter?: () => void;
   onOpenDetailedGallery?: () => void;
   isSuperadmin?: boolean;
+  onOpenSuperAdminPanel?: () => void;
 }
 
 export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
@@ -44,6 +45,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
   onExpandFooter,
   onOpenDetailedGallery,
   isSuperadmin = false,
+  onOpenSuperAdminPanel,
 }) => {
   const { user, isAdmin, loginWithGoogle, logout } = useAuth();
 
@@ -69,8 +71,11 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       icon: <Crown size={18} />,
       labelEn: 'Super Admin',
       labelNp: 'सुपर एडमिन',
-      onClick: () => onNavigate('superadmin'),
-      active: activeView === 'superadmin',
+      onClick: () => {
+        onOpenSuperAdminPanel?.();
+        onClose();
+      },
+      active: false,
     }] : []),
     {
       id: 'detailed-gallery',

@@ -10,11 +10,12 @@ import {
 
 interface SuperAdminDashboardProps {
   language: 'en' | 'ne';
+  activeTab: string;
+  onTabChange: (tab: string) => void;
 }
 
-export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ language }) => {
+export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ language, activeTab, onTabChange }) => {
   const { adminsList, user, isSuperadmin } = useAuth();
-  const [activeTab, setActiveTab] = useState<'analytics' | 'collaboration' | 'geolocation' | 'notifications' | 'bulk-roles' | 'data-manager' | 'security' | 'logs' | 'performance' | 'system'>('analytics');
 
   const totalAdmins = useMemo(() => adminsList.length + 1, [adminsList]);
   const adminEmails = useMemo(() => adminsList.map(a => a.email), [adminsList]);
@@ -38,48 +39,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Shield className="text-indigo-600" size={20} />
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
-              {language === 'en' ? 'Super Admin' : 'सुपर एडमिन'}
-            </h2>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {language === 'en' ? 'System administration and oversight' : 'प्रणाली प्रशासन र निरीक्षण'}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 text-xs bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-200 px-3 py-1.5 rounded-full font-bold">
-          <UserCheck size={14} />
-          {totalAdmins} {language === 'en' ? 'Admins' : 'प्रशासकहरू'}
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex flex-wrap items-center gap-1.5 bg-slate-50 dark:bg-slate-950 p-1.5 rounded-3xl border border-slate-100 dark:border-white/5 shadow-inner">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-              activeTab === tab.id
-                ? 'bg-indigo-600 text-white dark:bg-indigo-500 shadow-md border border-indigo-500'
-                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-850/50'
-            }`}
-          >
-            {tab.icon}
-            <span>{language === 'en' ? tab.labelEn : tab.labelNp}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* Content */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl -mr-40 -mt-40 pointer-events-none" />
-
-        {activeTab === 'analytics' && (
+      {/* Content based on active tab */}
+      {activeTab === 'analytics' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
               {language === 'en' ? 'User Analytics Overview' : 'प्रयोगकर्ता विश्लेषण सारांश'}
@@ -403,9 +364,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 <div className="text-xs font-bold text-slate-700 dark:text-slate-200">2.9.2</div>
               </div>
             </div>
-          </motion.div>
-        )}
-      </div>
-    </motion.div>
-  );
-};
+           </motion.div>
+         )}
+       </motion.div>
+   );
+ };
