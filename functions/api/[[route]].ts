@@ -513,6 +513,3 @@ if (path === '/api/superadmin/notifications/send' && method === 'POST') {
     return withCors(Response.json({ error: error.message || 'Failed to send notifications' }, { status: 500 }));
   }
 }
-
-  return withCors(new Response("Not Found", { status: 404 }));
-}
