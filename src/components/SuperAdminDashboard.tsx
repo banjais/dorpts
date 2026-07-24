@@ -772,16 +772,18 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
                 {newUserRole !== 'superadmin' && newUserRole !== 'viewer' && (
-                  <select
-                    value={newUserOffice}
-                    onChange={(e) => setNewUserOffice(e.target.value)}
-                    className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                  >
-                    <option value="">{language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}</option>
-                    {offices.map((o) => (
-                      <option key={o.name} value={o.name}>{o.name}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={newUserOffice}
+                      onChange={(e) => setNewUserOffice(e.target.value)}
+                      className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                    >
+                      <option value="">{language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}</option>
+                      {offices.map((o) => (
+                        <option key={o.name} value={o.name}>{o.name}</option>
+                      ))}
+                    </select>
+                  </div>
                 )}
                 <button
                   onClick={handleAddUser}
@@ -869,16 +871,18 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
                 {editingUser.role !== 'superadmin' && editingUser.role !== 'viewer' && (
-                  <select
-                    value={editingUser.office || ''}
-                    onChange={(e) => setEditingUser({ ...editingUser, office: e.target.value })}
-                    className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                  >
-                    <option value="">{language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}</option>
-                    {offices.map((o) => (
-                      <option key={o.name} value={o.name}>{o.name}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={editingUser.office || ''}
+                      onChange={(e) => setEditingUser({ ...editingUser, office: e.target.value })}
+                      className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                    >
+                      <option value="">{language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}</option>
+                      {offices.map((o) => (
+                        <option key={o.name} value={o.name}>{o.name}</option>
+                      ))}
+                    </select>
+                  </div>
                 )}
                 <button
                   onClick={handleUpdateUser}
