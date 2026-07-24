@@ -955,7 +955,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
   }, [showAllIndicators]);
 
    return (
-      <div className="relative min-h-screen space-y-6 max-w-7xl mx-auto px-0 sm:px-4">
+      <div className="relative min-h-screen space-y-4 max-w-7xl mx-auto px-0 sm:px-3">
        {showSplash && (
          <SplashScreen
            progress={stats.weightedRate}
@@ -981,7 +981,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               opacity: cardsReachedHeader ? 0 : 1,
             }}
             transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-             className="dashboard-cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5 pb-24 sm:pb-32"
+             className="dashboard-cards-grid grid grid-cols-1 
+md:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-3 pb-12 sm:pb-16"
           >
             <style>{`
               @media (max-width: 768px) {
@@ -1016,14 +1017,16 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
              whileHover={{ scale: 1.02 }}
                whileTap={{ scale: 0.98 }}
                 onClick={() => toggleCard(setShowOverallProgress, showOverallProgress)}
-                 className="group relative w-full cursor-pointer bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-slate-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
+                 className="group relative w-full cursor-pointer 
+bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 rounded-[28px] 
+p-3 sm:p-4 text-left shadow-xl shadow-slate-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl" />
           <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/5 rounded-full -ml-10 -mb-10 blur-3xl" />
           
-            <div className="relative z-10 flex flex-col gap-4">
+             <div className="relative z-10 flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">
@@ -1038,8 +1041,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                 </span>
               </div>
               
-               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                 <div className="flex items-center justify-center sm:justify-start gap-4 sm:gap-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div className="flex items-center justify-center sm:justify-start gap-2 sm:gap-4">
                    <div className="text-center">
                      <div className="text-2xl sm:text-3xl font-black text-white">{fmt(stats.total)}</div>
                      <div className="text-[10px] font-bold text-white/80 uppercase tracking-wider">
@@ -1189,7 +1192,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => toggleCard(setShowTotalIndicators, showTotalIndicators)}
-              className="group relative cursor-pointer w-full bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-700 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-indigo-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
+              className="group relative cursor-pointer w-full bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-700 rounded-[28px] p-3 sm:p-4 text-left shadow-xl shadow-indigo-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
             >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1267,7 +1270,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => toggleCard(setShowStatusDetails, showStatusDetails)}
-          className="group relative cursor-pointer w-full bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-700 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-indigo-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
+          className="group relative cursor-pointer w-full bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-700 rounded-[28px] p-3 sm:p-4 text-left shadow-xl shadow-indigo-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1469,7 +1472,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => toggleCard(setShowCategoryStatus, showCategoryStatus)}
-              className="group relative cursor-pointer w-full bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-700 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-teal-600/25 border border-white/20 transition-all duration-200 overflow-hidden"
+              className="group relative cursor-pointer w-full bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-700 rounded-[28px] p-3 sm:p-4 text-left shadow-xl shadow-teal-600/25 border border-white/20 transition-all duration-200 overflow-hidden"
             >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1657,7 +1660,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => toggleCard(setShowBudgetCard, showBudgetCard)}
-              className="group relative cursor-pointer bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-slate-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
+              className="group relative cursor-pointer bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 rounded-[28px] p-3 sm:p-4 text-left shadow-xl shadow-slate-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
             >
          <div className="absolute inset-0 bg-black/10" />
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1697,7 +1700,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       const capexInd = indicators.find(i => i.id === 'ind_15') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('capital expenditure') || (i.name || '').toLowerCase().includes('पुँजीगत'));
                       if (!budgetInd && !capexInd) {
                         return (
-                          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center">
+                          <div className="bg-white/5 border 
+border-white/10 rounded-2xl p-3 text-center">
                             <p className="text-xs text-white/70">
                               {language === 'en' ? 'Budget data not configured' : 'बजेट डाटा कन्फिगर गरिएको छैन'}
                             </p>
@@ -1705,14 +1709,14 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                         );
                       }
                       return (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {budgetInd && (() => {
                             const target = budgetInd.annualTarget || 0;
                             const progress = budgetInd.annualProgress || 0;
                             const pct = target > 0 ? Math.round((progress / target) * 100) : 0;
                             const remaining = Math.max(0, target - progress);
                             return (
-                              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                              <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
                                 <div className="flex items-center gap-2 mb-3">
                                   <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
                                     <Wallet size={16} className="text-white" />
@@ -1760,7 +1764,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                             const pct = target > 0 ? Math.round((progress / target) * 100) : 0;
                             const remaining = Math.max(0, target - progress);
                             return (
-                              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                              <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
                                 <div className="flex items-center gap-2 mb-3">
                                   <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
                                     <PiggyBank size={16} className="text-white" />
@@ -1827,7 +1831,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
              whileHover={{ scale: 1.02 }}
              whileTap={{ scale: 0.97 }}
              onClick={() => toggleCard(setShowEmploymentCard, showEmploymentCard)}
-              className="group relative cursor-pointer bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-700 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-indigo-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
+              className="group relative cursor-pointer bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-700 rounded-[28px] p-3 sm:p-4 text-left shadow-xl shadow-indigo-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
             >
          <div className="absolute inset-0 bg-black/10" />
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -1866,7 +1870,8 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       const empInd = indicators.find(i => i.id === 'ind_13') || indicators.find(i => (i.nameEn || '').toLowerCase().includes('employment'));
                       if (!empInd) {
                         return (
-                          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center">
+                          <div className="bg-white/5 border 
+border-white/10 rounded-2xl p-3 text-center">
                             <p className="text-xs text-white/70">
                               {language === 'en' ? 'Employment data not configured' : 'रोजगारी डाटा कन्फिगर गरिएको छैन'}
                             </p>
@@ -1878,7 +1883,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                       const pct = target > 0 ? Math.round((progress / target) * 100) : 0;
                       const remaining = Math.max(0, target - progress);
                       return (
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
                           <div className="flex items-center gap-2 mb-3">
                             <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
                               <Briefcase size={16} className="text-white" />
@@ -1937,11 +1942,11 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                  whileHover={{ scale: 1.02 }}
                  whileTap={{ scale: 0.97 }}
                  onClick={() => toggleCard(setShowReportingOffices, showReportingOffices)}
-                 className="group relative cursor-pointer bg-gradient-to-br from-slate-500 via-slate-600 to-slate-700 rounded-[28px] p-5 sm:p-6 text-left shadow-xl shadow-slate-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
+                 className="group relative cursor-pointer bg-gradient-to-br from-slate-500 via-slate-600 to-slate-700 rounded-[28px] p-3 sm:p-4 text-left shadow-xl shadow-slate-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
                >
                <div className="absolute inset-0 bg-black/10" />
                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-               <div className="relative z-10 flex flex-col gap-3">
+               <div className="relative z-10 flex flex-col gap-2">
                  <div className="flex items-center justify-between">
                    <div>
                      <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-tight">
@@ -2012,7 +2017,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
              whileHover={{ scale: 1.02 }}
              whileTap={{ scale: 0.97 }}
              onClick={() => toggleCard(setShowInsights, showInsights)}
-              className="group relative cursor-pointer bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] p-5 sm:p-6 shadow-xl shadow-indigo-500/10 dark:shadow-indigo-500/5 hover:shadow-2xl hover:shadow-indigo-500/20 dark:hover:shadow-indigo-500/10 active:shadow-2xl active:shadow-indigo-500/20 dark:active:shadow-indigo-500/10 transition-all duration-200 overflow-hidden"
+              className="group relative cursor-pointer bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[28px] p-3 sm:p-4 shadow-xl shadow-indigo-500/10 dark:shadow-indigo-500/5 hover:shadow-2xl hover:shadow-indigo-500/20 dark:hover:shadow-indigo-500/10 active:shadow-2xl active:shadow-indigo-500/20 dark:active:shadow-indigo-500/10 transition-all duration-200 overflow-hidden"
             >
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
          {highlightedCard === 'insights' && (
@@ -2180,7 +2185,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                whileHover={{ scale: 1.02 }}
                whileTap={{ scale: 0.98 }}
                onClick={() => toggleCard(setShowAllIndicators, showAllIndicators)}
-                className="group relative cursor-pointer bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-700 rounded-[28px] p-5 sm:p-6 shadow-xl shadow-indigo-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
+                className="group relative cursor-pointer bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-700 rounded-[28px] p-3 sm:p-4 shadow-xl shadow-indigo-500/25 border border-white/20 transition-all duration-200 overflow-hidden"
              >
          <div className="absolute inset-0 bg-black/10" />
          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -2367,7 +2372,7 @@ export const DashboardSummaryView: React.FC<DashboardSummaryViewProps> = ({
                   <X size={18} />
                 </button>
               </div>
-              <div className="p-6 space-y-4 overflow-y-auto custom-scrollbar">
+               <div className="p-4 space-y-3 overflow-y-auto custom-scrollbar">
                 <div className="flex items-start gap-3 rounded-2xl p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-white/5">
                   <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm shrink-0">
                     <Calculator size={16} className="text-slate-500" />
