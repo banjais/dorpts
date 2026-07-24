@@ -3207,7 +3207,7 @@ function MainAppContent() {
                              }
                            >
                               <div className="p-4 sm:p-6 md:p-8 w-full max-w-7xl mx-auto">
-                                <SuperAdminDashboard language={language} activeTab={superAdminActiveTab} onTabChange={setSuperAdminActiveTab} />
+                                <SuperAdminDashboard language={language} activeTab={superAdminActiveTab} onTabChange={setSuperAdminActiveTab} offices={offices} />
                               </div>
                            </ErrorBoundary>
                          )}

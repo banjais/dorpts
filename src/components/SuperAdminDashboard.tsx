@@ -46,9 +46,10 @@ interface SuperAdminDashboardProps {
   language: 'en' | 'ne';
   activeTab?: string;
   onTabChange?: (tab: string) => void;
+  offices?: Array<{ name: string; officeId: string; shortName: string }>;
 }
 
-export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ language, activeTab: externalActiveTab, onTabChange }) => {
+export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ language, activeTab: externalActiveTab, onTabChange, offices = [] }) => {
   const { adminsList, user, isSuperadmin } = useAuth();
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [logs, setLogs] = useState<any[]>([]);
@@ -585,13 +586,16 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   <option value="admin">{language === 'en' ? 'Admin' : 'प्रशासक'}</option>
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
-                <input
-                  type="text"
+                <select
                   value={newUserOffice}
                   onChange={(e) => setNewUserOffice(e.target.value)}
-                  placeholder={language === 'en' ? 'Office (optional)' : 'कार्यालय (वैकल्पिक)'}
                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                />
+                >
+                  <option value="">{language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}</option>
+                  {offices.map((o) => (
+                    <option key={o.name} value={o.name}>{o.name}</option>
+                  ))}
+                </select>
                 <button
                   onClick={handleAddUser}
                   disabled={!newUserEmail.trim()}
@@ -663,13 +667,16 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   <option value="admin">{language === 'en' ? 'Admin' : 'प्रशासक'}</option>
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
-                <input
-                  type="text"
+                <select
                   value={editingUser.office || ''}
                   onChange={(e) => setEditingUser({ ...editingUser, office: e.target.value })}
-                  placeholder={language === 'en' ? 'Office' : 'कार्यालय'}
                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                />
+                >
+                  <option value="">{language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}</option>
+                  {offices.map((o) => (
+                    <option key={o.name} value={o.name}>{o.name}</option>
+                  ))}
+                </select>
                 <button
                   onClick={handleUpdateUser}
                   className="w-full py-2 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors"
