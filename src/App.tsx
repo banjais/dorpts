@@ -72,6 +72,7 @@ import { PWAInstallBanner } from "./components/PWAInstallBanner";
 import { OfflineStatusBar } from "./components/OfflineStatusBar";
 import { LoginScreen } from "./components/LoginScreen";
 import { AdminPanelModal } from "./components/AdminPanelModal";
+import { SuperAdminDashboard } from "./components/SuperAdminDashboard";
 import { SettingsPanelModal } from "./components/SettingsPanelModal";
 import { motion, AnimatePresence } from "motion/react";
 import { useDashboardLayout } from "./hooks/useDashboardLayout";
@@ -229,6 +230,7 @@ const viewOrder: Record<MainView, number> = {
   institutional: 2,
   trends: 3,
   heatmap: 4,
+  superadmin: 5,
 };
 
 const viewVariants = {
@@ -1314,8 +1316,13 @@ function MainAppContent() {
         setTimeout(() => {
           try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
         }, 50);
+      } else if (view === 'superadmin') {
+        setViewMode('superadmin');
+        setTimeout(() => {
+          try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+        }, 50);
       }
-  }, [mainView]);
+    }, [mainView]);
 
   const goToIndicators = useCallback(() => {
     setMainView('dashboard');
@@ -2595,6 +2602,7 @@ function MainAppContent() {
         onOpenLogin={() => setShowLogin(true)}
         onExpandFooter={() => setIsFooterExpanded(true)}
         onOpenDetailedGallery={goToDetailedGallery}
+        isSuperadmin={isSuperadmin}
       />
       <BudgetModal
         isOpen={isBudgetOpen}
@@ -3189,9 +3197,24 @@ function MainAppContent() {
                                onViewFullAuditTrail={handleOpenLatestActivity}
                                retryKey={healthRetryKey}
                               />
-                            </ErrorBoundary>
-                           )}
-                      </motion.div>
+                             </ErrorBoundary>
+                            )}
+                         {mainView === "superadmin" && (
+                           <ErrorBoundary
+                             fallback={
+                               <div className="p-8 text-center">
+                                 <p className="text-sm text-slate-500 dark:text-slate-400">
+                                   Super Admin dashboard temporarily unavailable.
+                                 </p>
+                               </div>
+                             }
+                           >
+                             <div className="p-4 sm:p-6 md:p-8 w-full max-w-7xl mx-auto">
+                               <SuperAdminDashboard language={language} />
+                             </div>
+                           </ErrorBoundary>
+                         )}
+                       </motion.div>
                    </AnimatePresence>
                  </motion.div>
                )}

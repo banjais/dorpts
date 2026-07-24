@@ -84,9 +84,9 @@ export interface Toast {
   duration?: number;
 }
 
-export type ViewMode = 'hierarchy' | 'dashboard' | 'card' | 'chart' | 'table' | 'heatmap' | 'compare' | 'data-health' | 'institutional' | 'unified';
+export type ViewMode = 'hierarchy' | 'dashboard' | 'card' | 'chart' | 'table' | 'heatmap' | 'compare' | 'data-health' | 'institutional' | 'unified' | 'superadmin';
 
-export type MainView = 'dashboard' | 'insights' | 'institutional' | 'trends' | 'heatmap';
+export type MainView = 'dashboard' | 'insights' | 'institutional' | 'trends' | 'heatmap' | 'superadmin';
 
 export interface WidgetVisibility {
   radialChart: boolean;

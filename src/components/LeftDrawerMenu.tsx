@@ -13,6 +13,7 @@ import {
   LogOut,
   User,
   Info,
+  Crown,
 } from 'lucide-react';
 import type { MainView } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -28,6 +29,7 @@ interface LeftDrawerMenuProps {
   onOpenLogin?: () => void;
   onExpandFooter?: () => void;
   onOpenDetailedGallery?: () => void;
+  isSuperadmin?: boolean;
 }
 
 export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
@@ -41,6 +43,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
   onOpenLogin,
   onExpandFooter,
   onOpenDetailedGallery,
+  isSuperadmin = false,
 }) => {
   const { user, isAdmin, loginWithGoogle, logout } = useAuth();
 
@@ -61,6 +64,14 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       onClick: () => onNavigate('dashboard'),
       active: activeView === 'dashboard',
     },
+    ...(isSuperadmin ? [{
+      id: 'superadmin',
+      icon: <Crown size={18} />,
+      labelEn: 'Super Admin',
+      labelNp: 'सुपर एडमिन',
+      onClick: () => onNavigate('superadmin'),
+      active: activeView === 'superadmin',
+    }] : []),
     {
       id: 'detailed-gallery',
       icon: <Image size={18} />,
