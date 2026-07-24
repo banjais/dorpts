@@ -3217,7 +3217,6 @@ function MainAppContent() {
             onRefresh={async () => {
               await handleManualSync();
               markVersionUpdated();
-              setTimeout(() => window.location.reload(), 800);
             }}
           />
 
