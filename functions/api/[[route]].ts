@@ -449,5 +449,20 @@ Keep explanationEn and explanationNp concise, precise, and highly professional. 
     return withCors(Response.json(await r.json()));
   }
 
+  const permMatch = path.match(/^\/api\/sheets-permissions\/([^/]+)$/);
+  if (permMatch && method === "GET") {
+    const auth = request.headers.get("authorization");
+    if (!auth) return withCors(Response.json({ error: "Unauthorized" }, { status: 401 }));
+    const fileId = decodeURIComponent(permMatch[1]);
+    const r = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions?fields=permissions(emailAddress,role,type,displayName)`, {
+      headers: { Authorization: auth },
+    });
+    if (!r.ok) {
+      const text = await r.text();
+      return withCors(Response.json({ error: `Drive API error: ${r.status} ${text}` }, { status: r.status }));
+    }
+    return withCors(Response.json(await r.json()));
+  }
+
   return withCors(new Response("Not Found", { status: 404 }));
 }

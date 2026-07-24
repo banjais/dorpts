@@ -19,3 +19,22 @@ export const fetchSpreadsheetMeta = async (spreadsheetId: string, accessToken: s
   }
   return response.json();
 };
+
+export interface SheetPermission {
+  emailAddress?: string;
+  role: string;
+  type: string;
+  displayName?: string;
+}
+
+export const fetchSheetPermissions = async (fileId: string, accessToken: string): Promise<SheetPermission[]> => {
+  const response = await fetch(`${API_BASE}/api/sheets-permissions/${encodeURIComponent(fileId)}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ error: 'Failed to fetch permissions' }));
+    throw new Error(err.error || 'Failed to fetch sheet permissions');
+  }
+  const data = await response.json();
+  return data.permissions || [];
+};
