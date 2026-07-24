@@ -56,7 +56,8 @@ export const SuperAdminPanel: React.FC<SuperAdminPanelProps> = ({
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 320 }}
-            className="fixed top-0 left-0 bottom-0 z-[9001] w-[85%] max-w-[300px] bg-white dark:bg-slate-900 shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+            className="fixed top-0 left-0 bottom-0 z-[9001] w-[90%] max-w-[340px] bg-white dark:bg-slate-900 shadow-2xl flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-white/5">
