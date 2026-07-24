@@ -4,10 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import {
   Users, Activity, MapPin, Shield, BarChart3, Globe, UserCheck, TrendingUp,
-  RefreshCw, Bell, UserPlus, Download, Upload, Lock, FileText, Gauge,
-  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck
+  RefreshCw, Bell, Lock, FileText, Gauge,
+  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X
 } from 'lucide-react';
-import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { APP_VERSION } from '../constants/appTitles';
 
@@ -57,11 +57,14 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [loading, setLoading] = useState(false);
   const [notificationText, setNotificationText] = useState('');
   const [notificationSending, setNotificationSending] = useState(false);
-  const [bulkEmails, setBulkEmails] = useState('');
-  const [bulkRole, setBulkRole] = useState<'admin' | 'viewer'>('admin');
-  const [bulkSending, setBulkSending] = useState(false);
   const [collaborators, setCollaborators] = useState<any[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [editingUser, setEditingUser] = useState<any>(null);
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserRole, setNewUserRole] = useState<'admin' | 'viewer'>('admin');
+  const [newUserOffice, setNewUserOffice] = useState('');
   const [internalActiveTab, setInternalActiveTab] = useState('analytics');
 
   const activeTab = externalActiveTab || internalActiveTab;
@@ -72,13 +75,11 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
 
   const tabs = [
     { id: 'analytics', labelEn: 'User Analytics', labelNp: 'प्रयोगकर्ता विश्लेषण', icon: <BarChart3 size={16} /> },
-    { id: 'collaboration', labelEn: 'Collaboration', labelNp: 'सहकार्य', icon: <Users size={16} /> },
+    { id: 'user-management', labelEn: 'User Management', labelNp: 'प्रयोगकर्ता व्यवस्थापन', icon: <Users size={16} /> },
+    { id: 'collaboration', labelEn: 'Collaboration', labelNp: 'सहकार्य', icon: <Globe size={16} /> },
     { id: 'geolocation', labelEn: 'Geolocation', labelNp: 'भौगोलिक स्थान', icon: <MapPin size={16} /> },
     { id: 'notifications', labelEn: 'Notifications', labelNp: 'सूचनाहरू', icon: <Bell size={16} /> },
-    { id: 'bulk-roles', labelEn: 'Bulk Roles', labelNp: 'समूह भूमिका', icon: <UserPlus size={16} /> },
-    { id: 'data-manager', labelEn: 'Data Manager', labelNp: 'डेटा व्यवस्थापक', icon: <Download size={16} /> },
-    { id: 'security', labelEn: 'Security', labelNp: 'सुरक्षा', icon: <Lock size={16} /> },
-    { id: 'logs', labelEn: 'System Logs', labelNp: 'सिस्टम लग', icon: <FileText size={16} /> },
+    { id: 'security-logs', labelEn: 'Security & Logs', labelNp: 'सुरक्षा र लग', icon: <FileText size={16} /> },
     { id: 'performance', labelEn: 'Performance', labelNp: 'कार्यसम्पादन', icon: <Gauge size={16} /> },
     { id: 'system', labelEn: 'System Health', labelNp: 'प्रणाली स्वास्थ्य', icon: <Activity size={16} /> },
   ] as const;
@@ -257,70 +258,88 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     }
   };
 
-  const handleBulkRoles = async () => {
-    const emails = bulkEmails.split('\n').map(e => e.trim()).filter(Boolean);
-    if (emails.length === 0) return;
-    setBulkSending(true);
+  const fetchUsers = async () => {
+    setLoading(true);
     try {
-      const token = await user?.getIdToken();
-      const res = await fetch('/api/superadmin/bulk-roles', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ emails, role: bulkRole }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to process');
-      setBulkEmails('');
-      alert(language === 'en' ? `Processed ${data.results?.length || 0} emails` : `${data.results?.length || 0} इमेलहरू प्रोसेस भयो`);
-    } catch (err: any) {
-      alert(err.message);
+      const adminsSnap = await getDocs(collection(db, 'admins'));
+      const usersList = adminsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setUsers(usersList);
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
     } finally {
-      setBulkSending(false);
+      setLoading(false);
     }
   };
 
-  const handleExportData = async () => {
+  const handleAddUser = async () => {
+    if (!newUserEmail.trim()) return;
     try {
       const token = await user?.getIdToken();
-      const res = await fetch('/api/superadmin/data/export', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to export');
-
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `dorpts-export-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (err: any) {
-      alert(err.message);
-    }
-  };
-
-  const handleImportData = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-      const token = await user?.getIdToken();
-      const res = await fetch('/api/superadmin/data/import', {
+      const res = await fetch('/api/admin/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ email: newUserEmail, role: newUserRole }),
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || 'Failed to import');
-      alert(language === 'en' ? `Imported: ${JSON.stringify(result.imported)}` : `आयात भयो: ${JSON.stringify(result.imported)}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to add user');
+
+      await addDoc(collection(db, 'admins'), {
+        email: newUserEmail,
+        role: newUserRole,
+        office: newUserOffice || null,
+        createdAt: new Date(),
+        createdBy: user?.email,
+      });
+
+      setNewUserEmail('');
+      setNewUserRole('admin');
+      setNewUserOffice('');
+      setShowAddUser(false);
+      fetchUsers();
+      alert(language === 'en' ? 'User added successfully' : 'प्रयोगकर्ता सफलता पूर्वक थपियो');
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleUpdateUser = async () => {
+    if (!editingUser) return;
+    try {
+      const token = await user?.getIdToken();
+      const res = await fetch('/api/admin/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email: editingUser.email, role: editingUser.role }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update user');
+
+      await setDoc(doc(db, 'admins', editingUser.id), {
+        ...editingUser,
+        role: editingUser.role,
+        office: editingUser.office || null,
+      }, { merge: true });
+
+      setEditingUser(null);
+      fetchUsers();
+      alert(language === 'en' ? 'User updated successfully' : 'प्रयोगकर्ता सफलता पूर्वक अपडेट भयो');
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, email: string) => {
+    if (!confirm(language === 'en' ? `Delete user ${email}?` : `प्रयोगकर्ता ${email} मेट्नुहोस्?`)) return;
+    try {
+      await deleteDoc(doc(db, 'admins', userId));
+      setUsers(users.filter(u => u.id !== userId));
+      alert(language === 'en' ? 'User deleted' : 'प्रयोगकर्ता मेटियो');
     } catch (err: any) {
       alert(err.message);
     }
@@ -329,8 +348,9 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   useEffect(() => {
     if (!isSuperadmin) return;
     if (activeTab === 'analytics') fetchAnalytics();
-    if (activeTab === 'logs') fetchLogs();
-    if (activeTab === 'security') fetchSecurity();
+    if (activeTab === 'user-management') fetchUsers();
+    if (activeTab === 'logs' || activeTab === 'security') { fetchLogs(); fetchSecurity(); }
+    if (activeTab === 'security-logs') { fetchLogs(); fetchSecurity(); }
     if (activeTab === 'performance') fetchPerformance();
     if (activeTab === 'collaboration') fetchCollaboration();
     if (activeTab === 'geolocation') fetchGeolocation();
@@ -525,106 +545,146 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
           </motion.div>
         )}
 
-        {activeTab === 'bulk-roles' && (
+        {activeTab === 'user-management' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'Bulk Role Assignment' : 'समूह भूमिका नियुक्ति'}
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                {language === 'en' ? 'User Management' : 'प्रयोगकर्ता व्यवस्थापन'}
+              </h3>
+              <button
+                onClick={() => setShowAddUser(true)}
+                className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                <Plus size={12} />
+                {language === 'en' ? 'Add User' : 'प्रयोगकर्ता थप्नुहोस्'}
+              </button>
+            </div>
+
+            {showAddUser && (
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {language === 'en' ? 'Add New User' : 'नयाँ प्रयोगकर्ता थप्नुहोस्'}
+                  </span>
+                  <button onClick={() => setShowAddUser(false)} className="text-slate-400 hover:text-slate-600">
+                    <X size={14} />
+                  </button>
+                </div>
+                <input
+                  type="email"
+                  value={newUserEmail}
+                  onChange={(e) => setNewUserEmail(e.target.value)}
+                  placeholder={language === 'en' ? 'Email address' : 'इमेल ठेगाना'}
+                  className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                />
+                <select
+                  value={newUserRole}
+                  onChange={(e) => setNewUserRole(e.target.value as 'admin' | 'viewer')}
+                  className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                >
+                  <option value="admin">{language === 'en' ? 'Admin' : 'प्रशासक'}</option>
+                  <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
+                </select>
+                <input
+                  type="text"
+                  value={newUserOffice}
+                  onChange={(e) => setNewUserOffice(e.target.value)}
+                  placeholder={language === 'en' ? 'Office (optional)' : 'कार्यालय (वैकल्पिक)'}
+                  className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                />
+                <button
+                  onClick={handleAddUser}
+                  disabled={!newUserEmail.trim()}
+                  className="w-full py-2 bg-emerald-600 text-white text-[10px] font-black rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                >
+                  {language === 'en' ? 'Add User' : 'प्रयोगकर्ता थप्नुहोस्'}
+                </button>
+              </div>
+            )}
+
             <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-              <div className="flex items-center gap-2 mb-3">
-                <UserPlus size={14} className="text-indigo-600" />
-                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  {language === 'en' ? 'Import Multiple Admins' : 'धेरै प्रशासकहरू आयात गर्नुहोस्'}
-                </span>
-              </div>
-              <textarea
-                value={bulkEmails}
-                onChange={(e) => setBulkEmails(e.target.value)}
-                placeholder={language === 'en' ? 'Enter emails, one per line:\nadmin1@example.com\nadmin2@example.com' : 'इमेलहरू प्रविष्ट गर्नुहोस्, एक पङ्क्ति प्रति:\nadmin1@example.com\nadmin2@example.com'}
-                className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs resize-none"
-                rows={4}
-              />
-              <div className="flex gap-2 mt-3">
-                <button
-                  onClick={() => setBulkRole('admin')}
-                  className={`px-4 py-2 text-[10px] font-black rounded-lg transition-colors ${
-                    bulkRole === 'admin'
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200'
-                  }`}
-                >
-                  {language === 'en' ? 'Import as Admins' : 'प्रशासकको रूपमा आयात'}
-                </button>
-                <button
-                  onClick={() => setBulkRole('viewer')}
-                  className={`px-4 py-2 text-[10px] font-black rounded-lg transition-colors ${
-                    bulkRole === 'viewer'
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200'
-                  }`}
-                >
-                  {language === 'en' ? 'Import as Viewers' : 'दर्शकको रूपमा आयात'}
-                </button>
-                <button
-                  onClick={handleBulkRoles}
-                  disabled={bulkSending || !bulkEmails.trim()}
-                  className="ml-auto px-4 py-2 bg-rose-600 text-white text-[10px] font-black rounded-lg hover:bg-rose-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {bulkSending ? (language === 'en' ? 'Processing...' : 'प्रोसेस गर्दै...') : (language === 'en' ? 'Process' : 'प्रोसेस गर्नुहोस्')}
-                </button>
+              <div className="space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar">
+                {users.length === 0 && !loading && (
+                  <p className="text-[11px] text-slate-400 text-center py-4">
+                    {language === 'en' ? 'No users found' : 'प्रयोगकर्ता फेला परेन'}
+                  </p>
+                )}
+                {users.map((u) => (
+                  <div key={u.id} className="flex items-center justify-between bg-white dark:bg-slate-900 rounded-lg px-3 py-2.5 border border-slate-100 dark:border-white/5">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{u.email}</div>
+                      <div className="text-[10px] text-slate-400">
+                        {u.role === 'admin' ? (language === 'en' ? 'Admin' : 'प्रशासक') : (language === 'en' ? 'Viewer' : 'दर्शक')}
+                        {u.office ? ` · ${u.office}` : ''}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setEditingUser(u)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all"
+                        title={language === 'en' ? 'Edit' : 'सम्पादन'}
+                      >
+                        <Edit3 size={12} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(u.id, u.email)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all"
+                        title={language === 'en' ? 'Delete' : 'मेटाउनुहोस्'}
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-            <p className="text-[11px] text-slate-400 italic">
-              {language === 'en'
-                ? 'Bulk assign roles to multiple users at once. Each email will receive an invitation code.'
-                : 'एकैपटक धेरै प्रयोगकर्ताहरूलाई समूहमा भूमिका नियुक्त गर्नुहोस्।'}
-            </p>
+
+            {editingUser && (
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {language === 'en' ? 'Edit User' : 'प्रयोगकर्ता सम्पादन'}
+                  </span>
+                  <button onClick={() => setEditingUser(null)} className="text-slate-400 hover:text-slate-600">
+                    <X size={14} />
+                  </button>
+                </div>
+                <input
+                  type="email"
+                  value={editingUser.email}
+                  disabled
+                  className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-xs text-slate-500"
+                />
+                <select
+                  value={editingUser.role}
+                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as 'admin' | 'viewer' })}
+                  className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                >
+                  <option value="admin">{language === 'en' ? 'Admin' : 'प्रशासक'}</option>
+                  <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
+                </select>
+                <input
+                  type="text"
+                  value={editingUser.office || ''}
+                  onChange={(e) => setEditingUser({ ...editingUser, office: e.target.value })}
+                  placeholder={language === 'en' ? 'Office' : 'कार्यालय'}
+                  className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                />
+                <button
+                  onClick={handleUpdateUser}
+                  className="w-full py-2 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  {language === 'en' ? 'Save Changes' : 'परिवर्तनहरू सुरक्षित गर्नुहोस्'}
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
 
-        {activeTab === 'data-manager' && (
+        {activeTab === 'security-logs' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'Data Export / Import' : 'डेटा निर्यात / आयात'}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Download size={14} className="text-emerald-600" />
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                    {language === 'en' ? 'Export Data' : 'डेटा निर्यात'}
-                  </span>
-                </div>
-                <p className="text-[10px] text-slate-500 mb-3">
-                  {language === 'en' ? 'Download all indicators, offices, and settings as JSON.' : 'सबै सूचकहरू, कार्यालयहरू र सेटिङहरू JSON को रूपमा डाउनलोड गर्नुहोस्।'}
-                </p>
-                <button onClick={handleExportData} className="w-full py-2 bg-emerald-600 text-white text-[10px] font-black rounded-lg hover:bg-emerald-700 transition-colors">
-                  {language === 'en' ? 'Export All Data' : 'सबै डेटा निर्यात'}
-                </button>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Upload size={14} className="text-blue-600" />
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                    {language === 'en' ? 'Import Data' : 'डेटा आयात'}
-                  </span>
-                </div>
-                <p className="text-[10px] text-slate-500 mb-3">
-                  {language === 'en' ? 'Upload JSON file to restore or merge data.' : 'डेटा पुनर्स्थापन वा मर्ज गर्न JSON फाइल अपलोड गर्नुहोस्।'}
-                </p>
-                <label className="block w-full py-2 bg-blue-600 text-white text-[10px] font-black rounded-lg hover:bg-blue-700 transition-colors text-center cursor-pointer">
-                  {language === 'en' ? 'Import Data' : 'डेटा आयात'}
-                  <input type="file" accept=".json" onChange={handleImportData} className="hidden" />
-                </label>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === 'security' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'Security Dashboard' : 'सुरक्षा ड्यासबोर्ड'}
+              {language === 'en' ? 'Security & System Logs' : 'सुरक्षा र सिस्टम लग'}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
@@ -659,15 +719,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 </div>
               </div>
             </div>
-          </motion.div>
-        )}
-
-        {activeTab === 'logs' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'System Logs' : 'सिस्टम लग'}
-            </h3>
             <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">
+                {language === 'en' ? 'Recent Logs' : 'हालका लगहरू'}
+              </div>
               <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
                 {logs.length === 0 && !loading && (
                   <p className="text-[11px] text-slate-400 text-center py-4">
