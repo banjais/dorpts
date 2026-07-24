@@ -580,9 +580,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 />
                 <select
                   value={newUserRole}
-                  onChange={(e) => setNewUserRole(e.target.value as 'admin' | 'viewer')}
+                  onChange={(e) => setNewUserRole(e.target.value as 'superadmin' | 'admin' | 'viewer')}
                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
                 >
+                  <option value="superadmin">Superadmin</option>
                   <option value="admin">{language === 'en' ? 'Admin' : 'प्रशासक'}</option>
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
@@ -661,9 +662,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 />
                 <select
                   value={editingUser.role}
-                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as 'admin' | 'viewer' })}
+                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as 'superadmin' | 'admin' | 'viewer' })}
                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
                 >
+                  <option value="superadmin">Superadmin</option>
                   <option value="admin">{language === 'en' ? 'Admin' : 'प्रशासक'}</option>
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>

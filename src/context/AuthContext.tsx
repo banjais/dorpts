@@ -54,21 +54,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  const lookupEmailRole = useCallback(async (email: string): Promise<'superadmin' | 'admin' | 'data_updater' | 'viewer'> => {
-    if (email === SUPERADMIN_EMAIL) return 'superadmin';
-    try {
-      const q = query(collection(db, 'users'), where('email', '==', email));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        const data = snap.docs[0].data();
-        const r = data.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer';
-        if (r === 'superadmin' || r === 'admin' || r === 'data_updater' || r === 'viewer') return r;
-      }
-    } catch {
-      // suppress
-    }
-    return 'viewer';
-  }, []);
+   const lookupEmailRole = useCallback(async (email: string): Promise<'superadmin' | 'admin' | 'data_updater' | 'viewer'> => {
+     if (email === SUPERADMIN_EMAIL) return 'superadmin';
+     try {
+       const q = query(collection(db, 'users'), where('email', '==', email));
+       const snap = await getDocs(q);
+       if (!snap.empty) {
+         const data = snap.docs[0].data();
+         const r = data.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer';
+         if (r === 'superadmin' || r === 'admin' || r === 'data_updater' || r === 'viewer') return r;
+       }
+     } catch {
+       // suppress
+     }
+     try {
+       const q = query(collection(db, 'admins'), where('email', '==', email));
+       const snap = await getDocs(q);
+       if (!snap.empty) {
+         const data = snap.docs[0].data();
+         const r = data.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer';
+         if (r === 'superadmin' || r === 'admin' || r === 'data_updater' || r === 'viewer') return r;
+       }
+     } catch {
+       // suppress
+     }
+     return 'viewer';
+   }, []);
 
   const setRoleAndLoadAdmins = useCallback(async (newRole: 'superadmin' | 'admin' | 'data_updater' | 'viewer') => {
     setRole(newRole);
@@ -116,23 +127,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (currentUser) {
         setUser(currentUser);
         try {
-          const adminRef = doc(db, 'admins', currentUser.uid);
-          const adminSnap = await getDoc(adminRef);
-          if (adminSnap.exists()) {
-            const val = adminSnap.data();
-            const detectedRole = val.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer';
-            await setRoleAndLoadAdmins(detectedRole);
-          } else if (currentUser.email === SUPERADMIN_EMAIL) {
-            await setDoc(adminRef, {
-              email: SUPERADMIN_EMAIL,
-              role: 'superadmin',
-              createdAt: serverTimestamp(),
-            });
-            await setRoleAndLoadAdmins('superadmin');
-            await logActivity('role_change', `Bootstrapped ${SUPERADMIN_EMAIL} as Initial Superadmin`);
-          } else {
-            await setRoleAndLoadAdmins('viewer');
-          }
+           const adminRef = doc(db, 'admins', currentUser.uid);
+           const adminSnap = await getDoc(adminRef);
+           if (adminSnap.exists()) {
+             const val = adminSnap.data();
+             const detectedRole = val.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer';
+             await setRoleAndLoadAdmins(detectedRole);
+           } else if (currentUser.email === SUPERADMIN_EMAIL) {
+             await setDoc(adminRef, {
+               email: SUPERADMIN_EMAIL,
+               role: 'superadmin',
+               createdAt: serverTimestamp(),
+             });
+             await setRoleAndLoadAdmins('superadmin');
+             await logActivity('role_change', `Bootstrapped ${SUPERADMIN_EMAIL} as Initial Superadmin`);
+           } else {
+             try {
+               const q = query(collection(db, 'admins'), where('email', '==', currentUser.email));
+               const emailSnap = await getDocs(q);
+               if (!emailSnap.empty) {
+                 const val = emailSnap.docs[0].data();
+                 const detectedRole = val.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer';
+                 await setRoleAndLoadAdmins(detectedRole);
+               } else {
+                 await setRoleAndLoadAdmins('viewer');
+               }
+             } catch {
+               await setRoleAndLoadAdmins('viewer');
+             }
+           }
           const assignedOffice = await loadUserAssignedOffice(currentUser.email);
           setUserAssignedOffice(assignedOffice);
           await logActivity('login', `Google login: ${currentUser.email}`);
