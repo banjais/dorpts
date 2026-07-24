@@ -118,22 +118,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let cancelled = false;
     const checkSession = async () => {
       try {
-        const superadminBypass = sessionStorage.getItem('dor_superadmin_bypass');
-        const superadminSession = sessionStorage.getItem('dor_superadmin_session');
-        if (superadminBypass === 'true' && superadminSession) {
-          if (!cancelled) {
-            await setRoleAndLoadAdmins('superadmin');
-            setEmailSession({
-              email: superadminSession,
-              role: 'superadmin',
-              token: 'superadmin-bypass',
-              createdAt: new Date().toISOString(),
-            } as any);
-            await logActivity('otp_login', `Superadmin bypass login: ${superadminSession}`);
-          }
-          return;
-        }
-
         const token = sessionStorage.getItem('dor_session');
         if (token) {
           const session = await validateSession(token);

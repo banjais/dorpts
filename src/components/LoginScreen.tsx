@@ -41,6 +41,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
   }, [step]);
 
   const [fallbackOtp, setFallbackOtp] = useState<string | null>(null);
+  const [isSuperadminEmail, setIsSuperadminEmail] = useState(false);
 
    const handleSendOTP = async (e: React.FormEvent) => {
      e.preventDefault();
@@ -53,21 +54,11 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
        return;
      }
 
-    const isSuper = email.toLowerCase().trim() === SUPERADMIN_EMAIL.toLowerCase().trim();
-    if (isSuper) {
-      setStep('loading');
-      try {
-        sessionStorage.setItem('dor_superadmin_session', email);
-        sessionStorage.setItem('dor_superadmin_bypass', 'true');
-        setStep('success');
-        setTimeout(() => window.location.reload(), 600);
-      } catch (err) {
-        console.error('Superadmin auto-login failed:', err);
-        setError(language === 'en' ? 'Superadmin login failed. Try again.' : 'सुपरएडमिन लगइन असफल भयो। पुनः प्रयास गर्नुहोस्।');
-        setStep('email');
-      }
-      return;
-    }
+     const isSuper = email.toLowerCase().trim() === SUPERADMIN_EMAIL.toLowerCase().trim();
+     if (isSuper) {
+       setError(language === 'en' ? 'Superadmin must sign in with Google.' : 'सुपरएडमिन गूगल साइन-इनद्वारा लगइन गर्नुहोस्।');
+       return;
+     }
 
      setStep('loading');
 
@@ -91,20 +82,6 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    if (email.toLowerCase().trim() === SUPERADMIN_EMAIL.toLowerCase().trim()) {
-      setStep('loading');
-      try {
-        sessionStorage.setItem('dor_superadmin_session', email);
-        sessionStorage.setItem('dor_superadmin_bypass', 'true');
-        setStep('success');
-        setTimeout(() => window.location.reload(), 600);
-      } catch (err) {
-        setError(language === 'en' ? 'Login failed. Try again.' : 'लगइन असफल भयो। पुनः प्रयास गर्नुहोस्।');
-        setStep('otp');
-      }
-      return;
-    }
 
     const code = otp.join('');
     if (code.length !== 6) {
@@ -204,44 +181,61 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@example.com"
-                      autoFocus
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-all"
-                    />
-                  </div>
-                </div>
+                     <input
+                       type="email"
+                       value={email}
+                       onChange={(e) => {
+                         setEmail(e.target.value);
+                         setIsSuperadminEmail(e.target.value.toLowerCase().trim() === SUPERADMIN_EMAIL.toLowerCase().trim());
+                       }}
+                       placeholder="you@example.com"
+                       autoFocus
+                       className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-all"
+                     />
+                   </div>
+                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                >
-                  {language === 'en' ? 'Send OTP Code' : 'ओटीपी कोड पठाउनुहोस्'}
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                 {isSuperadminEmail && (
+                   <motion.div
+                     initial={{ opacity: 0, y: -5 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl p-3 flex items-center gap-2"
+                   >
+                     <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                     <p className="text-[10px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
+                       {language === 'en' ? 'Superadmin: use Google sign-in only' : 'सुपरएडमिन: गूगल साइन-इन मात्र प्रयोग गर्नुहोस्'}
+                     </p>
+                   </motion.div>
+                 )}
 
-                <div className="relative py-1">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
-                  </div>
-                  <div className="relative flex justify-center">
-                    <span className="px-3 bg-white dark:bg-slate-900 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                      {language === 'en' ? 'or' : 'वा'}
-                    </span>
-                  </div>
-                </div>
+                 <button
+                   type="submit"
+                   disabled={isSuperadminEmail}
+                   className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                 >
+                   {language === 'en' ? 'Send OTP Code' : 'ओटीपी कोड पठाउनुहोस्'}
+                   <ArrowRight className="w-3.5 h-3.5" />
+                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleGoogleLogin}
-                  className="w-full py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                >
-                  <Chrome className="w-4 h-4 text-red-500" />
-                  {language === 'en' ? 'Sign in with Google' : 'गूगलले साइन इन गर्नुहोस्'}
-                </button>
+                 <div className="relative py-1">
+                   <div className="absolute inset-0 flex items-center">
+                     <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
+                   </div>
+                   <div className="relative flex justify-center">
+                     <span className="px-3 bg-white dark:bg-slate-900 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                       {language === 'en' ? 'or' : 'वा'}
+                     </span>
+                   </div>
+                 </div>
+
+                 <button
+                   type="button"
+                   onClick={handleGoogleLogin}
+                   className={`w-full py-2.5 border text-xs font-bold rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 ${isSuperadminEmail ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 text-slate-700 dark:text-slate-300'}`}
+                 >
+                   <Chrome className="w-4 h-4 text-red-500" />
+                   {language === 'en' ? 'Sign in with Google' : 'गूगलले साइन इन गर्नुहोस्'}
+                 </button>
               </motion.form>
             )}
 
