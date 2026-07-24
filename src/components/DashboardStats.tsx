@@ -1055,7 +1055,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
             >
               <div className="absolute inset-0 bg-gradient-to-r from-slate-800 to-slate-900 dark:from-indigo-50 dark:to-white opacity-0 group-hover:opacity-100 transition-opacity" />
               <span className="relative z-10">
-                {language === "en" ? "Detailed Gallery" : "विस्तृत ग्यालरी"}
+                {language === "en" ? "All Indicators" : "सबै सूचकहरू"}
               </span>
               <div className="relative z-10 w-8 h-8 rounded-full bg-white/10 dark:bg-indigo-100 text-white dark:text-indigo-700 flex items-center justify-center group-hover:bg-white dark:group-hover:bg-indigo-600 group-hover:text-slate-900 dark:group-hover:text-white transition-all duration-300">
                 <ChevronRight size={16} />
