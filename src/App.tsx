@@ -270,7 +270,7 @@ function MainAppContent() {
   const layout = useDashboardLayout(dashboardWidth);
   useHaptic();
   const { language, t, translateOffice, translateUnit } = useLanguage();
-  const { accessToken, user, loading: authLoading, isAdmin, isSuperadmin, isDataUpdater, role, emailSession, logout, refreshAdmins, adminsList, userAssignedOffice } = useAuth();
+  const { accessToken, user, loading: authLoading, isAdmin, isSuperadmin, isDataUpdater, role, logout, refreshAdmins, adminsList, userAssignedOffice } = useAuth();
 
   const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -3391,7 +3391,7 @@ function MainAppContent() {
             ))}
           </select>
 
-          {!user && !emailSession ? (
+          {!user ? (
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

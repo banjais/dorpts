@@ -2,8 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { User, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../firebase';
-import { AdminUser, UserActivity, EmailOTPSession } from '../types';
-import { validateSession, destroySession } from '../services/otpService';
+import { AdminUser, UserActivity } from '../types';
 import { getOfficeByEmail } from '../utils/officeDetector';
 import { SUPERADMIN_EMAIL } from '../config/superadmin';
 
@@ -20,7 +19,6 @@ interface AuthContextType {
   logActivity: (actionType: UserActivity['actionType'], details: string) => Promise<void>;
   refreshAdmins: () => Promise<void>;
   accessToken: string | null;
-  emailSession: EmailOTPSession | null;
   userAssignedOffice: string | null;
 }
 
@@ -32,7 +30,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [role, setRole] = useState<'superadmin' | 'admin' | 'data_updater' | 'viewer' | null>(null);
   const [adminsList, setAdminsList] = useState<AdminUser[]>([]);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [emailSession, setEmailSession] = useState<EmailOTPSession | null>(null);
   const [userAssignedOffice, setUserAssignedOffice] = useState<string | null>(null);
 
   const isSuperadmin = role === 'superadmin';
@@ -41,8 +38,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logActivity = useCallback(async (actionType: UserActivity['actionType'], details: string) => {
     try {
-      const uid = user?.uid || emailSession?.email || 'anonymous';
-      const email = user?.email || emailSession?.email || 'anonymous';
+      const uid = user?.uid || 'anonymous';
+      const email = user?.email || 'anonymous';
       const actId = `act_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
       await setDoc(doc(db, 'activities', actId), {
         id: actId,
@@ -55,7 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {
       // suppress
     }
-  }, [user, emailSession]);
+  }, [user]);
 
   const lookupEmailRole = useCallback(async (email: string): Promise<'superadmin' | 'admin' | 'data_updater' | 'viewer'> => {
     if (email === SUPERADMIN_EMAIL) return 'superadmin';
@@ -113,35 +110,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   }, []);
 
-  // Check stored session on mount
-  useEffect(() => {
-    let cancelled = false;
-    const checkSession = async () => {
-      try {
-        const token = sessionStorage.getItem('dor_session');
-        if (token) {
-          const session = await validateSession(token);
-          if (session && !cancelled) {
-            const userRole = await lookupEmailRole(session.email);
-            setEmailSession(session);
-            await setRoleAndLoadAdmins(userRole);
-            const assignedOffice = await loadUserAssignedOffice(session.email);
-            setUserAssignedOffice(assignedOffice);
-            await logActivity('otp_login', `Email OTP login: ${session.email}`);
-          } else {
-            sessionStorage.removeItem('dor_session');
-          }
-        }
-      } catch {
-        // suppress
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    checkSession();
-    return () => { cancelled = true; };
-  }, [lookupEmailRole, setRoleAndLoadAdmins, logActivity, loadUserAssignedOffice]);
-
   // Google auth state listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -197,12 +165,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      if (emailSession?.token) {
-        await destroySession(emailSession.token);
-        sessionStorage.removeItem('dor_session');
-      }
-      setEmailSession(null);
-      await logActivity('logout', `User logged out: ${user?.email || emailSession?.email}`);
+      await logActivity('logout', `User logged out: ${user?.email || 'anonymous'}`);
       await signOut(auth);
     } catch (error) {
       console.error('Logout error:', error);
@@ -247,7 +210,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       logActivity,
       refreshAdmins,
       accessToken,
-      emailSession,
       userAssignedOffice,
     }}>
       {children}
