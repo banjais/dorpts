@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import {
   Users, Activity, MapPin, Shield, BarChart3, Globe, UserCheck, TrendingUp,
   RefreshCw, Bell, Lock, FileText, Gauge,
-  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X
+  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown
 } from 'lucide-react';
 import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -43,6 +43,60 @@ const SystemCard: React.FC<{ label: string; status: string; isText?: boolean; la
     </div>
   );
 };
+
+const OfficeDropdown: React.FC<{
+  value: string;
+  onChange: (value: string) => void;
+  offices: Array<{ name: string; officeId: string; shortName: string }>;
+  language: 'en' | 'ne';
+}> = ({ value, onChange, offices, language }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-left flex items-center justify-between"
+      >
+        <span className={value ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'}>
+          {value || (language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्')}
+        </span>
+        <ChevronDown size={14} className={`text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg max-h-[200px] overflow-y-auto custom-scrollbar">
+          {offices.map((o) => (
+            <button
+              key={o.name}
+              type="button"
+              onClick={() => {
+                onChange(o.name);
+                setOpen(false);
+              }}
+              className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-100 dark:hover:bg-slate-700 ${
+                value === o.name ? 'bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'
+              }`}
+            >
+              {o.name}
+            </button>
+          ))}
+        </div>
+      )}
+     </div>
+    );
+  };
 
 interface SuperAdminDashboardProps {
   language: 'en' | 'ne';
@@ -772,18 +826,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
                 {newUserRole !== 'superadmin' && newUserRole !== 'viewer' && (
-                  <div className="relative">
-                    <select
-                      value={newUserOffice}
-                      onChange={(e) => setNewUserOffice(e.target.value)}
-                      className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                    >
-                      <option value="">{language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}</option>
-                      {offices.map((o) => (
-                        <option key={o.name} value={o.name}>{o.name}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <OfficeDropdown
+                    value={newUserOffice}
+                    onChange={setNewUserOffice}
+                    offices={offices}
+                    language={language}
+                  />
                 )}
                 <button
                   onClick={handleAddUser}
@@ -871,18 +919,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
                 {editingUser.role !== 'superadmin' && editingUser.role !== 'viewer' && (
-                  <div className="relative">
-                    <select
-                      value={editingUser.office || ''}
-                      onChange={(e) => setEditingUser({ ...editingUser, office: e.target.value })}
-                      className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                    >
-                      <option value="">{language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}</option>
-                      {offices.map((o) => (
-                        <option key={o.name} value={o.name}>{o.name}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <OfficeDropdown
+                    value={editingUser.office || ''}
+                    onChange={(v) => setEditingUser({ ...editingUser, office: v })}
+                    offices={offices}
+                    language={language}
+                  />
                 )}
                 <button
                   onClick={handleUpdateUser}
