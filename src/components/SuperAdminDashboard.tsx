@@ -10,6 +10,8 @@ import {
 import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { APP_VERSION } from '../constants/appTitles';
+import { fetchPublishedCsv, PUBLISHED_CSV_URLS } from '../utils/sheetSync';
+import { parseCSVLine } from '../data';
 
 const SystemCard: React.FC<{ label: string; status: string; isText?: boolean; language: 'en' | 'ne' }> = ({ label, status, isText, language }) => {
   const isConnected = status === 'connected' || status === 'active';
@@ -69,7 +71,6 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [userSearch, setUserSearch] = useState('');
   const [dataInputOffice, setDataInputOffice] = useState('');
   const [dataInputSearch, setDataInputSearch] = useState('');
-  const [dataInputIndicators, setDataInputIndicators] = useState<any[]>([]);
   const [dataInputValues, setDataInputValues] = useState<Record<string, string>>({});
   const [dataInputLoading, setDataInputLoading] = useState(false);
   const [dataInputSaving, setDataInputSaving] = useState(false);
@@ -354,14 +355,76 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     }
   };
 
+  const [dataInputSheetOffices, setDataInputSheetOffices] = useState<string[]>([]);
+  const [dataInputSheetHeaders, setDataInputSheetHeaders] = useState<string[]>([]);
+
+  const fetchSheetData = async () => {
+    setDataInputLoading(true);
+    try {
+      const csv = await fetchPublishedCsv(PUBLISHED_CSV_URLS.offices);
+      if (!csv) throw new Error('Failed to fetch sheet data');
+
+      const lines = csv.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
+
+      const headersRowIdx = lines.findIndex((line) => {
+        const cols = parseCSVLine(line);
+        return cols.some((c) => c.toLowerCase().includes('office') || c.toLowerCase().includes('कार्यालय'));
+      });
+
+      const headerRow = headersRowIdx !== -1 ? parseCSVLine(lines[headersRowIdx]) : [];
+      const headers = headerRow.slice(2);
+      setDataInputSheetHeaders(headers);
+
+      const startRow = headersRowIdx !== -1 ? headersRowIdx + 1 : 0;
+      const officeNames: string[] = [];
+      for (let i = startRow; i < lines.length; i++) {
+        const cols = parseCSVLine(lines[i]);
+        if (cols.length > 1) {
+          const name = cols[1]?.trim();
+          if (name && name !== 'Total' && name !== 'कुल' && name.length > 3) {
+            officeNames.push(name);
+          }
+        }
+      }
+      setDataInputSheetOffices(officeNames);
+    } catch (err) {
+      console.error('Failed to fetch sheet data:', err);
+    } finally {
+      setDataInputLoading(false);
+    }
+  };
+
   const fetchIndicators = async () => {
     setDataInputLoading(true);
     try {
-      const snap = await getDocs(query(collection(db, 'indicators'), orderBy('id')));
-      const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setDataInputIndicators(list);
+      const csv = await fetchPublishedCsv(PUBLISHED_CSV_URLS.offices);
+      if (!csv) throw new Error('Failed to fetch sheet data');
+
+      const lines = csv.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
+
+      const headersRowIdx = lines.findIndex((line) => {
+        const cols = parseCSVLine(line);
+        return cols.some((c) => c.toLowerCase().includes('office') || c.toLowerCase().includes('कार्यालय'));
+      });
+
+      const headerRow = headersRowIdx !== -1 ? parseCSVLine(lines[headersRowIdx]) : [];
+      const headers = headerRow.slice(2);
+      setDataInputSheetHeaders(headers);
+
+      const startRow = headersRowIdx !== -1 ? headersRowIdx + 1 : 0;
+      const officeNames: string[] = [];
+      for (let i = startRow; i < lines.length; i++) {
+        const cols = parseCSVLine(lines[i]);
+        if (cols.length > 1) {
+          const name = cols[1]?.trim();
+          if (name && name !== 'Total' && name !== 'कुल' && name.length > 3) {
+            officeNames.push(name);
+          }
+        }
+      }
+      setDataInputSheetOffices(officeNames);
     } catch (err) {
-      console.error('Failed to fetch indicators:', err);
+      console.error('Failed to fetch sheet data:', err);
     } finally {
       setDataInputLoading(false);
     }
@@ -481,30 +544,30 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
               />
               <div className="max-h-[200px] overflow-y-auto custom-scrollbar space-y-1">
-                {offices.filter(o => {
+                {dataInputSheetOffices.filter(o => {
                   if (!dataInputSearch) return true;
                   const q = dataInputSearch.toLowerCase();
-                  return o.name.toLowerCase().includes(q) || o.shortName.toLowerCase().includes(q) || o.officeId.toLowerCase().includes(q);
+                  return o.toLowerCase().includes(q);
                 }).map((o) => (
                   <button
-                    key={o.officeId}
+                    key={o}
                     onClick={() => {
-                      setDataInputOffice(o.name);
+                      setDataInputOffice(o);
                       setDataInputValues({});
                     }}
                     className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-colors ${
-                      dataInputOffice === o.name
+                      dataInputOffice === o
                         ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
                         : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
                   >
-                    {o.name}
+                    {o}
                   </button>
                 ))}
-                {offices.filter(o => {
+                {dataInputSheetOffices.filter(o => {
                   if (!dataInputSearch) return true;
                   const q = dataInputSearch.toLowerCase();
-                  return o.name.toLowerCase().includes(q) || o.shortName.toLowerCase().includes(q) || o.officeId.toLowerCase().includes(q);
+                  return o.toLowerCase().includes(q);
                 }).length === 0 && (
                   <p className="text-[11px] text-slate-400 text-center py-3">
                     {language === 'en' ? 'No offices found' : 'कार्यालय फेला परेन'}
@@ -526,32 +589,29 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
 
                 {dataInputLoading && (
                   <div className="text-[11px] text-slate-400 text-center py-4">
-                    {language === 'en' ? 'Loading indicators...' : 'सूचकहरू लोड गर्दै...'}
+                    {language === 'en' ? 'Loading sheet data...' : 'शीट डाटा लोड गर्दै...'}
                   </div>
                 )}
 
-                {!dataInputLoading && dataInputIndicators.length === 0 && (
+                {!dataInputLoading && dataInputSheetHeaders.length === 0 && (
                   <div className="text-[11px] text-slate-400 text-center py-4">
-                    {language === 'en' ? 'No indicators available. Click an office to load data.' : 'सूचकहरू उपलब्ध छैनन्। डाटा लोड गर्न कार्यालय क्लिक गर्नुहोस्।'}
+                    {language === 'en' ? 'No indicator headers found in sheet.' : 'शीटमा सूचक हेडर फेला परेन।'}
                   </div>
                 )}
 
-                {dataInputIndicators.length > 0 && (
+                {!dataInputLoading && dataInputSheetHeaders.length > 0 && (
                   <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
-                    {dataInputIndicators.map((ind: any) => {
-                      const indId = ind.id || ind.indicatorId || ind.name;
-                      const label = language === 'en' ? (ind.nameEn || ind.name || indId) : (ind.nameNp || ind.name || indId);
-                      const currentValue = dataInputValues[indId] ?? (ind.value ?? ind.currentValue ?? '');
+                    {dataInputSheetHeaders.map((header, idx) => {
+                      const currentValue = dataInputValues[header] ?? '';
                       return (
-                        <div key={indId} className="flex items-center gap-3 bg-white dark:bg-slate-900 rounded-lg px-3 py-2.5 border border-slate-100 dark:border-white/5">
+                        <div key={idx} className="flex items-center gap-3 bg-white dark:bg-slate-900 rounded-lg px-3 py-2.5 border border-slate-100 dark:border-white/5">
                           <div className="flex-1 min-w-0">
-                            <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{label}</div>
-                            <div className="text-[10px] text-slate-400">{ind.category || ''}</div>
+                            <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{header}</div>
                           </div>
                           <input
                             type="number"
                             value={currentValue}
-                            onChange={(e) => setDataInputValues(prev => ({ ...prev, [indId]: e.target.value }))}
+                            onChange={(e) => setDataInputValues(prev => ({ ...prev, [header]: e.target.value }))}
                             className="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-right"
                             placeholder="0"
                           />
