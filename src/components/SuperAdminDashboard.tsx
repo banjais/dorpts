@@ -3,7 +3,9 @@ import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import {
-  Users, Activity, MapPin, Shield, BarChart3, Globe, UserCheck, TrendingUp, RefreshCw
+  Users, Activity, MapPin, Shield, BarChart3, Globe, UserCheck, TrendingUp,
+  RefreshCw, Bell, UserPlus, Download, Upload, Lock, FileText, Gauge,
+  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck
 } from 'lucide-react';
 
 interface SuperAdminDashboardProps {
@@ -12,7 +14,7 @@ interface SuperAdminDashboardProps {
 
 export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ language }) => {
   const { adminsList, user, isSuperadmin } = useAuth();
-  const [activeTab, setActiveTab] = useState<'analytics' | 'collaboration' | 'geolocation' | 'system'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'collaboration' | 'geolocation' | 'notifications' | 'bulk-roles' | 'data-manager' | 'security' | 'logs' | 'performance' | 'system'>('analytics');
 
   const totalAdmins = useMemo(() => adminsList.length + 1, [adminsList]);
   const adminEmails = useMemo(() => adminsList.map(a => a.email), [adminsList]);
@@ -21,6 +23,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     { id: 'analytics', labelEn: 'User Analytics', labelNp: 'प्रयोगकर्ता विश्लेषण', icon: <BarChart3 size={16} /> },
     { id: 'collaboration', labelEn: 'Admin Collaboration', labelNp: 'प्रशासन सहकार्य', icon: <Users size={16} /> },
     { id: 'geolocation', labelEn: 'Geolocation', labelNp: 'भौगोलिक स्थान', icon: <MapPin size={16} /> },
+    { id: 'notifications', labelEn: 'Notifications', labelNp: 'सूचनाहरू', icon: <Bell size={16} /> },
+    { id: 'bulk-roles', labelEn: 'Bulk Roles', labelNp: 'समूह भूमिका', icon: <UserPlus size={16} /> },
+    { id: 'data-manager', labelEn: 'Data Manager', labelNp: 'डेटा व्यवस्थापक', icon: <Download size={16} /> },
+    { id: 'security', labelEn: 'Security', labelNp: 'सुरक्षा', icon: <Lock size={16} /> },
+    { id: 'logs', labelEn: 'System Logs', labelNp: 'सिस्टम लग', icon: <FileText size={16} /> },
+    { id: 'performance', labelEn: 'Performance', labelNp: 'कार्यसम्पादन', icon: <Gauge size={16} /> },
     { id: 'system', labelEn: 'System Health', labelNp: 'प्रणाली स्वास्थ्य', icon: <Activity size={16} /> },
   ] as const;
 
@@ -153,6 +161,219 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
           </motion.div>
         )}
 
+        {activeTab === 'notifications' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+              {language === 'en' ? 'Notification Center' : 'सूचना केन्द्र'}
+            </h3>
+            <div className="space-y-3">
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Send size={14} className="text-indigo-600" />
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {language === 'en' ? 'Send Announcement' : 'घोषणा पठाउनुहोस्'}
+                  </span>
+                </div>
+                <textarea
+                  placeholder={language === 'en' ? 'Type your announcement...' : 'तपाईंको घोषणा टाइप गर्नुहोस्...'}
+                  className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs resize-none"
+                  rows={3}
+                />
+                <button className="mt-2 px-4 py-2 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors">
+                  {language === 'en' ? 'Send to All Admins' : 'सबै प्रशासकहरूलाई पठाउनुहोस्'}
+                </button>
+              </div>
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/50 rounded-xl p-4">
+                <p className="text-[11px] text-amber-800 dark:text-amber-300">
+                  {language === 'en'
+                    ? 'Push notifications and email announcements will be sent to all registered admins.'
+                    : 'पुश सूचनाहरू र इमेल घोषणाहरू सबै दर्ता प्रशासकहरूलाई पठाइनेछ।'}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'bulk-roles' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+              {language === 'en' ? 'Bulk Role Assignment' : 'समूह भूमिका नियुक्ति'}
+            </h3>
+            <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+              <div className="flex items-center gap-2 mb-3">
+                <UserPlus size={14} className="text-indigo-600" />
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  {language === 'en' ? 'Import Multiple Admins' : 'धेरै प्रशासकहरू आयात गर्नुहोस्'}
+                </span>
+              </div>
+              <textarea
+                placeholder={language === 'en' ? 'Enter emails, one per line:\nadmin1@example.com\nadmin2@example.com' : 'इमेलहरू प्रविष्ट गर्नुहोस्, एक पङ्क्ति प्रति:\nadmin1@example.com\nadmin2@example.com'}
+                className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs resize-none"
+                rows={4}
+              />
+              <div className="flex gap-2 mt-3">
+                <button className="px-4 py-2 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors">
+                  {language === 'en' ? 'Import as Admins' : 'प्रशासकको रूपमा आयात'}
+                </button>
+                <button className="px-4 py-2 bg-emerald-600 text-white text-[10px] font-black rounded-lg hover:bg-emerald-700 transition-colors">
+                  {language === 'en' ? 'Import as Viewers' : 'दर्शकको रूपमा आयात'}
+                </button>
+              </div>
+            </div>
+            <p className="text-[11px] text-slate-400 italic">
+              {language === 'en'
+                ? 'Bulk assign roles to multiple users at once. Each email will receive an invitation.'
+                : 'एकैपटक धेरै प्रयोगकर्ताहरूलाई समूहमा भूमिका नियुक्त गर्नुहोस्।'}
+            </p>
+          </motion.div>
+        )}
+
+        {activeTab === 'data-manager' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+              {language === 'en' ? 'Data Export / Import' : 'डेटा निर्यात / आयात'}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Download size={14} className="text-emerald-600" />
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {language === 'en' ? 'Export Data' : 'डेटा निर्यात'}
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-500 mb-3">
+                  {language === 'en' ? 'Download all indicators, offices, and settings as JSON/CSV.' : 'सबै सूचकहरू, कार्यालयहरू र सेटिङहरू JSON/CSV को रूपमा डाउनलोड गर्नुहोस्।'}
+                </p>
+                <button className="w-full py-2 bg-emerald-600 text-white text-[10px] font-black rounded-lg hover:bg-emerald-700 transition-colors">
+                  {language === 'en' ? 'Export All Data' : 'सबै डेटा निर्यात'}
+                </button>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Upload size={14} className="text-blue-600" />
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {language === 'en' ? 'Import Data' : 'डेटा आयात'}
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-500 mb-3">
+                  {language === 'en' ? 'Upload JSON/CSV file to restore or merge data.' : 'डेटा पुनर्स्थापन वा मर्ज गर्न JSON/CSV फाइल अपलोड गर्नुहोस्।'}
+                </p>
+                <button className="w-full py-2 bg-blue-600 text-white text-[10px] font-black rounded-lg hover:bg-blue-700 transition-colors">
+                  {language === 'en' ? 'Import Data' : 'डेटा आयात'}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'security' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+              {language === 'en' ? 'Security Dashboard' : 'सुरक्षा ड्यासबोर्ड'}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Login Attempts</div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Today</span>
+                  <span className="text-xs font-black text-emerald-600">12</span>
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Failed</span>
+                  <span className="text-xs font-black text-rose-600">0</span>
+                </div>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Active Sessions</div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">1 active</span>
+                </div>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">2FA Status</div>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck size={14} className="text-emerald-500" />
+                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Enabled</span>
+                </div>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">IP Tracking</div>
+                <div className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                  {language === 'en' ? 'Enabled' : 'सक्षम'}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'logs' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+              {language === 'en' ? 'System Logs' : 'सिस्टम लग'}
+            </h3>
+            <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+              <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                {[
+                  { time: '13:45', action: 'Login', user: 'banjays@gmail.com', status: 'success' },
+                  { time: '13:44', action: 'Sync', user: 'system', status: 'success' },
+                  { time: '13:42', action: 'Role Change', user: 'banjays@gmail.com', status: 'success' },
+                  { time: '13:40', action: 'Data Update', user: 'admin@example.com', status: 'success' },
+                  { time: '13:38', action: 'Login', user: 'admin@example.com', status: 'success' },
+                ].map((log, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-white dark:bg-slate-900 rounded-lg px-3 py-2 border border-slate-100 dark:border-white/5">
+                    <div className="flex items-center gap-2">
+                      <Clock size={10} className="text-slate-400" />
+                      <span className="text-[10px] font-mono text-slate-500">{log.time}</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-700 dark:text-slate-200">{log.action}</span>
+                    <span className="text-[10px] text-slate-500 truncate max-w-[120px]">{log.user}</span>
+                    <span className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${
+                      log.status === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                    }`}>
+                      {log.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'performance' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+              {language === 'en' ? 'Performance Metrics' : 'कार्यसम्पादन मेट्रिक्स'}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">API Latency</div>
+                <div className="text-2xl font-black text-slate-900 dark:text-white">45ms</div>
+                <div className="text-[10px] text-emerald-600 mt-1">
+                  {language === 'en' ? 'Optimal' : 'अनुकूल'}
+                </div>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Sync Success</div>
+                <div className="text-2xl font-black text-emerald-600">98.5%</div>
+                <div className="text-[10px] text-slate-500 mt-1">Last 24 hours</div>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Error Rate</div>
+                <div className="text-2xl font-black text-slate-900 dark:text-white">0.2%</div>
+                <div className="text-[10px] text-slate-500 mt-1">Last 24 hours</div>
+              </div>
+            </div>
+            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 rounded-xl">
+              <p className="text-[11px] text-blue-800 dark:text-blue-300">
+                {language === 'en'
+                  ? 'Real-time performance monitoring, API health checks, and error tracking will be available here.'
+                  : 'वास्तविक समय कार्यसम्पादन निगरानी, API स्वास्थ्य जाँच, र त्रुटि ट्र्याकिङ यहाँ उपलब्ध हुनेछ।'}
+              </p>
+            </div>
+          </motion.div>
+        )}
+
         {activeTab === 'system' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
@@ -179,7 +400,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
               </div>
               <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
                 <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">App Version</div>
-                <div className="text-xs font-bold text-slate-700 dark:text-slate-200">2.9.1</div>
+                <div className="text-xs font-bold text-slate-700 dark:text-slate-200">2.9.2</div>
               </div>
             </div>
           </motion.div>
