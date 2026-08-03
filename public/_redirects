@@ -1,0 +1,2 @@
+# Redirect all traffic (frontend) to the canonical Firebase URL
+/* https://dorpts.web.app/:splat 301
