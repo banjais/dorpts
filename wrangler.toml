@@ -1,0 +1,12 @@
+name = "dorpts"
+main = "functions/api/[[route]].ts"
+compatibility_date = "2024-09-01"
+
+[vars]
+APP_URL = "https://dorpts.pages.dev"
+
+[env.production]
+vars = { APP_URL = "https://dorpts.pages.dev" }
+
+[env.preview]
+vars = { APP_URL = "https://dorpts.pages.dev" }
