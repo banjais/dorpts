@@ -36,17 +36,5 @@
         ]
       }
     ]
-  },
-  "functions": {
-    "source": "firebase-functions",
-    "codebase": "default"
-  },
-  "emulators": {
-    "functions": {
-      "port": 5001
-    },
-    "hosting": {
-      "port": 5000
-    }
   }
 }
