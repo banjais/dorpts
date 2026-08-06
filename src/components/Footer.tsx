@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, HelpCircle, ChevronUp, FileText, Share2, Sparkles, ChevronDown, ChevronRight, MessageSquare, RefreshCw, Menu } from 'lucide-react';
+import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, HelpCircle, ChevronUp, FileText, Share2, Sparkles, ChevronDown, ChevronRight, MessageSquare, RefreshCw, Menu, Download } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
@@ -51,6 +51,7 @@ export const Footer: React.FC<FooterProps> = ({
   const prevSyncingRef = React.useRef(isSyncing);
   const [updateBannerVisible, setUpdateBannerVisible] = useState(false);
   const [showLastSynced, setShowLastSynced] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   
   const shouldExpand = isExpanded || isHovered;
   
@@ -90,6 +91,15 @@ export const Footer: React.FC<FooterProps> = ({
     }
     prevSyncingRef.current = isSyncing;
   }, [isSyncing]);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as any);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
   
   const shareText = language === 'en' 
     ? `Check out ${APP_TITLES.shortAppName.en}!` 
@@ -151,12 +161,23 @@ export const Footer: React.FC<FooterProps> = ({
     onGoHome?.();
   };
 
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    }
+  };
+
   const menuItems = [
     { 
       id: 'btn-reports', 
       icon: FileText, 
       action: onOpenReportBuilder || (() => { try { window.print(); } catch(e) { console.error(e); } }) 
     },
+    ...(deferredPrompt ? [{ id: 'btn-install', icon: Download, action: handleInstallClick }] : []),
     { id: 'btn-share', icon: Share2, action: () => setShowQr(true) },
     { id: 'btn-help', icon: HelpCircle, action: onOpenHelp || (() => {}) },
     ...(canGiveFeedback ? [{ id: 'btn-feedback', icon: MessageSquare, action: onOpenFeedback || (() => {}) }] : []),
@@ -266,35 +287,39 @@ export const Footer: React.FC<FooterProps> = ({
                             )}
                           </AnimatePresence>
                         )}
-                        <button
-                          id={item.id}
-                          onClick={(e) => { e.stopPropagation(); item.action(); }}
-                          onMouseEnter={() => { if (item.id === 'btn-share') setIsQrHovered(true); }}
-                          onMouseLeave={() => { if (item.id === 'btn-share') setIsQrHovered(false); }}
-                          className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl transition-all active:scale-95 cursor-pointer border relative ${
-                            item.id === 'btn-menu'
-                              ? 'bg-white/70 dark:bg-white/5 backdrop-blur-xl border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700'
-                              : item.id === 'btn-ai'
-                                ? 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white border-indigo-500/50 shadow-md shadow-indigo-600/30 hover:scale-105'
-                                : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
-                          }`}
-                          title={
-                            item.id === 'btn-menu'
-                              ? (language === 'en' ? 'Open Menu' : 'मेनु खोल्नुहोस्')
-                              : item.id === 'btn-ai'
-                                ? (language === 'en' ? 'AI Assistant' : 'एआई सहायक')
-                                : item.id === 'btn-sync'
-                                  ? (language === 'en' ? 'Refresh' : 'रिफ्रेस')
-                                  : ''
-                          }
+                         <button
+                           id={item.id}
+                           onClick={(e) => { e.stopPropagation(); item.action(); }}
+                           onMouseEnter={() => { if (item.id === 'btn-share') setIsQrHovered(true); }}
+                           onMouseLeave={() => { if (item.id === 'btn-share') setIsQrHovered(false); }}
+                           className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl transition-all active:scale-95 cursor-pointer border relative ${
+                             item.id === 'btn-menu'
+                               ? 'bg-white/70 dark:bg-white/5 backdrop-blur-xl border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700'
+                               : item.id === 'btn-ai'
+                                 ? 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white border-indigo-500/50 shadow-md shadow-indigo-600/30 hover:scale-105'
+                                 : item.id === 'btn-install'
+                                   ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
+                                   : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
+                           }`}
+                           title={
+                             item.id === 'btn-menu'
+                               ? (language === 'en' ? 'Open Menu' : 'मेनु खोल्नुहोस्')
+                               : item.id === 'btn-ai'
+                                 ? (language === 'en' ? 'AI Assistant' : 'एआई सहायक')
+                                 : item.id === 'btn-sync'
+                                   ? (language === 'en' ? 'Refresh' : 'रिफ्रेस')
+                                   : item.id === 'btn-install'
+                                     ? (language === 'en' ? 'Install App' : 'अप्लिकेसन इन्स्टल गर्नुहोस्')
+                                     : ''
+                           }
                         >
-                          {item.id === 'btn-ai' && (
-                            <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                            </span>
-                          )}
-                          <item.icon size={18} strokeWidth={2.5} className={`${item.id === 'btn-ai' ? 'text-white' : 'text-slate-700 dark:text-slate-300'} sm:size-[20px] transition-colors shrink-0 ${item.id === 'btn-sync' && isSyncing ? 'animate-spin' : ''}`} />
+                           {item.id === 'btn-ai' && (
+                             <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                               <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                             </span>
+                           )}
+                           <item.icon size={18} strokeWidth={2.5} className={`${item.id === 'btn-ai' ? 'text-white' : item.id === 'btn-install' ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'} sm:size-[20px] transition-colors shrink-0 ${item.id === 'btn-sync' && isSyncing ? 'animate-spin' : ''}`} />
                         </button>
                       </div>
                     ))}
