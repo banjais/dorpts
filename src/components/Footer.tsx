@@ -10,6 +10,7 @@ interface FooterProps {
   onOpenHelp?: () => void;
   onOpenFeedback?: () => void;
   onOpenAI?: () => void;
+  onOpenMessaging?: () => void;
   isScrolled?: boolean;
   fiscalYear?: string;
   isExpanded?: boolean;
@@ -28,6 +29,7 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenHelp,
   onOpenFeedback,
   onOpenAI,
+  onOpenMessaging,
   isScrolled,
   fiscalYear,
   isExpanded = false,
@@ -178,6 +180,7 @@ export const Footer: React.FC<FooterProps> = ({
       action: onOpenReportBuilder || (() => { try { window.print(); } catch(e) { console.error(e); } }) 
     },
     ...(deferredPrompt ? [{ id: 'btn-install', icon: Download, action: handleInstallClick }] : []),
+    { id: 'btn-messaging', icon: MessageSquare, action: () => onOpenMessaging?.() },
     { id: 'btn-share', icon: Share2, action: () => setShowQr(true) },
     { id: 'btn-help', icon: HelpCircle, action: onOpenHelp || (() => {}) },
     ...(canGiveFeedback ? [{ id: 'btn-feedback', icon: MessageSquare, action: onOpenFeedback || (() => {}) }] : []),
@@ -295,11 +298,13 @@ export const Footer: React.FC<FooterProps> = ({
                            className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl transition-all active:scale-95 cursor-pointer border relative ${
                              item.id === 'btn-menu'
                                ? 'bg-white/70 dark:bg-white/5 backdrop-blur-xl border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700'
-                               : item.id === 'btn-ai'
-                                 ? 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white border-indigo-500/50 shadow-md shadow-indigo-600/30 hover:scale-105'
-                                 : item.id === 'btn-install'
-                                   ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
-                                   : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
+                              : item.id === 'btn-ai'
+                                ? 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white border-indigo-500/50 shadow-md shadow-indigo-600/30 hover:scale-105'
+                                : item.id === 'btn-install'
+                                  ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
+                                  : item.id === 'btn-messaging'
+                                    ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
+                                    : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
                            }`}
                            title={
                              item.id === 'btn-menu'
@@ -310,7 +315,9 @@ export const Footer: React.FC<FooterProps> = ({
                                    ? (language === 'en' ? 'Refresh' : 'रिफ्रेस')
                                    : item.id === 'btn-install'
                                      ? (language === 'en' ? 'Install App' : 'अप्लिकेसन इन्स्टल गर्नुहोस्')
-                                     : ''
+                                     : item.id === 'btn-messaging'
+                                       ? (language === 'en' ? 'Messages' : 'सन्देशहरू')
+                                       : ''
                            }
                         >
                            {item.id === 'btn-ai' && (
@@ -319,7 +326,7 @@ export const Footer: React.FC<FooterProps> = ({
                                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
                              </span>
                            )}
-                           <item.icon size={18} strokeWidth={2.5} className={`${item.id === 'btn-ai' ? 'text-white' : item.id === 'btn-install' ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'} sm:size-[20px] transition-colors shrink-0 ${item.id === 'btn-sync' && isSyncing ? 'animate-spin' : ''}`} />
+                           <item.icon size={18} strokeWidth={2.5} className={`${item.id === 'btn-ai' ? 'text-white' : item.id === 'btn-install' ? 'text-indigo-700 dark:text-indigo-300' : item.id === 'btn-messaging' ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'} sm:size-[20px] transition-colors shrink-0 ${item.id === 'btn-sync' && isSyncing ? 'animate-spin' : ''}`} />
                         </button>
                       </div>
                     ))}

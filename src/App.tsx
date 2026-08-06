@@ -50,6 +50,7 @@ import { IndicatorHeatmap } from "./components/IndicatorHeatmap";
 import { OfflineSummaryDashboard } from "./components/OfflineSummaryDashboard";
 import { Overview } from "./components/Overview";
 import { AnnouncementBoard } from "./components/AnnouncementBoard";
+import { MessagingCenter } from "./components/MessagingCenter";
 import { DetailedGalleryView } from "./components/DetailedGalleryView";
 import { normalizeCategory, STANDARD_CATEGORIES, DEFAULT_CATEGORY_THEMES } from "./utils/category";
 import { getFiscalYearForBsDateStr, toNepaliNumerals } from "./utils/bsDate";
@@ -239,6 +240,7 @@ const viewOrder: Record<MainView, number> = {
   viewer: 7,
   'detailed-gallery': 8,
   announcements: 9,
+  messaging: 10,
 };
 
 const viewVariants = {
@@ -3508,22 +3510,37 @@ function MainAppContent() {
                                </div>
                             </ErrorBoundary>
                           )}
-                          {mainView === "announcements" && (
-                            <ErrorBoundary
-                              fallback={
-                                <div className="p-8 text-center">
-                                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                                    Announcements temporarily unavailable.
-                                  </p>
+                           {mainView === "announcements" && (
+                             <ErrorBoundary
+                               fallback={
+                                 <div className="p-8 text-center">
+                                   <p className="text-sm text-slate-500 dark:text-slate-400">
+                                     Announcements temporarily unavailable.
+                                   </p>
+                                 </div>
+                               }
+                             >
+                                <div className="p-4 sm:p-6 md:p-8 w-full max-w-4xl mx-auto">
+                                  <AnnouncementBoard />
                                 </div>
-                              }
-                            >
-                               <div className="p-4 sm:p-6 md:p-8 w-full max-w-4xl mx-auto">
-                                 <AnnouncementBoard />
-                               </div>
-                            </ErrorBoundary>
-                          )}
-                        </motion.div>
+                             </ErrorBoundary>
+                           )}
+                           {mainView === "messaging" && (
+                             <ErrorBoundary
+                               fallback={
+                                 <div className="p-8 text-center">
+                                   <p className="text-sm text-slate-500 dark:text-slate-400">
+                                     Messaging temporarily unavailable.
+                                   </p>
+                                 </div>
+                               }
+                             >
+                                <div className="p-4 sm:p-6 md:p-8 w-full max-w-5xl mx-auto">
+                                  <MessagingCenter language={language} offices={offices} />
+                                </div>
+                             </ErrorBoundary>
+                           )}
+                         </motion.div>
                    </AnimatePresence>
                  </motion.div>
                )}
@@ -3562,8 +3579,9 @@ function MainAppContent() {
                sessionStorage.setItem('dor_app_just_updated', 'true');
                window.location.reload();
              }}
-            canGiveFeedback={!user || role === 'viewer'}
-          />
+             canGiveFeedback={!user || role === 'viewer'}
+             onOpenMessaging={() => handleMainViewChange('messaging')}
+           />
 
         {/* Dim Overlay - Outside scaled content */}
         <AnimatePresence>

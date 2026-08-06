@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import {
   Users, Activity, MapPin, Shield, BarChart3, Globe, UserCheck, TrendingUp,
   RefreshCw, Bell, Lock, FileText, Gauge,
-  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone
+  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone, MessageSquare
 } from 'lucide-react';
 import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -13,6 +13,7 @@ import { APP_VERSION } from '../constants/appTitles';
 import { fetchPublishedCsv, PUBLISHED_CSV_URLS } from '../utils/sheetSync';
 import { parseCSVLine } from '../data';
 import { API_BASE } from '../utils/apiBase';
+import { MessagingCenter } from './MessagingCenter';
 
 const SystemCard: React.FC<{ label: string; status: string; isText?: boolean; language: 'en' | 'ne' }> = ({ label, status, isText, language }) => {
   const isConnected = status === 'connected' || status === 'active';
@@ -213,6 +214,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     { id: 'user-management', labelEn: 'User Management', labelNp: 'प्रयोगकर्ता व्यवस्थापन', icon: <Users size={16} /> },
     { id: 'data-input', labelEn: 'Data Input', labelNp: 'डाटा इनपुट', icon: <FileText size={16} /> },
     { id: 'announcements', labelEn: 'Announcements', labelNp: 'घोषणाहरू', icon: <Megaphone size={16} /> },
+    { id: 'messaging', labelEn: 'Messages', labelNp: 'सन्देशहरू', icon: <MessageSquare size={16} /> },
     { id: 'collaboration', labelEn: 'Collaboration', labelNp: 'सहकार्य', icon: <Globe size={16} /> },
     { id: 'geolocation', labelEn: 'Geolocation', labelNp: 'भौगोलिक स्थान', icon: <MapPin size={16} /> },
     { id: 'notifications', labelEn: 'Notifications', labelNp: 'सूचनाहरू', icon: <Bell size={16} /> },
@@ -639,6 +641,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     if (activeTab === 'collaboration') fetchCollaboration();
     if (activeTab === 'geolocation') fetchGeolocation();
     if (activeTab === 'announcements') fetchAnnouncements();
+    if (activeTab === 'messaging') { /* messaging handles its own data */ }
   }, [activeTab, isSuperadmin]);
 
   return (
@@ -982,9 +985,18 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                ))}
              </div>
            </motion.div>
-         )}
+          )}
 
-         {activeTab === 'collaboration' && (
+          {activeTab === 'messaging' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+                {language === 'en' ? 'Group & Office Messaging' : 'समूह र कार्यालय मेसेजिङ'}
+              </h3>
+              <MessagingCenter language={language} offices={offices} />
+            </motion.div>
+          )}
+
+          {activeTab === 'collaboration' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
               {language === 'en' ? 'Admin Collaboration Network' : 'प्रशासन सहकार्य नेटवर्क'}

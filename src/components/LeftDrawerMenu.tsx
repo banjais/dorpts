@@ -14,6 +14,7 @@ import {
   Info,
   Crown,
   Megaphone,
+  MessageSquare,
 } from 'lucide-react';
 import type { MainView } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -106,6 +107,16 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       labelNp: 'घोषणाहरू',
       onClick: () => {
         onNavigate('announcements');
+        onClose();
+      },
+    },
+    {
+      id: 'messaging',
+      icon: <MessageSquare size={18} />,
+      labelEn: 'Messages',
+      labelNp: 'सन्देशहरू',
+      onClick: () => {
+        onNavigate('messaging');
         onClose();
       },
     },

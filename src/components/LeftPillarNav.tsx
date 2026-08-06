@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useSpring, useTransform } from 'motion/react';
-import { LayoutDashboard, TrendingUp, Activity, Building2, Megaphone } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Activity, Building2, Megaphone, MessageSquare } from 'lucide-react';
 import type { MainView } from '../types';
 
 export const NAV_ITEMS = [
@@ -9,6 +9,7 @@ export const NAV_ITEMS = [
   { id: 'heatmap' as MainView, labelEn: 'HEATMAP', labelNp: 'हिटम्याप', icon: <Activity size={18} /> },
   { id: 'institutional' as MainView, labelEn: 'INSTITUTIONAL', labelNp: 'संस्थागत', icon: <Building2 size={18} /> },
   { id: 'announcements' as MainView, labelEn: 'ANNOUNCEMENTS', labelNp: 'घोषणाहरू', icon: <Megaphone size={18} /> },
+  { id: 'messaging' as MainView, labelEn: 'MESSAGES', labelNp: 'सन्देशहरू', icon: <MessageSquare size={18} /> },
 ];
 
 type PillarColor = {
@@ -72,6 +73,12 @@ const SECTION_COLORS: Record<MainView, PillarColor> = {
      activeBg: 'bg-emerald-600 dark:bg-emerald-500',
      glow: 'shadow-emerald-500/40',
      border: 'border-emerald-200 dark:border-emerald-700/40',
+   },
+   messaging: {
+     bg: 'bg-slate-50/80 dark:bg-slate-900/80',
+     activeBg: 'bg-indigo-600 dark:bg-indigo-500',
+     glow: 'shadow-indigo-500/40',
+     border: 'border-indigo-200 dark:border-indigo-700/40',
    },
    'detailed-gallery': {
      bg: 'bg-slate-50/80 dark:bg-slate-900/80',
