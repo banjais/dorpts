@@ -243,6 +243,7 @@ const viewOrder: Record<MainView, number> = {
   announcements: 9,
   messaging: 10,
   calendar: 11,
+  feedbacks: 12,
 };
 
 const viewVariants = {
@@ -3554,6 +3555,21 @@ function MainAppContent() {
                              >
                                 <div className="p-4 sm:p-6 md:p-8 w-full max-w-5xl mx-auto">
                                   <CalendarDeadlines language={language} offices={offices} />
+                                </div>
+                             </ErrorBoundary>
+                           )}
+                           {mainView === "feedbacks" && (
+                             <ErrorBoundary
+                               fallback={
+                                 <div className="p-8 text-center">
+                                   <p className="text-sm text-slate-500 dark:text-slate-400">
+                                     Feedbacks temporarily unavailable.
+                                   </p>
+                                 </div>
+                               }
+                             >
+                                <div className="p-4 sm:p-6 md:p-8 w-full max-w-4xl mx-auto">
+                                  <SuperAdminDashboard language={language} activeTab="feedbacks" onTabChange={setSuperAdminActiveTab} offices={offices} />
                                 </div>
                              </ErrorBoundary>
                            )}

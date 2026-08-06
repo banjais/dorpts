@@ -89,6 +89,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ language, active
     { id: 'data-input', labelEn: 'Data Input', labelNp: 'डाटा इनपुट', icon: <FileText size={16} /> },
     { id: 'messaging', labelEn: 'Messages', labelNp: 'सन्देशहरू', icon: <MessageSquare size={16} /> },
     { id: 'calendar', labelEn: 'Calendar', labelNp: 'क्यालेन्डर', icon: <CalendarDays size={16} /> },
+    { id: 'feedbacks', labelEn: 'Feedbacks', labelNp: 'प्रतिक्रियाहरू', icon: <MessageSquare size={16} /> },
     { id: 'reports', labelEn: 'Reports', labelNp: 'प्रतिवेदनहरू', icon: <FileText size={16} /> },
     { id: 'notifications', labelEn: 'Notifications', labelNp: 'सूचनाहरू', icon: <Bell size={16} /> },
     { id: 'system', labelEn: 'System Health', labelNp: 'प्रणाली स्वास्थ्य', icon: <Activity size={16} /> },
@@ -149,6 +150,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ language, active
   const [dataInputLoading, setDataInputLoading] = useState(false);
   const [dataInputSaving, setDataInputSaving] = useState(false);
   const [dataInputSheetHeaders, setDataInputSheetHeaders] = useState<string[]>([]);
+  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [feedbacksLoading, setFeedbacksLoading] = useState(false);
 
   // Office-specific data input fetch
   const fetchIndicatorsForOffice = async () => {
@@ -174,6 +177,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ language, active
     }
   };
 
+  const fetchFeedbacks = async () => {
+    setFeedbacksLoading(true);
+    try {
+      const snap = await getDocs(query(collection(db, 'user_feedback'), orderBy('createdAt', 'desc'), limit(50)));
+      setFeedbacks(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      console.error('Failed to fetch feedbacks:', err);
+    } finally {
+      setFeedbacksLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === 'analytics') fetchAnalytics();
     if (activeTab === 'data-input') {
@@ -182,6 +197,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ language, active
       }
       fetchIndicatorsForOffice();
     }
+    if (activeTab === 'feedbacks') fetchFeedbacks();
   }, [activeTab]);
 
   const analyticsCards = useMemo(() => [
@@ -405,6 +421,56 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ language, active
       {activeTab === 'calendar' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <CalendarDeadlines language={language} offices={offices} />
+        </motion.div>
+      )}
+
+      {activeTab === 'calendar' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+          <CalendarDeadlines language={language} offices={offices} />
+        </motion.div>
+      )}
+
+      {activeTab === 'feedbacks' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+            {language === 'en' ? 'User Feedbacks' : 'प्रयोगकर्ता प्रतिक्रियाहरू'}
+          </h3>
+          <div className="space-y-2">
+            {feedbacksLoading && (
+              <p className="text-[11px] text-slate-400 text-center py-4">
+                {language === 'en' ? 'Loading feedbacks...' : 'प्रतिक्रियाहरू लोड गर्दै...'}
+              </p>
+            )}
+            {!feedbacksLoading && feedbacks.length === 0 && (
+              <p className="text-[11px] text-slate-400 text-center py-4">
+                {language === 'en' ? 'No feedbacks yet' : 'अहिले सम्म कुनै प्रतिक्रिया छैन'}
+              </p>
+            )}
+            {feedbacks.map((fb: any) => (
+              <div key={fb.id} className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                        {fb.userName || fb.userEmail || 'Anonymous'}
+                      </span>
+                      {fb.rating && (
+                        <span className="text-[10px] font-black text-amber-600">
+                          {'★'.repeat(fb.rating)}{'☆'.repeat(5 - fb.rating)}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+                      {fb.message || fb.content || fb.text || '(no message)'}
+                    </p>
+                    <div className="text-[10px] text-slate-400 mt-2">
+                      {fb.createdAt?.toDate?.()?.toLocaleString() || fb.createdAt || '--'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </motion.div>
       )}
 

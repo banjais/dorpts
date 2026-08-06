@@ -88,7 +88,7 @@ export interface Toast {
 
 export type ViewMode = 'hierarchy' | 'dashboard' | 'card' | 'chart' | 'table' | 'heatmap' | 'compare' | 'data-health' | 'institutional' | 'unified' | 'superadmin';
 
-export type MainView = 'dashboard' | 'insights' | 'institutional' | 'trends' | 'heatmap' | 'superadmin' | 'admin' | 'viewer' | 'detailed-gallery' | 'announcements' | 'messaging' | 'calendar';
+export type MainView = 'dashboard' | 'insights' | 'institutional' | 'trends' | 'heatmap' | 'superadmin' | 'admin' | 'viewer' | 'detailed-gallery' | 'announcements' | 'messaging' | 'calendar' | 'feedbacks';
 
 export interface WidgetVisibility {
   radialChart: boolean;

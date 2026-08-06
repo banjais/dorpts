@@ -20,6 +20,7 @@ import { useLanguage } from '../context/LanguageContext';
   { id: 'announcements' as MainView, labelEn: 'ANNOUNCEMENTS', labelNp: 'घोषणाहरू', icon: <Megaphone size={16} /> },
   { id: 'messaging' as MainView, labelEn: 'MESSAGES', labelNp: 'सन्देशहरू', icon: <MessageSquare size={16} /> },
   { id: 'calendar' as MainView, labelEn: 'CALENDAR', labelNp: 'क्यालेन्डर', icon: <CalendarDays size={16} /> },
+  { id: 'feedbacks' as MainView, labelEn: 'FEEDBACKS', labelNp: 'प्रतिक्रियाहरू', icon: <MessageSquare size={16} /> },
 ];
 
 interface NavigationMenuProps {

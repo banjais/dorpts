@@ -11,6 +11,7 @@ export const NAV_ITEMS = [
   { id: 'announcements' as MainView, labelEn: 'ANNOUNCEMENTS', labelNp: 'घोषणाहरू', icon: <Megaphone size={18} /> },
   { id: 'messaging' as MainView, labelEn: 'MESSAGES', labelNp: 'सन्देशहरू', icon: <MessageSquare size={18} /> },
   { id: 'calendar' as MainView, labelEn: 'CALENDAR', labelNp: 'क्यालेन्डर', icon: <CalendarDays size={18} /> },
+  { id: 'feedbacks' as MainView, labelEn: 'FEEDBACKS', labelNp: 'प्रतिक्रियाहरू', icon: <MessageSquare size={18} /> },
 ];
 
 type PillarColor = {
@@ -86,6 +87,12 @@ const SECTION_COLORS: Record<MainView, PillarColor> = {
      activeBg: 'bg-amber-600 dark:bg-amber-500',
      glow: 'shadow-amber-500/40',
      border: 'border-amber-200 dark:border-amber-700/40',
+   },
+   feedbacks: {
+     bg: 'bg-slate-50/80 dark:bg-slate-900/80',
+     activeBg: 'bg-pink-600 dark:bg-pink-500',
+     glow: 'shadow-pink-500/40',
+     border: 'border-pink-200 dark:border-pink-700/40',
    },
    'detailed-gallery': {
      bg: 'bg-slate-50/80 dark:bg-slate-900/80',

@@ -136,6 +136,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
 
   const [officeRankings, setOfficeRankings] = useState<Array<{ name: string; completion: number; total: number; progress: number }>>([]);
   const [rankingsLoading, setRankingsLoading] = useState(false);
+  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [feedbacksLoading, setFeedbacksLoading] = useState(false);
 
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
@@ -220,6 +222,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     { id: 'announcements', labelEn: 'Announcements', labelNp: 'घोषणाहरू', icon: <Megaphone size={16} /> },
     { id: 'messaging', labelEn: 'Messages', labelNp: 'सन्देशहरू', icon: <MessageSquare size={16} /> },
     { id: 'calendar', labelEn: 'Calendar', labelNp: 'क्यालेन्डर', icon: <CalendarDays size={16} /> },
+    { id: 'feedbacks', labelEn: 'Feedbacks', labelNp: 'प्रतिक्रियाहरू', icon: <MessageSquare size={16} /> },
     { id: 'collaboration', labelEn: 'Collaboration', labelNp: 'सहकार्य', icon: <Globe size={16} /> },
     { id: 'geolocation', labelEn: 'Geolocation', labelNp: 'भौगोलिक स्थान', icon: <MapPin size={16} /> },
     { id: 'notifications', labelEn: 'Notifications', labelNp: 'सूचनाहरू', icon: <Bell size={16} /> },
@@ -415,6 +418,18 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
       setAnnouncements(prev => prev.filter(a => a.id !== id));
     } catch (err: any) {
       alert(err.message);
+    }
+  };
+
+  const fetchFeedbacks = async () => {
+    setFeedbacksLoading(true);
+    try {
+      const snap = await getDocs(query(collection(db, 'user_feedback'), orderBy('createdAt', 'desc'), limit(100)));
+      setFeedbacks(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      console.error('Failed to fetch feedbacks:', err);
+    } finally {
+      setFeedbacksLoading(false);
     }
   };
 
@@ -676,6 +691,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     if (activeTab === 'announcements') fetchAnnouncements();
     if (activeTab === 'messaging') { /* messaging handles its own data */ }
     if (activeTab === 'calendar') { /* calendar handles its own data */ }
+    if (activeTab === 'feedbacks') fetchFeedbacks();
   }, [activeTab, isSuperadmin]);
 
   return (
@@ -1072,6 +1088,56 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
           {activeTab === 'calendar' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
               <CalendarDeadlines language={language} offices={offices} />
+            </motion.div>
+          )}
+
+          {activeTab === 'calendar' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+              <CalendarDeadlines language={language} offices={offices} />
+            </motion.div>
+          )}
+
+          {activeTab === 'feedbacks' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+                {language === 'en' ? 'User Feedbacks' : 'प्रयोगकर्ता प्रतिक्रियाहरू'}
+              </h3>
+              <div className="space-y-2">
+                {feedbacksLoading && (
+                  <p className="text-[11px] text-slate-400 text-center py-4">
+                    {language === 'en' ? 'Loading feedbacks...' : 'प्रतिक्रियाहरू लोड गर्दै...'}
+                  </p>
+                )}
+                {!feedbacksLoading && feedbacks.length === 0 && (
+                  <p className="text-[11px] text-slate-400 text-center py-4">
+                    {language === 'en' ? 'No feedbacks yet' : 'अहिले सम्म कुनै प्रतिक्रिया छैन'}
+                  </p>
+                )}
+                {feedbacks.map((fb: any) => (
+                  <div key={fb.id} className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                            {fb.userName || fb.userEmail || 'Anonymous'}
+                          </span>
+                          {fb.rating && (
+                            <span className="text-[10px] font-black text-amber-600">
+                              {'★'.repeat(fb.rating)}{'☆'.repeat(5 - fb.rating)}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+                          {fb.message || fb.content || fb.text || '(no message)'}
+                        </p>
+                        <div className="text-[10px] text-slate-400 mt-2">
+                          {fb.createdAt?.toDate?.()?.toLocaleString() || fb.createdAt || '--'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </motion.div>
           )}
 

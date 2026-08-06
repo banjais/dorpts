@@ -132,6 +132,16 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       },
     },
     {
+      id: 'feedbacks',
+      icon: <MessageSquare size={18} />,
+      labelEn: 'Feedbacks',
+      labelNp: 'प्रतिक्रियाहरू',
+      onClick: () => {
+        onNavigate('feedbacks');
+        onClose();
+      },
+    },
+    {
       id: 'about',
       icon: <Info size={18} />,
       labelEn: 'System Info',
