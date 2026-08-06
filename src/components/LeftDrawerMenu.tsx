@@ -13,6 +13,7 @@ import {
   User,
   Info,
   Crown,
+  Megaphone,
 } from 'lucide-react';
 import type { MainView } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -95,6 +96,16 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       labelNp: 'कार्य पोर्टल',
       onClick: () => {
         onExpandFooter?.();
+        onClose();
+      },
+    },
+    {
+      id: 'announcements',
+      icon: <Megaphone size={18} />,
+      labelEn: 'Announcements',
+      labelNp: 'घोषणाहरू',
+      onClick: () => {
+        onNavigate('announcements');
         onClose();
       },
     },

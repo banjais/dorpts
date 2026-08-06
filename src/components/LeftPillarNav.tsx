@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useSpring, useTransform } from 'motion/react';
-import { LayoutDashboard, TrendingUp, Activity, Building2 } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Activity, Building2, Megaphone } from 'lucide-react';
 import type { MainView } from '../types';
 
 export const NAV_ITEMS = [
@@ -8,6 +8,7 @@ export const NAV_ITEMS = [
   { id: 'trends' as MainView, labelEn: 'TRENDS', labelNp: 'प्रवृत्ति', icon: <TrendingUp size={18} /> },
   { id: 'heatmap' as MainView, labelEn: 'HEATMAP', labelNp: 'हिटम्याप', icon: <Activity size={18} /> },
   { id: 'institutional' as MainView, labelEn: 'INSTITUTIONAL', labelNp: 'संस्थागत', icon: <Building2 size={18} /> },
+  { id: 'announcements' as MainView, labelEn: 'ANNOUNCEMENTS', labelNp: 'घोषणाहरू', icon: <Megaphone size={18} /> },
 ];
 
 type PillarColor = {
@@ -54,13 +55,19 @@ const SECTION_COLORS: Record<MainView, PillarColor> = {
      glow: 'shadow-rose-500/40',
      border: 'border-rose-200 dark:border-rose-700/40',
    },
-   admin: {
-     bg: 'bg-slate-50/80 dark:bg-slate-900/80',
-     activeBg: 'bg-indigo-600 dark:bg-indigo-500',
-     glow: 'shadow-indigo-500/40',
-     border: 'border-indigo-200 dark:border-indigo-700/40',
-   },
-   viewer: {
+    admin: {
+      bg: 'bg-slate-50/80 dark:bg-slate-900/80',
+      activeBg: 'bg-indigo-600 dark:bg-indigo-500',
+      glow: 'shadow-indigo-500/40',
+      border: 'border-indigo-200 dark:border-indigo-700/40',
+    },
+    announcements: {
+      bg: 'bg-slate-50/80 dark:bg-slate-900/80',
+      activeBg: 'bg-amber-600 dark:bg-amber-500',
+      glow: 'shadow-amber-500/40',
+      border: 'border-amber-200 dark:border-amber-700/40',
+    },
+    viewer: {
      bg: 'bg-slate-50/80 dark:bg-slate-900/80',
      activeBg: 'bg-emerald-600 dark:bg-emerald-500',
      glow: 'shadow-emerald-500/40',

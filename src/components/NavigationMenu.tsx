@@ -5,6 +5,7 @@ import {
   TrendingUp,
   Activity,
   Building2,
+  Megaphone,
 } from 'lucide-react';
 import { MainView } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -14,6 +15,7 @@ import { useLanguage } from '../context/LanguageContext';
   { id: 'trends' as MainView, labelEn: 'TRENDS', labelNp: 'प्रवृत्ति', icon: <TrendingUp size={16} /> },
   { id: 'heatmap' as MainView, labelEn: 'HEATMAP', labelNp: 'हिटम्याप', icon: <Activity size={16} /> },
   { id: 'institutional' as MainView, labelEn: 'INSTITUTIONAL', labelNp: 'संस्थागत', icon: <Building2 size={16} /> },
+  { id: 'announcements' as MainView, labelEn: 'ANNOUNCEMENTS', labelNp: 'घोषणाहरू', icon: <Megaphone size={16} /> },
 ];
 
 interface NavigationMenuProps {

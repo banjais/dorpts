@@ -49,6 +49,7 @@ import { SystemHelpModal } from "./components/SystemHelpModal";
 import { IndicatorHeatmap } from "./components/IndicatorHeatmap";
 import { OfflineSummaryDashboard } from "./components/OfflineSummaryDashboard";
 import { Overview } from "./components/Overview";
+import { AnnouncementBoard } from "./components/AnnouncementBoard";
 import { DetailedGalleryView } from "./components/DetailedGalleryView";
 import { normalizeCategory, STANDARD_CATEGORIES, DEFAULT_CATEGORY_THEMES } from "./utils/category";
 import { getFiscalYearForBsDateStr, toNepaliNumerals } from "./utils/bsDate";
@@ -237,6 +238,7 @@ const viewOrder: Record<MainView, number> = {
   admin: 6,
   viewer: 7,
   'detailed-gallery': 8,
+  announcements: 9,
 };
 
 const viewVariants = {
@@ -3491,22 +3493,37 @@ function MainAppContent() {
                               </div>
                            </ErrorBoundary>
                          )}
-                         {mainView === "viewer" && (
-                           <ErrorBoundary
-                             fallback={
-                               <div className="p-8 text-center">
-                                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                                   Viewer dashboard temporarily unavailable.
-                                 </p>
+                          {mainView === "viewer" && (
+                            <ErrorBoundary
+                              fallback={
+                                <div className="p-8 text-center">
+                                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                                    Viewer dashboard temporarily unavailable.
+                                  </p>
+                                </div>
+                              }
+                            >
+                               <div className="p-4 sm:p-6 md:p-8 w-full max-w-7xl mx-auto">
+                                 <ViewerDashboard language={language} activeTab={superAdminActiveTab} onTabChange={setSuperAdminActiveTab} />
                                </div>
-                             }
-                           >
-                              <div className="p-4 sm:p-6 md:p-8 w-full max-w-7xl mx-auto">
-                                <ViewerDashboard language={language} activeTab={superAdminActiveTab} onTabChange={setSuperAdminActiveTab} />
-                              </div>
-                           </ErrorBoundary>
-                         )}
-                       </motion.div>
+                            </ErrorBoundary>
+                          )}
+                          {mainView === "announcements" && (
+                            <ErrorBoundary
+                              fallback={
+                                <div className="p-8 text-center">
+                                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                                    Announcements temporarily unavailable.
+                                  </p>
+                                </div>
+                              }
+                            >
+                               <div className="p-4 sm:p-6 md:p-8 w-full max-w-4xl mx-auto">
+                                 <AnnouncementBoard />
+                               </div>
+                            </ErrorBoundary>
+                          )}
+                        </motion.div>
                    </AnimatePresence>
                  </motion.div>
                )}

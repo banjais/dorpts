@@ -5,9 +5,9 @@ import { useLanguage } from '../context/LanguageContext';
 import {
   Users, Activity, MapPin, Shield, BarChart3, Globe, UserCheck, TrendingUp,
   RefreshCw, Bell, Lock, FileText, Gauge,
-  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn
+  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone
 } from 'lucide-react';
-import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { APP_VERSION } from '../constants/appTitles';
 import { fetchPublishedCsv, PUBLISHED_CSV_URLS } from '../utils/sheetSync';
@@ -132,6 +132,20 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const analyticsCardRef = useRef<HTMLDivElement>(null);
   const [internalActiveTab, setInternalActiveTab] = useState('analytics');
 
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
+  const [editingAnnouncement, setEditingAnnouncement] = useState<any>(null);
+  const [announcementForm, setAnnouncementForm] = useState({
+    title: '',
+    message: '',
+    messageEn: '',
+    priority: 'info',
+    targetOffices: '',
+    targetRoles: '',
+    expiresAt: '',
+  });
+  const [announcementSaving, setAnnouncementSaving] = useState(false);
+
   const activeTab = externalActiveTab || internalActiveTab;
   const handleTabChange = onTabChange || setInternalActiveTab;
 
@@ -198,6 +212,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     { id: 'analytics', labelEn: 'User Analytics', labelNp: 'प्रयोगकर्ता विश्लेषण', icon: <BarChart3 size={16} /> },
     { id: 'user-management', labelEn: 'User Management', labelNp: 'प्रयोगकर्ता व्यवस्थापन', icon: <Users size={16} /> },
     { id: 'data-input', labelEn: 'Data Input', labelNp: 'डाटा इनपुट', icon: <FileText size={16} /> },
+    { id: 'announcements', labelEn: 'Announcements', labelNp: 'घोषणाहरू', icon: <Megaphone size={16} /> },
     { id: 'collaboration', labelEn: 'Collaboration', labelNp: 'सहकार्य', icon: <Globe size={16} /> },
     { id: 'geolocation', labelEn: 'Geolocation', labelNp: 'भौगोलिक स्थान', icon: <MapPin size={16} /> },
     { id: 'notifications', labelEn: 'Notifications', labelNp: 'सूचनाहरू', icon: <Bell size={16} /> },
@@ -304,6 +319,76 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
       console.error('Failed to fetch performance:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAnnouncements = async () => {
+    setLoading(true);
+    try {
+      const snap = await getDocs(query(collection(db, 'announcements'), orderBy('createdAt', 'desc'), limit(100)));
+      setAnnouncements(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      console.error('Failed to fetch announcements:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveAnnouncement = async () => {
+    if (!announcementForm.title.trim() || !announcementForm.message.trim()) return;
+    setAnnouncementSaving(true);
+    try {
+      const payload: any = {
+        title: announcementForm.title.trim(),
+        message: announcementForm.message.trim(),
+        messageEn: announcementForm.messageEn.trim() || announcementForm.message.trim(),
+        priority: announcementForm.priority,
+        createdBy: user?.email || 'unknown',
+        createdAt: Timestamp.now(),
+        isActive: true,
+      };
+      if (announcementForm.targetOffices.trim()) {
+        payload.targetOffices = announcementForm.targetOffices.split(',').map((s: string) => s.trim()).filter(Boolean);
+      }
+      if (announcementForm.targetRoles.trim()) {
+        payload.targetRoles = announcementForm.targetRoles.split(',').map((s: string) => s.trim()).filter(Boolean);
+      }
+      if (announcementForm.expiresAt) {
+        payload.expiresAt = Timestamp.fromDate(new Date(announcementForm.expiresAt));
+      }
+
+      if (editingAnnouncement) {
+        await setDoc(doc(db, 'announcements', editingAnnouncement.id), payload, { merge: true });
+      } else {
+        await addDoc(collection(db, 'announcements'), payload);
+      }
+      setAnnouncementForm({ title: '', message: '', messageEn: '', priority: 'info', targetOffices: '', targetRoles: '', expiresAt: '' });
+      setShowAnnouncementForm(false);
+      setEditingAnnouncement(null);
+      fetchAnnouncements();
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setAnnouncementSaving(false);
+    }
+  };
+
+  const handleDeleteAnnouncement = async (id: string) => {
+    if (!confirm(language === 'en' ? 'Delete this announcement?' : 'यो घोषणा मेट्नुहोस्?')) return;
+    try {
+      await deleteDoc(doc(db, 'announcements', id));
+      setAnnouncements(prev => prev.filter(a => a.id !== id));
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleToggleAnnouncement = async (ann: any) => {
+    try {
+      await setDoc(doc(db, 'announcements', ann.id), { isActive: !ann.isActive }, { merge: true });
+      fetchAnnouncements();
+    } catch (err: any) {
+      alert(err.message);
     }
   };
 
@@ -553,6 +638,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     if (activeTab === 'performance') fetchPerformance();
     if (activeTab === 'collaboration') fetchCollaboration();
     if (activeTab === 'geolocation') fetchGeolocation();
+    if (activeTab === 'announcements') fetchAnnouncements();
   }, [activeTab, isSuperadmin]);
 
   return (
@@ -771,7 +857,134 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
           </motion.div>
         )}
 
-        {activeTab === 'collaboration' && (
+         {activeTab === 'announcements' && (
+           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+             <div className="flex items-center justify-between">
+               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                 {language === 'en' ? 'Announcement Board' : 'घोषणा बोर्ड'}
+               </h3>
+               <button
+                 onClick={() => { setShowAnnouncementForm(true); setEditingAnnouncement(null); setAnnouncementForm({ title: '', message: '', messageEn: '', priority: 'info', targetOffices: '', targetRoles: '', expiresAt: '' }); }}
+                 className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors"
+               >
+                 <Plus size={12} />
+                 {language === 'en' ? 'New Announcement' : 'नयाँ घोषणा'}
+               </button>
+             </div>
+
+             {showAnnouncementForm && (
+               <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5 space-y-3">
+                 <div className="flex items-center justify-between">
+                   <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                     {editingAnnouncement ? (language === 'en' ? 'Edit Announcement' : 'घोषणा सम्पादन') : (language === 'en' ? 'New Announcement' : 'नयाँ घोषणा')}
+                   </span>
+                   <button onClick={() => { setShowAnnouncementForm(false); setEditingAnnouncement(null); }} className="text-slate-400 hover:text-slate-600">
+                     <X size={14} />
+                   </button>
+                 </div>
+                 <input
+                   type="text"
+                   value={announcementForm.title}
+                   onChange={(e) => setAnnouncementForm(prev => ({ ...prev, title: e.target.value }))}
+                   placeholder={language === 'en' ? 'Title' : 'शीर्षक'}
+                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                 />
+                 <textarea
+                   value={announcementForm.message}
+                   onChange={(e) => setAnnouncementForm(prev => ({ ...prev, message: e.target.value }))}
+                   placeholder={language === 'en' ? 'Message (Nepali)' : 'सन्देश (नेपाली)'}
+                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs resize-none"
+                   rows={3}
+                 />
+                 <input
+                   type="text"
+                   value={announcementForm.messageEn}
+                   onChange={(e) => setAnnouncementForm(prev => ({ ...prev, messageEn: e.target.value }))}
+                   placeholder={language === 'en' ? 'Message (English, optional)' : 'सन्देश (अंग्रेजी, वैकल्पिक)'}
+                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                 />
+                 <select
+                   value={announcementForm.priority}
+                   onChange={(e) => setAnnouncementForm(prev => ({ ...prev, priority: e.target.value as any }))}
+                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                 >
+                   <option value="info">{language === 'en' ? 'Info' : 'जानकारी'}</option>
+                   <option value="warning">{language === 'en' ? 'Warning' : 'चेतावनी'}</option>
+                   <option value="urgent">{language === 'en' ? 'Urgent' : 'जरूरी'}</option>
+                 </select>
+                 <input
+                   type="text"
+                   value={announcementForm.targetOffices}
+                   onChange={(e) => setAnnouncementForm(prev => ({ ...prev, targetOffices: e.target.value }))}
+                   placeholder={language === 'en' ? 'Target offices (comma-separated, leave blank for all)' : 'लक्षित कार्यालयहरू (कमा सेpareted, सबैका लागि खाली छोड्नुहोस्)'}
+                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                 />
+                 <input
+                   type="datetime-local"
+                   value={announcementForm.expiresAt}
+                   onChange={(e) => setAnnouncementForm(prev => ({ ...prev, expiresAt: e.target.value }))}
+                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                 />
+                 <button
+                   onClick={handleSaveAnnouncement}
+                   disabled={announcementSaving || !announcementForm.title.trim() || !announcementForm.message.trim()}
+                   className="w-full py-2 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                 >
+                   {announcementSaving ? (language === 'en' ? 'Saving...' : 'सुरक्षित गर्दै...') : (language === 'en' ? 'Save Announcement' : 'घोषणा सुरक्षित गर्नुहोस्')}
+                 </button>
+               </div>
+             )}
+
+             <div className="space-y-2">
+               {announcements.length === 0 && !loading && (
+                 <p className="text-[11px] text-slate-400 text-center py-4">
+                   {language === 'en' ? 'No announcements yet' : 'अहिले सम्म कुनै घोषणा छैन'}
+                 </p>
+               )}
+               {announcements.map((ann) => (
+                 <div key={ann.id} className={`flex items-start gap-3 bg-slate-50 dark:bg-slate-950 rounded-lg p-3 border ${ann.isActive ? 'border-slate-100 dark:border-white/5' : 'border-slate-200 dark:border-slate-700 opacity-60'}`}>
+                   <div className="flex-1 min-w-0">
+                     <div className="flex items-center gap-2 mb-1">
+                       <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                         ann.priority === 'urgent' ? 'bg-rose-600 text-white' :
+                         ann.priority === 'warning' ? 'bg-amber-600 text-white' :
+                         'bg-indigo-600 text-white'
+                       }`}>{ann.priority}</span>
+                       <span className="text-[10px] text-slate-400">{ann.createdAt?.toDate?.()?.toLocaleDateString() || '--'}</span>
+                     </div>
+                     <div className="text-xs font-bold text-slate-800 dark:text-slate-200">{ann.title}</div>
+                     <div className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">{ann.message}</div>
+                   </div>
+                   <div className="flex items-center gap-1 shrink-0">
+                     <button
+                       onClick={() => handleToggleAnnouncement(ann)}
+                       className={`p-1.5 rounded-lg transition-all ${ann.isActive ? 'text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10' : 'text-slate-400 hover:text-slate-600'}`}
+                       title={ann.isActive ? (language === 'en' ? 'Deactivate' : 'निस्क्रिय गर्नुहोस्') : (language === 'en' ? 'Activate' : 'सक्रिय गर्नुहोस्')}
+                     >
+                       <CheckCircle size={12} />
+                     </button>
+                     <button
+                       onClick={() => { setEditingAnnouncement(ann); setAnnouncementForm({ title: ann.title, message: ann.message, messageEn: ann.messageEn || '', priority: ann.priority, targetOffices: (ann.targetOffices || []).join(', '), targetRoles: (ann.targetRoles || []).join(', '), expiresAt: ann.expiresAt?.toDate?.()?.toISOString().slice(0, 16) || '' }); setShowAnnouncementForm(true); }}
+                       className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all"
+                       title={language === 'en' ? 'Edit' : 'सम्पादन'}
+                     >
+                       <Edit3 size={12} />
+                     </button>
+                     <button
+                       onClick={() => handleDeleteAnnouncement(ann.id)}
+                       className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all"
+                       title={language === 'en' ? 'Delete' : 'मेटाउनुहोस्'}
+                     >
+                       <Trash2 size={12} />
+                     </button>
+                   </div>
+                 </div>
+               ))}
+             </div>
+           </motion.div>
+         )}
+
+         {activeTab === 'collaboration' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
               {language === 'en' ? 'Admin Collaboration Network' : 'प्रशासन सहकार्य नेटवर्क'}
