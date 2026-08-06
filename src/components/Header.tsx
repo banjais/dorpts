@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sun, Moon, Languages, CloudUpload, Type, Info, X, Menu } from 'lucide-react';
+import { Sun, Moon, Languages, CloudUpload, Type, Info, X, Menu, CheckCircle2 } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
 import { triggerHaptic } from '../utils/haptic';
@@ -67,6 +67,14 @@ const getSyncedAgoText = (diffMs: number, lang: 'en' | 'ne'): string => {
     }
     return `${diffMin} minutes ago`;
   }
+};
+
+const toNepaliNumerals = (num: number | string): string => {
+  const nepaliDigits: Record<string, string> = {
+    '0': '०', '1': '१', '2': '२', '3': '३', '4': '४',
+    '5': '५', '6': '६', '7': '७', '8': '८', '9': '९',
+  };
+  return String(num).split('').map((char) => nepaliDigits[char] || char).join('');
 };
 
 const TEXT_SCALE_CYCLE: TextScale[] = ['small', 'medium', 'large', 'xlarge'];
@@ -288,6 +296,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const rolePortal = getRolePortalConfig();
+  const hasPendingWrites = Boolean(pendingWrites && pendingWrites.length > 0);
 
   const toggleTheme = () => {
     triggerHaptic('medium');
@@ -395,6 +404,144 @@ export const Header: React.FC<HeaderProps> = ({
                  onMouseEnter={onMouseEnterFab}
                  onMouseLeave={onMouseLeaveFab}
                >
+                   {/* Sync / Offline Writes Button */}
+                   <div className="relative">
+                     <motion.button
+                       whileHover={{ scale: 1.08 }}
+                       whileTap={{ scale: 0.92 }}
+                       onClick={() => {
+                         triggerHaptic('medium');
+                         setIsPendingWritesOpen((prev) => !prev);
+                       }}
+                       className={`relative p-2 sm:p-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 min-w-[36px] sm:min-w-[44px] min-h-[36px] sm:min-h-[44px] active:scale-95 shadow-sm border ${
+                         hasPendingWrites
+                           ? 'bg-amber-500/15 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-500/50 ring-2 ring-amber-400/60 dark:ring-amber-500/50 animate-pulse'
+                           : 'bg-white/70 dark:bg-white/5 text-slate-600 dark:text-indigo-300 border-transparent hover:border-indigo-200 dark:hover:border-indigo-700/40 hover:text-indigo-700 dark:hover:text-white'
+                       }`}
+                       title={
+                         hasPendingWrites
+                           ? language === 'en'
+                             ? `${pendingWrites.length} pending offline write(s)`
+                             : `${toNepaliNumerals(pendingWrites.length)} बाँकी परिवर्तनहरू`
+                           : language === 'en'
+                             ? `Sync Status: Synced ${syncedAgoText}`
+                             : `सिङ्क स्थिति: सिङ्क भएको ${syncedAgoText}`
+                       }
+                     >
+                       <CloudUpload size={14} className={`sm:w-4 sm:h-4 ${hasPendingWrites ? 'animate-bounce' : ''}`} />
+                       <span className="text-[0.65rem] font-extrabold uppercase tracking-wider hidden sm:inline">
+                         {hasPendingWrites
+                           ? language === 'ne'
+                             ? `${toNepaliNumerals(pendingWrites.length)} सिङ्क`
+                             : `${pendingWrites.length} Sync`
+                           : language === 'ne'
+                             ? 'सिङ्क'
+                             : 'Sync'}
+                       </span>
+
+                       {hasPendingWrites && (
+                         <span className="absolute -top-1 -right-1 flex h-4 w-4 z-10">
+                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                           <span className="relative inline-flex rounded-full h-4 w-4 bg-amber-500 text-[9px] font-black text-white items-center justify-center shadow-md border border-white dark:border-slate-900">
+                             {language === 'ne' ? toNepaliNumerals(pendingWrites.length) : pendingWrites.length}
+                           </span>
+                         </span>
+                       )}
+                     </motion.button>
+
+                     {/* Dropdown Popover for Sync Status / Pending Writes */}
+                     <AnimatePresence>
+                       {isPendingWritesOpen && (
+                         <>
+                           <div
+                             className="fixed inset-0 z-[5010]"
+                             onClick={() => setIsPendingWritesOpen(false)}
+                           />
+
+                           <motion.div
+                             initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                             animate={{ opacity: 1, y: 0, scale: 1 }}
+                             exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                             transition={{ duration: 0.15 }}
+                             className="absolute right-0 top-full mt-2 z-[5020] w-72 sm:w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-4 text-slate-800 dark:text-slate-100"
+                           >
+                             <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                               <div className="flex items-center gap-2">
+                                 <div
+                                   className={`p-1.5 rounded-lg ${
+                                     hasPendingWrites
+                                       ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
+                                       : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+                                   }`}
+                                 >
+                                   <CloudUpload size={16} className={hasPendingWrites ? 'animate-pulse' : ''} />
+                                 </div>
+                                 <div>
+                                   <h4 className="text-xs font-black uppercase tracking-wider">
+                                     {language === 'en' ? 'Sync Status' : 'सिङ्क स्थिति'}
+                                   </h4>
+                                   <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                                     {language === 'en' ? `Updated ${syncedAgoText}` : `अपडेट: ${syncedAgoText}`}
+                                   </p>
+                                 </div>
+                               </div>
+                               <button
+                                 onClick={() => setIsPendingWritesOpen(false)}
+                                 className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                               >
+                                 <X size={14} />
+                               </button>
+                             </div>
+
+                             <div className="py-3">
+                               {hasPendingWrites ? (
+                                 <div className="space-y-2">
+                                   <div className="flex items-center justify-between text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-2 rounded-xl border border-amber-200/60 dark:border-amber-800/40">
+                                     <span>
+                                       {language === 'en' ? 'Pending Offline Writes:' : 'बाँकी अफलाइन परिवर्तनहरू:'}
+                                     </span>
+                                     <span className="font-mono bg-amber-200/80 dark:bg-amber-800/80 px-2 py-0.5 rounded-md text-[11px] font-black">
+                                       {language === 'ne' ? toNepaliNumerals(pendingWrites.length) : pendingWrites.length}
+                                     </span>
+                                   </div>
+                                   <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1 scrollbar-thin">
+                                     {pendingWrites.map((item, idx) => (
+                                       <div
+                                         key={item.id + '-' + idx}
+                                         className="p-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2"
+                                       >
+                                         <span className="font-bold truncate text-[11px] text-slate-700 dark:text-slate-200">
+                                           {language === 'en' ? item.nameEn || item.name : item.name}
+                                         </span>
+                                         <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 shrink-0">
+                                           {language === 'en' ? 'Queued' : 'कतारमा'}
+                                         </span>
+                                       </div>
+                                     ))}
+                                   </div>
+                                 </div>
+                               ) : (
+                                 <div className="text-center py-4 space-y-1.5">
+                                   <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-500 mx-auto flex items-center justify-center">
+                                     <CheckCircle2 size={18} />
+                                   </div>
+                                   <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                                     {language === 'en' ? 'All changes synced' : 'सबै परिवर्तनहरू सिङ्क भएका छन्'}
+                                   </p>
+                                   <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                                     {language === 'en'
+                                       ? 'No pending offline writes in local buffer.'
+                                       : 'स्थानीय बफरमा कुनै बाँकी अफलाइन परिवर्तनहरू छैनन्।'}
+                                   </p>
+                                 </div>
+                               )}
+                             </div>
+                           </motion.div>
+                         </>
+                       )}
+                     </AnimatePresence>
+                   </div>
+
                    {/* Theme Toggle Button */}
                    <motion.button
                      whileHover={{ scale: 1.08 }}

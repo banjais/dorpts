@@ -3,6 +3,7 @@ import {
   parseCSVLine,
 } from '../data';
 import { getOfficeByEmail } from './officeDetector';
+import { Indicator } from '../types';
 
 export const PUBLISHED_CSV_URLS = {
   dashboard: `https://docs.google.com/spreadsheets/d/e/2PACX-1vQElDgCZtxw83cOi2p7MPCASAVlt1jFC0QnEW3LagOZeu4ecVCKcqrG9M2IumCgeyi4vgvhYTSn2mTl/pub?output=csv&gid=0`,
@@ -64,7 +65,7 @@ export function parseSheetCsv(csvText: string) {
   return parseGoogleSheetsCSV(body);
 }
 
-export function resolveOfficesFromSheet(indicators: Array<{ office?: string; gmail?: string; updatedBy?: string }>) {
+export function resolveOfficesFromSheet(indicators: Indicator[]) {
   indicators.forEach((ind) => {
     if ((!ind.office || ind.office.trim() === '') && (ind.gmail || ind.updatedBy)) {
       ind.office = getOfficeByEmail(ind.gmail || ind.updatedBy || '') || ind.office;
@@ -150,20 +151,31 @@ export async function syncPublishedSheets(urls?: { dashboard?: string; offices?:
 
       if (!officeId && !shortName) continue;
 
-      let sumCompletion = 0;
+      let sumWeightedCompletion = 0;
+      let totalWeightSum = 0;
       let count = 0;
       if (totalRowValues.length > 0) {
         for (let c = officeColIdx + 1; c < Math.min(cols.length, totalRowValues.length); c++) {
           const totalVal = totalRowValues[c];
           const officeVal = parseFloat(String(cols[c] || '').replace(/,/g, ''));
-          if (!isNaN(officeVal) && officeVal > 0 && totalVal > 0) {
-            sumCompletion += Math.min(100, (officeVal / totalVal) * 100);
+          const indIdx = c - (officeColIdx + 1);
+          const weight = (finalIndicators[indIdx] && typeof finalIndicators[indIdx].weight === 'number' && finalIndicators[indIdx].weight! > 0)
+            ? finalIndicators[indIdx].weight!
+            : 1;
+          if (!isNaN(officeVal) && officeVal >= 0 && totalVal > 0) {
+            const completionPct = Math.min(100, (officeVal / totalVal) * 100);
+            sumWeightedCompletion += completionPct * weight;
+            totalWeightSum += weight;
             count++;
           }
         }
       }
 
-      const avgCompletion = count > 0 ? Math.round(sumCompletion / count) : 0;
+      const avgCompletion = totalWeightSum > 0 
+        ? Math.round(sumWeightedCompletion / totalWeightSum)
+        : 0;
+
+      console.log(`[SheetSync Verification] ${officeName} => Avg Weighted Completion: ${avgCompletion}% (Weighted Sum: ${sumWeightedCompletion.toFixed(1)} / Total Weight: ${totalWeightSum})`);
 
       parsedOffices.push({ 
         name: officeName, 

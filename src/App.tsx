@@ -857,19 +857,29 @@ function MainAppContent() {
             return name === office.name;
           });
           if (!officeRow) return;
-          let sumCompletion = 0;
+          let sumWeightedCompletion = 0;
+          let totalWeightSum = 0;
           let count = 0;
           for (let c = officeColIdx + 1; c < Math.min(officeRow.length, totalRowValues.length); c++) {
             const totalVal = totalRowValues[c];
             const officeVal = parseFloat(String(officeRow[c] || "").replace(/,/g, ""));
-            if (!isNaN(officeVal) && totalVal > 0) {
-              sumCompletion += Math.min(100, (officeVal / totalVal) * 100);
+            const indIdx = c - (officeColIdx + 1);
+            const weight = (indicators[indIdx] && typeof indicators[indIdx].weight === 'number' && indicators[indIdx].weight! > 0)
+              ? indicators[indIdx].weight!
+              : 1;
+            if (!isNaN(officeVal) && officeVal >= 0 && totalVal > 0) {
+              const completionPct = Math.min(100, (officeVal / totalVal) * 100);
+              sumWeightedCompletion += completionPct * weight;
+              totalWeightSum += weight;
               count++;
             }
           }
           if (count > 0) {
-            office.avgCompletion = Math.round(sumCompletion / count);
+            office.avgCompletion = totalWeightSum > 0
+              ? Math.round(sumWeightedCompletion / totalWeightSum)
+              : Math.round(sumWeightedCompletion / count);
             office.total = count;
+            console.log(`[Verification] Office: ${office.name} | Weighted Contribution: ${office.avgCompletion}% | Weighted Sum: ${sumWeightedCompletion.toFixed(2)} / Total Weight: ${totalWeightSum}`);
           }
         });
       }

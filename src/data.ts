@@ -807,16 +807,27 @@ export function parseGoogleSheetsCSV(csvText: string): {
     const rawAnnualTarget = cols[annualTargetIndex];
     const rawAnnualProgress = cols[annualProgressIndex];
 
+    const parseNumber = (val: string | undefined | null): number => {
+      if (!val) return 0;
+      let s = val.toString().trim();
+      if (s === '' || s === '-' || s.toLowerCase() === 'null' || s.toLowerCase() === 'undefined') return 0;
+      const nepaliMap: Record<string, string> = { '०': '0', '१': '1', '२': '2', '३': '3', '४': '4', '५': '5', '६': '6', '७': '7', '८': '8', '९': '9' };
+      s = s.replace(/[०-९]/g, (digit) => nepaliMap[digit] || digit);
+      s = s.replace(/,/g, '');
+      const num = parseFloat(s);
+      return isNaN(num) ? 0 : num;
+    };
+
     const isRawBlank = (val: string | undefined | null) => {
       if (val === undefined || val === null) return true;
-      const s = val.trim();
+      const s = val.toString().trim();
       return s === '' || s === '-' || s.toLowerCase() === 'null' || s.toLowerCase() === 'undefined';
     };
 
-    const finalTotalTarget = isRawBlank(rawTotalTarget) ? 1 : (parseFloat(rawTotalTarget) === 0 ? 0 : (parseFloat(rawTotalTarget) || 0));
-    const finalTotalProgress = isRawBlank(rawTotalProgress) ? 1 : (parseFloat(rawTotalProgress) === 0 ? 0 : (parseFloat(rawTotalProgress) || 0));
-    const finalAnnualTarget = isRawBlank(rawAnnualTarget) ? 1 : (parseFloat(rawAnnualTarget) === 0 ? 0 : (parseFloat(rawAnnualTarget) || 0));
-    const finalAnnualProgress = isRawBlank(rawAnnualProgress) ? 1 : (parseFloat(rawAnnualProgress) === 0 ? 0 : (parseFloat(rawAnnualProgress) || 0));
+    const finalTotalTarget = isRawBlank(rawTotalTarget) ? 1 : (parseNumber(rawTotalTarget) || 1);
+    const finalTotalProgress = parseNumber(rawTotalProgress);
+    const finalAnnualTarget = isRawBlank(rawAnnualTarget) ? 1 : (parseNumber(rawAnnualTarget) || 1);
+    const finalAnnualProgress = parseNumber(rawAnnualProgress);
 
     // Retrieve Office & Gmail values dynamically
     const officeVal = officeIndex !== -1 && cols[officeIndex] ? cols[officeIndex].trim() : '';

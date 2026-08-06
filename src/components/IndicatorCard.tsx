@@ -93,6 +93,8 @@ export const IndicatorCard = React.memo<CardProps>(
     const [hoveredPointIdx, setHoveredPointIdx] = React.useState<number | null>(
       null,
     );
+    const [showQuickOverlay, setShowQuickOverlay] = React.useState(false);
+    const didLongPressRef = useRef(false);
     const [showFastLook, setShowFastLook] = React.useState(false);
     const [showThresholdConfig, setShowThresholdConfig] = React.useState(false);
     const [dragOffset, setDragOffset] = React.useState(0);
@@ -129,10 +131,11 @@ export const IndicatorCard = React.memo<CardProps>(
       const event = e as React.MouseEvent;
       if (event.button && event.button !== 0) return;
 
+      const target = e.target as HTMLElement;
       if (
-        e.target.closest("button") ||
-        e.target.closest("a") ||
-        e.target.closest("input")
+        target?.closest("button") ||
+        target?.closest("a") ||
+        target?.closest("input")
       ) {
         return;
       }
@@ -141,33 +144,43 @@ export const IndicatorCard = React.memo<CardProps>(
         clearTimeout(pressTimerRef.current);
       }
 
+      didLongPressRef.current = false;
+
       pressTimerRef.current = setTimeout(() => {
-        // Long-press peek (fast-look) only — normal click opens detail separately
-        setShowFastLook(true);
+        // Trigger dedicated Quick Action Overlay on long-press
+        setShowQuickOverlay(true);
+        didLongPressRef.current = true;
         triggerHaptic('medium');
-      }, 550);
-    }, [indicator]);
+      }, 500);
+    }, []);
 
     const handleCardClick = React.useCallback((e: React.MouseEvent) => {
+      const target = e.target as HTMLElement;
       if (
-        e.target.closest("button") ||
-        e.target.closest("a") ||
-        e.target.closest("input")
+        target?.closest("button") ||
+        target?.closest("a") ||
+        target?.closest("input")
       ) {
+        return;
+      }
+      if (didLongPressRef.current) {
+        didLongPressRef.current = false;
+        return;
+      }
+      if (showQuickOverlay) {
         return;
       }
       // Open the extended detail page immediately on a normal click/tap
       if (onClick) {
         onClick(indicator);
       }
-    }, [onClick, indicator]);
+    }, [onClick, indicator, showQuickOverlay]);
 
     const endPress = React.useCallback(() => {
       if (pressTimerRef.current) {
         clearTimeout(pressTimerRef.current);
         pressTimerRef.current = null;
       }
-      setShowFastLook(false);
 
       if (annualCompletionPercent >= 100) {
         triggerHaptic('success');
@@ -890,7 +903,7 @@ export const IndicatorCard = React.memo<CardProps>(
             ...glowStyles
           }}
           whileHover={
-            showFastLook || showThresholdConfig
+            showQuickOverlay || showFastLook || showThresholdConfig
               ? undefined
               : {
                   scale: 1.02,
@@ -900,7 +913,7 @@ export const IndicatorCard = React.memo<CardProps>(
                 }
           }
           whileTap={
-            showFastLook || showThresholdConfig
+            showQuickOverlay || showFastLook || showThresholdConfig
               ? undefined
               : { scale: 0.98 }
           }
@@ -925,9 +938,10 @@ export const IndicatorCard = React.memo<CardProps>(
           onTouchEnd={handleTouchEnd}
           onTouchMove={handleTouchMove}
           onContextMenu={(e) => {
-            if (showFastLook) {
-              e.preventDefault();
-            }
+            e.preventDefault();
+            setShowQuickOverlay(true);
+            didLongPressRef.current = true;
+            triggerHaptic('medium');
           }}
         >
           {/* Category Vertical Stripe */}
@@ -956,6 +970,216 @@ export const IndicatorCard = React.memo<CardProps>(
           )}
 
           <AnimatePresence>
+            {showQuickOverlay && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.92, y: 4 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.92, y: 4 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                onClick={(e) => e.stopPropagation()}
+                className="absolute inset-0 bg-slate-950/95 dark:bg-slate-950/98 backdrop-blur-md rounded-xl p-3.5 sm:p-4.5 flex flex-col justify-between text-white z-[300] border border-indigo-500/40 shadow-2xl overflow-hidden"
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <div className="flex items-center gap-2 text-indigo-400 min-w-0">
+                    <div className="p-1 rounded-md bg-indigo-500/20 text-indigo-300 shrink-0">
+                      <Zap size={14} className="animate-pulse" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-black uppercase tracking-wider font-sans leading-none text-indigo-300">
+                          {language === "en" ? "QUICK ACTIONS" : "द्रुत कार्यहरू"}
+                        </span>
+                        <span className="text-[8px] bg-indigo-500/30 text-indigo-200 px-1.5 py-0.2 rounded font-mono font-bold">
+                          {indicator.id}
+                        </span>
+                      </div>
+                      <span className="text-[9.5px] text-slate-300 font-semibold truncate block leading-tight mt-0.5">
+                        {primaryName}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowQuickOverlay(false);
+                      triggerHaptic('light');
+                    }}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+                    title={language === 'en' ? 'Close' : 'बन्द गर्नुहोस्'}
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
+
+                {/* Quick Action Options Grid */}
+                <div className="grid grid-cols-2 gap-2 my-2">
+                  {/* 1. Toggle Tracked Status */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onToggleTrack) {
+                        onToggleTrack();
+                        triggerHaptic('success');
+                      }
+                    }}
+                    className={`p-2.5 rounded-xl border flex flex-col items-start justify-between gap-1.5 transition-all text-left cursor-pointer ${
+                      isTracked
+                        ? 'bg-indigo-500/25 border-indigo-400/60 text-indigo-100 ring-1 ring-indigo-400/40 shadow-lg shadow-indigo-500/10'
+                        : 'bg-white/5 border-white/10 text-slate-200 hover:bg-white/10 hover:border-indigo-400/40'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <Bell size={16} className={isTracked ? 'fill-indigo-300 text-indigo-300' : 'text-slate-400'} />
+                      <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${
+                        isTracked ? 'bg-indigo-500 text-white' : 'bg-white/10 text-slate-400'
+                      }`}>
+                        {isTracked ? (language === 'en' ? 'Tracked' : 'ट्र्याक') : (language === 'en' ? 'Off' : 'निस्क्रिय')}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-bold block leading-tight">
+                        {isTracked
+                          ? (language === 'en' ? 'Untrack Item' : 'अनुगमन हटाउनुहोस्')
+                          : (language === 'en' ? 'Track Item' : 'अनुगमन गर्नुहोस्')}
+                      </span>
+                      <span className="text-[8.5px] text-slate-400 block mt-0.5">
+                        {language === 'en' ? 'Watchlist alert' : 'वाचलिस्टमा राख्नुहोस्'}
+                      </span>
+                    </div>
+                  </motion.button>
+
+                  {/* 2. Open Comments */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowQuickOverlay(false);
+                      if (onOpenComments) {
+                        onOpenComments(indicator);
+                        triggerHaptic('medium');
+                      }
+                    }}
+                    className="p-2.5 rounded-xl border bg-white/5 border-white/10 text-slate-200 hover:bg-emerald-500/15 hover:border-emerald-500/40 hover:text-emerald-300 flex flex-col items-start justify-between gap-1.5 transition-all text-left cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <MessageSquare size={16} className="text-emerald-400" />
+                      <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
+                        {language === 'en' ? 'Notes' : 'नोट्स'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-bold block leading-tight">
+                        {language === 'en' ? 'Open Comments' : 'टिप्पणीहरू खोल्नुहोस्'}
+                      </span>
+                      <span className="text-[8.5px] text-slate-400 block mt-0.5">
+                        {language === 'en' ? 'View/add notes' : 'छलफल र टिप्पणीहरू'}
+                      </span>
+                    </div>
+                  </motion.button>
+
+                  {/* 3. View History / Timeline */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowQuickOverlay(false);
+                      if (onViewHistory) {
+                        onViewHistory(indicator);
+                        triggerHaptic('medium');
+                      }
+                    }}
+                    className="p-2.5 rounded-xl border bg-white/5 border-white/10 text-slate-200 hover:bg-amber-500/15 hover:border-amber-500/40 hover:text-amber-300 flex flex-col items-start justify-between gap-1.5 transition-all text-left cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <History size={16} className="text-amber-400" />
+                      <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">
+                        {language === 'en' ? 'Logs' : 'लग'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-bold block leading-tight">
+                        {language === 'en' ? 'View History' : 'इतिहास हेर्नुहोस्'}
+                      </span>
+                      <span className="text-[8.5px] text-slate-400 block mt-0.5">
+                        {language === 'en' ? 'Timeline updates' : 'विगतका प्रगति विवरण'}
+                      </span>
+                    </div>
+                  </motion.button>
+
+                  {/* 4. Edit or Full Navigation */}
+                  {isAdmin ? (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowQuickOverlay(false);
+                        onEdit(indicator);
+                        triggerHaptic('medium');
+                      }}
+                      className="p-2.5 rounded-xl border bg-white/5 border-white/10 text-slate-200 hover:bg-indigo-500/15 hover:border-indigo-500/40 hover:text-indigo-300 flex flex-col items-start justify-between gap-1.5 transition-all text-left cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <Edit3 size={16} className="text-indigo-400" />
+                        <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
+                          {language === 'en' ? 'Admin' : 'प्रशासक'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[11px] font-bold block leading-tight">
+                          {language === 'en' ? 'Edit Indicator' : 'सूचक सम्पादन गर्नुहोस्'}
+                        </span>
+                        <span className="text-[8.5px] text-slate-400 block mt-0.5">
+                          {language === 'en' ? 'Update progress data' : 'प्रगति डेटा अद्यावधिक'}
+                        </span>
+                      </div>
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowQuickOverlay(false);
+                        if (onClick) onClick(indicator);
+                        triggerHaptic('medium');
+                      }}
+                      className="p-2.5 rounded-xl border bg-white/5 border-white/10 text-slate-200 hover:bg-sky-500/15 hover:border-sky-500/40 hover:text-sky-300 flex flex-col items-start justify-between gap-1.5 transition-all text-left cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <Eye size={16} className="text-sky-400" />
+                        <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300">
+                          {language === 'en' ? 'Full' : 'पूर्ण'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[11px] font-bold block leading-tight">
+                          {language === 'en' ? 'Full Details' : 'पूर्ण विवरण'}
+                        </span>
+                        <span className="text-[8.5px] text-slate-400 block mt-0.5">
+                          {language === 'en' ? 'Open detail page' : 'विस्तृत पृष्ठ खोल्नुहोस्'}
+                        </span>
+                      </div>
+                    </motion.button>
+                  )}
+                </div>
+
+                {/* Footer Info / Progress Summary */}
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                  <span>
+                    {language === 'en' ? 'Annual Progress:' : 'वार्षिक प्रगति:'} {indicator.annualProgress} / {indicator.annualTarget}
+                  </span>
+                  <span className="font-bold text-indigo-300">
+                    {annualCompletionPercent}%
+                  </span>
+                </div>
+              </motion.div>
+            )}
             {showThresholdConfig && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}

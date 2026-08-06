@@ -5,15 +5,15 @@ export type StatusType = 'excellent' | 'onTrack' | 'progressing' | 'atRisk' | 'd
 export type BreakdownStatus = 'onTrack' | 'needsAttention' | 'stale';
 
 export function getBreakdownStatus(ind: Indicator): BreakdownStatus {
-  if (!ind.updatedAt) return 'stale';
-  const lastUpdated = new Date(ind.updatedAt);
-  const now = new Date();
-  const daysSinceUpdate = (now.getTime() - lastUpdated.getTime()) / (1000 * 3600 * 24);
-  if (daysSinceUpdate > 30) return 'stale';
+  if (!ind) return 'stale';
+  const target = ind.annualTarget > 0 ? ind.annualTarget : 0;
+  const progress = ind.annualProgress !== undefined && ind.annualProgress !== null ? ind.annualProgress : 0;
+  if (target <= 0) return 'stale';
+  const pct = (progress / target) * 100;
 
-  const pct = ind.annualTarget > 0 ? (ind.annualProgress / ind.annualTarget) * 100 : 0;
-  if (pct >= 60) return 'onTrack';
-  return 'needsAttention';
+  if (pct >= 80) return 'onTrack';
+  if (pct >= 40) return 'needsAttention';
+  return 'stale';
 }
 
 export const getStatusBadge = (percent: number, t: (key: string) => string): { label: string; className: string; status: StatusType } => {

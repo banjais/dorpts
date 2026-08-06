@@ -12,9 +12,9 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "lint:eslint": "eslint .",
-    "deploy": "npm run build && wrangler pages publish dist --project-name dorpts",
-    "deploy:cf": "npm run build && wrangler pages publish dist --project-name dorpts",
-    "deploy:fb": "npm run build && firebase deploy --only hosting",
+    "deploy": "node deploy.cjs",
+    "deploy:cf": "wrangler pages deploy dist --project-name dorpts",
+    "deploy:fb": "firebase deploy --only hosting",
     "deploy:functions": "cd firebase-functions && npm install && npm run build && firebase deploy --only functions",
     "deploy:all": "npm run build && npm run deploy:functions && npm run deploy:fb"
   },

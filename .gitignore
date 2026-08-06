@@ -6,3 +6,11 @@ coverage/
 *.log
 .env*
 !.env.example
+.firebase/
+.wrangler/
+firebase-functions/lib/
+firebase-functions/node_modules/
+.vite/
+.cache/
+.eslintcache
+*.tmp

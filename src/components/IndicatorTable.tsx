@@ -8,6 +8,7 @@ import { normalizeCategory, getCategoryColor } from '../utils/category';
 
 import { triggerHaptic } from '../utils/haptic';
 import { highlightText } from '../utils/highlight';
+import { WeightFormulaTooltip } from './WeightFormulaTooltip';
 
 interface IndicatorTableProps {
   indicators: Indicator[];
@@ -16,6 +17,29 @@ interface IndicatorTableProps {
   onOpenComments?: (indicator: Indicator) => void;
   categoryThemes?: Record<string, string>;
 }
+
+const tableContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.04,
+      delayChildren: 0.02,
+    },
+  },
+};
+
+const tableRowVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.25,
+      ease: [0.25, 0.1, 0.25, 1.0],
+    },
+  },
+};
 
 const isUpdatedWithin24Hours = (updatedAt?: string) => {
   if (!updatedAt) return false;
@@ -148,9 +172,20 @@ const IndicatorTableRow = memo(({
       <motion.tr 
         id={`row-${ind.id}`}
         layout
-        initial={{ opacity: 0, x: -10 }}
-        animate={animateValue}
-        transition={transitionValue}
+        variants={tableRowVariants}
+        initial="hidden"
+        animate={isRecent ? { 
+          opacity: 1, 
+          y: 0,
+          backgroundColor: [
+            "rgba(99, 102, 241, 0.02)", 
+            "rgba(99, 102, 241, 0.12)", 
+            "rgba(99, 102, 241, 0.02)"
+          ] 
+        } : "visible"}
+        transition={isRecent ? {
+          backgroundColor: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+        } : undefined}
         onMouseDown={startPress}
         onMouseUp={endPress}
         onMouseLeave={endPress}
@@ -916,11 +951,30 @@ export const IndicatorTable: React.FC<IndicatorTableProps> = ({
               {effectiveColumns.target && <th className={`px-2 sm:px-5 ${thPadding} text-[0.5rem] sm:text-[0.5625rem] font-black text-slate-400 uppercase tracking-widest text-left transition-all duration-300`}>{t('target')}</th>}
               <th className={`px-2 sm:px-5 ${thPadding} text-[0.5rem] sm:text-[0.5625rem] font-black text-slate-400 uppercase tracking-widest text-left transition-all duration-300`}>{t('progress')}</th>
               {effectiveColumns.unit && <th className={`px-2 sm:px-5 ${thPadding} text-[0.5rem] sm:text-[0.5625rem] font-black text-slate-400 uppercase tracking-widest text-left transition-all duration-300`}>{t('unit')}</th>}
-              {effectiveColumns.weight && <th className={`px-2 sm:px-5 ${thPadding} text-[0.5rem] sm:text-[0.5625rem] font-black text-slate-400 uppercase tracking-widest text-left transition-all duration-300`}>{t('weight')}</th>}
-              {effectiveColumns.contribution && <th className={`px-2 sm:px-5 ${thPadding} text-[0.5rem] sm:text-[0.5625rem] font-black text-slate-400 uppercase tracking-widest text-right transition-all duration-300`}>{t('contribution')}</th>}
+              {effectiveColumns.weight && (
+                <th className={`px-2 sm:px-5 ${thPadding} text-[0.5rem] sm:text-[0.5625rem] font-black text-slate-400 uppercase tracking-widest text-left transition-all duration-300`}>
+                  <div className="flex items-center gap-1.5">
+                    <span>{t('weight')}</span>
+                    <WeightFormulaTooltip indicators={indicators} />
+                  </div>
+                </th>
+              )}
+              {effectiveColumns.contribution && (
+                <th className={`px-2 sm:px-5 ${thPadding} text-[0.5rem] sm:text-[0.5625rem] font-black text-slate-400 uppercase tracking-widest text-right transition-all duration-300`}>
+                  <div className="flex items-center justify-end gap-1.5">
+                    <span>{t('contribution')}</span>
+                    <WeightFormulaTooltip indicators={indicators} />
+                  </div>
+                </th>
+              )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          <motion.tbody 
+            variants={tableContainerVariants}
+            initial="hidden"
+            animate="visible"
+            className="divide-y divide-slate-100 dark:divide-slate-800"
+          >
             {isSmartGroupingEnabled && groupedIndicators ? (
               Object.entries(groupedIndicators as Record<string, Indicator[]>).map(([category, inds]) => {
                 const isExpanded = expandedCategories[category] !== false;
@@ -984,7 +1038,7 @@ export const IndicatorTable: React.FC<IndicatorTableProps> = ({
                 />
               ))
             )}
-          </tbody>
+          </motion.tbody>
         </table>
         
         {displayCount < indicators.length && (

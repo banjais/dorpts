@@ -848,7 +848,7 @@ export const Overview: React.FC<OverviewProps> = ({
   onSpeakDashboardSummary,
 }) => {
   const { language, setLanguage, t, translateUnit, translateOffice, translateCategory } = useLanguage();
-  const { isAdmin } = useAuth();
+  const { isAdmin, adminsList } = useAuth();
   const isNepali = language === 'ne';
   const fmt = (val: number | string): string => {
     if (isNepali) return toNepaliNumerals(val);
@@ -1074,20 +1074,26 @@ export const Overview: React.FC<OverviewProps> = ({
       return getBreakdownStatus(ind) === 'stale';
     }).length;
 
+    const getPct = (ind: any) => {
+      if (!ind) return 0;
+      const target = ind.annualTarget > 0 ? ind.annualTarget : (ind.target > 0 ? ind.target : 0);
+      const progress = ind.annualProgress !== undefined && ind.annualProgress !== null ? ind.annualProgress : (ind.progress || 0);
+      if (target <= 0) return 0;
+      return (progress / target) * 100;
+    };
+
     const meetingTarget = indicators.filter((ind) => {
       if (!ind) return false;
-      const pct = ind.annualTarget > 0 ? Math.min(100, (ind.annualProgress / ind.annualTarget) * 100) : 0;
-      return pct >= 80;
+      return getPct(ind) >= 80;
     }).length;
     const belowTarget = indicators.filter((ind) => {
       if (!ind) return false;
-      const pct = ind.annualTarget > 0 ? Math.min(100, (ind.annualProgress / ind.annualTarget) * 100) : 0;
+      const pct = getPct(ind);
       return pct >= 40 && pct < 80;
     }).length;
     const needsCritical = indicators.filter((ind) => {
       if (!ind) return false;
-      const pct = ind.annualTarget > 0 ? Math.min(100, (ind.annualProgress / ind.annualTarget) * 100) : 0;
-      return pct < 40;
+      return getPct(ind) < 40;
     }).length;
 
     return {
@@ -1132,20 +1138,19 @@ export const Overview: React.FC<OverviewProps> = ({
         const matchDigits = office.officeId || (office.name.match(/\b\d+\b/)?.[0] || '');
         const numericId = matchDigits || '';
 
-        // Derive clean admin email
-        let adminEmail = emailList[0] || '';
+        // Derive real superadmin assigned email from adminsList if exists
+        let adminEmail = '';
+        if (adminsList && adminsList.length > 0) {
+          const assignedAdmin = adminsList.find(
+            (a) => a.office === office.name || (numericId && a.office?.includes(numericId))
+          );
+          if (assignedAdmin?.email) {
+            adminEmail = assignedAdmin.email;
+          }
+        }
+
         if (!adminEmail) {
-          const cleanShortName = (office.shortName || office.name)
-            .toLowerCase()
-            .replace(/^[\d\s-]+/, '')
-            .replace(/office|division|field|road|सडक|डिभिजन/gi, '')
-            .trim()
-            .replace(/[^a-z0-9]/g, '');
-          adminEmail = cleanShortName
-            ? `dro.${cleanShortName}@dor.gov.np`
-            : numericId
-              ? `dro.office${numericId}@dor.gov.np`
-              : 'admin@dor.gov.np';
+          adminEmail = emailList[0] || '';
         }
 
         return {
@@ -1163,7 +1168,7 @@ export const Overview: React.FC<OverviewProps> = ({
         };
       })
       .sort((a, b) => b.avgCompletion - a.avgCompletion);
-  }, [indicators, offices]);
+  }, [indicators, offices, adminsList]);
 
   const budgetMetrics = useMemo(() => {
     const list = indicators.filter((ind) => {
@@ -2232,44 +2237,74 @@ export const Overview: React.FC<OverviewProps> = ({
                            {language === 'en' ? 'Reporting Field Offices Breakdown' : 'रिपोर्टिङ क्षेत्र कार्यालयहरूको पूर्ण विवरण'} ({reportingOffices.length})
                          </h4>
                        </div>
+
+                       {/* Explanation Info Banner */}
+                       <div className="bg-indigo-50/70 dark:bg-indigo-950/40 p-3 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 flex items-start gap-2.5 text-xs text-indigo-950 dark:text-indigo-200">
+                         <Info size={15} className="text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+                         <p className="text-[11px] leading-relaxed">
+                           {language === 'en'
+                             ? 'Each card shows the office ID, assigned superadmin email, and the percentage score representing the overall combined progress across all indicators of that office.'
+                             : 'प्रत्येक कार्डमा कार्यालय कोड, तोकिएको प्रशासक इमेल, र अन्तिम पंक्तिमा सो कार्यालयका सम्पूर्ण सूचकहरूको संयुक्त समग्र उपलब्धि दर देखाइएको छ।'}
+                         </p>
+                       </div>
+
                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {reportingOffices.map((off) => (
-                            <div
-                              key={off.office}
-                              className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition-all flex items-start justify-between gap-3"
-                            >
-                              <div className="space-y-1 min-w-0 flex-1">
-                                {/* Line 1: Prefix numeric (office ID) */}
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/40 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
-                                    <Building2 size={10} className="shrink-0" />
-                                    {language === "en"
-                                      ? `ID: ${off.officeId || "—"}`
-                                      : `कार्यालय कोड: ${toNepaliNumerals(off.officeId || "—")}`}
-                                  </span>
-                                </div>
+                         {reportingOffices.map((off) => {
+                           const rawName = translateOffice(off.office);
+                           const cleanName = rawName.replace(/^[\d.]+\s*[-–—]?\s*/, '').trim();
 
-                                {/* Line 2: Name */}
-                                <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 truncate leading-snug">
-                                  {translateOffice(off.office)}
-                                </h4>
+                           return (
+                             <div
+                               key={off.office}
+                               className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition-all flex flex-col justify-between gap-3"
+                             >
+                               <div className="space-y-1.5 min-w-0">
+                                 {/* Line 1: Prefix numeric (office ID) */}
+                                 <div className="flex items-center justify-between gap-1.5">
+                                   <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/40 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                     <Building2 size={10} className="shrink-0" />
+                                     {language === "en"
+                                       ? `ID: ${off.officeId || "—"}`
+                                       : `कार्यालय कोड: ${toNepaliNumerals(off.officeId || "—")}`}
+                                   </span>
+                                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                                     {language === 'en' ? 'Active Unit' : 'सक्रिय एकाइ'}
+                                   </span>
+                                 </div>
 
-                                {/* Line 3: Admin email */}
-                                <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate pt-0.5">
-                                  <Mail size={12} className="shrink-0 text-slate-400 dark:text-slate-500" />
-                                  <span className="truncate">{off.adminEmail}</span>
-                                </div>
-                              </div>
+                                 {/* Line 2: Clean Name without duplicate ID prefix */}
+                                 <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 leading-snug pt-0.5">
+                                   {cleanName}
+                                 </h4>
 
-                              {/* Performance Score Badge */}
-                              <div className="shrink-0 flex flex-col items-end">
-                                <span className="text-xs font-black px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50">
-                                  {off.score > 0 ? `${off.score}%` : "—"}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                                 {/* Line 3: Admin email */}
+                                 <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-400 truncate pt-0.5">
+                                   <Mail size={12} className="shrink-0 text-indigo-500" />
+                                   <span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">
+                                     {language === 'en' ? 'Admin:' : 'प्रशासक:'}
+                                   </span>
+                                   <span className="truncate font-mono text-xs text-slate-700 dark:text-slate-300">
+                                     {off.adminEmail || (language === 'en' ? 'Unassigned' : 'अपरिभाषित')}
+                                   </span>
+                                 </div>
+                               </div>
+
+                               {/* Last Line: Percentage score & description */}
+                               <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2 text-xs">
+                                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1 min-w-0 truncate" title={language === 'en' ? 'Combined completion rate across all indicators for this office' : 'यस कार्यालयका संयुक्त सूचकहरूको समग्र उपलब्धि दर'}>
+                                   <CheckCircle2 size={11} className="text-emerald-500 shrink-0" />
+                                   <span className="truncate">
+                                     {language === 'en' ? 'Overall Progress:' : 'समग्र उपलब्धि दर:'}
+                                   </span>
+                                 </span>
+                                 <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50 shrink-0">
+                                   {off.score > 0 ? (language === 'en' ? `${off.score}%` : `${toNepaliNumerals(off.score)}%`) : "—"}
+                                 </span>
+                               </div>
+                             </div>
+                           );
+                         })}
+                       </div>
                      </div>
                    </div>
                  )}
@@ -2330,49 +2365,78 @@ export const Overview: React.FC<OverviewProps> = ({
                    </div>
                  )}
 
-                 {/* Card 4: Reporting Offices Modal */}
-                 {activeExpandedModalCardId === 'reporting-offices' && (
-                   <div className="space-y-4">
-                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {reportingOffices.map((off) => (
+                  {/* Card 4: Reporting Offices Modal */}
+                  {activeExpandedModalCardId === 'reporting-offices' && (
+                    <div className="space-y-4">
+                      {/* Explanation Info Banner */}
+                      <div className="bg-indigo-50/70 dark:bg-indigo-950/40 p-3 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 flex items-start gap-2.5 text-xs text-indigo-950 dark:text-indigo-200">
+                        <Info size={15} className="text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+                        <p className="text-[11px] leading-relaxed">
+                          {language === 'en'
+                            ? 'The percentage value shown at the bottom of each office card represents the overall combined progress across all indicators of that office.'
+                            : 'प्रत्येक कार्डको अन्तिम पंक्तिमा देखाइएको प्रतिशतले सो क्षेत्र कार्यालयको सम्पूर्ण सूचकहरूको संयुक्त समग्र उपलब्धि दरलाई जनाउँछ।'}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {reportingOffices.map((off) => {
+                          const rawName = translateOffice(off.office);
+                          const cleanName = rawName.replace(/^[\d.]+\s*[-–—]?\s*/, '').trim();
+
+                          return (
                             <div
                               key={off.office}
-                              className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition-all flex items-start justify-between gap-3"
+                              className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition-all flex flex-col justify-between gap-3"
                             >
-                              <div className="space-y-1 min-w-0 flex-1">
+                              <div className="space-y-1.5 min-w-0">
                                 {/* Line 1: Prefix numeric (office ID) */}
-                                <div className="flex items-center gap-1.5">
+                                <div className="flex items-center justify-between gap-1.5">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/40 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
                                     <Building2 size={10} className="shrink-0" />
                                     {language === "en"
                                       ? `ID: ${off.officeId || "—"}`
                                       : `कार्यालय कोड: ${toNepaliNumerals(off.officeId || "—")}`}
                                   </span>
+                                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                                    {language === 'en' ? 'Active Unit' : 'सक्रिय एकाइ'}
+                                  </span>
                                 </div>
 
-                                {/* Line 2: Name */}
-                                <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 truncate leading-snug">
-                                  {translateOffice(off.office)}
+                                {/* Line 2: Clean Name without duplicate ID prefix */}
+                                <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 leading-snug pt-0.5">
+                                  {cleanName}
                                 </h4>
 
                                 {/* Line 3: Admin email */}
-                                <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate pt-0.5">
-                                  <Mail size={12} className="shrink-0 text-slate-400 dark:text-slate-500" />
-                                  <span className="truncate">{off.adminEmail}</span>
+                                <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-400 truncate pt-0.5">
+                                  <Mail size={12} className="shrink-0 text-indigo-500" />
+                                  <span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">
+                                    {language === 'en' ? 'Admin:' : 'प्रशासक:'}
+                                  </span>
+                                  <span className="truncate font-mono text-xs text-slate-700 dark:text-slate-300">
+                                    {off.adminEmail || (language === 'en' ? 'Unassigned' : 'अपरिभाषित')}
+                                  </span>
                                 </div>
                               </div>
 
-                              {/* Performance Score Badge */}
-                              <div className="shrink-0 flex flex-col items-end">
-                                <span className="text-xs font-black px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50">
-                                  {off.score > 0 ? `${off.score}%` : "—"}
+                              {/* Last Line: Percentage score & description */}
+                              <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2 text-xs">
+                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1 min-w-0 truncate" title={language === 'en' ? 'Combined completion rate across all indicators for this office' : 'यस कार्यालयका संयुक्त सूचकहरूको समग्र उपलब्धि दर'}>
+                                  <CheckCircle2 size={11} className="text-emerald-500 shrink-0" />
+                                  <span className="truncate">
+                                    {language === 'en' ? 'Overall Progress:' : 'समग्र उपलब्धि दर:'}
+                                  </span>
+                                </span>
+                                <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50 shrink-0">
+                                  {off.score > 0 ? (language === 'en' ? `${off.score}%` : `${toNepaliNumerals(off.score)}%`) : "—"}
                                 </span>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                   </div>
-                 )}
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                  {/* Card 5: Budget Utilization Modal */}
                  {activeExpandedModalCardId === 'budget-card' && (
