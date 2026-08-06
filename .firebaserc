@@ -1,0 +1,20 @@
+{
+  "projects": {
+    "default": "dor-progress"
+  },
+  "targets": {
+    "hosting": {
+      "dorpts": [
+        "dorpts"
+      ]
+    },
+    "dor-progress": {
+      "hosting": {
+        "dorpts": [
+          "dorpts"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

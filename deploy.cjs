@@ -36,13 +36,17 @@ run('git add -A');
 run('git commit -m "chore: release build v' + version + ' [skip ci]"', { allowFail: true });
 run('git push');
 
-// 4. Deploy to Cloudflare Pages -> https://dorpts.pages.dev
-console.log('[3/5] Deploying to Cloudflare Pages...');
-run('npx wrangler pages deploy dist --project-name dorpts');
+// 4. Deploy to Cloudflare Pages (production) -> https://dorpts.pages.dev
+// project's production_branch is "main" (no Git integration); --branch main targets production
+// (without it, wrangler deploys to the local git branch as a Preview and dorpts.pages.dev 404s)
+console.log('[3/5] Deploying to Cloudflare Pages (production)...');
+run('npx wrangler pages deploy dist --project-name dorpts --branch main');
 
 // 5. Deploy Firebase Hosting (static only) -> https://dorpts.web.app
+// .firebaserc sets default project "dor-progress"; firebase.json "target":"dorpts" + target mapping
+// deploy to the named site "dorpts" (-> dorpts.web.app), NOT the default dor-progress.web.app site
 console.log('[4/5] Deploying to Firebase Hosting (static only)...');
-run('npx firebase deploy --only hosting');
+run('npx firebase deploy --only hosting --project dor-progress');
 
 console.log('\n[5/5] Deployment complete.');
 console.log('  Cloudflare Pages : https://dorpts.pages.dev');
