@@ -7,6 +7,7 @@ import {
   Building2,
   Megaphone,
   MessageSquare,
+  CalendarDays,
 } from 'lucide-react';
 import { MainView } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -18,6 +19,7 @@ import { useLanguage } from '../context/LanguageContext';
   { id: 'institutional' as MainView, labelEn: 'INSTITUTIONAL', labelNp: 'संस्थागत', icon: <Building2 size={16} /> },
   { id: 'announcements' as MainView, labelEn: 'ANNOUNCEMENTS', labelNp: 'घोषणाहरू', icon: <Megaphone size={16} /> },
   { id: 'messaging' as MainView, labelEn: 'MESSAGES', labelNp: 'सन्देशहरू', icon: <MessageSquare size={16} /> },
+  { id: 'calendar' as MainView, labelEn: 'CALENDAR', labelNp: 'क्यालेन्डर', icon: <CalendarDays size={16} /> },
 ];
 
 interface NavigationMenuProps {

@@ -15,6 +15,7 @@ import {
   Crown,
   Megaphone,
   MessageSquare,
+  CalendarDays,
 } from 'lucide-react';
 import type { MainView } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -117,6 +118,16 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       labelNp: 'सन्देशहरू',
       onClick: () => {
         onNavigate('messaging');
+        onClose();
+      },
+    },
+    {
+      id: 'calendar',
+      icon: <CalendarDays size={18} />,
+      labelEn: 'Calendar',
+      labelNp: 'क्यालेन्डर',
+      onClick: () => {
+        onNavigate('calendar');
         onClose();
       },
     },

@@ -51,6 +51,7 @@ import { OfflineSummaryDashboard } from "./components/OfflineSummaryDashboard";
 import { Overview } from "./components/Overview";
 import { AnnouncementBoard } from "./components/AnnouncementBoard";
 import { MessagingCenter } from "./components/MessagingCenter";
+import { CalendarDeadlines } from "./components/CalendarDeadlines";
 import { DetailedGalleryView } from "./components/DetailedGalleryView";
 import { normalizeCategory, STANDARD_CATEGORIES, DEFAULT_CATEGORY_THEMES } from "./utils/category";
 import { getFiscalYearForBsDateStr, toNepaliNumerals } from "./utils/bsDate";
@@ -241,6 +242,7 @@ const viewOrder: Record<MainView, number> = {
   'detailed-gallery': 8,
   announcements: 9,
   messaging: 10,
+  calendar: 11,
 };
 
 const viewVariants = {
@@ -3537,6 +3539,21 @@ function MainAppContent() {
                              >
                                 <div className="p-4 sm:p-6 md:p-8 w-full max-w-5xl mx-auto">
                                   <MessagingCenter language={language} offices={offices} />
+                                </div>
+                             </ErrorBoundary>
+                           )}
+                           {mainView === "calendar" && (
+                             <ErrorBoundary
+                               fallback={
+                                 <div className="p-8 text-center">
+                                   <p className="text-sm text-slate-500 dark:text-slate-400">
+                                     Calendar temporarily unavailable.
+                                   </p>
+                                 </div>
+                               }
+                             >
+                                <div className="p-4 sm:p-6 md:p-8 w-full max-w-5xl mx-auto">
+                                  <CalendarDeadlines language={language} offices={offices} />
                                 </div>
                              </ErrorBoundary>
                            )}

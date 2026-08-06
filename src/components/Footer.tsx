@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, HelpCircle, ChevronUp, FileText, Share2, Sparkles, ChevronDown, ChevronRight, MessageSquare, RefreshCw, Menu, Download } from 'lucide-react';
+import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, HelpCircle, ChevronUp, FileText, Share2, Sparkles, ChevronDown, ChevronRight, MessageSquare, RefreshCw, Menu, Download, CalendarDays } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
@@ -181,6 +181,7 @@ export const Footer: React.FC<FooterProps> = ({
     },
     ...(deferredPrompt ? [{ id: 'btn-install', icon: Download, action: handleInstallClick }] : []),
     { id: 'btn-messaging', icon: MessageSquare, action: () => onOpenMessaging?.() },
+    { id: 'btn-calendar', icon: CalendarDays, action: () => onOpenMessaging?.() },
     { id: 'btn-share', icon: Share2, action: () => setShowQr(true) },
     { id: 'btn-help', icon: HelpCircle, action: onOpenHelp || (() => {}) },
     ...(canGiveFeedback ? [{ id: 'btn-feedback', icon: MessageSquare, action: onOpenFeedback || (() => {}) }] : []),
@@ -304,7 +305,9 @@ export const Footer: React.FC<FooterProps> = ({
                                   ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
                                   : item.id === 'btn-messaging'
                                     ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
-                                    : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
+                                    : item.id === 'btn-calendar'
+                                      ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
+                                      : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
                            }`}
                            title={
                              item.id === 'btn-menu'
@@ -317,7 +320,9 @@ export const Footer: React.FC<FooterProps> = ({
                                      ? (language === 'en' ? 'Install App' : 'अप्लिकेसन इन्स्टल गर्नुहोस्')
                                      : item.id === 'btn-messaging'
                                        ? (language === 'en' ? 'Messages' : 'सन्देशहरू')
-                                       : ''
+                                       : item.id === 'btn-calendar'
+                                         ? (language === 'en' ? 'Calendar' : 'क्यालेन्डर')
+                                         : ''
                            }
                         >
                            {item.id === 'btn-ai' && (
@@ -326,7 +331,7 @@ export const Footer: React.FC<FooterProps> = ({
                                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
                              </span>
                            )}
-                           <item.icon size={18} strokeWidth={2.5} className={`${item.id === 'btn-ai' ? 'text-white' : item.id === 'btn-install' ? 'text-indigo-700 dark:text-indigo-300' : item.id === 'btn-messaging' ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'} sm:size-[20px] transition-colors shrink-0 ${item.id === 'btn-sync' && isSyncing ? 'animate-spin' : ''}`} />
+                           <item.icon size={18} strokeWidth={2.5} className={`${item.id === 'btn-ai' ? 'text-white' : item.id === 'btn-install' ? 'text-indigo-700 dark:text-indigo-300' : item.id === 'btn-messaging' ? 'text-indigo-700 dark:text-indigo-300' : item.id === 'btn-calendar' ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'} sm:size-[20px] transition-colors shrink-0 ${item.id === 'btn-sync' && isSyncing ? 'animate-spin' : ''}`} />
                         </button>
                       </div>
                     ))}

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { FileText, BarChart3, Users, MapPin, Bell, Shield, Lock, Gauge, Activity, MessageSquare } from 'lucide-react';
+import { FileText, BarChart3, Users, MapPin, Bell, Shield, Lock, Gauge, Activity, MessageSquare, CalendarDays } from 'lucide-react';
 import { collection, getDocs, query, orderBy, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { APP_VERSION } from '../constants/appTitles';
@@ -10,6 +10,7 @@ import { fetchPublishedCsv, PUBLISHED_CSV_URLS } from '../utils/sheetSync';
 import { parseCSVLine } from '../data';
 import { API_BASE } from '../utils/apiBase';
 import { MessagingCenter } from './MessagingCenter';
+import { CalendarDeadlines } from './CalendarDeadlines';
 
 const SystemCard: React.FC<{ label: string; status: string; isText?: boolean; language: 'en' | 'ne' }> = ({ label, status, isText, language }) => {
   const isConnected = status === 'connected' || status === 'active';
@@ -87,6 +88,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ language, active
     { id: 'analytics', labelEn: 'Office Analytics', labelNp: 'कार्यालय विश्लेषण', icon: <BarChart3 size={16} /> },
     { id: 'data-input', labelEn: 'Data Input', labelNp: 'डाटा इनपुट', icon: <FileText size={16} /> },
     { id: 'messaging', labelEn: 'Messages', labelNp: 'सन्देशहरू', icon: <MessageSquare size={16} /> },
+    { id: 'calendar', labelEn: 'Calendar', labelNp: 'क्यालेन्डर', icon: <CalendarDays size={16} /> },
     { id: 'reports', labelEn: 'Reports', labelNp: 'प्रतिवेदनहरू', icon: <FileText size={16} /> },
     { id: 'notifications', labelEn: 'Notifications', labelNp: 'सूचनाहरू', icon: <Bell size={16} /> },
     { id: 'system', labelEn: 'System Health', labelNp: 'प्रणाली स्वास्थ्य', icon: <Activity size={16} /> },
@@ -397,6 +399,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ language, active
             {language === 'en' ? 'Group & Office Messaging' : 'समूह र कार्यालय मेसेजिङ'}
           </h3>
           <MessagingCenter language={language} offices={offices} />
+        </motion.div>
+      )}
+
+      {activeTab === 'calendar' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+          <CalendarDeadlines language={language} offices={offices} />
         </motion.div>
       )}
 

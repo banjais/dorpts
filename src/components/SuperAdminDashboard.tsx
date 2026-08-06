@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import {
   Users, Activity, MapPin, Shield, BarChart3, Globe, UserCheck, TrendingUp,
   RefreshCw, Bell, Lock, FileText, Gauge,
-  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone, MessageSquare
+  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone, MessageSquare, CalendarDays
 } from 'lucide-react';
 import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -14,6 +14,7 @@ import { fetchPublishedCsv, PUBLISHED_CSV_URLS } from '../utils/sheetSync';
 import { parseCSVLine } from '../data';
 import { API_BASE } from '../utils/apiBase';
 import { MessagingCenter } from './MessagingCenter';
+import { CalendarDeadlines } from './CalendarDeadlines';
 
 const SystemCard: React.FC<{ label: string; status: string; isText?: boolean; language: 'en' | 'ne' }> = ({ label, status, isText, language }) => {
   const isConnected = status === 'connected' || status === 'active';
@@ -215,6 +216,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     { id: 'data-input', labelEn: 'Data Input', labelNp: 'डाटा इनपुट', icon: <FileText size={16} /> },
     { id: 'announcements', labelEn: 'Announcements', labelNp: 'घोषणाहरू', icon: <Megaphone size={16} /> },
     { id: 'messaging', labelEn: 'Messages', labelNp: 'सन्देशहरू', icon: <MessageSquare size={16} /> },
+    { id: 'calendar', labelEn: 'Calendar', labelNp: 'क्यालेन्डर', icon: <CalendarDays size={16} /> },
     { id: 'collaboration', labelEn: 'Collaboration', labelNp: 'सहकार्य', icon: <Globe size={16} /> },
     { id: 'geolocation', labelEn: 'Geolocation', labelNp: 'भौगोलिक स्थान', icon: <MapPin size={16} /> },
     { id: 'notifications', labelEn: 'Notifications', labelNp: 'सूचनाहरू', icon: <Bell size={16} /> },
@@ -642,6 +644,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     if (activeTab === 'geolocation') fetchGeolocation();
     if (activeTab === 'announcements') fetchAnnouncements();
     if (activeTab === 'messaging') { /* messaging handles its own data */ }
+    if (activeTab === 'calendar') { /* calendar handles its own data */ }
   }, [activeTab, isSuperadmin]);
 
   return (
@@ -993,6 +996,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 {language === 'en' ? 'Group & Office Messaging' : 'समूह र कार्यालय मेसेजिङ'}
               </h3>
               <MessagingCenter language={language} offices={offices} />
+            </motion.div>
+          )}
+
+          {activeTab === 'calendar' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+              <CalendarDeadlines language={language} offices={offices} />
             </motion.div>
           )}
 
