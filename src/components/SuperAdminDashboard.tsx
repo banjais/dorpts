@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import {
   Users, Activity, MapPin, Shield, BarChart3, Globe, UserCheck, TrendingUp,
   RefreshCw, Bell, Lock, FileText, Gauge,
-  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone, MessageSquare, CalendarDays
+  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone, MessageSquare, CalendarDays, Trophy
 } from 'lucide-react';
 import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -134,6 +134,9 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const analyticsCardRef = useRef<HTMLDivElement>(null);
   const [internalActiveTab, setInternalActiveTab] = useState('analytics');
 
+  const [officeRankings, setOfficeRankings] = useState<Array<{ name: string; completion: number; total: number; progress: number }>>([]);
+  const [rankingsLoading, setRankingsLoading] = useState(false);
+
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<any>(null);
@@ -247,6 +250,34 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
         todayLogins: todayActivities.filter((a: any) => a.actionType === 'login').length,
         todayActivities: todayActivities.length,
       });
+
+      // Fetch office rankings from indicators
+      const indicatorsSnap = await getDocs(query(collection(db, 'indicators'), orderBy('id')));
+      const indicators = indicatorsSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+      
+      const officeMap = new Map<string, { total: number; progress: number; count: number }>();
+      indicators.forEach((ind: any) => {
+        const office = ind.office || 'Unassigned';
+        if (!officeMap.has(office)) {
+          officeMap.set(office, { total: 0, progress: 0, count: 0 });
+        }
+        const entry = officeMap.get(office)!;
+        entry.total += ind.annualTarget || 0;
+        entry.progress += ind.annualProgress || 0;
+        entry.count += 1;
+      });
+
+      const rankings = Array.from(officeMap.entries())
+        .map(([name, data]) => ({
+          name,
+          completion: data.total > 0 ? Math.round((data.progress / data.total) * 100) : 0,
+          total: data.total,
+          progress: data.progress,
+        }))
+        .sort((a, b) => b.completion - a.completion)
+        .slice(0, 10);
+
+      setOfficeRankings(rankings);
     } catch (err) {
       console.error('Failed to fetch analytics:', err);
     } finally {
@@ -759,6 +790,45 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   <ChevronDown size={16} className="-rotate-90" />
                 </button>
               )}
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'analytics' && officeRankings.length > 0 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+              {language === 'en' ? 'Office Ranking' : 'कार्यालय रanking'}
+            </h3>
+            <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl p-4 border border-slate-100 dark:border-white/5">
+              <div className="space-y-2.5">
+                {officeRankings.map((office, idx) => (
+                  <div key={office.name} className="flex items-center gap-3">
+                    <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black ${
+                      idx === 0 ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300' :
+                      idx === 1 ? 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300' :
+                      idx === 2 ? 'bg-orange-50 dark:bg-orange-500/10 text-orange-700 dark:text-orange-300' :
+                      'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                    }`}>
+                      {idx + 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate pr-2">{office.name}</span>
+                        <span className={`text-[11px] font-black ${
+                          office.completion >= 80 ? 'text-emerald-600' :
+                          office.completion >= 50 ? 'text-amber-600' : 'text-rose-600'
+                        }`}>{office.completion}%</span>
+                      </div>
+                      <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full transition-all duration-500 ${
+                          office.completion >= 80 ? 'bg-emerald-500' :
+                          office.completion >= 50 ? 'bg-amber-500' : 'bg-rose-500'
+                        }`} style={{ width: `${Math.min(100, office.completion)}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
         )}
