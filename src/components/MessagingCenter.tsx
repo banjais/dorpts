@@ -27,9 +27,13 @@ interface Channel {
   unreadCount?: number;
 }
 
-export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{ name: string }> }> = ({ language, offices = [] }) => {
+export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{ name: string }>; isAdmin?: boolean }> = ({ language, offices = [], isAdmin = false }) => {
   const { user } = useAuth();
   const { t } = useLanguage();
+
+  if (!isAdmin) {
+    return null;
+  }
   const [activeChannel, setActiveChannel] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');

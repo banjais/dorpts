@@ -111,7 +111,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
         onClose();
       },
     },
-    {
+    ...(isAdmin ? [{
       id: 'messaging',
       icon: <MessageSquare size={18} />,
       labelEn: 'Messages',
@@ -120,7 +120,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
         onNavigate('messaging');
         onClose();
       },
-    },
+    }] : []),
     {
       id: 'calendar',
       icon: <CalendarDays size={18} />,

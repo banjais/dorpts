@@ -24,6 +24,7 @@ interface FooterProps {
   canGiveFeedback?: boolean;
   pendingWrites?: Array<{ id: string; name: string; nameEn?: string }>;
   hasPendingWrites?: boolean;
+  isAdmin?: boolean;
 }
 
 export const Footer: React.FC<FooterProps> = ({ 
@@ -45,6 +46,7 @@ export const Footer: React.FC<FooterProps> = ({
   canGiveFeedback,
   pendingWrites = [],
   hasPendingWrites = false,
+  isAdmin = false,
 }) => {
   const { language, t } = useLanguage();
   const [showQr, setShowQr] = useState(false);
@@ -200,7 +202,7 @@ export const Footer: React.FC<FooterProps> = ({
       action: onOpenReportBuilder || (() => { try { window.print(); } catch(e) { console.error(e); } }) 
     },
     ...(deferredPrompt ? [{ id: 'btn-install', icon: Download, action: handleInstallClick }] : []),
-    { id: 'btn-messaging', icon: MessageSquare, action: () => onOpenMessaging?.() },
+    ...(isAdmin ? [{ id: 'btn-messaging', icon: MessageSquare, action: () => onOpenMessaging?.() }] : []),
     { id: 'btn-calendar', icon: CalendarDays, action: () => onOpenMessaging?.() },
     { id: 'btn-share', icon: Share2, action: () => setShowQr(true) },
     { id: 'btn-help', icon: HelpCircle, action: onOpenHelp || (() => {}) },

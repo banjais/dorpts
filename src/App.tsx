@@ -3539,7 +3539,7 @@ function MainAppContent() {
                                }
                              >
                                 <div className="p-4 sm:p-6 md:p-8 w-full max-w-5xl mx-auto">
-                                  <MessagingCenter language={language} offices={offices} />
+                                   <MessagingCenter language={language} offices={offices} isAdmin={isAdmin} />
                                 </div>
                              </ErrorBoundary>
                            )}
@@ -3616,6 +3616,7 @@ function MainAppContent() {
              onOpenMessaging={() => handleMainViewChange('messaging')}
              pendingWrites={pendingWrites}
              hasPendingWrites={pendingWrites.length > 0}
+             isAdmin={isAdmin}
             />
 
         {/* Dim Overlay - Outside scaled content */}

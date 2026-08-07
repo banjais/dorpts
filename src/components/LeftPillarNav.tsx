@@ -105,11 +105,18 @@ const SECTION_COLORS: Record<MainView, PillarColor> = {
 interface LeftPillarNavProps {
   activeView: MainView;
   onViewChange: (view: MainView) => void;
+  isAdmin?: boolean;
 }
 
-export const LeftPillarNav: React.FC<LeftPillarNavProps> = ({ activeView, onViewChange }) => {
+export const LeftPillarNav: React.FC<LeftPillarNavProps> = ({ activeView, onViewChange, isAdmin = false }) => {
   const [hovered, setHovered] = useState<MainView | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+
+  const visibleNavItems = NAV_ITEMS.filter(item => {
+    if (item.id === 'messaging') return isAdmin;
+    if (item.id === 'feedbacks') return isAdmin;
+    return true;
+  });
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)');
@@ -127,7 +134,7 @@ export const LeftPillarNav: React.FC<LeftPillarNavProps> = ({ activeView, onView
       <nav className="fixed bottom-4 left-4 right-4 z-[6000] md:hidden">
         <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-200/60 dark:border-slate-700/60 shadow-lg p-1">
           <div className="flex items-center justify-around">
-            {NAV_ITEMS.map((item) => {
+            {visibleNavItems.map((item) => {
               const isActive = activeView === item.id;
               return (
                 <button

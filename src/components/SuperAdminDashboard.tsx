@@ -1081,7 +1081,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
                 {language === 'en' ? 'Group & Office Messaging' : 'समूह र कार्यालय मेसेजिङ'}
               </h3>
-              <MessagingCenter language={language} offices={offices} />
+              <MessagingCenter language={language} offices={offices} isAdmin={isSuperadmin} />
             </motion.div>
           )}
 

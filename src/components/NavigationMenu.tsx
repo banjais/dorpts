@@ -28,20 +28,28 @@ interface NavigationMenuProps {
   onViewChange: (view: MainView) => void;
   onOpenReportBuilder?: () => void;
   isScrolled?: boolean;
+  isAdmin?: boolean;
 }
 
 export const NavigationMenu: React.FC<NavigationMenuProps> = ({ 
   activeView,
   onViewChange,
   onOpenReportBuilder,
-  isScrolled = false
+  isScrolled = false,
+  isAdmin = false,
 }) => {
   const { language } = useLanguage();
+
+  const visibleItems = NAV_ITEMS.filter(item => {
+    if (item.id === 'messaging') return isAdmin;
+    if (item.id === 'feedbacks') return isAdmin;
+    return true;
+  });
 
   return (
     <nav className={`fixed top-[57px] sm:top-[65px] right-3 sm:right-5 z-[5001] ${isScrolled ? 'scale-[0.85] origin-top-right' : ''}`}>
       <div className="flex flex-row items-center gap-0.5 bg-white/90 dark:bg-slate-900/90 p-0.5 sm:p-1 rounded-full border border-white/70 dark:border-slate-700/50 shadow-lg shadow-indigo-500/10 backdrop-blur-xl">
-        {NAV_ITEMS.map((item) => {
+        {visibleItems.map((item) => {
           const isActive = activeView === item.id;
           return (
             <motion.button
