@@ -977,7 +977,7 @@ export const IndicatorCard = React.memo<CardProps>(
                 exit={{ opacity: 0, scale: 0.92, y: 4 }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
                 onClick={(e) => e.stopPropagation()}
-                className="absolute inset-0 bg-slate-950/95 dark:bg-slate-950/98 backdrop-blur-md rounded-xl p-3.5 sm:p-4.5 flex flex-col justify-between text-white z-[300] border border-indigo-500/40 shadow-2xl overflow-hidden"
+                className="absolute inset-0 bg-slate-950/70 dark:bg-slate-950/80 md:bg-slate-950/95 md:dark:bg-slate-950/98 backdrop-blur-sm md:backdrop-blur-md rounded-xl p-3 sm:p-4 flex flex-col justify-between text-white z-[300] border border-indigo-500/40 shadow-2xl overflow-hidden"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-2">
@@ -1337,7 +1337,7 @@ export const IndicatorCard = React.memo<CardProps>(
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="absolute inset-0 bg-slate-950/95 dark:bg-slate-950/98 backdrop-blur-md rounded-xl p-5 flex flex-col justify-between text-white z-[250] border border-indigo-500/30 overflow-hidden shadow-2xl"
+                className="absolute inset-0 bg-slate-950/70 dark:bg-slate-950/80 md:bg-slate-950/95 md:dark:bg-slate-950/98 backdrop-blur-sm md:backdrop-blur-md rounded-xl p-4 sm:p-5 flex flex-col justify-between text-white z-[250] border border-indigo-500/30 overflow-hidden shadow-2xl"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-2">

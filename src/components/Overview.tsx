@@ -2000,26 +2000,26 @@ export const Overview: React.FC<OverviewProps> = ({
          defaultTab="indicators"
        />
 
-       {/* Device-Adaptive Modal Overlay for Card Expansion with Reduce Option */}
-       <AnimatePresence>
-         {activeExpandedModalCardId && (
-           <motion.div
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             exit={{ opacity: 0 }}
-             className="fixed inset-0 z-[9990] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-2 sm:p-4 md:p-6 overflow-y-auto"
-             onClick={() => setActiveExpandedModalCardId(null)}
-           >
-             <motion.div
-               initial={{ scale: 0.93, opacity: 0, y: 15 }}
-               animate={{ scale: 1, opacity: 1, y: 0 }}
-               exit={{ scale: 0.93, opacity: 0, y: 15 }}
-               transition={{ type: 'spring', damping: 25, stiffness: 280 }}
-               onClick={(e) => e.stopPropagation()}
-               className="relative w-full max-w-4xl max-h-[90dvh] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto"
-             >
+        {/* Device-Adaptive Modal Overlay for Card Expansion with Reduce Option */}
+        <AnimatePresence>
+          {activeExpandedModalCardId && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9990] flex items-center justify-center bg-slate-950/50 md:bg-slate-950/80 backdrop-blur-sm md:backdrop-blur-md p-2 sm:p-4 md:p-6 overflow-y-auto"
+              onClick={() => setActiveExpandedModalCardId(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.93, opacity: 0, y: 15 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.93, opacity: 0, y: 15 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 280 }}
+                onClick={(e) => e.stopPropagation()}
+                className="relative w-full max-w-4xl max-h-[85dvh] sm:max-h-[90dvh] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto"
+              >
                {/* Sticky Header with Title and Prominent REDUCE option */}
-               <div className="sticky top-0 z-20 flex items-center justify-between p-4 sm:p-5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/80">
+               <div className="sticky top-0 z-20 flex items-center justify-between p-3 sm:p-4 md:p-5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/80">
                  <div className="flex items-center gap-3">
                    <span className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50">
                      {activeExpandedModalCardId === 'overall-progress' && <TrendingUp size={20} />}
@@ -2124,7 +2124,7 @@ export const Overview: React.FC<OverviewProps> = ({
                </div>
 
                {/* Scrollable Expanded View Content */}
-               <div className="p-4 sm:p-6 overflow-y-auto space-y-6 custom-scrollbar max-h-[calc(90dvh-75px)]">
+                <div className="p-3 sm:p-4 md:p-6 overflow-y-auto space-y-3 sm:space-y-4 md:space-y-6 custom-scrollbar max-h-[calc(85dvh-60px)] sm:max-h-[calc(90dvh-75px)]">
                  {/* Card 0: Overall Progress Performance Expanded Modal */}
                  {activeExpandedModalCardId === 'overall-progress' && (
                    <div className="space-y-6">
