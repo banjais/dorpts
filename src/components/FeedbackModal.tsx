@@ -28,14 +28,22 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, l
     triggerHaptic('success');
     
     try {
-      await addDoc(collection(db, 'user_feedback'), {
-        message: feedback.trim(),
-        timestamp: serverTimestamp(),
-        userEmail: user?.email || null,
-        userName: user?.displayName || null,
-        userRole: user ? (user.email === 'banjays@gmail.com' ? 'superadmin' : 'user') : 'anonymous',
-        source: 'app_feedback',
-      });
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timed out. Please try again.')), 10000)
+      );
+      
+      await Promise.race([
+        addDoc(collection(db, 'user_feedback'), {
+          message: feedback.trim(),
+          timestamp: serverTimestamp(),
+          userEmail: user?.email || null,
+          userName: user?.displayName || null,
+          userRole: user ? (user.email === 'banjays@gmail.com' ? 'superadmin' : 'user') : 'anonymous',
+          source: 'app_feedback',
+        }),
+        timeoutPromise,
+      ]);
+      
       setFeedback('');
       setStatus('success');
       setTimeout(() => {
