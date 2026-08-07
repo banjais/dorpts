@@ -1253,7 +1253,7 @@ export const Overview: React.FC<OverviewProps> = ({
              initial={{ opacity: 0 }}
              animate={{ opacity: 1 }}
              exit={{ opacity: 0 }}
-             className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/90 backdrop-blur-xl p-3 sm:p-6 overflow-y-auto"
+              className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/90 backdrop-blur-xl p-2 sm:p-4 overflow-y-auto"
            >
              <div className="relative w-full max-w-2xl my-auto">
                <button

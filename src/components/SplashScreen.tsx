@@ -75,13 +75,13 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ progress, requireLan
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center px-6 py-10 sm:py-12 text-center">
+      <div className="relative z-10 flex flex-col items-center justify-center px-4 py-6 sm:py-8 text-center">
         {/* App Icon/Logo */}
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
-          className="mb-5"
+          className="mb-3 sm:mb-5"
         >
           <div className="relative w-16 h-16 sm:w-20 sm:h-20">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl rotate-6 opacity-50 blur-xl" />
@@ -118,7 +118,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ progress, requireLan
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.65, duration: 0.6 }}
-          className="text-[10px] sm:text-[11px] text-white/50 max-w-sm mb-6"
+          className="text-[10px] sm:text-[11px] text-white/50 max-w-sm mb-3 sm:mb-6"
         >
           {t('splashPurpose')}
         </motion.p>
@@ -128,7 +128,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ progress, requireLan
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.8 }}
-          className="relative w-36 h-36 sm:w-44 sm:h-44 mb-8"
+          className="relative w-28 h-28 sm:w-36 sm:h-36 sm:mb-8 mb-4"
         >
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
             <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
@@ -171,7 +171,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ progress, requireLan
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.0, duration: 0.6 }}
-          className="flex flex-col items-center gap-4 mb-6 z-20"
+          className="flex flex-col items-center gap-4 mb-4 sm:mb-6 z-20"
         >
           <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">
             {language === 'en' ? 'Language / भाषा' : 'भाषा / Language'}
