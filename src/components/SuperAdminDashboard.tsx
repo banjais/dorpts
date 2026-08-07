@@ -123,7 +123,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [showAddUser, setShowAddUser] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [newUserEmail, setNewUserEmail] = useState('');
-  const [newUserRole, setNewUserRole] = useState<'superadmin' | 'admin' | 'viewer'>('admin');
+  const [newUserRole, setNewUserRole] = useState<'superadmin' | 'admin' | 'data_updater' | 'viewer'>('admin');
   const [newUserOffice, setNewUserOffice] = useState('');
   const [userSearch, setUserSearch] = useState('');
   const [dataInputOffice, setDataInputOffice] = useState('');
@@ -1280,14 +1280,15 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 />
                 <select
                   value={newUserRole}
-                  onChange={(e) => setNewUserRole(e.target.value as 'superadmin' | 'admin' | 'viewer')}
+                  onChange={(e) => setNewUserRole(e.target.value as 'superadmin' | 'admin' | 'data_updater' | 'viewer')}
                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
                 >
                   <option value="superadmin">Superadmin</option>
                   <option value="admin">{language === 'en' ? 'Admin' : 'प्रशासक'}</option>
+                  <option value="data_updater">{language === 'en' ? 'Data Updater' : 'डाटा अपडेटर'}</option>
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
-                {newUserRole !== 'superadmin' && newUserRole !== 'viewer' && (
+                {newUserRole !== 'superadmin' && (
                   <OfficeDropdown
                     value={newUserOffice}
                     onChange={setNewUserOffice}
