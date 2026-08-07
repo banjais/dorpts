@@ -1615,12 +1615,8 @@ export const Overview: React.FC<OverviewProps> = ({
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => {
-          if (onNavigateToView) {
-            onNavigateToView('insights');
-          } else {
-            setActiveExpandedModalCardId('visual-insights-gallery');
-            toggleCard(setShowInsights, showInsights);
-          }
+          setActiveExpandedModalCardId('visual-insights-gallery');
+          toggleCard(setShowInsights, showInsights);
         }}
         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-3 sm:p-4 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[80px] sm:min-h-[90px] flex items-center justify-between"
       >
@@ -1769,15 +1765,18 @@ export const Overview: React.FC<OverviewProps> = ({
          className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-3 sm:p-4 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[80px] sm:min-h-[90px] flex items-center justify-between"
       >
         <div className="flex items-center justify-between mb-2">
-          <div>
-            <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100">
-              {language === 'en' ? 'Detailed Gallery' : 'विस्तृत ग्यालेरी'}
-            </span>
-            <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
-              {language === 'en' ? 'Full Indicators View' : 'पूर्ण सूचक अवलोकन'}
-            </p>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-500/20 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-500/30">0</span>
+            <div>
+              <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100">
+                {language === 'en' ? 'Detailed Gallery' : 'विस्तृत ग्यालेरी'}
+              </span>
+              <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                {language === 'en' ? 'Full Indicators View' : 'पूर्ण सूचक अवलोकन'}
+              </p>
+            </div>
           </div>
-          <span className="p-2 bg-gradient-to-br from-rose-500 to-rose-700 rounded-xl shadow-md shadow-rose-500/30">
+          <span className="p-2 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl shadow-md shadow-indigo-500/30">
             <ImageIcon size={16} className="text-white" />
           </span>
         </div>
@@ -1936,72 +1935,7 @@ export const Overview: React.FC<OverviewProps> = ({
                      <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">
                        {activeExpandedModalCardId === 'overall-progress' && (language === 'en' ? 'Overall Progress Dashboard' : 'समग्र प्रगति ड्यासबोर्ड')}
                        {activeExpandedModalCardId === 'category-status' && (language === 'en' ? 'Category & Sector Breakdown' : 'क्षेत्रगत तथा वर्ग विवरण')}
-                       {activeExpandedModalCardId === 'status-breakdown' && (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-3 gap-3 text-center">
-                        <div className="bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-2xl border border-emerald-200/50">
-                          <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-300 block">{language === 'en' ? 'On Track (≥80%)' : 'लक्ष्य अनुरूप (≥८०%)'}</span>
-                          <span className="text-2xl font-black text-emerald-800 dark:text-emerald-200">{fmt(stats.meetingTarget)}</span>
-                        </div>
-                        <div className="bg-amber-50 dark:bg-amber-950/40 p-3 rounded-2xl border border-amber-200/50">
-                          <span className="text-xs font-extrabold text-amber-700 dark:text-amber-300 block">{language === 'en' ? 'Below Target (40-79%)' : 'लक्ष्य भन्दा कम (४०-७९%)'}</span>
-                          <span className="text-2xl font-black text-amber-800 dark:text-amber-200">{fmt(stats.belowTarget)}</span>
-                        </div>
-                        <div className="bg-rose-50 dark:bg-rose-950/40 p-3 rounded-2xl border border-rose-200/50">
-                          <span className="text-xs font-extrabold text-rose-700 dark:text-rose-300 block">{language === 'en' ? 'Needs Attention (<40%)' : 'ध्यान आवश्यक (<४०%)'}</span>
-                          <span className="text-2xl font-black text-rose-800 dark:text-rose-200">{fmt(stats.needsCritical)}</span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2 pt-2">
-                        <h4 className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 tracking-wider">
-                          {language === 'en' ? 'Indicator Status Details' : 'सूचकहरूको कार्यसम्पादन स्थिति विवरण'}
-                        </h4>
-                        <div className="space-y-2 max-h-[340px] overflow-y-auto pr-1">
-                          {indicators.map((ind) => {
-                            if (!ind) return null;
-                            const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
-                            const statusColor = pct >= 80 
-                              ? 'bg-emerald-500 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' 
-                              : pct >= 40 
-                              ? 'bg-amber-500 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800' 
-                              : 'bg-rose-500 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800';
-                            
-                            const badgeLabel = pct >= 80 
-                              ? (language === 'en' ? 'On Track' : 'सफल') 
-                              : pct >= 40 
-                              ? (language === 'en' ? 'Below Target' : 'मध्यम') 
-                              : (language === 'en' ? 'Critical' : 'गम्भीर');
-
-                            return (
-                              <div key={ind.id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-3 shadow-2xs">
-                                <div className="space-y-1 min-w-0 flex-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-[10px] font-bold text-slate-400">#{ind.id}</span>
-                                    <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${statusColor.split(' ').slice(1).join(' ')}`}>
-                                      {badgeLabel}
-                                    </span>
-                                  </div>
-                                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                                    {language === 'en' ? (ind.nameEn || ind.name) : ind.name}
-                                  </p>
-                                  <div className="flex items-center gap-3 text-[10px] text-slate-500 dark:text-slate-400">
-                                    <span>{language === 'en' ? 'Progress:' : 'प्रगति:'} {fmt(ind.annualProgress)} / {fmt(ind.annualTarget)} {translateUnit(ind.unit)}</span>
-                                  </div>
-                                </div>
-                                <div className="shrink-0 text-right">
-                                  <span className="text-sm font-black text-slate-900 dark:text-white block">{pct}%</span>
-                                  <div className="w-16 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1">
-                                    <div className={`h-full ${statusColor.split(' ')[0]}`} style={{ width: `${pct}%` }} />
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                        {activeExpandedModalCardId === 'status-breakdown' && (language === 'en' ? 'Performance Status Breakdown' : 'कार्यसम्पादन स्थिति विवरण')}
 
                         {activeExpandedModalCardId === 'reporting-offices' && (language === 'en' ? 'Reporting Field Offices' : 'रिपोर्टिङ क्षेत्र कार्यालयहरू')}
                        {activeExpandedModalCardId === 'budget-card' && (language === 'en' ? 'Budget & Capital Expenditure' : 'बजेट उपयोग र पूँजीगत खर्च')}
@@ -2266,25 +2200,73 @@ export const Overview: React.FC<OverviewProps> = ({
                    </div>
                  )}
 
-                 {/* Card 2: Performance Status Breakdown Modal */}
-                 {activeExpandedModalCardId === 'status-breakdown' && (
-                   <div className="space-y-4">
-                     <div className="grid grid-cols-3 gap-3 text-center">
-                       <div className="bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-200/50">
-                         <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-300 block">{language === 'en' ? 'On Track (≥80%)' : 'सफल'}</span>
-                         <span className="text-xl font-black text-emerald-800 dark:text-emerald-200">{fmt(stats.onTrack)}</span>
-                       </div>
-                       <div className="bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200/50">
-                         <span className="text-xs font-extrabold text-amber-700 dark:text-amber-300 block">{language === 'en' ? 'Attention (40-79%)' : 'मध्यम'}</span>
-                         <span className="text-xl font-black text-amber-800 dark:text-amber-200">{fmt(stats.needsAttention)}</span>
-                       </div>
-                       <div className="bg-rose-50 dark:bg-rose-950/40 p-3 rounded-xl border border-rose-200/50">
-                         <span className="text-xs font-extrabold text-rose-700 dark:text-rose-300 block">{language === 'en' ? 'Delayed (<40%)' : 'सुस्त'}</span>
-                         <span className="text-xl font-black text-rose-800 dark:text-rose-200">{fmt(stats.staleCount)}</span>
-                       </div>
-                     </div>
-                   </div>
-                 )}
+                  {/* Card 2: Performance Status Breakdown Modal */}
+                  {activeExpandedModalCardId === 'status-breakdown' && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-3 gap-3 text-center">
+                        <div className="bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-200/50">
+                          <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-300 block">{language === 'en' ? 'On Track (≥80%)' : 'लक्ष्य अनुरूप (≥८०%)'}</span>
+                          <span className="text-xl font-black text-emerald-800 dark:text-emerald-200">{fmt(stats.onTrack)}</span>
+                        </div>
+                        <div className="bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200/50">
+                          <span className="text-xs font-extrabold text-amber-700 dark:text-amber-300 block">{language === 'en' ? 'Below Target (40-79%)' : 'लक्ष्य भन्दा कम (४०-७९%)'}</span>
+                          <span className="text-xl font-black text-amber-800 dark:text-amber-200">{fmt(stats.needsAttention)}</span>
+                        </div>
+                        <div className="bg-rose-50 dark:bg-rose-950/40 p-3 rounded-xl border border-rose-200/50">
+                          <span className="text-xs font-extrabold text-rose-700 dark:text-rose-300 block">{language === 'en' ? 'Needs Attention (<40%)' : 'ध्यान आवश्यक (<४०%)'}</span>
+                          <span className="text-xl font-black text-rose-800 dark:text-rose-200">{fmt(stats.staleCount)}</span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 pt-2">
+                        <h4 className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 tracking-wider">
+                          {language === 'en' ? 'Indicator Status Details' : 'सूचकहरूको कार्यसम्पादन स्थिति विवरण'}
+                        </h4>
+                        <div className="space-y-2 max-h-[340px] overflow-y-auto pr-1">
+                          {indicators.map((ind) => {
+                            if (!ind) return null;
+                            const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
+                            const statusColor = pct >= 80 
+                              ? 'bg-emerald-500 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' 
+                              : pct >= 40 
+                              ? 'bg-amber-500 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800' 
+                              : 'bg-rose-500 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800';
+                            
+                            const badgeLabel = pct >= 80 
+                              ? (language === 'en' ? 'On Track' : 'सफल') 
+                              : pct >= 40 
+                              ? (language === 'en' ? 'Below Target' : 'मध्यम') 
+                              : (language === 'en' ? 'Critical' : 'गम्भीर');
+
+                            return (
+                              <div key={ind.id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-3 shadow-2xs">
+                                <div className="space-y-1 min-w-0 flex-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-bold text-slate-400">#{ind.id}</span>
+                                    <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${statusColor.split(' ').slice(1).join(' ')}`}>
+                                      {badgeLabel}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                                    {language === 'en' ? (ind.nameEn || ind.name) : ind.name}
+                                  </p>
+                                  <div className="flex items-center gap-3 text-[10px] text-slate-500 dark:text-slate-400">
+                                    <span>{language === 'en' ? 'Progress:' : 'प्रगति:'} {fmt(ind.annualProgress)} / {fmt(ind.annualTarget)} {translateUnit(ind.unit)}</span>
+                                  </div>
+                                </div>
+                                <div className="shrink-0 text-right">
+                                  <span className="text-sm font-black text-slate-900 dark:text-white block">{pct}%</span>
+                                  <div className="w-16 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1">
+                                    <div className={`h-full ${statusColor.split(' ')[0]}`} style={{ width: `${pct}%` }} />
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Card 4: Reporting Offices Modal */}
                   {activeExpandedModalCardId === 'reporting-offices' && (

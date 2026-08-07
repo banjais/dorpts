@@ -21,4 +21,4 @@ export const APP_TITLES = {
   }
 };
 
-export const APP_VERSION = '2.9.95';
+export const APP_VERSION = '2.9.97';
