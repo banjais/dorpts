@@ -1438,17 +1438,14 @@ export const Overview: React.FC<OverviewProps> = ({
 
           {/* Metrics & Gauge Row */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full bg-indigo-900/5 dark:bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-indigo-100 dark:border-white/10">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-baseline gap-3">
-                <span className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-                  {fmt(stats.weightedRate)}%
-                </span>
-                <span className="text-xs font-extrabold text-indigo-700 dark:text-indigo-300 uppercase tracking-widest bg-indigo-100 dark:bg-indigo-500/20 px-2.5 py-1 rounded-lg border border-indigo-200 dark:border-indigo-500/30">
-                  {language === 'en' ? 'Weighted Completion' : 'भारित सफलता'}
-                </span>
-              </div>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
+                    {fmt(stats.weightedRate)}%
+                  </span>
+                </div>
 
-              {/* Quick Status Badges */}
+                {/* Quick Status Badges */}
               <div className="flex flex-wrap items-center gap-2 text-xs font-extrabold">
                 <span className="px-2.5 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30">
                   {language === 'en' ? 'On Track:' : 'सफल:'} {fmt(stats.onTrack)}
@@ -1494,7 +1491,6 @@ export const Overview: React.FC<OverviewProps> = ({
               <span>{language === 'en' ? 'Reporting Offices:' : 'रिपोर्टिङ कार्यालयहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(reportingOffices.length)}</strong></span>
             </div>
             <div className="flex items-center gap-1 text-indigo-600 dark:text-indigo-300 font-bold group-hover:text-indigo-800 dark:group-hover:text-white transition-colors">
-              <span>{language === 'en' ? 'Tap to Expand' : 'विस्तार गर्न थिच्नुहोस्'}</span>
               <ChevronDown size={14} className={`transform transition-transform ${showOverallProgress ? 'rotate-180' : ''}`} />
             </div>
           </div>
