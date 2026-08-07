@@ -110,6 +110,16 @@ interface SuperAdminDashboardProps {
 
 export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ language, activeTab: externalActiveTab, onTabChange, offices = [] }) => {
   const { adminsList, user, isSuperadmin } = useAuth();
+
+  if (!isSuperadmin) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          {language === 'en' ? 'Access denied. Superadmin only.' : 'पहुँच अस्वीकृत। सुपरएडमिन मात्र।'}
+        </p>
+      </div>
+    );
+  }
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [logs, setLogs] = useState<any[]>([]);
   const [securityData, setSecurityData] = useState<any>(null);
@@ -123,6 +133,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [showAddUser, setShowAddUser] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserEmailError, setNewUserEmailError] = useState('');
   const [newUserRole, setNewUserRole] = useState<'superadmin' | 'admin' | 'data_updater' | 'viewer'>('admin');
   const [newUserOffice, setNewUserOffice] = useState('');
   const [userSearch, setUserSearch] = useState('');
@@ -530,7 +541,22 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   };
 
   const handleAddUser = async () => {
-    if (!newUserEmail.trim()) return;
+    const email = newUserEmail.trim();
+    if (!email) {
+      setNewUserEmailError(language === 'en' ? 'Email is required' : 'इमेल आवश्यक छ');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setNewUserEmailError(language === 'en' ? 'Invalid email format' : 'अमान्य इमेल ढाँचा');
+      return;
+    }
+    const exists = users.some(u => (u.email || '').toLowerCase() === email.toLowerCase());
+    if (exists) {
+      setNewUserEmailError(language === 'en' ? 'This email is already added' : 'यो इमेल पहिले नै थपिएको छ');
+      return;
+    }
+    setNewUserEmailError('');
     try {
       const token = await user?.getIdToken();
       const res = await fetch(`${API_BASE}/api/admin/create`, {
@@ -539,13 +565,13 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ email: newUserEmail, role: newUserRole }),
+        body: JSON.stringify({ email, role: newUserRole }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to add user');
 
       await addDoc(collection(db, 'admins'), {
-        email: newUserEmail,
+        email,
         role: newUserRole,
         office: newUserOffice || null,
         createdAt: new Date(),
@@ -553,6 +579,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
       });
 
       setNewUserEmail('');
+      setNewUserEmailError('');
       setNewUserRole('admin');
       setNewUserOffice('');
       setShowAddUser(false);
@@ -565,6 +592,17 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
 
   const handleUpdateUser = async () => {
     if (!editingUser) return;
+    const email = (editingUser.email || '').trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert(language === 'en' ? 'Please enter a valid email address.' : 'कृपया वैध इमेल ठेगाना प्रविष्ट गर्नुहोस्।');
+      return;
+    }
+    const exists = users.some(u => (u.email || '').toLowerCase() === email.toLowerCase() && u.id !== editingUser.id);
+    if (exists) {
+      alert(language === 'en' ? 'A user with this email already exists.' : 'यो इमेल सँग प्रयोगकर्ता पहिले नै अवस्थित छ।');
+      return;
+    }
     try {
       const token = await user?.getIdToken();
       const res = await fetch(`${API_BASE}/api/admin/create`, {
@@ -573,13 +611,14 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ email: editingUser.email, role: editingUser.role }),
+        body: JSON.stringify({ email, role: editingUser.role }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to update user');
 
       await setDoc(doc(db, 'admins', editingUser.id), {
         ...editingUser,
+        email,
         role: editingUser.role,
         office: editingUser.office || null,
       }, { merge: true });
@@ -1274,10 +1313,13 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 <input
                   type="email"
                   value={newUserEmail}
-                  onChange={(e) => setNewUserEmail(e.target.value)}
+                  onChange={(e) => { setNewUserEmail(e.target.value); if (newUserEmailError) setNewUserEmailError(''); }}
                   placeholder={language === 'en' ? 'Email address' : 'इमेल ठेगाना'}
-                  className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                  className={`w-full p-2 rounded-lg border bg-white dark:bg-slate-800 text-xs ${newUserEmailError ? 'border-rose-300 dark:border-rose-700' : 'border-slate-200 dark:border-slate-700'}`}
                 />
+                {newUserEmailError && (
+                  <p className="text-[10px] text-rose-600 dark:text-rose-400 font-medium">{newUserEmailError}</p>
+                )}
                 <select
                   value={newUserRole}
                   onChange={(e) => setNewUserRole(e.target.value as 'superadmin' | 'admin' | 'data_updater' | 'viewer')}
@@ -1298,8 +1340,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 )}
                 <button
                   onClick={handleAddUser}
-                  disabled={!newUserEmail.trim()}
-                  className="w-full py-2 bg-emerald-600 text-white text-[10px] font-black rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                  disabled={!newUserEmail.trim() || !!newUserEmailError}
+                  className="w-full py-2 bg-emerald-600 text-white text-[10px] font-black rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {language === 'en' ? 'Add User' : 'प्रयोगकर्ता थप्नुहोस्'}
                 </button>
@@ -1374,11 +1416,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 />
                 <select
                   value={editingUser.role}
-                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as 'superadmin' | 'admin' | 'viewer' })}
+                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as 'superadmin' | 'admin' | 'data_updater' | 'viewer' })}
                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
                 >
                   <option value="superadmin">Superadmin</option>
                   <option value="admin">{language === 'en' ? 'Admin' : 'प्रशासक'}</option>
+                  <option value="data_updater">{language === 'en' ? 'Data Updater' : 'डाटा अपडेटर'}</option>
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
                 {editingUser.role !== 'superadmin' && editingUser.role !== 'viewer' && (
