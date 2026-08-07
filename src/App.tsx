@@ -1,5 +1,3 @@
-// bust-cache: force new bundle hash for PWA SW update
-if (typeof console !== 'undefined') console.log('[DORPTS] build:' + Date.now());
 import React, {
   useState,
   useEffect,

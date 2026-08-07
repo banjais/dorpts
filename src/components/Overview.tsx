@@ -1536,9 +1536,9 @@ export const Overview: React.FC<OverviewProps> = ({
             <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100">
               {language === 'en' ? 'Category Status' : 'वर्ग स्थिति'}
             </span>
-            <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
-              {language === 'en' ? '4 Main Sectors' : '४ मुख्य क्षेत्रहरू'}
-            </p>
+             <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
+               {language === 'en' ? '5 Main Sectors' : '५ मुख्य क्षेत्रहरू'}
+             </p>
           </div>
           <span className="p-2 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl shadow-md shadow-cyan-500/30">
             <LayoutGrid size={16} className="text-white" />
@@ -1546,7 +1546,7 @@ export const Overview: React.FC<OverviewProps> = ({
         </div>
 
         <div className="grid grid-cols-2 gap-2 sm:gap-2.5 my-2">
-          {STANDARD_CATEGORIES.slice(0, 4).map((catName) => {
+          {STANDARD_CATEGORIES.slice(0, 5).map((catName) => {
             const color = getCategoryColor(catName);
             const count = indicators.filter((i) => normalizeCategory(i.category) === catName).length;
             const displayName = language === 'en'
