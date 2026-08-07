@@ -31,7 +31,7 @@ export interface UserActivity {
   id: string;
   userId: string;
   email: string;
-  actionType: 'login' | 'view_dashboard' | 'edit_indicator' | 'sync_sheets' | 'role_change' | 'otp_login';
+  actionType: 'login' | 'view_dashboard' | 'edit_indicator' | 'sync_sheets' | 'role_change';
   details: string;
   timestamp: string;
 }

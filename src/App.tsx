@@ -3252,8 +3252,24 @@ function MainAppContent() {
               style={{ transition: "padding-top 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
              >
 
-             <AnimatePresence mode="wait">
-              {loading ? (
+              <AnimatePresence mode="wait">
+               {authLoading ? (
+                 <motion.div
+                   key="auth-loading"
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   exit={{ opacity: 0 }}
+                   transition={{ duration: 0.3 }}
+                   className="flex items-center justify-center min-h-[50vh]"
+                 >
+                   <div className="text-center space-y-3">
+                     <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                     <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                       {language === 'en' ? 'Signing in...' : 'साइन इन हुँदै...'}
+                     </p>
+                   </div>
+                 </motion.div>
+               ) : loading ? (
                 <motion.div
                   key="loading"
                   initial={{ opacity: 0 }}

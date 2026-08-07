@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Chrome, ShieldCheck, X } from 'lucide-react';
+import { Chrome, ShieldCheck, X, Users, BarChart3, MessageSquare, FileText } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 
 export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
   const { language } = useLanguage();
-  const { loginWithGoogle } = useAuth();
+  const { loginWithGoogle, loading } = useAuth();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -61,9 +61,9 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
                 {language === 'en' ? 'Sign in to access the system' : 'प्रणालीमा प्रवेश गर्न साइन इन गर्नुहोस्'}
               </p>
               <p className="text-[10px] text-slate-400 dark:text-slate-500">
-                {language === 'en' 
-                  ? 'Superadmin and admins use Google sign-in. Normal users can also sign in for comments and feedback.'
-                  : 'सुपरएडमिन र प्रशासकहरू गूगल साइन-इन प्रयोग गर्छन्। सामान्य प्रयोगकर्ताहरू पनि टिप्पणी र प्रतिक्रियाको लागि साइन इन गर्न सक्छन्।'
+                {language === 'en'
+                  ? 'Use your Google account to sign in. Role-based access is managed by your administrator.'
+                  : 'साइन इन गर्न तपाईंको गूगल खाता प्रयोग गर्नुहोस्। भूमिका-आधारित पहुँच तपाईंको प्रशासकद्वारा व्यवस्थापित छ।'
                 }
               </p>
             </div>
@@ -71,7 +71,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
             <button
               type="button"
               onClick={handleGoogleLogin}
-              disabled={isLoading}
+              disabled={isLoading || loading}
               className="w-full py-3 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-600 text-slate-700 dark:text-slate-200 text-sm font-bold rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <Chrome className="w-5 h-5 text-red-500" />
@@ -84,6 +84,15 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
                 <span>{language === 'en' ? 'Redirecting to Google...' : 'गूगलमा रिडाइरेक्ट हुँदै...'}</span>
               </div>
             )}
+
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center font-medium">
+                {language === 'en'
+                  ? 'Access roles: Superadmin, Admin, Data Updater, Viewer'
+                  : 'पहुँच भूमिकाहरू: सुपरएडमिन, प्रशासक, डाटा अपडेटर, दर्शक'
+                }
+              </p>
+            </div>
           </div>
         </div>
 
@@ -104,7 +113,8 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
         <p className="text-center text-[9px] text-slate-400 dark:text-slate-500 mt-4 font-medium">
           {language === 'en'
             ? 'By signing in, you agree to the Department of Roads guidelines.'
-            : 'साइन इन गरेर तपाईं सडक विभाग दिगो निर्देशिकामा सहमति जनाउनुभयो।'}
+            : 'साइन इन गरेर तपाईं सडक विभाग दिगो निर्देशिकामा सहमति जनाउनुभयो।'
+          }
         </p>
       </motion.div>
     </div>
