@@ -988,7 +988,10 @@ export const Overview: React.FC<OverviewProps> = ({
   useEffect(() => {
     const handleScroll = () => {
       if (!lastCardRef.current) return;
-      const headerHeight = window.innerWidth < 640 ? 150 : 170;
+      const isMobile = window.innerWidth < 640;
+      const baseHeaderHeight = isMobile ? 150 : 170;
+      const footerOffset = (isMobile && isFooterExpanded) ? 200 : 0;
+      const headerHeight = baseHeaderHeight + footerOffset;
       const cardRect = lastCardRef.current.getBoundingClientRect();
       const reached = cardRect.bottom <= headerHeight;
       setCardsReachedHeader(reached);
@@ -998,7 +1001,7 @@ export const Overview: React.FC<OverviewProps> = ({
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [onCardsReachedHeader]);
+  }, [onCardsReachedHeader, isFooterExpanded]);
 
   useEffect(() => {
     if (cardsReachedHeader) {
@@ -1228,7 +1231,23 @@ export const Overview: React.FC<OverviewProps> = ({
 
    return (
       <div className="relative min-h-screen space-y-4 max-w-7xl mx-auto px-0 sm:px-3">
-       <AnimatePresence>
+        <style>{`
+          .expanded-content-mobile {
+            max-height: 55vh;
+            overflow-y: auto;
+          }
+          @media (min-width: 640px) {
+            .expanded-content-mobile {
+              max-height: 60vh;
+            }
+          }
+          @media (min-width: 1024px) {
+            .expanded-content-mobile {
+              max-height: 65vh;
+            }
+          }
+        `}</style>
+        <AnimatePresence>
          {showSplash && (
            <motion.div
              initial={{ opacity: 0 }}
