@@ -1439,14 +1439,9 @@ export const Overview: React.FC<OverviewProps> = ({
           {/* Metrics & Gauge Row */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full bg-indigo-900/5 dark:bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-indigo-100 dark:border-white/10">
               <div className="flex flex-col gap-2">
-                <div className="flex items-baseline gap-3">
-                  <span className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-                    {fmt(stats.weightedRate)}%
-                  </span>
-                  <span className="text-xs font-extrabold text-indigo-700 dark:text-indigo-300 uppercase tracking-widest bg-indigo-100 dark:bg-indigo-500/20 px-2.5 py-1 rounded-lg border border-indigo-200 dark:border-indigo-500/30">
-                    {language === 'en' ? 'Weighted Completion' : 'भारित सफलता'}
-                  </span>
-                </div>
+                <span className="text-xs font-extrabold text-indigo-700 dark:text-indigo-300 uppercase tracking-widest bg-indigo-100 dark:bg-indigo-500/20 px-2.5 py-1 rounded-lg border border-indigo-200 dark:border-indigo-500/30">
+                  {language === 'en' ? 'Weighted Completion' : 'भारित सफलता'}
+                </span>
 
                 {/* Quick Status Badges */}
               <div className="flex flex-wrap items-center gap-2 text-xs font-extrabold">
@@ -1475,7 +1470,7 @@ export const Overview: React.FC<OverviewProps> = ({
                   className="text-indigo-600 dark:text-indigo-400"
                   strokeWidth="10"
                   strokeLinecap="round"
-                  strokeDasharray={`${2 * Math.PI * 42} ${2 * Math.PI * 42}`}
+                  strokeDasharray={`${2 * Math.PI * 42 * stats.weightedRate / 100} ${2 * Math.PI * 42 * (100 - stats.weightedRate) / 100}`}
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center font-black text-xs text-indigo-700 dark:text-indigo-200">
@@ -1485,14 +1480,13 @@ export const Overview: React.FC<OverviewProps> = ({
           </div>
 
           {/* Bottom Action Footer */}
-          <div className="flex items-center justify-between text-xs font-extrabold text-slate-600 dark:text-indigo-200/80 pt-2 border-t border-slate-200/80 dark:border-white/10">
-            <div className="flex items-center gap-3">
-              <span>{language === 'en' ? 'Total Indicators:' : 'कुल सूचकहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(stats.total)}</strong></span>
-              <span>•</span>
-              <span>{language === 'en' ? 'Reporting Offices:' : 'रिपोर्टिङ कार्यालयहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(reportingOffices.length)}</strong></span>
-            </div>
-            <div className="flex items-center gap-1 text-indigo-600 dark:text-indigo-300 font-bold group-hover:text-indigo-800 dark:group-hover:text-white transition-colors">
-              <ChevronDown size={14} className={`transform transition-transform ${showOverallProgress ? 'rotate-180' : ''}`} />
+          <div className="flex flex-col gap-1.5 text-xs font-extrabold text-slate-600 dark:text-indigo-200/80 pt-2 border-t border-slate-200/80 dark:border-white/10">
+            <span>{language === 'en' ? 'Total Indicators:' : 'कुल सूचकहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(stats.total)}</strong></span>
+            <span>{language === 'en' ? 'Reporting Offices:' : 'रिपोर्टिङ कार्यालयहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(reportingOffices.length)}</strong></span>
+            <div className="flex justify-end">
+              <div className="flex items-center gap-1 text-indigo-600 dark:text-indigo-300 font-bold group-hover:text-indigo-800 dark:group-hover:text-white transition-colors">
+                <ChevronDown size={14} className={`transform transition-transform ${showOverallProgress ? 'rotate-180' : ''}`} />
+              </div>
             </div>
           </div>
         </div>
