@@ -22,6 +22,8 @@ interface FooterProps {
   hasNewUpdate?: boolean;
   onRefresh?: () => void;
   canGiveFeedback?: boolean;
+  pendingWrites?: Array<{ id: string; name: string; nameEn?: string }>;
+  hasPendingWrites?: boolean;
 }
 
 export const Footer: React.FC<FooterProps> = ({ 
@@ -41,6 +43,8 @@ export const Footer: React.FC<FooterProps> = ({
   hasNewUpdate = false,
   onRefresh,
   canGiveFeedback,
+  pendingWrites = [],
+  hasPendingWrites = false,
 }) => {
   const { language, t } = useLanguage();
   const [showQr, setShowQr] = useState(false);
@@ -54,6 +58,7 @@ export const Footer: React.FC<FooterProps> = ({
   const [updateBannerVisible, setUpdateBannerVisible] = useState(false);
   const [showLastSynced, setShowLastSynced] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showSyncDropdown, setShowSyncDropdown] = useState(false);
   
   const shouldExpand = isExpanded || isHovered;
   
@@ -125,7 +130,22 @@ export const Footer: React.FC<FooterProps> = ({
     { name: 'Instagram', icon: Instagram, color: 'text-pink-600', url: `https://www.instagram.com/` },
   ];
 
+  const handleSyncClick = () => {
+    setShowSyncDropdown(prev => !prev);
+  };
+
+  const handleQuickSync = async () => {
+    setShowSyncDropdown(false);
+    await onManualSync?.();
+    setSyncSuccess(true);
+    setTimeout(() => setSyncSuccess(false), 3000);
+    setShowLastSynced(true);
+    setTimeout(() => setShowLastSynced(false), 3000);
+    setTimeout(updateMinutesAgo, 500);
+  };
+
   const handleFullRefresh = async () => {
+    setShowSyncDropdown(false);
     try {
       await caches?.delete?.('dorpts-v1');
     } catch (_) {}
@@ -188,7 +208,7 @@ export const Footer: React.FC<FooterProps> = ({
     { 
       id: 'btn-sync', 
       icon: RefreshCw, 
-      action: handleFullRefresh 
+      action: handleSyncClick 
     },
   ];
 
@@ -291,50 +311,103 @@ export const Footer: React.FC<FooterProps> = ({
                             )}
                           </AnimatePresence>
                         )}
-                         <button
-                           id={item.id}
-                           onClick={(e) => { e.stopPropagation(); item.action(); }}
-                           onMouseEnter={() => { if (item.id === 'btn-share') setIsQrHovered(true); }}
-                           onMouseLeave={() => { if (item.id === 'btn-share') setIsQrHovered(false); }}
-                           className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl transition-all active:scale-95 cursor-pointer border relative ${
-                             item.id === 'btn-menu'
-                               ? 'bg-white/70 dark:bg-white/5 backdrop-blur-xl border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700'
-                              : item.id === 'btn-ai'
-                                ? 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white border-indigo-500/50 shadow-md shadow-indigo-600/30 hover:scale-105'
-                                : item.id === 'btn-install'
-                                  ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
-                                  : item.id === 'btn-messaging'
-                                    ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
-                                    : item.id === 'btn-calendar'
-                                      ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
-                                      : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
-                           }`}
-                           title={
-                             item.id === 'btn-menu'
-                               ? (language === 'en' ? 'Open Menu' : 'मेनु खोल्नुहोस्')
+                          <button
+                            id={item.id}
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              if (item.id === 'btn-sync') {
+                                handleSyncClick();
+                              } else {
+                                item.action();
+                              }
+                            }}
+                            onMouseEnter={() => { if (item.id === 'btn-share') setIsQrHovered(true); }}
+                            onMouseLeave={() => { if (item.id === 'btn-share') setIsQrHovered(false); }}
+                            className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl transition-all active:scale-95 cursor-pointer border relative ${
+                              item.id === 'btn-menu'
+                                ? 'bg-white/70 dark:bg-white/5 backdrop-blur-xl border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700'
                                : item.id === 'btn-ai'
-                                 ? (language === 'en' ? 'AI Assistant' : 'एआई सहायक')
-                                 : item.id === 'btn-sync'
-                                   ? (language === 'en' ? 'Refresh' : 'रिफ्रेस')
-                                   : item.id === 'btn-install'
-                                     ? (language === 'en' ? 'Install App' : 'अप्लिकेसन इन्स्टल गर्नुहोस्')
-                                     : item.id === 'btn-messaging'
-                                       ? (language === 'en' ? 'Messages' : 'सन्देशहरू')
-                                       : item.id === 'btn-calendar'
-                                         ? (language === 'en' ? 'Calendar' : 'क्यालेन्डर')
-                                         : ''
-                           }
-                        >
-                           {item.id === 'btn-ai' && (
-                             <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                               <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                             </span>
-                           )}
-                           <item.icon size={18} strokeWidth={2.5} className={`${item.id === 'btn-ai' ? 'text-white' : item.id === 'btn-install' ? 'text-indigo-700 dark:text-indigo-300' : item.id === 'btn-messaging' ? 'text-indigo-700 dark:text-indigo-300' : item.id === 'btn-calendar' ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'} sm:size-[20px] transition-colors shrink-0 ${item.id === 'btn-sync' && isSyncing ? 'animate-spin' : ''}`} />
-                        </button>
-                      </div>
-                    ))}
+                                 ? 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white border-indigo-500/50 shadow-md shadow-indigo-600/30 hover:scale-105'
+                                 : item.id === 'btn-install'
+                                   ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
+                                   : item.id === 'btn-messaging'
+                                     ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
+                                     : item.id === 'btn-calendar'
+                                       ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
+                                       : item.id === 'btn-sync'
+                                         ? hasPendingWrites
+                                           ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-300 hover:border-amber-500/50'
+                                           : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
+                                       : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
+                            }`}
+                            title={
+                              item.id === 'btn-menu'
+                                ? (language === 'en' ? 'Open Menu' : 'मेनु खोल्नुहोस्')
+                                : item.id === 'btn-ai'
+                                  ? (language === 'en' ? 'AI Assistant' : 'एआई सहायक')
+                                  : item.id === 'btn-sync'
+                                    ? (language === 'en' ? 'Sync' : 'सिङ्क')
+                                    : item.id === 'btn-install'
+                                      ? (language === 'en' ? 'Install App' : 'अप्लिकेसन इन्स्टल गर्नुहोस्')
+                                      : item.id === 'btn-messaging'
+                                        ? (language === 'en' ? 'Messages' : 'सन्देशहरू')
+                                        : item.id === 'btn-calendar'
+                                          ? (language === 'en' ? 'Calendar' : 'क्यालेन्डर')
+                                          : ''
+                            }
+                         >
+                            {item.id === 'btn-ai' && (
+                              <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                              </span>
+                            )}
+                            {item.id === 'btn-sync' && hasPendingWrites && (
+                              <span className="absolute -top-1 -right-1 flex h-4 w-4 z-10">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                                <span className="relative inline-flex rounded-full h-4 w-4 bg-amber-500 text-[9px] font-black text-white items-center justify-center shadow-md border border-white dark:border-slate-900">
+                                  {pendingWrites.length}
+                                </span>
+                              </span>
+                            )}
+                             <item.icon size={18} strokeWidth={2.5} className={`${item.id === 'btn-ai' ? 'text-white' : item.id === 'btn-install' ? 'text-indigo-700 dark:text-indigo-300' : item.id === 'btn-messaging' ? 'text-indigo-700 dark:text-indigo-300' : item.id === 'btn-calendar' ? 'text-indigo-700 dark:text-indigo-300' : item.id === 'btn-sync' && hasPendingWrites ? 'text-amber-700 dark:text-amber-300' : 'text-slate-700 dark:text-slate-300'} sm:size-[20px] transition-colors shrink-0 ${item.id === 'btn-sync' && isSyncing ? 'animate-spin' : ''}`} />
+                          </button>
+                          {item.id === 'btn-sync' && showSyncDropdown && (
+                            <AnimatePresence>
+                              <motion.div
+                                initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                                transition={{ duration: 0.15 }}
+                                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden"
+                              >
+                                <div className="p-2 space-y-1">
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleQuickSync(); }}
+                                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-500/15 transition-colors"
+                                  >
+                                    <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
+                                    {language === 'en' ? 'Sync Now' : 'अहिले सिङ्क गर्नुहोस्'}
+                                  </button>
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleFullRefresh(); }}
+                                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-500/15 transition-colors"
+                                  >
+                                    <X size={14} />
+                                    {language === 'en' ? 'Full Refresh' : 'पूरा रिफ्रेस'}
+                                  </button>
+                                </div>
+                                <div className="px-3 py-2 border-t border-slate-100 dark:border-slate-800">
+                                  <p className="text-[10px] text-slate-400 font-medium">
+                                    {language === 'en' ? 'Last synced' : 'अन्तिम सिङ्क'}
+                                    {minutesAgo !== null ? `: ${minutesAgo === 0 ? (language === 'en' ? 'just now' : 'अहिले') : `${language === 'en' ? `${minutesAgo}m ago` : `${minutesAgo} मिनेट पहिले`}`}` : ''}
+                                  </p>
+                                </div>
+                              </motion.div>
+                            </AnimatePresence>
+                          )}
+                       </div>
+                     ))}
                  </div>
                </div>
 

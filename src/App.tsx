@@ -3614,7 +3614,9 @@ function MainAppContent() {
              }}
              canGiveFeedback={!user || role === 'viewer'}
              onOpenMessaging={() => handleMainViewChange('messaging')}
-           />
+             pendingWrites={pendingWrites}
+             hasPendingWrites={pendingWrites.length > 0}
+            />
 
         {/* Dim Overlay - Outside scaled content */}
         <AnimatePresence>
