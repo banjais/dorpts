@@ -1554,6 +1554,7 @@ export const Overview: React.FC<OverviewProps> = ({
               : catName === 'Infrastructure Creation' ? 'पूर्वाधार निर्माण'
               : catName === 'Maintenance' ? 'मर्मत सम्भार'
               : catName === 'Employment Creation' ? 'रोजगार सिर्जना'
+              : catName === 'Governance' ? 'सुशासन'
               : 'बजेट उपयोग';
             return (
               <div key={catName} className="p-2.5 rounded-xl bg-slate-50/90 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between shadow-xs hover:border-cyan-200 dark:hover:border-cyan-800 transition-colors">
