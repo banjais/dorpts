@@ -29,7 +29,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, l
     
     try {
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timed out. Please try again.')), 10000)
+        setTimeout(() => reject(new Error('Network timeout. Check your internet connection or disable ad blockers, then retry.')), 15000)
       );
       
       await Promise.race([
@@ -53,7 +53,10 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, l
     } catch (error: any) {
       console.error('Error submitting feedback:', error);
       setStatus('error');
-      setErrorMessage(error?.message || 'Failed to submit feedback');
+      const msg = error?.message || 'Failed to submit feedback';
+      setErrorMessage(msg.includes('timeout') || msg.includes('network') || msg.includes('fetch')
+        ? 'Cannot reach server. Check your connection or disable ad blockers, then retry.'
+        : msg);
       triggerHaptic('warning');
     } finally {
       setIsSubmitting(false);
@@ -112,9 +115,18 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, l
                 />
                 
                 {status === 'error' && (
-                  <div className="flex items-center gap-2 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/50 rounded-lg px-3 py-2 mb-4">
-                    <AlertCircle className="text-rose-500 shrink-0" size={16} />
-                    <p className="text-xs font-medium text-rose-700 dark:text-rose-400">{errorMessage}</p>
+                  <div className="flex items-start gap-2 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/50 rounded-lg px-3 py-2 mb-4">
+                    <AlertCircle className="text-rose-500 shrink-0 mt-0.5" size={16} />
+                    <div className="flex-1">
+                      <p className="text-xs font-medium text-rose-700 dark:text-rose-400">{errorMessage}</p>
+                      <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting || !feedback.trim()}
+                        className="mt-2 text-[10px] font-black text-rose-700 dark:text-rose-300 underline underline-offset-2 disabled:opacity-50"
+                      >
+                        {language === 'en' ? 'Retry' : 'फेरि प्रयास गर्नुहोस्'}
+                      </button>
+                    </div>
                   </div>
                 )}
 
