@@ -1790,16 +1790,13 @@ export const Overview: React.FC<OverviewProps> = ({
           <span className="p-2 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl shadow-md shadow-indigo-500/30 shrink-0">
             <ImageIcon size={16} className="text-white" />
           </span>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-500/20 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-500/30">0</span>
-            <div>
-              <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100">
-                {language === 'en' ? 'Detailed Gallery' : 'विस्तृत ग्यालेरी'}
-              </span>
-              <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                {language === 'en' ? 'Full Indicators View' : 'पूर्ण सूचक अवलोकन'}
-              </p>
-            </div>
+          <div>
+            <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100">
+              {language === 'en' ? 'Detailed Gallery' : 'विस्तृत ग्यालेरी'}
+            </span>
+            <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
+              {language === 'en' ? 'Full Indicators View' : 'पूर्ण सूचक अवलोकन'}
+            </p>
           </div>
         </div>
 
