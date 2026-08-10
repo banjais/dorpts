@@ -1217,7 +1217,7 @@ export const Overview: React.FC<OverviewProps> = ({
       totalTarget,
       totalProgress: totalProgress > 0 ? totalProgress : 12.4,
       percentage,
-      unit: list[0]?.unit || (language === 'en' ? 'Billion NPR' : 'अर्ब रुपैयाँ'),
+      unit: translateUnit(list[0]?.unit || (language === 'en' ? 'Billion NPR' : 'अर्ब रुपैयाँ')),
     };
   }, [indicators, language]);
 
@@ -1237,7 +1237,7 @@ export const Overview: React.FC<OverviewProps> = ({
       totalTarget,
       totalProgress: totalProgress > 0 ? totalProgress : 14250,
       percentage,
-      unit: list[0]?.unit || (language === 'en' ? 'Person Days' : 'व्यक्ति दिन'),
+      unit: translateUnit(list[0]?.unit || (language === 'en' ? 'Person Days' : 'व्यक्ति दिन')),
     };
   }, [indicators, language]);
 
