@@ -2258,53 +2258,42 @@ export const Overview: React.FC<OverviewProps> = ({
                         </div>
                       </div>
 
-                      <div className="space-y-2 pt-2">
-                        <h4 className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 tracking-wider">
-                          {language === 'en' ? 'Indicator Status Details' : 'सूचकहरूको कार्यसम्पादन स्थिति विवरण'}
-                        </h4>
-                        <div className="space-y-2 max-h-[340px] overflow-y-auto pr-1">
-                          {indicators.map((ind) => {
-                            if (!ind) return null;
-                            const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
-                            const statusColor = pct >= 80 
-                              ? 'bg-emerald-500 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' 
-                              : pct >= 40 
-                              ? 'bg-amber-500 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800' 
-                              : 'bg-rose-500 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800';
-                            
-                            const badgeLabel = pct >= 80 
-                              ? (language === 'en' ? 'On Track' : 'सफल') 
-                              : pct >= 40 
-                              ? (language === 'en' ? 'Below Target' : 'मध्यम') 
-                              : (language === 'en' ? 'Critical' : 'गम्भीर');
-
-                            return (
-                              <div key={ind.id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-3 shadow-2xs">
-                                <div className="space-y-1 min-w-0 flex-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-[10px] font-bold text-slate-400">#{ind.id}</span>
-                                    <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${statusColor.split(' ').slice(1).join(' ')}`}>
-                                      {badgeLabel}
-                                    </span>
-                                  </div>
-                                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                                    {language === 'en' ? (ind.nameEn || ind.name) : ind.name}
-                                  </p>
-                                  <div className="flex items-center gap-3 text-[10px] text-slate-500 dark:text-slate-400">
-                                    <span>{language === 'en' ? 'Progress:' : 'प्रगति:'} {fmt(ind.annualProgress)} / {fmt(ind.annualTarget)} {translateUnit(ind.unit)}</span>
-                                  </div>
-                                </div>
-                                <div className="shrink-0 text-right">
-                                  <span className="text-sm font-black text-slate-900 dark:text-white block">{pct}%</span>
-                                  <div className="w-16 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1">
-                                    <div className={`h-full ${statusColor.split(' ')[0]}`} style={{ width: `${pct}%` }} />
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
+                       <div className="space-y-2 pt-2">
+                         <h4 className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 tracking-wider">
+                           {language === 'en' ? 'Indicators by Category' : 'वर्ग अनुसार सूचकहरू'}
+                         </h4>
+                         <div className="space-y-2 max-h-[340px] overflow-y-auto pr-1">
+                           {STANDARD_CATEGORIES.map((cat) => {
+                             const catIndicators = indicators.filter(i => i && normalizeCategory(i.category) === cat);
+                             if (catIndicators.length === 0) return null;
+                             const colorObj = getCategoryColor(cat);
+                             
+                             return (
+                               <div key={cat} className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                                 <div className="flex items-center gap-2 mb-2">
+                                   <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: colorObj.hex }} />
+                                   <span className="text-xs font-black text-slate-800 dark:text-slate-200">
+                                     {translateCategory(cat)}
+                                   </span>
+                                   <span className="text-[10px] font-bold text-slate-400 ml-auto">
+                                     {catIndicators.length} {language === 'en' ? 'items' : 'वस्तुहरू'}
+                                   </span>
+                                 </div>
+                                 <div className="flex flex-wrap gap-1.5">
+                                   {catIndicators.map((ind) => (
+                                     <span
+                                       key={ind.id}
+                                       className="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                                     >
+                                       {language === 'en' ? (ind.nameEn || ind.name) : ind.name}
+                                     </span>
+                                   ))}
+                                 </div>
+                               </div>
+                             );
+                           })}
+                         </div>
+                       </div>
                     </div>
                   )}
 
