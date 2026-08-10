@@ -923,6 +923,17 @@ export const Overview: React.FC<OverviewProps> = ({
     });
   }, []);
 
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.cardId) {
+        handleDismissCard(detail.cardId);
+      }
+    };
+    window.addEventListener('dismiss-card', handler as EventListener);
+    return () => window.removeEventListener('dismiss-card', handler as EventListener);
+  }, [handleDismissCard]);
+
   const handleRestoreCard = useCallback((cardId: string) => {
     setDismissedCards((prev) => {
       const next = new Set(prev);

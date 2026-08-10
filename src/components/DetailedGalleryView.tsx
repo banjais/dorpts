@@ -69,7 +69,6 @@ interface DetailedGalleryViewProps {
   onCardsReachedHeader?: (reached: boolean) => void;
   onCardsHidden?: (hidden: boolean) => void;
   onNavigateToView?: (view: string, defaultTab?: string) => void;
-  onDismissCard?: (cardId: string) => void;
   onSpeakDashboardSummary?: () => void;
 }
 
@@ -431,7 +430,6 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
   onCardsReachedHeader,
   onCardsHidden,
   onNavigateToView,
-  onDismissCard,
   onSpeakDashboardSummary,
 }) => {
   const { language, t, translateUnit, translateOffice } = useLanguage();
@@ -789,7 +787,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
           <button
             onClick={() => {
               onNavigateToView('dashboard');
-              onDismissCard?.('detailed-gallery');
+              window.dispatchEvent(new CustomEvent('dismiss-card', { detail: { cardId: 'detailed-gallery' } }));
             }}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
             title={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}

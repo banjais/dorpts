@@ -24,7 +24,6 @@ interface VisualInsightsViewProps {
   onOpenAbout?: (tab?: string) => void;
   defaultInsightTab?: 'health' | 'category' | 'indicators' | 'trends' | 'heatmap';
   onNavigateToView?: (view: string) => void;
-  onDismissCard?: (cardId: string) => void;
 }
 
 export const VisualInsightsView: React.FC<VisualInsightsViewProps> = ({
@@ -34,7 +33,6 @@ export const VisualInsightsView: React.FC<VisualInsightsViewProps> = ({
   onOpenAbout,
   defaultInsightTab = 'health',
   onNavigateToView,
-  onDismissCard,
 }) => {
   const { language, t } = useLanguage();
   const [insightTab, setInsightTab] = useState<'health' | 'category' | 'indicators' | 'trends' | 'heatmap'>(defaultInsightTab);
@@ -69,7 +67,7 @@ export const VisualInsightsView: React.FC<VisualInsightsViewProps> = ({
             <button
               onClick={() => {
                 onNavigateToView('dashboard');
-                onDismissCard?.('visual-insights');
+                window.dispatchEvent(new CustomEvent('dismiss-card', { detail: { cardId: 'visual-insights' } }));
               }}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
               title={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
