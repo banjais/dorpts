@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   LineChart as LineChartIcon,
   Activity,
+  Minimize2,
 } from 'lucide-react';
 import { PortfolioHealthChart } from './PortfolioHealthChart';
 import { IndicatorHeatmap } from './IndicatorHeatmap';
@@ -22,6 +23,7 @@ interface VisualInsightsViewProps {
   updatesHistory?: any[];
   onOpenAbout?: (tab?: string) => void;
   defaultInsightTab?: 'health' | 'category' | 'indicators' | 'trends' | 'heatmap';
+  onNavigateToView?: (view: string) => void;
 }
 
 export const VisualInsightsView: React.FC<VisualInsightsViewProps> = ({
@@ -30,6 +32,7 @@ export const VisualInsightsView: React.FC<VisualInsightsViewProps> = ({
   updatesHistory = [],
   onOpenAbout,
   defaultInsightTab = 'health',
+  onNavigateToView,
 }) => {
   const { language, t } = useLanguage();
   const [insightTab, setInsightTab] = useState<'health' | 'category' | 'indicators' | 'trends' | 'heatmap'>(defaultInsightTab);
@@ -46,18 +49,30 @@ export const VisualInsightsView: React.FC<VisualInsightsViewProps> = ({
     <div className="bg-white dark:bg-slate-900 rounded-[28px] border border-slate-100 dark:border-slate-800 shadow-xl shadow-indigo-500/10 dark:shadow-indigo-500/5 overflow-hidden">
       <div className="px-5 sm:px-6 py-5 space-y-3">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <span className="p-2 bg-indigo-500 text-white rounded-xl">
-            <BarChart3 size={18} />
-          </span>
-          <div>
-            <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
-              {language === 'en' ? 'Visual Insights' : 'दृश्यात्मक अन्तर्दृष्टि'}
-            </h2>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              {language === 'en' ? 'Optional charts & analytics' : 'वैकल्पिक चार्ट र विश्लेषण'}
-            </p>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="p-2 bg-indigo-500 text-white rounded-xl">
+              <BarChart3 size={18} />
+            </span>
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                {language === 'en' ? 'Visual Insights' : 'दृश्यात्मक अन्तर्दृष्टि'}
+              </h2>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                {language === 'en' ? 'Optional charts & analytics' : 'वैकल्पिक चार्ट र विश्लेषण'}
+              </p>
+            </div>
           </div>
+          {onNavigateToView && (
+            <button
+              onClick={() => onNavigateToView('dashboard')}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
+              title={language === 'en' ? 'Back to Home' : 'गृहपृष्ठमा फर्कनुहोस्'}
+            >
+              <Minimize2 size={14} className="text-indigo-600 dark:text-indigo-400" />
+              <span className="uppercase tracking-wider">{language === 'en' ? 'Home' : 'गृहपृष्ठ'}</span>
+            </button>
+          )}
         </div>
 
         {/* Chart type tabs */}

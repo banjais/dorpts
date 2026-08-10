@@ -3338,16 +3338,17 @@ function MainAppContent() {
                                 </div>
                               }
                             >
-                              <VisualInsightsView
-                                indicators={indicators}
-                                metadata={metadata}
-                                updatesHistory={visibleHistory}
-                                onOpenAbout={(tab) => {
-                                  if (tab) setAboutModalTab(tab as any);
-                                  setIsAboutModalOpen(true);
-                                }}
-                                defaultInsightTab={insightsDefaultTab}
-                              />
+                               <VisualInsightsView
+                                 indicators={indicators}
+                                 metadata={metadata}
+                                 updatesHistory={visibleHistory}
+                                 onOpenAbout={(tab) => {
+                                   if (tab) setAboutModalTab(tab as any);
+                                   setIsAboutModalOpen(true);
+                                 }}
+                                 defaultInsightTab={insightsDefaultTab}
+                                 onNavigateToView={handleMainViewChange}
+                               />
                             </ErrorBoundary>
                           )}
  

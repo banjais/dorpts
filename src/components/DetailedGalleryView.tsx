@@ -23,6 +23,7 @@ import {
   Building2,
   Calculator,
   Database,
+  Minimize2,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -768,18 +769,30 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
       `}</style>
 
       {/* Header */}
-      <div className="flex items-center gap-3 pt-4 pb-2">
-        <span className="p-2 bg-indigo-500 text-white rounded-xl">
-          <LayoutGrid size={18} />
-        </span>
-        <div>
-          <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
-            {language === 'en' ? 'Detailed Gallery' : 'विस्तृत ग्यालरी'}
-          </h2>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400">
-            {language === 'en' ? `${stats.total} indicators tracked` : `${stats.total} सूचकहरू ट्र्याक गरिएको`}
-          </p>
+      <div className="flex items-center justify-between gap-3 pt-4 pb-2">
+        <div className="flex items-center gap-3">
+          <span className="p-2 bg-indigo-500 text-white rounded-xl">
+            <LayoutGrid size={18} />
+          </span>
+          <div>
+            <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">
+              {language === 'en' ? 'Detailed Gallery' : 'विस्तृत ग्यालरी'}
+            </h2>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              {language === 'en' ? `${stats.total} indicators tracked` : `${stats.total} सूचकहरू ट्र्याक गरिएको`}
+            </p>
+          </div>
         </div>
+        {onNavigateToView && (
+          <button
+            onClick={() => onNavigateToView('dashboard')}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
+            title={language === 'en' ? 'Back to Home' : 'गृहपृष्ठमा फर्कनुहोस्'}
+          >
+            <Minimize2 size={14} className="text-indigo-600 dark:text-indigo-400" />
+            <span className="uppercase tracking-wider">{language === 'en' ? 'Home' : 'गृहपृष्ठ'}</span>
+          </button>
+        )}
       </div>
 
       {/* Summary Stats Row */}
