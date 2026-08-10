@@ -1923,24 +1923,24 @@ export const Overview: React.FC<OverviewProps> = ({
          defaultTab="indicators"
        />
 
-        {/* Device-Adaptive Modal Overlay for Card Expansion with Reduce Option */}
-        <AnimatePresence>
-          {activeExpandedModalCardId && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[9990] flex items-center justify-center bg-slate-950/30 md:bg-slate-950/80 backdrop-blur-sm md:backdrop-blur-md p-2 sm:p-3 md:p-6 overflow-y-auto"
-              onClick={() => setActiveExpandedModalCardId(null)}
-            >
-              <motion.div
-                initial={{ scale: 0.93, opacity: 0, y: 15 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.93, opacity: 0, y: 15 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 280 }}
-                onClick={(e) => e.stopPropagation()}
-                className="relative w-full max-w-4xl max-h-[75dvh] sm:max-h-[90dvh] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto"
-              >
+         {/* Device-Adaptive Modal Overlay for Card Expansion with Reduce Option */}
+         <AnimatePresence>
+           {activeExpandedModalCardId && (
+             <motion.div
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               className="fixed inset-0 z-[9990] flex items-start justify-center bg-slate-950/30 md:bg-slate-950/80 backdrop-blur-sm md:backdrop-blur-md p-2 sm:p-3 md:p-6 overflow-y-auto"
+               onClick={() => setActiveExpandedModalCardId(null)}
+             >
+               <motion.div
+                 initial={{ scale: 0.93, opacity: 0, y: 15 }}
+                 animate={{ scale: 1, opacity: 1, y: 0 }}
+                 exit={{ scale: 0.93, opacity: 0, y: 15 }}
+                 transition={{ type: 'spring', damping: 25, stiffness: 280 }}
+                 onClick={(e) => e.stopPropagation()}
+                 className="relative w-full max-w-4xl max-h-[70dvh] sm:max-h-[80dvh] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col mt-4 sm:mt-6 md:mt-8"
+               >
                {/* Sticky Header with Title and Prominent REDUCE option */}
                <div className="sticky top-0 z-20 flex items-center justify-between p-2.5 sm:p-3 md:p-5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/80">
                  <div className="flex items-center gap-3">
@@ -1992,11 +1992,11 @@ export const Overview: React.FC<OverviewProps> = ({
                   )}
                </div>
 
-                {/* Scrollable Expanded View Content */}
-                  <div className="flex-1 min-h-0 p-2 sm:p-3 md:p-5 overflow-y-auto space-y-2 sm:space-y-3 md:space-y-6 custom-scrollbar">
-                 {/* Card 0: Overall Progress Performance Expanded Modal */}
-                 {activeExpandedModalCardId === 'overall-progress' && (
-                   <div className="space-y-6">
+                 {/* Scrollable Expanded View Content */}
+                   <div className="flex-1 min-h-0 p-2 sm:p-3 md:p-4 overflow-y-auto space-y-2 sm:space-y-3 custom-scrollbar">
+                  {/* Card 0: Overall Progress Performance Expanded Modal */}
+                  {activeExpandedModalCardId === 'overall-progress' && (
+                    <div className="space-y-3">
                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                        <div className="md:col-span-1 bg-gradient-to-br from-indigo-500 to-indigo-700 text-white rounded-2xl p-5 shadow-lg flex flex-col justify-between items-center text-center">
                          <span className="text-xs font-bold uppercase tracking-widest text-indigo-100">
@@ -2197,9 +2197,9 @@ export const Overview: React.FC<OverviewProps> = ({
                    </div>
                  )}
 
-                 {/* Card 1: Category Status Modal */}
-                 {activeExpandedModalCardId === 'category-status' && (
-                   <div className="space-y-4">
+                  {/* Card 1: Category Status Modal */}
+                  {activeExpandedModalCardId === 'category-status' && (
+                    <div className="space-y-3">
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                        {STANDARD_CATEGORIES.map((cat) => {
                          const catIndicators = indicators.filter(i => i && normalizeCategory(i.category) === cat);
@@ -2235,7 +2235,7 @@ export const Overview: React.FC<OverviewProps> = ({
 
                   {/* Card 2: Performance Status Breakdown Modal */}
                   {activeExpandedModalCardId === 'status-breakdown' && (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <div className="grid grid-cols-3 gap-3 text-center">
                         <div className="bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-200/50">
                           <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-300 block">{language === 'en' ? 'On Track (≥80%)' : 'लक्ष्य अनुरूप (≥८०%)'}</span>
@@ -2303,7 +2303,7 @@ export const Overview: React.FC<OverviewProps> = ({
 
                   {/* Card 4: Reporting Offices Modal */}
                   {activeExpandedModalCardId === 'reporting-offices' && (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {/* Explanation Info Banner */}
                       <div className="bg-indigo-50/70 dark:bg-indigo-950/40 p-3 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 flex items-start gap-2.5 text-xs text-indigo-950 dark:text-indigo-200">
                         <Info size={15} className="text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
@@ -2374,10 +2374,10 @@ export const Overview: React.FC<OverviewProps> = ({
                     </div>
                   )}
 
-                 {/* Card 5: Budget Utilization Modal */}
-                 {activeExpandedModalCardId === 'budget-card' && (
-                   <div className="space-y-4">
-                     <div className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-5 rounded-2xl shadow-lg flex justify-between items-center">
+                  {/* Card 5: Budget Utilization Modal */}
+                  {activeExpandedModalCardId === 'budget-card' && (
+                    <div className="space-y-3">
+                      <div className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-4 rounded-2xl shadow-lg flex justify-between items-center">
                        <div>
                          <span className="text-xs font-bold text-blue-200 uppercase tracking-wider block">{language === 'en' ? 'Live Sheet Budget Progress' : 'प्रत्यक्ष बजेट प्रगति'}</span>
                          <span className="text-3xl font-black mt-1 block">{fmt(budgetMetrics.totalProgress)} {budgetMetrics.unit}</span>
@@ -2406,10 +2406,10 @@ export const Overview: React.FC<OverviewProps> = ({
                    </div>
                  )}
 
-                 {/* Card 6: Employment Creation Modal */}
-                 {activeExpandedModalCardId === 'employment-card' && (
-                   <div className="space-y-4">
-                     <div className="bg-gradient-to-br from-teal-600 to-emerald-700 text-white p-5 rounded-2xl shadow-lg flex justify-between items-center">
+                  {/* Card 6: Employment Creation Modal */}
+                  {activeExpandedModalCardId === 'employment-card' && (
+                    <div className="space-y-3">
+                      <div className="bg-gradient-to-br from-teal-600 to-emerald-700 text-white p-4 rounded-2xl shadow-lg flex justify-between items-center">
                        <div>
                          <span className="text-xs font-bold text-teal-200 uppercase tracking-wider block">{language === 'en' ? 'Jobs / Person Days Created' : 'सिर्जित रोजगारी / व्यक्ति दिन'}</span>
                          <span className="text-3xl font-black mt-1 block">{fmt(employmentMetrics.totalProgress)}</span>
@@ -2438,9 +2438,9 @@ export const Overview: React.FC<OverviewProps> = ({
                    </div>
                  )}
 
-                 {/* Card 7: Visual Insights Gallery Modal */}
-                 {activeExpandedModalCardId === 'visual-insights-gallery' && (
-                   <div className="space-y-4">
+                  {/* Card 7: Visual Insights Gallery Modal */}
+                  {activeExpandedModalCardId === 'visual-insights-gallery' && (
+                    <div className="space-y-3">
                      <p className="text-xs text-slate-600 dark:text-slate-400 font-bold">
                        {language === 'en' ? 'Comprehensive visual gallery and analytics dashboard view.' : 'विस्तृत दृश्य ग्यालेरी र विश्लेषण ड्यासबोर्ड।'}
                      </p>
