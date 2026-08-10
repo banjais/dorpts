@@ -1475,19 +1475,6 @@ export const Overview: React.FC<OverviewProps> = ({
                 <Zap size={16} className="text-amber-600 dark:text-amber-400 animate-pulse" />
               </button>
 
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  triggerHaptic('light');
-                  setActiveExpandedModalCardId('overall-progress');
-                }}
-                className="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-500/30 hover:bg-indigo-200 dark:hover:bg-indigo-500/40 text-indigo-800 dark:text-indigo-200 border border-indigo-300 dark:border-indigo-500/40 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
-                title={language === 'en' ? 'Expand Card' : 'कार्ड विस्तृत गर्नुहोस्'}
-              >
-                <Maximize2 size={16} className="text-indigo-600 dark:text-indigo-300" />
-              </button>
-
               <div className="relative">
                 {showAudioControls && (
                   <div data-audio-controls className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 flex items-center gap-2 min-w-max">
@@ -1569,9 +1556,14 @@ export const Overview: React.FC<OverviewProps> = ({
           </div>
 
           {/* Bottom Action Footer */}
-          <div className="flex flex-col gap-0.5 text-[10px] sm:text-xs font-extrabold text-slate-600 dark:text-indigo-200/80 pt-1.5 border-t border-slate-200/80 dark:border-white/10">
-            <span>{language === 'en' ? 'Total Indicators:' : 'कुल सूचकहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(stats.total)}</strong></span>
-            <span>{language === 'en' ? 'Reporting Offices:' : 'रिपोर्टिङ कार्यालयहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(reportingOffices.length)}</strong></span>
+          <div className="flex items-center justify-between text-[10px] sm:text-xs font-extrabold text-slate-600 dark:text-indigo-200/80 pt-1.5 border-t border-slate-200/80 dark:border-white/10">
+            <div className="flex flex-col gap-0.5">
+              <span>{language === 'en' ? 'Total Indicators:' : 'कुल सूचकहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(stats.total)}</strong></span>
+              <span>{language === 'en' ? 'Reporting Offices:' : 'रिपोर्टिङ कार्यालयहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(reportingOffices.length)}</strong></span>
+            </div>
+            <div className="flex items-center gap-1 text-indigo-600 dark:text-indigo-300 font-bold">
+              <ChevronDown size={14} className={`transform transition-transform ${showOverallProgress ? 'rotate-180' : ''}`} />
+            </div>
           </div>
         </div>
       </motion.div>
