@@ -73,35 +73,6 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       active: false,
     }] : []),
     {
-      id: 'detailed-gallery',
-      icon: <Image size={18} />,
-      labelEn: 'Detailed Gallery',
-      labelNp: 'विस्तृत ग्यालरी',
-      onClick: () => {
-        onNavigate('detailed-gallery');
-        onClose();
-      },
-      active: activeView === 'detailed-gallery',
-    },
-    {
-      id: 'visual-insights',
-      icon: <BarChart3 size={18} />,
-      labelEn: 'Visual Insights',
-      labelNp: 'दृश्यात्मक अन्तर्दृष्टि',
-      onClick: onOpenVisualInsights,
-      active: activeView === 'insights',
-    },
-    {
-      id: 'action-portal',
-      icon: <ShieldCheck size={18} />,
-      labelEn: 'Action Portal',
-      labelNp: 'कार्य पोर्टल',
-      onClick: () => {
-        onExpandFooter?.();
-        onClose();
-      },
-    },
-    {
       id: 'announcements',
       icon: <Megaphone size={18} />,
       labelEn: 'Announcements',
