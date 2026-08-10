@@ -1967,38 +1967,25 @@ export const Overview: React.FC<OverviewProps> = ({
                    </div>
                  </div>
 
-                   {/* Prominent Home / Reduce Button */}
-                   {activeExpandedModalCardId === 'visual-insights-gallery' || activeExpandedModalCardId === 'detailed-gallery' ? (
-                     <button
-                       onClick={() => {
-                         setActiveExpandedModalCardId(null);
-                         if (activeExpandedModalCardId === 'visual-insights-gallery') {
-                           handleDismissCard('visual-insights');
-                         } else if (activeExpandedModalCardId === 'detailed-gallery') {
-                           handleDismissCard('detailed-gallery');
-                         }
-                       }}
-                       className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95"
-                       title={language === 'en' ? 'Back to Home' : 'गृहपृष्ठमा फर्कनुहोस्'}
-                     >
-                       <TrendingUp size={16} className="text-indigo-600 dark:text-indigo-400" />
-                       <span className="uppercase tracking-wider">{language === 'en' ? 'Home' : 'गृहपृष्ठ'}</span>
-                     </button>
-                   ) : (
-                     <button
-                       onClick={() => {
-                         setActiveExpandedModalCardId(null);
-                         if (activeExpandedModalCardId) {
-                           handleDismissCard(activeExpandedModalCardId);
-                         }
-                       }}
-                       className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95"
-                       title={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
-                     >
-                       <Minimize2 size={16} className="text-indigo-600 dark:text-indigo-400" />
-                       <span className="uppercase tracking-wider">{language === 'en' ? 'Reduce' : 'घटाउनुहोस्'}</span>
-                     </button>
-                   )}
+                   {/* Prominent Reduce Button */}
+                   <button
+                     onClick={() => {
+                       setActiveExpandedModalCardId(null);
+                       if (activeExpandedModalCardId) {
+                         const cardId = activeExpandedModalCardId === 'visual-insights-gallery'
+                           ? 'visual-insights'
+                           : activeExpandedModalCardId === 'detailed-gallery'
+                             ? 'detailed-gallery'
+                             : activeExpandedModalCardId;
+                         handleDismissCard(cardId);
+                       }
+                     }}
+                     className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95"
+                     title={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
+                   >
+                     <Minimize2 size={16} className="text-indigo-600 dark:text-indigo-400" />
+                     <span className="uppercase tracking-wider">{language === 'en' ? 'Reduce' : 'घटाउनुहोस्'}</span>
+                   </button>
                </div>
 
                  {/* Scrollable Expanded View Content */}
