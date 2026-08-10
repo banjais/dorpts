@@ -382,21 +382,16 @@ export const Header: React.FC<HeaderProps> = ({
                 )}
               </motion.div>
 
-               <div className="relative flex flex-col justify-center min-w-0 flex-1">
-                 <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                   <span className="text-xs sm:text-base font-black tracking-tight uppercase leading-tight truncate text-slate-800 dark:text-slate-100">
-                     {language === 'ne' ? 'प्रगति ट्र्याकर' : APP_TITLES.shortAppName[language]}
-                   </span>
-                   {fiscalYear && (
-                     <span className="text-[9px] sm:text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-1.5 py-0.5 rounded-md shrink-0 whitespace-nowrap">
-                       FY: {fiscalYear}
-                     </span>
-                   )}
-                 </div>
-                 <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate hidden xs:block sm:block">
-                   {language === 'en' ? 'Performance Tracking System' : 'प्रगति ट्र्याकिङ सिस्टम'}
-                 </span>
-               </div>
+                <div className="relative flex flex-col justify-center min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                    <span className="text-xs sm:text-base font-black tracking-tight uppercase leading-tight truncate text-slate-800 dark:text-slate-100">
+                      {language === 'ne' ? 'प्रगति ट्र्याकर' : APP_TITLES.shortAppName[language]}
+                    </span>
+                  </div>
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate hidden xs:block sm:block">
+                    {language === 'en' ? 'Performance Tracking System' : 'प्रगति ट्र्याकिङ सिस्टम'}
+                  </span>
+                </div>
             </div>
               <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <div

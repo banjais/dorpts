@@ -1409,17 +1409,12 @@ export const Overview: React.FC<OverviewProps> = ({
                 <TrendingUp size={18} className="text-indigo-600 dark:text-indigo-400" />
               </span>
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-300">
-                    {language === 'en' ? 'Executive Overview' : 'कार्यकारी प्रणाली अवलोकन'}
-                  </span>
-                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30">
-                    LIVE
-                  </span>
-                </div>
                 <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-white tracking-tight">
-                  {language === 'en' ? 'Overall Progress Performance' : 'समग्र कार्यसम्पादन र प्रगति विवरण'}
+                  {language === 'en' ? 'DOR OVERALL PERFORMANCE' : 'डी.ओ.आर. समग्र कार्यसम्पादन'}
                 </h3>
+                <span className="text-[10px] sm:text-xs font-extrabold text-indigo-600 dark:text-indigo-300 uppercase tracking-widest">
+                  {language === 'en' ? 'FY: 2082/83' : 'आर्थिक वर्ष: २०८२/८३'}
+                </span>
               </div>
             </div>
 
