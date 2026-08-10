@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, HelpCircle, ChevronUp, FileText, Share2, Sparkles, ChevronDown, ChevronRight, MessageSquare, RefreshCw, Menu, Download } from 'lucide-react';
+import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, ChevronUp, FileText, Share2, Sparkles, ChevronDown, ChevronRight, MessageSquare, RefreshCw, Menu, Download } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
@@ -7,7 +7,6 @@ import { APP_TITLES, APP_VERSION } from '../constants/appTitles';
 
 interface FooterProps {
   onOpenReportBuilder?: () => void;
-  onOpenHelp?: () => void;
   onOpenAI?: () => void;
   onOpenMessaging?: () => void;
   isScrolled?: boolean;
@@ -25,7 +24,6 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ 
   onOpenReportBuilder, 
-  onOpenHelp,
   onOpenAI,
   onOpenMessaging,
   isScrolled,
@@ -193,7 +191,6 @@ export const Footer: React.FC<FooterProps> = ({
     ...(deferredPrompt ? [{ id: 'btn-install', icon: Download, action: handleInstallClick }] : []),
     ...(isAdmin ? [{ id: 'btn-messaging', icon: MessageSquare, action: () => onOpenMessaging?.() }] : []),
     { id: 'btn-share', icon: Share2, action: () => setShowQr(true) },
-    { id: 'btn-help', icon: HelpCircle, action: onOpenHelp || (() => {}) },
     { 
       id: 'btn-sync', 
       icon: RefreshCw, 

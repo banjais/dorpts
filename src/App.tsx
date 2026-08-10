@@ -3506,38 +3506,19 @@ function MainAppContent() {
            </main>
          </div>
 
-        {/* Footer */}
-         <Footer
-            onOpenReportBuilder={() => setIsReportBuilderOpen(true)}
-            onOpenHelp={() => setIsHelpOpen(true)}
-            onOpenFeedback={() => setIsFeedbackModalOpen(true)}
-            onOpenAI={() => setIsAIAssistantOpen(true)}
-             isScrolled={isScrolled}
+         {/* Footer */}
+          <Footer
+             onOpenReportBuilder={() => setIsReportBuilderOpen(true)}
+             onOpenAI={() => setIsAIAssistantOpen(true)}
+              isScrolled={isScrolled}
              viewMode={viewMode}
              fiscalYear={selectedFiscalYear}
              isExpanded={isFooterExpanded}
              onExpandChange={setIsFooterExpanded}
              isSyncing={isSyncing}
              onManualSync={handleManualSync}
-             onOpenDrawer={() => setIsDrawerOpen(true)}
-              onRefresh={async () => {
-               await handleManualSync();
-               if ('serviceWorker' in navigator) {
-                 try {
-                   const regs = await navigator.serviceWorker.getRegistrations();
-                   await Promise.all(regs.map(r => r.update()));
-                   for (const reg of regs) {
-                     if (reg.waiting) {
-                       reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-                     }
-                   }
-                 } catch (_) {}
-               }
-               sessionStorage.setItem('dor_app_just_updated', 'true');
-               window.location.reload();
-             }}
-             canGiveFeedback={!user || role === 'viewer'}
-             onOpenMessaging={() => handleMainViewChange('messaging')}
+              onOpenDrawer={() => setIsDrawerOpen(true)}
+              onOpenMessaging={() => handleMainViewChange('messaging')}
              pendingWrites={pendingWrites}
              hasPendingWrites={pendingWrites.length > 0}
              isAdmin={isAdmin}
