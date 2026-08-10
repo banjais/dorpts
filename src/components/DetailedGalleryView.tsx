@@ -69,6 +69,7 @@ interface DetailedGalleryViewProps {
   onCardsReachedHeader?: (reached: boolean) => void;
   onCardsHidden?: (hidden: boolean) => void;
   onNavigateToView?: (view: string, defaultTab?: string) => void;
+  onDismissCard?: (cardId: string) => void;
   onSpeakDashboardSummary?: () => void;
 }
 
@@ -430,6 +431,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
   onCardsReachedHeader,
   onCardsHidden,
   onNavigateToView,
+  onDismissCard,
   onSpeakDashboardSummary,
 }) => {
   const { language, t, translateUnit, translateOffice } = useLanguage();
@@ -785,12 +787,15 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
         </div>
         {onNavigateToView && (
           <button
-            onClick={() => onNavigateToView('dashboard')}
+            onClick={() => {
+              onNavigateToView('dashboard');
+              onDismissCard?.('detailed-gallery');
+            }}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer border border-slate-200 dark:border-slate-700"
-            title={language === 'en' ? 'Back to Home' : 'गृहपृष्ठमा फर्कनुहोस्'}
+            title={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
           >
             <Minimize2 size={14} className="text-indigo-600 dark:text-indigo-400" />
-            <span className="uppercase tracking-wider">{language === 'en' ? 'Home' : 'गृहपृष्ठ'}</span>
+            <span className="uppercase tracking-wider">{language === 'en' ? 'Reduce' : 'घटाउनुहोस्'}</span>
           </button>
         )}
       </div>
