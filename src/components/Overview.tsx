@@ -1949,55 +1949,93 @@ export const Overview: React.FC<OverviewProps> = ({
                  onClick={(e) => e.stopPropagation()}
                  className="relative w-full max-w-4xl max-h-[70dvh] sm:max-h-[80dvh] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col mt-4 sm:mt-6 md:mt-8"
                >
-               {/* Sticky Header with Title and Prominent REDUCE option */}
-               <div className="sticky top-0 z-20 flex items-center justify-between p-2.5 sm:p-3 md:p-5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/80">
-                 <div className="flex items-center gap-3">
-                   <span className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50">
-                     {activeExpandedModalCardId === 'overall-progress' && <TrendingUp size={20} />}
-                     {activeExpandedModalCardId === 'category-status' && <LayoutGrid size={20} />}
-                     {activeExpandedModalCardId === 'status-breakdown' && <Activity size={20} />}
-                     {activeExpandedModalCardId === 'reporting-offices' && <Building2 size={20} />}
-                     {activeExpandedModalCardId === 'budget-card' && <Wallet size={20} />}
-                     {activeExpandedModalCardId === 'employment-card' && <Users size={20} />}
-                     {activeExpandedModalCardId === 'visual-insights-gallery' && <ImageIcon size={20} />}
-                   </span>
-                   <div>
-                     <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">
-                       {activeExpandedModalCardId === 'overall-progress' && (language === 'en' ? 'Overall Progress Dashboard' : 'समग्र प्रगति ड्यासबोर्ड')}
-                       {activeExpandedModalCardId === 'category-status' && (language === 'en' ? 'Category & Sector Breakdown' : 'क्षेत्रगत तथा वर्ग विवरण')}
-                        {activeExpandedModalCardId === 'status-breakdown' && (language === 'en' ? 'Performance Status Breakdown' : 'कार्यसम्पादन स्थिति विवरण')}
-
+                {/* Sticky Header with Title and Prominent REDUCE option */}
+                <div className="sticky top-0 z-20 flex items-center justify-between p-2.5 sm:p-3 md:p-5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/80">
+                  <div className="flex items-center gap-3">
+                    {activeExpandedModalCardId === 'overall-progress' && (
+                      <span className="p-2 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-xl border border-indigo-200 dark:border-indigo-500/30 shadow-inner">
+                        <TrendingUp size={18} className="text-indigo-600 dark:text-indigo-400" />
+                      </span>
+                    )}
+                    {activeExpandedModalCardId === 'category-status' && (
+                      <span className="p-2 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl shadow-md shadow-cyan-500/30 shrink-0">
+                        <LayoutGrid size={16} className="text-white" />
+                      </span>
+                    )}
+                    {activeExpandedModalCardId === 'status-breakdown' && (
+                      <span className="p-2 bg-gradient-to-br from-amber-500 to-amber-700 rounded-xl shadow-md shadow-amber-500/30 shrink-0">
+                        <BarChart3 size={16} className="text-white" />
+                      </span>
+                    )}
+                    {activeExpandedModalCardId === 'reporting-offices' && (
+                      <span className="p-2 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-xl border border-indigo-200 dark:border-indigo-500/30 shadow-inner">
+                        <Building2 size={16} className="text-indigo-600 dark:text-indigo-400" />
+                      </span>
+                    )}
+                    {activeExpandedModalCardId === 'budget-card' && (
+                      <span className="p-2 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-md shadow-blue-500/30 shrink-0">
+                        <Wallet size={16} className="text-white" />
+                      </span>
+                    )}
+                    {activeExpandedModalCardId === 'employment-card' && (
+                      <span className="p-2 bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl shadow-md shadow-teal-500/30 shrink-0">
+                        <Users size={16} className="text-white" />
+                      </span>
+                    )}
+                    {activeExpandedModalCardId === 'visual-insights-gallery' && (
+                      <span className="p-2 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl shadow-md shadow-purple-500/30 shrink-0">
+                        <PieChartIcon size={16} className="text-white" />
+                      </span>
+                    )}
+                    {activeExpandedModalCardId === 'detailed-gallery' && (
+                      <span className="p-2 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl shadow-md shadow-indigo-500/30 shrink-0">
+                        <ImageIcon size={16} className="text-white" />
+                      </span>
+                    )}
+                    <div>
+                      <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">
+                        {activeExpandedModalCardId === 'overall-progress' && (language === 'en' ? 'DOR OVERALL PERFORMANCE' : 'डी.ओ.आर. समग्र कार्यसम्पादन')}
+                        {activeExpandedModalCardId === 'category-status' && (language === 'en' ? 'Category Status' : 'वर्ग स्थिति')}
+                        {activeExpandedModalCardId === 'status-breakdown' && (language === 'en' ? 'Status Breakdown' : 'स्थिति विवरण')}
                         {activeExpandedModalCardId === 'reporting-offices' && (language === 'en' ? 'Reporting Field Offices' : 'रिपोर्टिङ क्षेत्र कार्यालयहरू')}
-                       {activeExpandedModalCardId === 'budget-card' && (language === 'en' ? 'Budget & Capital Expenditure' : 'बजेट उपयोग र पूँजीगत खर्च')}
-                       {activeExpandedModalCardId === 'employment-card' && (language === 'en' ? 'Employment Creation' : 'रोजगार सिर्जना')}
-                       {activeExpandedModalCardId === 'visual-insights-gallery' && (language === 'en' ? 'Visual Analytics Gallery' : 'दृश्य विश्लेषण ग्यालेरी')}
-                     </h2>
-                     <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                       {language === 'en' ? 'Live data synchronized from official sheet' : 'अधिकारिक शीटबाट प्रत्यक्ष डाटा अद्यावधिक'}
-                     </p>
-                   </div>
-                 </div>
+                        {activeExpandedModalCardId === 'budget-card' && (language === 'en' ? 'Budget Utilization' : 'बजेट उपयोग')}
+                        {activeExpandedModalCardId === 'employment-card' && (language === 'en' ? 'Employment' : 'रोजगार')}
+                        {activeExpandedModalCardId === 'visual-insights-gallery' && (language === 'en' ? 'Visual Insights' : 'दृश्य अन्तर्दृष्टि')}
+                        {activeExpandedModalCardId === 'detailed-gallery' && (language === 'en' ? 'Detailed Gallery' : 'विस्तृत ग्यालेरी')}
+                      </h2>
+                      <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                        {activeExpandedModalCardId === 'overall-progress' && (language === 'en' ? 'FY: 2082/83' : 'आर्थिक वर्ष: २०८२/८३')}
+                        {activeExpandedModalCardId === 'category-status' && (language === 'en' ? '5 Main Sectors' : '५ मुख्य क्षेत्रहरू')}
+                        {activeExpandedModalCardId === 'status-breakdown' && (language === 'en' ? 'Performance Categories' : 'कार्यान्वयन स्थिति')}
+                        {activeExpandedModalCardId === 'reporting-offices' && (language === 'en' ? `${reportingOffices.length} offices` : `${reportingOffices.length} कार्यालयहरू`)}
+                        {activeExpandedModalCardId === 'budget-card' && (language === 'en' ? 'Capital Expenditure' : 'पूँजीगत खर्च')}
+                        {activeExpandedModalCardId === 'employment-card' && (language === 'en' ? 'Jobs Created' : 'सिर्जित रोजगारी')}
+                        {activeExpandedModalCardId === 'visual-insights-gallery' && (language === 'en' ? 'Portfolio Health Chart' : 'पोर्टफोलियो स्वास्थ्य रेखाचित्र')}
+                        {activeExpandedModalCardId === 'detailed-gallery' && (language === 'en' ? 'Full Indicators View' : 'पूर्ण सूचक अवलोकन')}
+                      </p>
+                    </div>
+                  </div>
 
-                   {/* Prominent Reduce Button */}
-                   <button
-                     onClick={() => {
-                       setActiveExpandedModalCardId(null);
-                       if (activeExpandedModalCardId) {
-                         const cardId = activeExpandedModalCardId === 'visual-insights-gallery'
-                           ? 'visual-insights'
-                           : activeExpandedModalCardId === 'detailed-gallery'
-                             ? 'detailed-gallery'
-                             : activeExpandedModalCardId;
-                         handleDismissCard(cardId);
-                       }
-                     }}
-                     className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95"
-                     title={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
-                   >
-                     <Minimize2 size={16} className="text-indigo-600 dark:text-indigo-400" />
-                     <span className="uppercase tracking-wider">{language === 'en' ? 'Reduce' : 'घटाउनुहोस्'}</span>
-                   </button>
-               </div>
+                  {/* Prominent Reduce Button */}
+                  <button
+                    onClick={() => {
+                      setActiveExpandedModalCardId(null);
+                      if (activeExpandedModalCardId) {
+                        const cardId = activeExpandedModalCardId === 'visual-insights-gallery'
+                          ? 'visual-insights'
+                          : activeExpandedModalCardId === 'detailed-gallery'
+                            ? 'detailed-gallery'
+                            : activeExpandedModalCardId;
+                        handleDismissCard(cardId);
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95"
+                    title={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
+                  >
+                    <Minimize2 size={16} className="text-indigo-600 dark:text-indigo-400" />
+                    <span className="uppercase tracking-wider">{language === 'en' ? 'Reduce' : 'घटाउनुहोस्'}</span>
+                  </button>
+                </div>
 
                  {/* Scrollable Expanded View Content */}
                    <div className="flex-1 min-h-0 p-2 sm:p-3 md:p-4 overflow-y-auto space-y-2 sm:space-y-3 custom-scrollbar">
