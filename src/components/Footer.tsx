@@ -257,35 +257,35 @@ export const Footer: React.FC<FooterProps> = ({
         >
           {/* Integrated +FAB button inside the bar at right - perfectly vertically centered */}
           <div className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-10 flex items-center">
-            <motion.button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onExpandChange?.(!shouldExpand);
-              }}
-              onMouseEnter={() => {
-                setIsHovered(true);
-                onExpandChange?.(true);
-              }}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/30 flex items-center justify-center cursor-pointer border border-indigo-400/30 hover:shadow-indigo-500/50 transition-all relative"
-              title={shouldExpand ? (language === 'en' ? 'Close Portal' : 'पोर्टल बन्द गर्नुहोस्') : (language === 'en' ? 'Expand Portal' : 'द्रुत कार्यहरू')}
-            >
-              <motion.span
-                className="text-lg sm:text-xl font-bold leading-none flex items-center justify-center"
-                animate={{ rotate: shouldExpand ? 45 : 0 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
-              >
-                +
-              </motion.span>
-              {!shouldExpand && (
-                <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
-                </span>
-              )}
-            </motion.button>
+             <motion.button
+               type="button"
+               onClick={(e) => {
+                 e.stopPropagation();
+                 onExpandChange?.(!shouldExpand);
+               }}
+               onMouseEnter={() => {
+                 setIsHovered(true);
+                 onExpandChange?.(true);
+               }}
+               whileHover={{ scale: 1.08 }}
+               whileTap={{ scale: 0.92 }}
+               className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/30 flex items-center justify-center cursor-pointer border border-indigo-400/30 hover:shadow-indigo-500/50 transition-all relative"
+               title={shouldExpand ? (language === 'en' ? 'Close Portal' : 'पोर्टल बन्द गर्नुहोस्') : (language === 'en' ? 'Expand Portal' : 'द्रुत कार्यहरू')}
+             >
+               <motion.span
+                 className="flex items-center justify-center"
+                 animate={{ rotate: shouldExpand ? 180 : 0 }}
+                 transition={{ duration: 0.25, ease: "easeOut" }}
+               >
+                 <ChevronDown size={18} className="sm:w-5 sm:h-5" />
+               </motion.span>
+               {!shouldExpand && (
+                 <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                   <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
+                 </span>
+               )}
+             </motion.button>
           </div>
           {shouldExpand && (
             <>
