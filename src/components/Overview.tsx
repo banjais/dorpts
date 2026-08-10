@@ -1557,9 +1557,10 @@ export const Overview: React.FC<OverviewProps> = ({
         onClick={() => {
           setActiveExpandedModalCardId('category-status');
           toggleCard(setShowCategoryStatus, showCategoryStatus);
-        }}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-600/90 hover:border-cyan-400/50 dark:hover:border-cyan-500/40 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1"
+         }}
+          className="group relative w-full cursor-pointer bg-gradient-to-br from-cyan-50/90 via-white to-slate-50 dark:from-cyan-900/90 dark:via-slate-900 dark:to-cyan-950 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-cyan-200/80 dark:border-cyan-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
       >
+        <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 dark:bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="p-2 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl shadow-md shadow-cyan-500/30 shrink-0">
             <LayoutGrid size={16} className="text-white" />
@@ -1607,8 +1608,9 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('status-breakdown');
           toggleCard(setShowStatusDetails, showStatusDetails);
         }}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-600/90 hover:border-amber-400/50 dark:hover:border-amber-500/40 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98]"
+          className="group relative w-full cursor-pointer bg-gradient-to-br from-amber-50/90 via-white to-slate-50 dark:from-amber-900/90 dark:via-slate-900 dark:to-amber-950 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-amber-200/80 dark:border-amber-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
       >
+        <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="p-2 bg-gradient-to-br from-amber-500 to-amber-700 rounded-xl shadow-md shadow-amber-500/30 shrink-0">
             <BarChart3 size={16} className="text-white" />
@@ -1653,8 +1655,9 @@ export const Overview: React.FC<OverviewProps> = ({
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => onNavigateToView?.('insights')}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-600/90 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98]"
+          className="group relative w-full cursor-pointer bg-gradient-to-br from-purple-50/90 via-white to-slate-50 dark:from-purple-900/90 dark:via-slate-900 dark:to-purple-950 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-purple-200/80 dark:border-purple-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
       >
+        <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-2 sm:gap-3 mb-1">
           <span className="p-2 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl shadow-md shadow-purple-500/30 shrink-0">
             <PieChartIcon size={16} className="text-white" />
@@ -1702,8 +1705,9 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('budget-card');
           toggleCard(setShowBudgetCard, showBudgetCard);
         }}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-600/90 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98]"
+          className="group relative w-full cursor-pointer bg-gradient-to-br from-blue-50/90 via-white to-slate-50 dark:from-blue-900/90 dark:via-slate-900 dark:to-blue-950 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-blue-200/80 dark:border-blue-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
       >
+        <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="p-2 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-md shadow-blue-500/30 shrink-0">
             <Wallet size={16} className="text-white" />
@@ -1751,8 +1755,9 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('employment-card');
           toggleCard(setShowEmploymentCard, showEmploymentCard);
         }}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-600/90 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98]"
+          className="group relative w-full cursor-pointer bg-gradient-to-br from-teal-50/90 via-white to-slate-50 dark:from-teal-900/90 dark:via-slate-900 dark:to-teal-950 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-teal-200/80 dark:border-teal-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
       >
+        <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/10 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="p-2 bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl shadow-md shadow-teal-500/30 shrink-0">
             <Users size={16} className="text-white" />
@@ -1797,8 +1802,9 @@ export const Overview: React.FC<OverviewProps> = ({
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => onNavigateToView?.('detailed-gallery')}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-600/90 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98]"
+          className="group relative w-full cursor-pointer bg-gradient-to-br from-indigo-50/90 via-white to-slate-50 dark:from-indigo-900/90 dark:via-slate-900 dark:to-indigo-950 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-indigo-200/80 dark:border-indigo-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
       >
+        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="p-2 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl shadow-md shadow-indigo-500/30 shrink-0">
             <ImageIcon size={16} className="text-white" />
