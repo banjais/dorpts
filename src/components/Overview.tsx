@@ -36,7 +36,6 @@ import {
   Activity,
   Mic,
   MicOff,
-  Play,
   Pause,
   Wallet,
   PiggyBank,
@@ -889,7 +888,6 @@ export const Overview: React.FC<OverviewProps> = ({
   const [activeExpandedModalCardId, setActiveExpandedModalCardId] = useState<string | null>(null);
   const [modalSearchQuery, setModalSearchQuery] = useState('');
   const [modalCategoryFilter, setModalCategoryFilter] = useState('All');
-  const [showAudioControls, setShowAudioControls] = useState(false);
 
   const [speechState, setSpeechState] = useState<ReturnType<typeof speechPlayer.getState>>(speechPlayer.getState());
 
@@ -897,22 +895,6 @@ export const Overview: React.FC<OverviewProps> = ({
     const unsubscribe = speechPlayer.subscribe(setSpeechState);
     return unsubscribe;
   }, []);
-
-  useEffect(() => {
-    if (!showAudioControls) return;
-    const handleClick = (e: MouseEvent | TouchEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest('[data-audio-controls]')) {
-        setShowAudioControls(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    document.addEventListener('touchstart', handleClick);
-    return () => {
-      document.removeEventListener('mousedown', handleClick);
-      document.removeEventListener('touchstart', handleClick);
-    };
-  }, [showAudioControls]);
 
   const closeAllCards = useCallback(() => {
     setShowOverallProgress(false);
@@ -1448,7 +1430,14 @@ export const Overview: React.FC<OverviewProps> = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   triggerHaptic('light');
-                  setShowAudioControls(v => !v);
+                  if (speechState.isMuted) {
+                    speechPlayer.setMuted(false);
+                    speechPlayer.play(dashboardSummaryText, language);
+                  } else if (speechState.isPlaying) {
+                    speechPlayer.stop();
+                  } else {
+                    speechPlayer.play(dashboardSummaryText, language);
+                  }
                 }}
                 className={`p-2 rounded-xl transition-all cursor-pointer border ${
                   speechState.isPlaying
@@ -1457,9 +1446,9 @@ export const Overview: React.FC<OverviewProps> = ({
                       ? 'bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600'
                       : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30'
                 }`}
-                title={language === 'en' ? 'Audio Controls' : 'आवाज नियन्त्रण'}
+                title={language === 'en' ? (speechState.isPlaying ? 'Pause' : speechState.isMuted ? 'Unmute & Play' : 'Play Summary') : (speechState.isPlaying ? 'पज गर्नुहोस्' : speechState.isMuted ? 'आवाज चालु गर्नुहोस् र प्ले गर्नुहोस्' : 'सारांश प्ले गर्नुहोस्')}
               >
-                {speechState.isMuted ? <MicOff size={16} /> : speechState.isPlaying ? <Mic size={16} className="animate-pulse" /> : <Mic size={16} />}
+                {speechState.isMuted ? <MicOff size={16} /> : speechState.isPlaying ? <Pause size={16} /> : <Mic size={16} />}
               </button>
 
               <button
@@ -1474,41 +1463,6 @@ export const Overview: React.FC<OverviewProps> = ({
               >
                 <Zap size={16} className="text-amber-600 dark:text-amber-400 animate-pulse" />
               </button>
-
-              <div className="relative">
-                {showAudioControls && (
-                  <div data-audio-controls className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 flex items-center gap-2 min-w-max">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        triggerHaptic('light');
-                        if (speechState.isPlaying) {
-                          speechPlayer.stop();
-                        } else {
-                          speechPlayer.play(dashboardSummaryText, language);
-                        }
-                      }}
-                      className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-500/30 hover:bg-indigo-200 dark:hover:bg-indigo-500/40 text-indigo-800 dark:text-indigo-200 border border-indigo-300 dark:border-indigo-500/40 transition-all cursor-pointer"
-                      title={language === 'en' ? (speechState.isPlaying ? 'Pause' : 'Play Summary') : (speechState.isPlaying ? 'पज गर्नुहोस्' : 'सारांश प्ले गर्नुहोस्')}
-                    >
-                      {speechState.isPlaying ? <Pause size={16} /> : <Play size={16} />}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        triggerHaptic('light');
-                        speechPlayer.toggleMute();
-                      }}
-                      className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer"
-                      title={language === 'en' ? (speechState.isMuted ? 'Unmute' : 'Mute') : (speechState.isMuted ? 'आवाज चालु गर्नुहोस्' : 'आवाज बन्द गर्नुहोस्')}
-                    >
-                      {speechState.isMuted ? <MicOff size={16} /> : <Mic size={16} />}
-                    </button>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 
