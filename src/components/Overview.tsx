@@ -1452,7 +1452,8 @@ export const Overview: React.FC<OverviewProps> = ({
                       ? 'bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600'
                       : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30'
                 }`}
-                title={language === 'en' ? (speechState.isPlaying ? 'Pause' : speechState.isMuted ? 'Unmute & Play' : 'Play Summary') : (speechState.isPlaying ? 'पज गर्नुहोस्' : speechState.isMuted ? 'आवाज चालु गर्नुहोस् र प्ले गर्नुहोस्' : 'सारांश प्ले गर्नुहोस्')}
+                 aria-label={language === 'en' ? (speechState.isPlaying ? 'Pause' : speechState.isMuted ? 'Unmute & Play' : 'Play Summary') : (speechState.isPlaying ? 'पज गर्नुहोस्' : speechState.isMuted ? 'आवाज चालु गर्नुहोस् र प्ले गर्नुहोस्' : 'सारांश प्ले गर्नुहोस्')}
+                 title={language === 'en' ? (speechState.isPlaying ? 'Pause' : speechState.isMuted ? 'Unmute & Play' : 'Play Summary') : (speechState.isPlaying ? 'पज गर्नुहोस्' : speechState.isMuted ? 'आवाज चालु गर्नुहोस् र प्ले गर्नुहोस्' : 'सारांश प्ले गर्नुहोस्')}
               >
                 {speechState.isMuted ? <MicOff size={16} /> : speechState.isPlaying ? <Pause size={16} /> : <Mic size={16} />}
               </button>
@@ -1465,7 +1466,8 @@ export const Overview: React.FC<OverviewProps> = ({
                   setShowSplash(true);
                 }}
                 className="p-2 rounded-xl bg-amber-100 dark:bg-amber-500/20 hover:bg-amber-200 dark:hover:bg-amber-500/30 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
-                title={language === 'en' ? 'Trigger Flash Screen' : 'फ्ल्यास स्क्रिन खोल्नुहोस्'}
+                 aria-label={language === 'en' ? 'Trigger Flash Screen' : 'फ्ल्यास स्क्रिन खोल्नुहोस्'}
+                 title={language === 'en' ? 'Trigger Flash Screen' : 'फ्ल्यास स्क्रिन खोल्नुहोस्'}
               >
                 <Zap size={16} className="text-amber-600 dark:text-amber-400 animate-pulse" />
               </button>
@@ -1556,14 +1558,14 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('category-status');
           toggleCard(setShowCategoryStatus, showCategoryStatus);
         }}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-400/50 dark:hover:border-cyan-500/40 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-600/90 hover:border-cyan-400/50 dark:hover:border-cyan-500/40 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1"
       >
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="p-2 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl shadow-md shadow-cyan-500/30 shrink-0">
             <LayoutGrid size={16} className="text-white" />
           </span>
           <div>
-            <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100">
+            <span className="text-sm sm:text-base font-black uppercase tracking-[0.1em] text-slate-900 dark:text-slate-100">
               {language === 'en' ? 'Category Status' : 'वर्ग स्थिति'}
             </span>
              <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
@@ -1572,7 +1574,7 @@ export const Overview: React.FC<OverviewProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+        <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-600/70">
           <ChevronDown size={14} className={`transform transition-transform ${showCategoryStatus ? 'rotate-180' : ''}`} />
         </div>
       </motion.div>
@@ -1605,14 +1607,14 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('status-breakdown');
           toggleCard(setShowStatusDetails, showStatusDetails);
         }}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 hover:border-amber-400/50 dark:hover:border-amber-500/40 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-600/90 hover:border-amber-400/50 dark:hover:border-amber-500/40 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98]"
       >
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="p-2 bg-gradient-to-br from-amber-500 to-amber-700 rounded-xl shadow-md shadow-amber-500/30 shrink-0">
             <BarChart3 size={16} className="text-white" />
           </span>
           <div>
-            <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100">
+            <span className="text-sm sm:text-base font-black uppercase tracking-[0.1em] text-slate-900 dark:text-slate-100">
               {language === 'en' ? 'Status Breakdown' : 'स्थिति विवरण'}
             </span>
             <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
@@ -1621,7 +1623,7 @@ export const Overview: React.FC<OverviewProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+        <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-600/70">
           <ChevronDown size={14} className={`transform transition-transform ${showStatusDetails ? 'rotate-180' : ''}`} />
         </div>
       </motion.div>
@@ -1651,14 +1653,14 @@ export const Overview: React.FC<OverviewProps> = ({
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => onNavigateToView?.('insights')}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-600/90 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98]"
       >
         <div className="flex items-center gap-2 sm:gap-3 mb-1">
           <span className="p-2 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl shadow-md shadow-purple-500/30 shrink-0">
             <PieChartIcon size={16} className="text-white" />
           </span>
           <div>
-            <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100">
+            <span className="text-sm sm:text-base font-black uppercase tracking-[0.1em] text-slate-900 dark:text-slate-100">
               {language === 'en' ? 'Visual Insights' : 'दृश्य अन्तर्दृष्टि'}
             </span>
             <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
@@ -1667,7 +1669,7 @@ export const Overview: React.FC<OverviewProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+        <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-600/70">
           <ExternalLink size={14} />
         </div>
       </motion.div>
@@ -1700,14 +1702,14 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('budget-card');
           toggleCard(setShowBudgetCard, showBudgetCard);
         }}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-600/90 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98]"
       >
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="p-2 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-md shadow-blue-500/30 shrink-0">
             <Wallet size={16} className="text-white" />
           </span>
           <div>
-            <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100">
+            <span className="text-sm sm:text-base font-black uppercase tracking-[0.1em] text-slate-900 dark:text-slate-100">
               {language === 'en' ? 'Budget Utilization' : 'बजेट उपयोग'}
             </span>
             <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
@@ -1716,7 +1718,7 @@ export const Overview: React.FC<OverviewProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+        <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-600/70">
           <ChevronDown size={14} className={`transform transition-transform ${showBudgetCard ? 'rotate-180' : ''}`} />
         </div>
       </motion.div>
@@ -1749,14 +1751,14 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('employment-card');
           toggleCard(setShowEmploymentCard, showEmploymentCard);
         }}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-600/90 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98]"
       >
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="p-2 bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl shadow-md shadow-teal-500/30 shrink-0">
             <Users size={16} className="text-white" />
           </span>
           <div>
-            <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100">
+            <span className="text-sm sm:text-base font-black uppercase tracking-[0.1em] text-slate-900 dark:text-slate-100">
               {language === 'en' ? 'Employment' : 'रोजगार'}
             </span>
             <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
@@ -1765,7 +1767,7 @@ export const Overview: React.FC<OverviewProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+        <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-600/70">
           <ChevronDown size={14} className={`transform transition-transform ${showEmploymentCard ? 'rotate-180' : ''}`} />
         </div>
       </motion.div>
@@ -1795,14 +1797,14 @@ export const Overview: React.FC<OverviewProps> = ({
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => onNavigateToView?.('detailed-gallery')}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-600/90 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98]"
       >
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="p-2 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl shadow-md shadow-indigo-500/30 shrink-0">
             <ImageIcon size={16} className="text-white" />
           </span>
           <div>
-            <span className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100">
+            <span className="text-sm sm:text-base font-black uppercase tracking-[0.1em] text-slate-900 dark:text-slate-100">
               {language === 'en' ? 'Detailed Gallery' : 'विस्तृत ग्यालेरी'}
             </span>
             <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
@@ -1811,7 +1813,7 @@ export const Overview: React.FC<OverviewProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+        <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-600/70">
           <ExternalLink size={14} />
         </div>
       </motion.div>
@@ -2030,7 +2032,8 @@ export const Overview: React.FC<OverviewProps> = ({
                       }
                     }}
                     className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95"
-                    title={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
+                     aria-label={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
+                     title={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
                   >
                     <Minimize2 size={16} className="text-indigo-600 dark:text-indigo-400" />
                     <span className="uppercase tracking-wider">{language === 'en' ? 'Reduce' : 'घटाउनुहोस्'}</span>
