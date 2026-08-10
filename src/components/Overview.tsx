@@ -879,6 +879,7 @@ export const Overview: React.FC<OverviewProps> = ({
   const [showSystemHelpModal, setShowSystemHelpModal] = useState(false);
   const [showBudgetCard, setShowBudgetCard] = useState(false);
   const [showEmploymentCard, setShowEmploymentCard] = useState(false);
+  const [showDetailedGallery, setShowDetailedGallery] = useState(false);
   const [showOverallProgress, setShowOverallProgress] = useState(false);
   const [cardsHidden, setCardsHidden] = useState(false);
   const [showStatusDetails, setShowStatusDetails] = useState(false);
@@ -943,7 +944,7 @@ export const Overview: React.FC<OverviewProps> = ({
     }
   }, [closeAllCards]);
 
-  useEffect(() => {
+   useEffect(() => {
     const states = [
       showOverallProgress,
       showStatusDetails,
@@ -952,6 +953,8 @@ export const Overview: React.FC<OverviewProps> = ({
       showCategoryStatus,
       showBudgetCard,
       showInsights,
+      showEmploymentCard,
+      showDetailedGallery,
     ];
     const openedIndex = states.findIndex(Boolean);
     if (openedIndex === -1) return;
@@ -963,11 +966,13 @@ export const Overview: React.FC<OverviewProps> = ({
       setShowCategoryStatus,
       setShowBudgetCard,
       setShowInsights,
+      setShowEmploymentCard,
+      setShowDetailedGallery,
     ];
     setters.forEach((setter, index) => {
       if (index !== openedIndex) setter(false);
     });
-  }, [showOverallProgress, showStatusDetails, showTotalIndicators, showReportingOffices, showCategoryStatus, showBudgetCard, showInsights]);
+  }, [showOverallProgress, showStatusDetails, showTotalIndicators, showReportingOffices, showCategoryStatus, showBudgetCard, showInsights, showEmploymentCard, showDetailedGallery]);
 
   useEffect(() => {
     if (showInsights) {
@@ -1639,7 +1644,10 @@ export const Overview: React.FC<OverviewProps> = ({
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        onClick={() => onNavigateToView?.('insights')}
+        onClick={() => {
+          setActiveExpandedModalCardId('visual-insights-gallery');
+          toggleCard(setShowInsights, showInsights);
+        }}
          className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
       >
         <div className="flex items-center gap-2 sm:gap-3 mb-1">
@@ -1657,14 +1665,14 @@ export const Overview: React.FC<OverviewProps> = ({
         </div>
 
         <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700/60">
-          <ExternalLink size={14} />
+          <ChevronDown size={14} className={`transform transition-transform ${showInsights ? 'rotate-180' : ''}`} />
         </div>
       </motion.div>
     </SwipeableCard>
   </motion.div>
-)}
+ )}
 
-{/* Card 5: Budget & Capital Expenditure */}
+ {/* Card 5: Budget & Capital Expenditure */}
 {!dismissedCards.has('budget-card') && (
   <motion.div
     key="budget-card"
@@ -1783,7 +1791,10 @@ export const Overview: React.FC<OverviewProps> = ({
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        onClick={() => onNavigateToView?.('detailed-gallery')}
+        onClick={() => {
+          setActiveExpandedModalCardId('detailed-gallery');
+          toggleCard(setShowDetailedGallery, showDetailedGallery);
+        }}
          className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
       >
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -1801,12 +1812,12 @@ export const Overview: React.FC<OverviewProps> = ({
         </div>
 
         <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700/60">
-          <ExternalLink size={14} />
+          <ChevronDown size={14} className={`transform transition-transform ${showDetailedGallery ? 'rotate-180' : ''}`} />
         </div>
       </motion.div>
     </SwipeableCard>
   </motion.div>
-)}
+ )}
             </AnimatePresence>
           </motion.div>
 
@@ -1967,26 +1978,15 @@ export const Overview: React.FC<OverviewProps> = ({
                    </div>
                  </div>
 
-                  {/* Prominent Home / Reduce Button */}
-                  {activeExpandedModalCardId === 'visual-insights-gallery' || activeExpandedModalCardId === 'detailed-gallery' ? (
-                    <button
-                      onClick={() => setActiveExpandedModalCardId(null)}
-                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95"
-                      title={language === 'en' ? 'Back to Home' : 'गृहपृष्ठमा फर्कनुहोस्'}
-                    >
-                      <TrendingUp size={16} className="text-indigo-600 dark:text-indigo-400" />
-                      <span className="uppercase tracking-wider">{language === 'en' ? 'Home' : 'गृहपृष्ठ'}</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setActiveExpandedModalCardId(null)}
-                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95"
-                      title={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
-                    >
-                      <Minimize2 size={16} className="text-indigo-600 dark:text-indigo-400" />
-                      <span className="uppercase tracking-wider">{language === 'en' ? 'Reduce' : 'घटाउनुहोस्'}</span>
-                    </button>
-                  )}
+                   {/* Prominent Reduce Button */}
+                   <button
+                     onClick={() => setActiveExpandedModalCardId(null)}
+                     className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95"
+                     title={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
+                   >
+                     <Minimize2 size={16} className="text-indigo-600 dark:text-indigo-400" />
+                     <span className="uppercase tracking-wider">{language === 'en' ? 'Reduce' : 'घटाउनुहोस्'}</span>
+                   </button>
                </div>
 
                  {/* Scrollable Expanded View Content */}
