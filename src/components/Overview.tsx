@@ -2260,38 +2260,68 @@ export const Overview: React.FC<OverviewProps> = ({
 
                        <div className="space-y-2 pt-2">
                          <h4 className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 tracking-wider">
-                           {language === 'en' ? 'Indicators by Category' : 'वर्ग अनुसार सूचकहरू'}
+                           {language === 'en' ? 'Indicator Status Details' : 'सूचकहरूको कार्यसम्पादन स्थिति विवरण'}
                          </h4>
-                         <div className="space-y-2 max-h-[340px] overflow-y-auto pr-1">
-                           {STANDARD_CATEGORIES.map((cat) => {
-                             const catIndicators = indicators.filter(i => i && normalizeCategory(i.category) === cat);
-                             if (catIndicators.length === 0) return null;
-                             const colorObj = getCategoryColor(cat);
-                             
-                             return (
-                               <div key={cat} className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-                                 <div className="flex items-center gap-2 mb-2">
-                                   <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: colorObj.hex }} />
-                                   <span className="text-xs font-black text-slate-800 dark:text-slate-200">
-                                     {translateCategory(cat)}
-                                   </span>
-                                   <span className="text-[10px] font-bold text-slate-400 ml-auto">
-                                     {catIndicators.length} {language === 'en' ? 'items' : 'वस्तुहरू'}
-                                   </span>
-                                 </div>
-                                 <div className="flex flex-wrap gap-1.5">
-                                   {catIndicators.map((ind) => (
-                                     <span
-                                       key={ind.id}
-                                       className="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-                                     >
-                                       {language === 'en' ? (ind.nameEn || ind.name) : ind.name}
-                                     </span>
-                                   ))}
-                                 </div>
-                               </div>
-                             );
-                           })}
+                         <div className="space-y-3 max-h-[340px] overflow-y-auto pr-1">
+                           {/* On Track */}
+                           <div className="space-y-1.5">
+                             <div className="flex items-center gap-2">
+                               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                               <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                                 {language === 'en' ? `On Track (≥80%) — ${stats.onTrack}` : `सफल (≥८०%) — ${stats.onTrack}`}
+                               </span>
+                             </div>
+                             <div className="flex flex-wrap gap-1.5 pl-5">
+                               {indicators.filter(i => i && (i.annualTarget > 0 ? Math.min(100, Math.round((i.annualProgress / i.annualTarget) * 100)) : 0) >= 80).map((ind) => (
+                                 <span key={ind.id} className="text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800/40">
+                                   {language === 'en' ? (ind.nameEn || ind.name) : ind.name}
+                                 </span>
+                               ))}
+                               {indicators.filter(i => i && (i.annualTarget > 0 ? Math.min(100, Math.round((i.annualProgress / i.annualTarget) * 100)) : 0) >= 80).length === 0 && (
+                                 <span className="text-[10px] font-semibold text-slate-400 italic">{language === 'en' ? 'None' : 'कुनै छैन'}</span>
+                               )}
+                             </div>
+                           </div>
+
+                           {/* Below Target */}
+                           <div className="space-y-1.5">
+                             <div className="flex items-center gap-2">
+                               <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                               <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-300">
+                                 {language === 'en' ? `Below Target (40-79%) — ${stats.needsAttention}` : `मध्यम (४०-७९%) — ${stats.needsAttention}`}
+                               </span>
+                             </div>
+                             <div className="flex flex-wrap gap-1.5 pl-5">
+                               {indicators.filter(i => i && (i.annualTarget > 0 ? Math.min(100, Math.round((i.annualProgress / i.annualTarget) * 100)) : 0) >= 40 && (i.annualTarget > 0 ? Math.min(100, Math.round((i.annualProgress / i.annualTarget) * 100)) : 0) < 80).map((ind) => (
+                                 <span key={ind.id} className="text-[10px] font-bold px-2 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800/40">
+                                   {language === 'en' ? (ind.nameEn || ind.name) : ind.name}
+                                 </span>
+                               ))}
+                               {indicators.filter(i => i && (i.annualTarget > 0 ? Math.min(100, Math.round((i.annualProgress / i.annualTarget) * 100)) : 0) >= 40 && (i.annualTarget > 0 ? Math.min(100, Math.round((i.annualProgress / i.annualTarget) * 100)) : 0) < 80).length === 0 && (
+                                 <span className="text-[10px] font-semibold text-slate-400 italic">{language === 'en' ? 'None' : 'कुनै छैन'}</span>
+                               )}
+                             </div>
+                           </div>
+
+                           {/* Needs Attention */}
+                           <div className="space-y-1.5">
+                             <div className="flex items-center gap-2">
+                               <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                               <span className="text-[10px] font-black uppercase tracking-wider text-rose-700 dark:text-rose-300">
+                                 {language === 'en' ? `Needs Attention (<40%) — ${stats.staleCount}` : `गम्भीर (<४०%) — ${stats.staleCount}`}
+                               </span>
+                             </div>
+                             <div className="flex flex-wrap gap-1.5 pl-5">
+                               {indicators.filter(i => i && (i.annualTarget > 0 ? Math.min(100, Math.round((i.annualProgress / i.annualTarget) * 100)) : 0) < 40).map((ind) => (
+                                 <span key={ind.id} className="text-[10px] font-bold px-2 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-800/40">
+                                   {language === 'en' ? (ind.nameEn || ind.name) : ind.name}
+                                 </span>
+                               ))}
+                               {indicators.filter(i => i && (i.annualTarget > 0 ? Math.min(100, Math.round((i.annualProgress / i.annualTarget) * 100)) : 0) < 40).length === 0 && (
+                                 <span className="text-[10px] font-semibold text-slate-400 italic">{language === 'en' ? 'None' : 'कुनै छैन'}</span>
+                               )}
+                             </div>
+                           </div>
                          </div>
                        </div>
                     </div>
