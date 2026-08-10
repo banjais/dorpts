@@ -55,6 +55,7 @@ export const Footer: React.FC<FooterProps> = ({
   const currentUrl = window.location.href;
   const [minutesAgo, setMinutesAgo] = useState<number | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isTouched, setIsTouched] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
   const prevSyncingRef = React.useRef(isSyncing);
   const [updateBannerVisible, setUpdateBannerVisible] = useState(false);
@@ -62,7 +63,7 @@ export const Footer: React.FC<FooterProps> = ({
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showSyncDropdown, setShowSyncDropdown] = useState(false);
   
-  const shouldExpand = isExpanded || isHovered;
+  const shouldExpand = isExpanded || isHovered || isTouched;
   
   const updateMinutesAgo = () => {
     try {
@@ -233,11 +234,13 @@ export const Footer: React.FC<FooterProps> = ({
 
   return (
     <>
-      <footer 
-         id="app-footer"
-         onMouseEnter={() => { setIsHovered(true); onExpandChange?.(true); }}
-         onMouseLeave={() => { setIsHovered(false); onExpandChange?.(false); }}
-         onClick={(e) => { e.stopPropagation(); onExpandChange?.(!shouldExpand); }}
+       <footer 
+          id="app-footer"
+          onMouseEnter={() => { setIsHovered(true); onExpandChange?.(true); }}
+          onMouseLeave={() => { setIsHovered(false); onExpandChange?.(false); }}
+          onTouchStart={() => { setIsTouched(true); onExpandChange?.(true); }}
+          onTouchEnd={() => { setIsTouched(false); onExpandChange?.(false); }}
+          onClick={(e) => { e.stopPropagation(); onExpandChange?.(!shouldExpand); }}
          className={`fixed bottom-0 left-0 w-full z-[850] transition-all duration-500 ease-out cursor-pointer ${
            shouldExpand
              ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t-2 border-indigo-500/40 dark:border-indigo-400/30 shadow-[0_-4px_32px_rgba(0,0,0,0.08)] py-10 sm:py-14'

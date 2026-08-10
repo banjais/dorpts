@@ -2105,8 +2105,8 @@ export const Overview: React.FC<OverviewProps> = ({
                   )}
                </div>
 
-               {/* Scrollable Expanded View Content */}
-                 <div className="p-2 sm:p-3 md:p-5 overflow-y-auto space-y-2 sm:space-y-3 md:space-y-6 custom-scrollbar max-h-[calc(75dvh-55px)] sm:max-h-[calc(90dvh-75px)]">
+                {/* Scrollable Expanded View Content */}
+                  <div className="flex-1 min-h-0 p-2 sm:p-3 md:p-5 overflow-y-auto space-y-2 sm:space-y-3 md:space-y-6 custom-scrollbar">
                  {/* Card 0: Overall Progress Performance Expanded Modal */}
                  {activeExpandedModalCardId === 'overall-progress' && (
                    <div className="space-y-6">

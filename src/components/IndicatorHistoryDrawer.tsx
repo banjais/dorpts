@@ -107,7 +107,7 @@ export const IndicatorHistoryDrawer: React.FC<IndicatorHistoryDrawerProps> = ({
               triggerHaptic('light');
               onClose();
             }}
-            className="fixed inset-0 bg-slate-900/65 backdrop-blur-xs z-[1050] pointer-events-auto"
+            className="fixed inset-0 bg-slate-900/65 backdrop-blur-xs z-[6000] pointer-events-auto"
           />
 
           {/* Subtle Zoom-In Panel (Centered for focus) */}
@@ -116,7 +116,7 @@ export const IndicatorHistoryDrawer: React.FC<IndicatorHistoryDrawerProps> = ({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[90vh] w-full max-w-2xl bg-white dark:bg-slate-900 shadow-3xl z-[1060] flex flex-col pointer-events-auto border border-slate-200/50 dark:border-slate-800 rounded-3xl overflow-hidden"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[90vh] w-full max-w-2xl bg-white dark:bg-slate-900 shadow-3xl z-[6100] flex flex-col pointer-events-auto border border-slate-200/50 dark:border-slate-800 rounded-3xl overflow-hidden"
           >
             {/* Drawer Header */}
             <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/20">
