@@ -2252,10 +2252,20 @@ export const Overview: React.FC<OverviewProps> = ({
                            
                            return (
                              <div key={cat} className="space-y-1.5">
-                               <div className="flex items-center gap-2">
-                                 <span className="w-2 h-2 rounded-full bg-slate-400"></span>
-                                 <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                                   {translateCategory(cat)}
+                               <div className="flex items-center justify-between">
+                                 <div className="flex items-center gap-2">
+                                   <span className="w-2 h-2 rounded-full bg-slate-400"></span>
+                                   <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                     {translateCategory(cat)}
+                                   </span>
+                                 </div>
+                                 <span className="text-xs font-black text-slate-900 dark:text-white">
+                                   {(() => {
+                                     const totalT = catIndicators.reduce((a, b) => a + (b.annualTarget || 0), 0);
+                                     const totalP = catIndicators.reduce((a, b) => a + (b.annualProgress || 0), 0);
+                                     const avgPct = totalT > 0 ? Math.min(100, Math.round((totalP / totalT) * 100)) : 0;
+                                     return `${avgPct}%`;
+                                   })()}
                                  </span>
                                </div>
                                <div className="space-y-1 pl-4">
