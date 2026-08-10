@@ -2585,37 +2585,6 @@ function MainAppContent() {
   const [cardsHidden, setCardsHidden] = useState(false);
   const fabHoverTimer = useRef<number | null>(null);
 
-  // AI Auto-Summarization: Generate smart summary when indicators load
-  const hasAutoSummarized = useRef(false);
-  useEffect(() => {
-    if (indicators.length > 0 && !loading && !hasAutoSummarized.current) {
-      hasAutoSummarized.current = true;
-      const timer = setTimeout(() => {
-        const total = indicators.length;
-        const onTrack = indicators.filter(ind => {
-          const pct = ind.annualTarget > 0 ? (ind.annualProgress / ind.annualTarget) * 100 : 0;
-          return pct >= 60;
-        }).length;
-        const critical = indicators.filter(ind => {
-          const pct = ind.annualTarget > 0 ? (ind.annualProgress / ind.annualTarget) * 100 : 0;
-          return pct < 20;
-        }).length;
-        const weightedRate = dashboardCalculations.weightedRate;
-        
-        const summaryEn = `AI Dashboard Summary: ${total} indicators tracked. ${onTrack} on track (${Math.round(onTrack/total*100)}%). ${critical} critical. Weighted achievement: ${weightedRate}%.`;
-        const summaryNp = `एआई ड्यासबोर्ड सारांश: ${toNepaliNumerals(total)} सूचकहरू ट्र्याक गरियो। ${toNepaliNumerals(onTrack)} ट्र्याकमा (${Math.round(onTrack/total*100)}%)। ${toNepaliNumerals(critical)} नाजुक। भारित उपलब्धि: ${toNepaliNumerals(weightedRate)}%।`;
-        
-        addToast(
-          summaryNp,
-          summaryEn,
-          "info",
-          6000
-        );
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [indicators, loading]);
-
   // AI Smart Notifications: Detect anomalies in indicator data
   const prevIndicatorsRef = useRef<Indicator[]>([]);
   useEffect(() => {
