@@ -1381,7 +1381,7 @@ export const Overview: React.FC<OverviewProps> = ({
             opacity: cardsReachedHeader ? 0 : 1,
           }}
           transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-          className="dashboard-cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-5 pb-8 sm:pb-12"
+          className="dashboard-cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 pb-10 sm:pb-16"
         >
           <AnimatePresence mode="popLayout">
 
@@ -1409,7 +1409,7 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('overall-progress');
           toggleCard(setShowOverallProgress, showOverallProgress);
         }}
-        className="group relative w-full cursor-pointer bg-gradient-to-br from-indigo-50/90 via-white to-slate-50 dark:from-indigo-900/90 dark:via-slate-900 dark:to-indigo-950 text-slate-900 dark:text-white rounded-[28px] p-3 sm:p-4 text-left shadow-lg hover:shadow-xl dark:shadow-2xl dark:hover:shadow-indigo-500/10 border border-indigo-200/80 dark:border-indigo-500/30 transition-all duration-200 min-h-[100px] sm:min-h-[140px] flex flex-col justify-between overflow-hidden"
+         className="group relative w-full cursor-pointer bg-gradient-to-br from-indigo-50/90 via-white to-slate-50 dark:from-indigo-900/90 dark:via-slate-900 dark:to-indigo-950 text-slate-900 dark:text-white rounded-[28px] p-3 sm:p-4 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-indigo-200/80 dark:border-indigo-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex flex-col justify-between overflow-hidden hover:-translate-y-1"
       >
         <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col justify-between h-full gap-2 sm:gap-3">
@@ -1556,7 +1556,7 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('category-status');
           toggleCard(setShowCategoryStatus, showCategoryStatus);
         }}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-400/50 dark:hover:border-cyan-500/40 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-400/50 dark:hover:border-cyan-500/40 transition-all duration-300 min-h-[70px] sm:min-h-[80px] flex items-center justify-between hover:-translate-y-1"
       >
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <span className="p-2 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl shadow-md shadow-cyan-500/30 shrink-0">
