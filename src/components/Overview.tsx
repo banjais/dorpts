@@ -1375,7 +1375,7 @@ export const Overview: React.FC<OverviewProps> = ({
             opacity: cardsReachedHeader ? 0 : 1,
           }}
           transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-          className="dashboard-cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 pb-12 sm:pb-16"
+          className="dashboard-cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-5 pb-8 sm:pb-12"
         >
           <AnimatePresence mode="popLayout">
 
@@ -1403,33 +1403,33 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('overall-progress');
           toggleCard(setShowOverallProgress, showOverallProgress);
         }}
-        className="group relative w-full cursor-pointer bg-gradient-to-br from-indigo-50/90 via-white to-slate-50 dark:from-indigo-900/90 dark:via-slate-900 dark:to-indigo-950 text-slate-900 dark:text-white rounded-[28px] p-4 sm:p-6 text-left shadow-lg hover:shadow-xl dark:shadow-2xl dark:hover:shadow-indigo-500/10 border border-indigo-200/80 dark:border-indigo-500/30 transition-all duration-200 min-h-[200px] flex flex-col justify-between overflow-hidden"
+        className="group relative w-full cursor-pointer bg-gradient-to-br from-indigo-50/90 via-white to-slate-50 dark:from-indigo-900/90 dark:via-slate-900 dark:to-indigo-950 text-slate-900 dark:text-white rounded-[28px] p-3 sm:p-4 text-left shadow-lg hover:shadow-xl dark:shadow-2xl dark:hover:shadow-indigo-500/10 border border-indigo-200/80 dark:border-indigo-500/30 transition-all duration-200 min-h-[100px] sm:min-h-[140px] flex flex-col justify-between overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col justify-between h-full gap-4">
+        <div className="relative z-10 flex flex-col justify-between h-full gap-2 sm:gap-3">
           {/* Header Row */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="p-2.5 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-2xl border border-indigo-200 dark:border-indigo-500/30 shadow-inner">
-                <TrendingUp size={20} className="text-indigo-600 dark:text-indigo-400" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="p-2 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-xl border border-indigo-200 dark:border-indigo-500/30 shadow-inner">
+                <TrendingUp size={18} className="text-indigo-600 dark:text-indigo-400" />
               </span>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-black uppercase tracking-[0.25em] text-indigo-600 dark:text-indigo-300">
+                  <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-300">
                     {language === 'en' ? 'Executive Overview' : 'कार्यकारी प्रणाली अवलोकन'}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30">
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30">
                     LIVE
                   </span>
                 </div>
-                <h3 className="text-base sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-white tracking-tight">
                   {language === 'en' ? 'Overall Progress Performance' : 'समग्र कार्यसम्पादन र प्रगति विवरण'}
                 </h3>
               </div>
             </div>
 
             {/* Top Quick Actions */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex flex-wrap items-center justify-end gap-1 sm:gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={(e) => {
@@ -1456,7 +1456,7 @@ export const Overview: React.FC<OverviewProps> = ({
                 <Maximize2 size={16} className="text-indigo-600 dark:text-indigo-300" />
               </button>
 
-              <div className="flex items-center gap-1 pl-2 border-l border-indigo-200/60 dark:border-indigo-500/30">
+              <div className="flex flex-wrap items-center gap-1 pl-1.5 sm:pl-2 border-l border-indigo-200/60 dark:border-indigo-500/30">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -1464,10 +1464,10 @@ export const Overview: React.FC<OverviewProps> = ({
                     triggerHaptic('light');
                     speechPlayer.toggleMute();
                   }}
-                  className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer"
+                  className="p-1 rounded-md bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer"
                   title={language === 'en' ? (speechState.isMuted ? 'Unmute' : 'Mute') : (speechState.isMuted ? 'आवाज चालु गर्नुहोस्' : 'आवाज बन्द गर्नुहोस्')}
                 >
-                  {speechState.isMuted ? <MicOff size={14} /> : <Mic size={14} />}
+                  {speechState.isMuted ? <MicOff size={12} /> : <Mic size={12} />}
                 </button>
                 <button
                   type="button"
@@ -1480,10 +1480,10 @@ export const Overview: React.FC<OverviewProps> = ({
                       speechPlayer.play(dashboardSummaryText, language);
                     }
                   }}
-                  className="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-500/30 hover:bg-indigo-200 dark:hover:bg-indigo-500/40 text-indigo-800 dark:text-indigo-200 border border-indigo-300 dark:border-indigo-500/40 transition-all cursor-pointer"
+                  className="p-1 rounded-md bg-indigo-100 dark:bg-indigo-500/30 hover:bg-indigo-200 dark:hover:bg-indigo-500/40 text-indigo-800 dark:text-indigo-200 border border-indigo-300 dark:border-indigo-500/40 transition-all cursor-pointer"
                   title={language === 'en' ? (speechState.isPlaying ? 'Pause' : 'Play Summary') : (speechState.isPlaying ? 'पज गर्नुहोस्' : 'सारांश प्ले गर्नुहोस्')}
                 >
-                  {speechState.isPlaying ? <Pause size={14} /> : <Play size={14} />}
+                  {speechState.isPlaying ? <Pause size={12} /> : <Play size={12} />}
                 </button>
                 <button
                   type="button"
@@ -1492,10 +1492,10 @@ export const Overview: React.FC<OverviewProps> = ({
                     triggerHaptic('light');
                     speechPlayer.stop();
                   }}
-                  className="p-1.5 rounded-lg bg-rose-100 dark:bg-rose-500/20 hover:bg-rose-200 dark:hover:bg-rose-500/30 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-500/30 transition-all cursor-pointer"
+                  className="p-1 rounded-md bg-rose-100 dark:bg-rose-500/20 hover:bg-rose-200 dark:hover:bg-rose-500/30 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-500/30 transition-all cursor-pointer"
                   title={language === 'en' ? 'Stop' : 'रोक्नुहोस्'}
                 >
-                  <Square size={14} />
+                  <Square size={12} />
                 </button>
                 <button
                   type="button"
@@ -1505,10 +1505,10 @@ export const Overview: React.FC<OverviewProps> = ({
                     speechPlayer.prev();
                   }}
                   disabled={speechState.currentIndex <= 0}
-                  className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer disabled:opacity-40"
+                  className="p-1 rounded-md bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer disabled:opacity-40"
                   title={language === 'en' ? 'Previous Sentence' : 'अघिल्लो वाक्य'}
                 >
-                  <SkipBack size={14} />
+                  <SkipBack size={12} />
                 </button>
                 <button
                   type="button"
@@ -1517,10 +1517,10 @@ export const Overview: React.FC<OverviewProps> = ({
                     triggerHaptic('light');
                     speechPlayer.repeat();
                   }}
-                  className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer"
+                  className="p-1 rounded-md bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer"
                   title={language === 'en' ? 'Repeat Sentence' : 'वाक्य दोहोर्याउनुहोस्'}
                 >
-                  <Repeat size={14} />
+                  <Repeat size={12} />
                 </button>
                 <button
                   type="button"
@@ -1530,17 +1530,17 @@ export const Overview: React.FC<OverviewProps> = ({
                     speechPlayer.next();
                   }}
                   disabled={speechState.currentIndex >= speechState.totalSentences - 1}
-                  className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer disabled:opacity-40"
+                  className="p-1 rounded-md bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer disabled:opacity-40"
                   title={language === 'en' ? 'Next Sentence' : 'अर्को वाक्य'}
                 >
-                  <SkipForward size={14} />
+                  <SkipForward size={12} />
                 </button>
               </div>
             </div>
           </div>
 
           {/* Metrics & Gauge Row */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full bg-indigo-900/5 dark:bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-indigo-100 dark:border-white/10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full bg-indigo-900/5 dark:bg-white/5 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-indigo-100 dark:border-white/10">
               <div className="flex flex-col gap-2">
                 <span className="text-xs font-extrabold text-indigo-700 dark:text-indigo-300 uppercase tracking-widest bg-indigo-100 dark:bg-indigo-500/20 px-2.5 py-1 rounded-lg border border-indigo-200 dark:border-indigo-500/30">
                   {language === 'en' ? 'Weighted Completion' : 'भारित सफलता'}
@@ -1583,14 +1583,9 @@ export const Overview: React.FC<OverviewProps> = ({
           </div>
 
           {/* Bottom Action Footer */}
-          <div className="flex flex-col gap-1.5 text-xs font-extrabold text-slate-600 dark:text-indigo-200/80 pt-2 border-t border-slate-200/80 dark:border-white/10">
+          <div className="flex flex-col gap-0.5 text-[10px] sm:text-xs font-extrabold text-slate-600 dark:text-indigo-200/80 pt-1.5 border-t border-slate-200/80 dark:border-white/10">
             <span>{language === 'en' ? 'Total Indicators:' : 'कुल सूचकहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(stats.total)}</strong></span>
             <span>{language === 'en' ? 'Reporting Offices:' : 'रिपोर्टिङ कार्यालयहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(reportingOffices.length)}</strong></span>
-            <div className="flex justify-end">
-              <div className="flex items-center gap-1 text-indigo-600 dark:text-indigo-300 font-bold group-hover:text-indigo-800 dark:group-hover:text-white transition-colors">
-                <ChevronDown size={14} className={`transform transition-transform ${showOverallProgress ? 'rotate-180' : ''}`} />
-              </div>
-            </div>
           </div>
         </div>
       </motion.div>
@@ -1623,7 +1618,7 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('category-status');
           toggleCard(setShowCategoryStatus, showCategoryStatus);
         }}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-3 sm:p-4 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-400/50 dark:hover:border-cyan-500/40 transition-all duration-200 min-h-[80px] sm:min-h-[90px] flex items-center justify-between"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 hover:border-cyan-400/50 dark:hover:border-cyan-500/40 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
       >
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -1672,7 +1667,7 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('status-breakdown');
           toggleCard(setShowStatusDetails, showStatusDetails);
         }}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-3 sm:p-4 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 hover:border-amber-400/50 dark:hover:border-amber-500/40 transition-all duration-200 min-h-[80px] sm:min-h-[90px] flex items-center justify-between"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 hover:border-amber-400/50 dark:hover:border-amber-500/40 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
       >
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -1718,7 +1713,7 @@ export const Overview: React.FC<OverviewProps> = ({
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => onNavigateToView?.('insights')}
-        className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-3 sm:p-4 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[80px] sm:min-h-[90px] flex items-center justify-between"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
       >
         <div className="flex items-center justify-between mb-1">
           <div>
@@ -1767,7 +1762,7 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('budget-card');
           toggleCard(setShowBudgetCard, showBudgetCard);
         }}
-        className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-3 sm:p-4 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[80px] sm:min-h-[90px] flex items-center justify-between"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
       >
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -1816,7 +1811,7 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('employment-card');
           toggleCard(setShowEmploymentCard, showEmploymentCard);
         }}
-        className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-3 sm:p-4 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[80px] sm:min-h-[90px] flex items-center justify-between"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
       >
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -1862,7 +1857,7 @@ export const Overview: React.FC<OverviewProps> = ({
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => onNavigateToView?.('detailed-gallery')}
-         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-3 sm:p-4 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[80px] sm:min-h-[90px] flex items-center justify-between"
+         className="group relative w-full cursor-pointer bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-[28px] p-2.5 sm:p-3 text-left shadow-md hover:shadow-xl border border-slate-200/90 dark:border-slate-700/80 transition-all duration-200 min-h-[70px] sm:min-h-[80px] flex items-center justify-between"
       >
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
