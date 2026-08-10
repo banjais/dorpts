@@ -1519,32 +1519,6 @@ function MainAppContent() {
   const [isPulling, setIsPulling] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  const [hasNewUpdate, setHasNewUpdate] = useState(false);
-
-  useEffect(() => {
-    try {
-      if (sessionStorage.getItem('dor_app_just_updated') === 'true') {
-        sessionStorage.removeItem('dor_app_just_updated');
-        localStorage.setItem('dor_app_version', APP_VERSION);
-        setHasNewUpdate(false);
-        return;
-      }
-      const stored = localStorage.getItem('dor_app_version');
-      if (stored !== APP_VERSION) {
-        setHasNewUpdate(true);
-      }
-    } catch (_) {
-      setHasNewUpdate(true);
-    }
-  }, []);
-
-  const markVersionUpdated = () => {
-    try {
-      localStorage.setItem('dor_app_version', APP_VERSION);
-    } catch (_) {}
-    setHasNewUpdate(false);
-  };
-
   const speakDashboardSummary = useCallback(() => {
     if (typeof window !== 'undefined' && getMuted?.()) return;
     if (typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.speaking) {
@@ -1640,7 +1614,6 @@ function MainAppContent() {
         if (data.lastUpdateDate) {
           localStorage.setItem("dor_last_seen_update", data.lastUpdateDate);
         }
-        markVersionUpdated();
         try {
           localStorage.setItem("dor_metadata_cache", JSON.stringify(data));
         } catch (_) {}
@@ -3539,16 +3512,15 @@ function MainAppContent() {
             onOpenHelp={() => setIsHelpOpen(true)}
             onOpenFeedback={() => setIsFeedbackModalOpen(true)}
             onOpenAI={() => setIsAIAssistantOpen(true)}
-            isScrolled={isScrolled}
-            viewMode={viewMode}
-            fiscalYear={selectedFiscalYear}
-            isExpanded={isFooterExpanded}
-            onExpandChange={setIsFooterExpanded}
-            isSyncing={isSyncing}
-            onManualSync={handleManualSync}
-            onOpenDrawer={() => setIsDrawerOpen(true)}
-            hasNewUpdate={hasNewUpdate}
-             onRefresh={async () => {
+             isScrolled={isScrolled}
+             viewMode={viewMode}
+             fiscalYear={selectedFiscalYear}
+             isExpanded={isFooterExpanded}
+             onExpandChange={setIsFooterExpanded}
+             isSyncing={isSyncing}
+             onManualSync={handleManualSync}
+             onOpenDrawer={() => setIsDrawerOpen(true)}
+              onRefresh={async () => {
                await handleManualSync();
                if ('serviceWorker' in navigator) {
                  try {

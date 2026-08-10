@@ -19,8 +19,6 @@ interface FooterProps {
   onManualSync?: () => void;
   onOpenDrawer?: () => void;
   onGoHome?: () => void;
-  hasNewUpdate?: boolean;
-  onRefresh?: () => void;
   canGiveFeedback?: boolean;
   pendingWrites?: Array<{ id: string; name: string; nameEn?: string }>;
   hasPendingWrites?: boolean;
@@ -41,8 +39,6 @@ export const Footer: React.FC<FooterProps> = ({
   onManualSync,
   onOpenDrawer,
   onGoHome,
-  hasNewUpdate = false,
-  onRefresh,
   canGiveFeedback,
   pendingWrites = [],
   hasPendingWrites = false,
@@ -58,7 +54,6 @@ export const Footer: React.FC<FooterProps> = ({
   const [isTouched, setIsTouched] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
   const prevSyncingRef = React.useRef(isSyncing);
-  const [updateBannerVisible, setUpdateBannerVisible] = useState(false);
   const [showLastSynced, setShowLastSynced] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showSyncDropdown, setShowSyncDropdown] = useState(false);
@@ -90,9 +85,6 @@ export const Footer: React.FC<FooterProps> = ({
   useEffect(() => {
     if (!isSyncing && prevSyncingRef.current) {
       setSyncSuccess(true);
-      if (updateBannerVisible) {
-        setTimeout(() => setUpdateBannerVisible(false), 5000);
-      }
       setTimeout(() => setSyncSuccess(false), 4000);
       setShowLastSynced(true);
       setTimeout(() => setShowLastSynced(false), 5000);
@@ -424,31 +416,11 @@ export const Footer: React.FC<FooterProps> = ({
                   </p>
                   <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
                 </div>
-               <div className="flex items-center justify-center gap-3">
-                <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
-                  v{APP_VERSION}
-                </p>
-                {hasNewUpdate && !updateBannerVisible && (
-                  <motion.button
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setUpdateBannerVisible(true);
-                      onExpandChange?.(true);
-                      onRefresh?.();
-                    }}
-                    className="shrink-0 text-[0.55rem] sm:text-[0.6rem] font-black uppercase tracking-[0.2em] text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 animate-pulse cursor-pointer"
-                  >
-                     {language === 'en' ? 'Update' : 'अपडेट'}
-                  </motion.button>
-                )}
-                {updateBannerVisible && (
-                  <p className="text-[0.55rem] sm:text-[0.6rem] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">
-                    {language === 'en' ? `Updated to v${APP_VERSION}` : `v${APP_VERSION} मा अपडेट भयो`}
-                  </p>
-                )}
-                {minutesAgo !== null && (
+                <div className="flex items-center justify-center gap-3">
+                 <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
+                   v{APP_VERSION}
+                 </p>
+                 {minutesAgo !== null && (
                  <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium truncate">
                    {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
                  </p>
@@ -487,17 +459,8 @@ export const Footer: React.FC<FooterProps> = ({
               )}
               {minutesAgo !== null && !isSyncing && !syncSuccess && showLastSynced && (
                 <span className="text-[0.55rem] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  {language === 'en' ? `Synced ${minutesAgo}m ago` : `सिंक: ${minutesAgo}m अघि`}
+                  {language === 'en' ? `Synced ${minutesAgo}m ago` : `सिंक: ${minutesAgo} मिनेट अघि`}
                 </span>
-              )}
-              {hasNewUpdate && !updateBannerVisible && (
-                <motion.span
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 border border-rose-300 dark:border-rose-500/40 text-[0.6rem] font-black uppercase tracking-wider text-rose-700 dark:text-rose-400 animate-pulse"
-                >
-                  {language === 'en' ? 'Update available' : 'अपडेट उपलब्ध'}
-                </motion.span>
               )}
               <motion.span
                 animate={{ 
