@@ -142,7 +142,7 @@ import {
 } from "recharts";
 import { HISTORICAL_DATA } from "./historicalData";
 import { triggerHaptic } from "./utils/haptic";
-import { speak, getMuted } from "./utils/speech";
+import { speak, speechPlayer, buildDashboardSummaryText, getMuted } from "./utils/speech";
 import { getStatusBadge } from "./utils/status";
 
 const cardStaggerContainerVariants = {
@@ -1567,41 +1567,9 @@ function MainAppContent() {
       return acc + (achievement * ((curr.weight || 0) / 100));
     }, 0);
     const weightedRate = totalWeight > 0 ? Math.round((achievedWeight / totalWeight) * 100) : 0;
-    let text = '';
-    if (language === 'en') {
-      text = `System Dashboard Summary. Tracking ${total} performance indicators. The overall weighted achievement rate is ${weightedRate} percent. `;
-      if (lowIndicators.length > 0) {
-        text += `Attention required: There are ${lowIndicators.length} indicators performing below the 20 percent threshold. `;
-        const listNames = lowIndicators.slice(0, 5).map(i => i.nameEn || i.name).join(', ');
-        text += `These critical indicators include: ${listNames}. `;
-        if (lowIndicators.length > 5) {
-          text += `and ${lowIndicators.length - 5} other indicators. `;
-        }
-        text += "Please review these indicators for recovery actions.";
-      } else {
-        text += "Outstanding performance. All active indicators are currently performing above the 20 percent threshold.";
-      }
-    } else {
-      const nepaliTotal = toNepaliNumerals(total);
-      const nepaliRate = toNepaliNumerals(weightedRate);
-      const nepaliLowCount = toNepaliNumerals(lowIndicators.length);
-      text = `प्रणाली ड्यासबोर्ड सारांश। कुल ${nepaliTotal} कार्यसम्पादन सूचकहरू ट्र्याक गरिएको छ। समग्र भारित उपलब्धि दर ${nepaliRate} प्रतिशत रहेको छ। `;
-      if (lowIndicators.length > 0) {
-        text += `विशेष ध्यान दिनुहोस्: ${nepaliLowCount} वटा सूचकहरू बीस प्रतिशतको थ्रेसहोल्ड भन्दा कम प्रदर्शनमा छन्। `;
-        const listNames = lowIndicators.slice(0, 5).map(i => i.name).join(', ');
-        text += `यी सूचकहरूमा: ${listNames} समावेश छन्। `;
-        if (lowIndicators.length > 5) {
-          text += `र अन्य ${toNepaliNumerals(lowIndicators.length - 5)} सूचकहरू। `;
-        }
-        text += "कृपया यी सूचकहरूको सुधारका लागि आवश्यक कदमहरू चाल्नुहोला।";
-      } else {
-        text += "उत्कृष्ट कार्यसम्पादन। सबै सूचकहरू हाल बीस प्रतिशतको न्यूनतम थ्रेसहोल्ड भन्दा माथि रहेका छन्।";
-      }
-    }
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
-    speak(text, language);
+    const lowIndicatorNames = lowIndicators.map(i => i.nameEn || i.name);
+    const text = buildDashboardSummaryText(total, weightedRate, lowIndicatorNames, language);
+    speechPlayer.play(text, language);
   }, [indicators, language]);
 
   const pullDistanceRef = React.useRef(0);

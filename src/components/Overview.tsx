@@ -8,6 +8,7 @@ import { normalizeCategory, getCategoryColor, STANDARD_CATEGORIES } from '../uti
 import { triggerHaptic } from '../utils/haptic';
 import { HISTORICAL_DATA } from '../historicalData';
 import { formatNepaliDate } from '../utils/date';
+import { speechPlayer, buildDashboardSummaryText } from '../utils/speech';
 import {
   Archive,
   RotateCcw,
@@ -34,6 +35,13 @@ import {
   LayoutGrid,
   Activity,
   Mic,
+  MicOff,
+  Play,
+  Pause,
+  Square,
+  SkipBack,
+  SkipForward,
+  Repeat,
   Wallet,
   PiggyBank,
   Building2,
@@ -885,15 +893,12 @@ export const Overview: React.FC<OverviewProps> = ({
   const [activeExpandedModalCardId, setActiveExpandedModalCardId] = useState<string | null>(null);
   const [modalSearchQuery, setModalSearchQuery] = useState('');
   const [modalCategoryFilter, setModalCategoryFilter] = useState('All');
-  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const [speechState, setSpeechState] = useState<ReturnType<typeof speechPlayer.getState>>(speechPlayer.getState());
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        setIsSpeaking(window.speechSynthesis.speaking);
-      }
-    }, 500);
-    return () => clearInterval(interval);
+    const unsubscribe = speechPlayer.subscribe(setSpeechState);
+    return unsubscribe;
   }, []);
 
   const closeAllCards = useCallback(() => {
@@ -1116,6 +1121,23 @@ export const Overview: React.FC<OverviewProps> = ({
       weightedRate: weightedAchievementRate,
     };
   }, [indicators, weightedAchievementRate]);
+
+  const dashboardSummaryText = useMemo(() => {
+    const lowIndicators = indicators.filter((ind) => {
+      if (!ind) return false;
+      const target = ind.annualTarget || 0;
+      const progress = ind.annualProgress || 0;
+      const achievement = target > 0 ? (progress / target) * 100 : 0;
+      return achievement < 20;
+    });
+    const lowIndicatorNames = lowIndicators.map(i => i.nameEn || i.name);
+    return buildDashboardSummaryText(
+      indicators.length,
+      Math.round(weightedAchievementRate),
+      lowIndicatorNames,
+      language
+    );
+  }, [indicators, weightedAchievementRate, language]);
 
   const reportingOffices = useMemo(() => {
     const emailMap = new Map<string, Set<string>>();
@@ -1433,6 +1455,87 @@ export const Overview: React.FC<OverviewProps> = ({
               >
                 <Maximize2 size={16} className="text-indigo-600 dark:text-indigo-300" />
               </button>
+
+              <div className="flex items-center gap-1 pl-2 border-l border-indigo-200/60 dark:border-indigo-500/30">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    triggerHaptic('light');
+                    speechPlayer.toggleMute();
+                  }}
+                  className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer"
+                  title={language === 'en' ? (speechState.isMuted ? 'Unmute' : 'Mute') : (speechState.isMuted ? 'आवाज चालु गर्नुहोस्' : 'आवाज बन्द गर्नुहोस्')}
+                >
+                  {speechState.isMuted ? <MicOff size={14} /> : <Mic size={14} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    triggerHaptic('light');
+                    if (speechState.isPlaying) {
+                      speechPlayer.stop();
+                    } else {
+                      speechPlayer.play(dashboardSummaryText, language);
+                    }
+                  }}
+                  className="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-500/30 hover:bg-indigo-200 dark:hover:bg-indigo-500/40 text-indigo-800 dark:text-indigo-200 border border-indigo-300 dark:border-indigo-500/40 transition-all cursor-pointer"
+                  title={language === 'en' ? (speechState.isPlaying ? 'Pause' : 'Play Summary') : (speechState.isPlaying ? 'पज गर्नुहोस्' : 'सारांश प्ले गर्नुहोस्')}
+                >
+                  {speechState.isPlaying ? <Pause size={14} /> : <Play size={14} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    triggerHaptic('light');
+                    speechPlayer.stop();
+                  }}
+                  className="p-1.5 rounded-lg bg-rose-100 dark:bg-rose-500/20 hover:bg-rose-200 dark:hover:bg-rose-500/30 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-500/30 transition-all cursor-pointer"
+                  title={language === 'en' ? 'Stop' : 'रोक्नुहोस्'}
+                >
+                  <Square size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    triggerHaptic('light');
+                    speechPlayer.prev();
+                  }}
+                  disabled={speechState.currentIndex <= 0}
+                  className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer disabled:opacity-40"
+                  title={language === 'en' ? 'Previous Sentence' : 'अघिल्लो वाक्य'}
+                >
+                  <SkipBack size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    triggerHaptic('light');
+                    speechPlayer.repeat();
+                  }}
+                  className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer"
+                  title={language === 'en' ? 'Repeat Sentence' : 'वाक्य दोहोर्याउनुहोस्'}
+                >
+                  <Repeat size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    triggerHaptic('light');
+                    speechPlayer.next();
+                  }}
+                  disabled={speechState.currentIndex >= speechState.totalSentences - 1}
+                  className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 transition-all cursor-pointer disabled:opacity-40"
+                  title={language === 'en' ? 'Next Sentence' : 'अर्को वाक्य'}
+                >
+                  <SkipForward size={14} />
+                </button>
+              </div>
             </div>
           </div>
 
