@@ -1,7 +1,7 @@
 export const APP_TITLES = {
   appName: {
-    en: "Progress Tracker",
-    ne: "प्रगति ट्र्याकर"
+    en: "DORPTS",
+    ne: "डी.ओ.आर.पी.टी.एस."
   },
   subHeader: {
     en: "Performance Tracking System",
@@ -21,4 +21,4 @@ export const APP_TITLES = {
   }
 };
 
-export const APP_VERSION = '2.9.125';
+export const APP_VERSION = '2.9.127';

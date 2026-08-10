@@ -366,12 +366,7 @@ export const Header: React.FC<HeaderProps> = ({
                     referrerPolicy="no-referrer"
                   />
                 </div>
-                {isOnline ? (
-                  <span
-                    className="absolute -bottom-0.5 -right-0.5 rounded-full border-2 border-white dark:border-slate-900 bg-emerald-500 shadow-sm z-10 w-2.5 h-2.5"
-                    title={language === 'en' ? 'System online' : 'प्रणाली अनलाइन'}
-                  />
-                ) : (
+                {!isOnline && (
                   <span
                     className="absolute -bottom-1 -right-1 w-3.5 h-3.5 z-10 flex items-center justify-center cursor-help"
                     title={language === 'en' ? 'System offline - changes saved to local cache' : 'प्रणाली अफलाइन - परिवर्तनहरू स्थानीय क्यासमा सुरक्षित छन्'}
