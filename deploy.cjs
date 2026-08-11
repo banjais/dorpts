@@ -31,7 +31,7 @@ const functionsSrc = path.join(root, 'functions');
 const functionsDst = path.join(root, 'dist', 'functions');
 if (fs.existsSync(functionsSrc)) {
   console.log('[2a/5] Copying Pages Functions into dist...');
-  fs.cpSync(functionsSrc, functionsDst, { recursive: true });
+  execSync(`powershell -Command "Copy-Item -Path '${functionsSrc.replace(/'/g, "''")}\\*' -Destination '${functionsDst.replace(/'/g, "''")}' -Recurse -Force"`, { stdio: 'inherit', cwd: root, shell: true });
 }
 
 // 3. Commit (with version bump) and push to GitHub
