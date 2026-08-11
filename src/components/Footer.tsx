@@ -52,6 +52,7 @@ export const Footer: React.FC<FooterProps> = ({
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallSteps, setShowInstallSteps] = useState(false);
   const [showSyncDropdown, setShowSyncDropdown] = useState(false);
+  const longPressTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   
   const shouldExpand = isExpanded || isHovered || isTouched;
   
@@ -120,8 +121,25 @@ export const Footer: React.FC<FooterProps> = ({
     { name: 'Instagram', icon: Instagram, color: 'text-pink-600', url: `https://www.instagram.com/` },
   ];
 
-  const handleSyncClick = () => {
+  const handleSyncClick = async () => {
+    await handleQuickSync();
+  };
+
+  const handleSyncLongPress = () => {
     setShowSyncDropdown(prev => !prev);
+  };
+
+  const handleSyncPressStart = () => {
+    longPressTimerRef.current = setTimeout(() => {
+      handleSyncLongPress();
+    }, 500);
+  };
+
+  const handleSyncPressEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
   };
 
   const handleQuickSync = async () => {
@@ -336,8 +354,20 @@ export const Footer: React.FC<FooterProps> = ({
                                 item.action();
                               }
                             }}
-                            onMouseEnter={() => { if (item.id === 'btn-share') setIsQrHovered(true); if (item.id === 'btn-install' && !deferredPrompt) setShowInstallSteps(true); }}
-                            onMouseLeave={() => { if (item.id === 'btn-share') setIsQrHovered(false); if (item.id === 'btn-install') setShowInstallSteps(false); }}
+                            onMouseDown={(e) => { if (item.id === 'btn-sync') { e.stopPropagation(); handleSyncPressStart(); } }}
+                            onMouseUp={(e) => { if (item.id === 'btn-sync') { e.stopPropagation(); handleSyncPressEnd(); } }}
+                            onTouchStart={(e) => { if (item.id === 'btn-sync') { e.stopPropagation(); handleSyncPressStart(); } }}
+                            onTouchEnd={(e) => { if (item.id === 'btn-sync') { e.stopPropagation(); handleSyncPressEnd(); } }}
+                            onMouseEnter={() => { 
+                              if (item.id === 'btn-share') setIsQrHovered(true); 
+                              if (item.id === 'btn-install' && !deferredPrompt) setShowInstallSteps(true);
+                              if (item.id === 'btn-sync') setShowSyncDropdown(false);
+                            }}
+                            onMouseLeave={() => { 
+                              if (item.id === 'btn-share') setIsQrHovered(false); 
+                              if (item.id === 'btn-install') setShowInstallSteps(false);
+                              if (item.id === 'btn-sync') { handleSyncPressEnd(); setShowSyncDropdown(false); }
+                            }}
                             className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl transition-all active:scale-95 cursor-pointer border relative ${
                               item.id === 'btn-menu'
                                 ? 'bg-white/70 dark:bg-white/5 backdrop-blur-xl border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700'
