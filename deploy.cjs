@@ -26,6 +26,14 @@ try { fs.rmSync(path.join(root, 'server.js'), { force: true }); } catch (_) {}
 // 2. Build (prebuild hook auto-bumps APP_VERSION in src/constants/appTitles.ts)
 run('npm run build');
 
+// 2a. Copy Pages Functions into dist so wrangler deploys them alongside static assets
+const functionsSrc = path.join(root, 'functions');
+const functionsDst = path.join(root, 'dist', 'functions');
+if (fs.existsSync(functionsSrc)) {
+  console.log('[2a/5] Copying Pages Functions into dist...');
+  fs.cpSync(functionsSrc, functionsDst, { recursive: true });
+}
+
 // 3. Commit (with version bump) and push to GitHub
 const vFile = path.join(root, 'src', 'constants', 'appTitles.ts');
 const vText = fs.readFileSync(vFile, 'utf8');
