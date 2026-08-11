@@ -50,6 +50,7 @@ export const Footer: React.FC<FooterProps> = ({
   const prevSyncingRef = React.useRef(isSyncing);
   const [showLastSynced, setShowLastSynced] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallSteps, setShowInstallSteps] = useState(false);
   const [showSyncDropdown, setShowSyncDropdown] = useState(false);
   
   const shouldExpand = isExpanded || isHovered || isTouched;
@@ -179,16 +180,14 @@ export const Footer: React.FC<FooterProps> = ({
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
       }
+    } else {
+      setShowInstallSteps(prev => !prev);
     }
   };
 
   const menuItems = [
-    { 
-      id: 'btn-reports', 
-      icon: FileText, 
-      action: onOpenReportBuilder || (() => { try { window.print(); } catch(e) { console.error(e); } }) 
-    },
-    ...(deferredPrompt ? [{ id: 'btn-install', icon: Download, action: handleInstallClick }] : []),
+    { id: 'btn-reports', icon: FileText, action: onOpenReportBuilder || (() => { try { window.print(); } catch(e) { console.error(e); } }) },
+    { id: 'btn-install', icon: Download, action: handleInstallClick },
     ...(isAdmin ? [{ id: 'btn-messaging', icon: MessageSquare, action: () => onOpenMessaging?.() }] : []),
     { id: 'btn-share', icon: Share2, action: () => setShowQr(true) },
     { 
@@ -298,8 +297,36 @@ export const Footer: React.FC<FooterProps> = ({
                               </motion.div>
                             )}
                           </AnimatePresence>
-                        )}
-                          <button
+                         )}
+                         {item.id === 'btn-install' && showInstallSteps && (
+                           <AnimatePresence>
+                             <motion.div
+                               initial={{ opacity: 0, y: 15, scale: 0.8 }}
+                               animate={{ opacity: 1, y: 0, scale: 1 }}
+                               exit={{ opacity: 0, y: 10, scale: 0.8 }}
+                               className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 flex flex-col items-center gap-2 pointer-events-none"
+                             >
+                               <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
+                                 {language === 'en' ? 'How to install' : 'कसरी इन्स्टल गर्ने'}
+                               </span>
+                               <ol className="space-y-1.5 text-[10px] font-semibold text-slate-600 dark:text-slate-400 leading-snug">
+                                 {/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream ? (
+                                   <>
+                                     <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">1</span><span>{language === 'en' ? 'Tap Share button in Safari' : 'सफारीमा सेयर बटन मा ट्याप गर्नुहोस्'}</span></li>
+                                     <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">2</span><span>{language === 'en' ? 'Choose "Add to Home Screen"' : '"Add to Home Screen" छान्नुहोस्'}</span></li>
+                                     <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">3</span><span>{language === 'en' ? 'Tap Add to complete' : 'Add मा ट्याप गरेर पूरा गर्नुहोस्'}</span></li>
+                                   </>
+                                 ) : (
+                                   <>
+                                     <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">1</span><span>{language === 'en' ? 'Open browser menu (⋮ or ⋯)' : 'ब्राउजर मेनु (⋮ वा ⋯) खोल्नुहोस्'}</span></li>
+                                     <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">2</span><span>{language === 'en' ? 'Select "Install App" or "Add to Home Screen"' : '"Install App" वा "Add to Home Screen" चयन गर्नुहोस्'}</span></li>
+                                   </>
+                                 )}
+                               </ol>
+                             </motion.div>
+                           </AnimatePresence>
+                         )}
+                           <button
                             id={item.id}
                             onClick={(e) => { 
                               e.stopPropagation(); 
@@ -309,8 +336,8 @@ export const Footer: React.FC<FooterProps> = ({
                                 item.action();
                               }
                             }}
-                            onMouseEnter={() => { if (item.id === 'btn-share') setIsQrHovered(true); }}
-                            onMouseLeave={() => { if (item.id === 'btn-share') setIsQrHovered(false); }}
+                            onMouseEnter={() => { if (item.id === 'btn-share') setIsQrHovered(true); if (item.id === 'btn-install' && !deferredPrompt) setShowInstallSteps(true); }}
+                            onMouseLeave={() => { if (item.id === 'btn-share') setIsQrHovered(false); if (item.id === 'btn-install') setShowInstallSteps(false); }}
                             className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl transition-all active:scale-95 cursor-pointer border relative ${
                               item.id === 'btn-menu'
                                 ? 'bg-white/70 dark:bg-white/5 backdrop-blur-xl border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700'
