@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Copy, X, Facebook, MessageCircle, Linkedin, Mail, Instagram, Check, ChevronUp, FileText, Share2, Sparkles, ChevronDown, ChevronRight, MessageSquare, RefreshCw, Menu, Download } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -53,6 +53,13 @@ export const Footer: React.FC<FooterProps> = ({
   const [showInstallSteps, setShowInstallSteps] = useState(false);
   const [showSyncDropdown, setShowSyncDropdown] = useState(false);
   const longPressTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const didLongPressRef = React.useRef(false);
+  
+  const closeAllPanels = useCallback(() => {
+    setIsQrHovered(false);
+    setShowInstallSteps(false);
+    setShowSyncDropdown(false);
+  }, []);
   
   const shouldExpand = isExpanded || isHovered || isTouched;
   
@@ -126,10 +133,13 @@ export const Footer: React.FC<FooterProps> = ({
   };
 
   const handleSyncLongPress = () => {
+    didLongPressRef.current = true;
+    closeAllPanels();
     setShowSyncDropdown(prev => !prev);
   };
 
   const handleSyncPressStart = () => {
+    didLongPressRef.current = false;
     longPressTimerRef.current = setTimeout(() => {
       handleSyncLongPress();
     }, 500);
@@ -192,6 +202,7 @@ export const Footer: React.FC<FooterProps> = ({
   };
 
   const handleInstallClick = async () => {
+    closeAllPanels();
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
@@ -348,6 +359,11 @@ export const Footer: React.FC<FooterProps> = ({
                             id={item.id}
                             onClick={(e) => { 
                               e.stopPropagation(); 
+                              if (didLongPressRef.current) {
+                                didLongPressRef.current = false;
+                                return;
+                              }
+                              closeAllPanels();
                               if (item.id === 'btn-sync') {
                                 handleSyncClick();
                               } else {
@@ -361,12 +377,9 @@ export const Footer: React.FC<FooterProps> = ({
                             onMouseEnter={() => { 
                               if (item.id === 'btn-share') setIsQrHovered(true); 
                               if (item.id === 'btn-install' && !deferredPrompt) setShowInstallSteps(true);
-                              if (item.id === 'btn-sync') setShowSyncDropdown(false);
                             }}
                             onMouseLeave={() => { 
-                              if (item.id === 'btn-share') setIsQrHovered(false); 
-                              if (item.id === 'btn-install') setShowInstallSteps(false);
-                              if (item.id === 'btn-sync') { handleSyncPressEnd(); setShowSyncDropdown(false); }
+                              if (item.id === 'btn-sync') handleSyncPressEnd();
                             }}
                             className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl transition-all active:scale-95 cursor-pointer border relative ${
                               item.id === 'btn-menu'
