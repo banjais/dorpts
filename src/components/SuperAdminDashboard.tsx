@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import {
-  Users, Activity, MapPin, Shield, BarChart3, Globe, UserCheck, TrendingUp,
+  Users, Activity, MapPin, Shield, BarChart3, UserCheck, TrendingUp,
   RefreshCw, Bell, Lock, FileText, Gauge,
   Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone, MessageSquare, CalendarDays, Trophy
 } from 'lucide-react';
@@ -141,6 +141,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [dataInputValues, setDataInputValues] = useState<Record<string, string>>({});
   const [dataInputLoading, setDataInputLoading] = useState(false);
   const [dataInputSaving, setDataInputSaving] = useState(false);
+  const [dataInputSheetHeaders, setDataInputSheetHeaders] = useState<string[]>([]);
+  const [dataInputSheetOffices, setDataInputSheetOffices] = useState<string[]>([]);
   const [analyticsCardIndex, setAnalyticsCardIndex] = useState(0);
   const analyticsCardRef = useRef<HTMLDivElement>(null);
   const [internalActiveTab, setInternalActiveTab] = useState('analytics');
@@ -227,14 +229,13 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   };
 
   const tabs = [
-    { id: 'analytics', labelEn: 'User Analytics', labelNp: 'प्रयोगकर्ता विश्लेषण', icon: <BarChart3 size={16} /> },
+    { id: 'analytics', labelEn: 'Dashboard', labelNp: 'ड्यासबोर्ड', icon: <BarChart3 size={16} /> },
     { id: 'user-management', labelEn: 'User Management', labelNp: 'प्रयोगकर्ता व्यवस्थापन', icon: <Users size={16} /> },
     { id: 'data-input', labelEn: 'Data Input', labelNp: 'डाटा इनपुट', icon: <FileText size={16} /> },
     { id: 'announcements', labelEn: 'Announcements', labelNp: 'घोषणाहरू', icon: <Megaphone size={16} /> },
     { id: 'messaging', labelEn: 'Messages', labelNp: 'सन्देशहरू', icon: <MessageSquare size={16} /> },
     { id: 'calendar', labelEn: 'Calendar', labelNp: 'क्यालेन्डर', icon: <CalendarDays size={16} /> },
     { id: 'feedbacks', labelEn: 'Feedbacks', labelNp: 'प्रतिक्रियाहरू', icon: <MessageSquare size={16} /> },
-    { id: 'collaboration', labelEn: 'Collaboration', labelNp: 'सहकार्य', icon: <Globe size={16} /> },
     { id: 'geolocation', labelEn: 'Geolocation', labelNp: 'भौगोलिक स्थान', icon: <MapPin size={16} /> },
     { id: 'notifications', labelEn: 'Notifications', labelNp: 'सूचनाहरू', icon: <Bell size={16} /> },
     { id: 'security-logs', labelEn: 'Security & Logs', labelNp: 'सुरक्षा र लग', icon: <FileText size={16} /> },
@@ -642,9 +643,6 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     }
   };
 
-  const [dataInputSheetOffices, setDataInputSheetOffices] = useState<string[]>([]);
-  const [dataInputSheetHeaders, setDataInputSheetHeaders] = useState<string[]>([]);
-
   const fetchSheetData = async () => {
     setDataInputLoading(true);
     try {
@@ -719,13 +717,15 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
 
   useEffect(() => {
     if (!isSuperadmin) return;
-    if (activeTab === 'analytics') fetchAnalytics();
+    if (activeTab === 'analytics') {
+      fetchAnalytics();
+      fetchCollaboration();
+    }
     if (activeTab === 'user-management') fetchUsers();
     if (activeTab === 'data-input') fetchIndicators();
     if (activeTab === 'logs' || activeTab === 'security') { fetchLogs(); fetchSecurity(); }
     if (activeTab === 'security-logs') { fetchLogs(); fetchSecurity(); }
     if (activeTab === 'performance') fetchPerformance();
-    if (activeTab === 'collaboration') fetchCollaboration();
     if (activeTab === 'geolocation') fetchGeolocation();
     if (activeTab === 'announcements') fetchAnnouncements();
     if (activeTab === 'messaging') { /* messaging handles its own data */ }
@@ -776,7 +776,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
         {activeTab === 'analytics' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'User Analytics Overview' : 'प्रयोगकर्ता विश्लेषण सारांश'}
+              {language === 'en' ? 'Dashboard Overview' : 'ड्यासबोर्ड सारांश'}
             </h3>
             <div
               ref={analyticsCardRef}
@@ -884,6 +884,39 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   </div>
                 ))}
               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Admin Collaboration - merged into analytics tab */}
+        {activeTab === 'analytics' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+              {language === 'en' ? 'Admin Activity' : 'प्रशासक गतिविधि'}
+            </h3>
+            <div className="space-y-2">
+              {collaborators.length === 0 && !loading && (
+                <p className="text-[11px] text-slate-400 text-center py-4">
+                  {language === 'en' ? 'No activity data available' : 'गतिविधि डाटा उपलब्ध छैन'}
+                </p>
+              )}
+              {collaborators.map((collab, idx) => (
+                <div key={idx} className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 rounded-lg p-3 border border-slate-100 dark:border-white/5">
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-xs font-bold">
+                    {collab.email[0].toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{collab.email}</div>
+                    <div className="text-[10px] text-slate-400">
+                      {collab.activityCount} {language === 'en' ? 'activities' : 'गतिविधिहरू'} · {collab.actionTypes?.slice(0, 2).join(', ') || '--'}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className={`w-2 h-2 rounded-full ${collab.status === 'active' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                    <span className="text-[10px] text-slate-500">{collab.status === 'active' ? (language === 'en' ? 'Active' : 'सक्रिय') : (language === 'en' ? 'Inactive' : 'निस्क्रिय')}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </motion.div>
         )}
@@ -1180,39 +1213,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
             </motion.div>
           )}
 
-          {activeTab === 'collaboration' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'Admin Collaboration Network' : 'प्रशासन सहकार्य नेटवर्क'}
-            </h3>
-            <div className="space-y-2">
-              {collaborators.length === 0 && !loading && (
-                <p className="text-[11px] text-slate-400 text-center py-4">
-                  {language === 'en' ? 'No collaboration data available' : 'सहकार्य डाटा उपलब्ध छैन'}
-                </p>
-              )}
-              {collaborators.map((collab, idx) => (
-                <div key={idx} className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 rounded-lg p-3 border border-slate-100 dark:border-white/5">
-                  <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-xs font-bold">
-                    {collab.email[0].toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{collab.email}</div>
-                    <div className="text-[10px] text-slate-400">
-                      {collab.activityCount} {language === 'en' ? 'activities' : 'गतिविधिहरू'} · {collab.actionTypes?.slice(0, 2).join(', ') || '--'}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className={`w-2 h-2 rounded-full ${collab.status === 'active' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                    <span className="text-[10px] text-slate-500">{collab.status === 'active' ? (language === 'en' ? 'Active' : 'सक्रिय') : (language === 'en' ? 'Inactive' : 'निस्क्रिय')}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === 'geolocation' && (
+          {activeTab === 'geolocation' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
               {language === 'en' ? 'Geolocation Tracking' : 'भौगोलिक स्थान ट्र्याकिङ'}
