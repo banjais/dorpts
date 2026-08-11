@@ -3,18 +3,16 @@ import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import {
-  Users, Activity, MapPin, Shield, BarChart3, UserCheck, TrendingUp,
-  RefreshCw, Bell, Lock, FileText, Gauge,
-  Send, CheckCircle, AlertTriangle, Clock, Mail, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone, MessageSquare, CalendarDays, Trophy
+  Users, Activity, MapPin, BarChart3, Bell,
+  Send, CheckCircle, Clock, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone, MessageSquare, FileText
 } from 'lucide-react';
-import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { APP_VERSION } from '../constants/appTitles';
 import { fetchPublishedCsv, PUBLISHED_CSV_URLS } from '../utils/sheetSync';
 import { parseCSVLine } from '../data';
 import { API_BASE } from '../utils/apiBase';
 import { MessagingCenter } from './MessagingCenter';
-import { CalendarDeadlines } from './CalendarDeadlines';
 
 const SystemCard: React.FC<{ label: string; status: string; isText?: boolean; language: 'en' | 'ne' }> = ({ label, status, isText, language }) => {
   const isConnected = status === 'connected' || status === 'active';
@@ -234,13 +232,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     { id: 'data-input', labelEn: 'Data Input', labelNp: 'डाटा इनपुट', icon: <FileText size={16} /> },
     { id: 'announcements', labelEn: 'Announcements', labelNp: 'घोषणाहरू', icon: <Megaphone size={16} /> },
     { id: 'messaging', labelEn: 'Messages', labelNp: 'सन्देशहरू', icon: <MessageSquare size={16} /> },
-    { id: 'calendar', labelEn: 'Calendar', labelNp: 'क्यालेन्डर', icon: <CalendarDays size={16} /> },
     { id: 'feedbacks', labelEn: 'Feedbacks', labelNp: 'प्रतिक्रियाहरू', icon: <MessageSquare size={16} /> },
     { id: 'geolocation', labelEn: 'Geolocation', labelNp: 'भौगोलिक स्थान', icon: <MapPin size={16} /> },
     { id: 'notifications', labelEn: 'Notifications', labelNp: 'सूचनाहरू', icon: <Bell size={16} /> },
-    { id: 'security-logs', labelEn: 'Security & Logs', labelNp: 'सुरक्षा र लग', icon: <FileText size={16} /> },
-    { id: 'performance', labelEn: 'Performance', labelNp: 'कार्यसम्पादन', icon: <Gauge size={16} /> },
-    { id: 'system', labelEn: 'System Health', labelNp: 'प्रणाली स्वास्थ्य', icon: <Activity size={16} /> },
+    { id: 'security-logs', labelEn: 'Security & System', labelNp: 'सुरक्षा र प्रणाली', icon: <Activity size={16} /> },
   ] as const;
 
   const fetchAnalytics = async () => {
@@ -724,56 +719,92 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     if (activeTab === 'user-management') fetchUsers();
     if (activeTab === 'data-input') fetchIndicators();
     if (activeTab === 'logs' || activeTab === 'security') { fetchLogs(); fetchSecurity(); }
-    if (activeTab === 'security-logs') { fetchLogs(); fetchSecurity(); }
-    if (activeTab === 'performance') fetchPerformance();
+    if (activeTab === 'security-logs') { fetchLogs(); fetchSecurity(); fetchPerformance(); }
     if (activeTab === 'geolocation') fetchGeolocation();
     if (activeTab === 'announcements') fetchAnnouncements();
     if (activeTab === 'messaging') { /* messaging handles its own data */ }
-    if (activeTab === 'calendar') { /* calendar handles its own data */ }
     if (activeTab === 'feedbacks') fetchFeedbacks();
   }, [activeTab, isSuperadmin]);
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      {/* Tab Navigation */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl p-1.5 overflow-x-auto custom-scrollbar">
-        <div className="flex items-center gap-1 min-w-max">
-          {tabs.map((item) => {
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleTabChange(item.id)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-left whitespace-nowrap ${
-                  isActive
-                    ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-200'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                }`}
-              >
-                <span
-                  className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
-                    isActive
-                      ? 'bg-rose-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                  }`}
-                >
-                  {item.icon}
-                </span>
-                <span className="block text-[11px] font-bold leading-tight">
-                  {language === 'en' ? item.labelEn : item.labelNp}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+   return (
+     <motion.div
+       initial={{ opacity: 0, y: 10 }}
+       animate={{ opacity: 1, y: 0 }}
+       className="flex items-start gap-4"
+     >
+       {/* Left Sidebar Navigation */}
+       <div className="hidden lg:block w-60 shrink-0">
+         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl p-2 sticky top-4">
+           <nav className="flex flex-col gap-1">
+             {tabs.map((item) => {
+               const isActive = activeTab === item.id;
+               return (
+                 <button
+                   key={item.id}
+                   onClick={() => handleTabChange(item.id)}
+                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${
+                     isActive
+                       ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-200'
+                       : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                   }`}
+                 >
+                   <span
+                     className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                       isActive
+                         ? 'bg-rose-600 text-white'
+                         : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                     }`}
+                   >
+                     {item.icon}
+                   </span>
+                   <span className="text-[11px] font-bold leading-tight">
+                     {language === 'en' ? item.labelEn : item.labelNp}
+                   </span>
+                 </button>
+               );
+             })}
+           </nav>
+         </div>
+       </div>
 
-      {/* Content based on active tab */}
-        {activeTab === 'analytics' && (
+       {/* Mobile Tab Bar (visible on small screens) */}
+       <div className="lg:hidden w-full">
+         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl p-1.5 overflow-x-auto custom-scrollbar">
+           <div className="flex items-center gap-1 min-w-max">
+             {tabs.map((item) => {
+               const isActive = activeTab === item.id;
+               return (
+                 <button
+                   key={item.id}
+                   onClick={() => handleTabChange(item.id)}
+                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-left whitespace-nowrap ${
+                     isActive
+                       ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-200'
+                       : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                   }`}
+                 >
+                   <span
+                     className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                       isActive
+                       ? 'bg-rose-600 text-white'
+                       : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                   }`}
+                   >
+                     {item.icon}
+                   </span>
+                   <span className="block text-[11px] font-bold leading-tight">
+                     {language === 'en' ? item.labelEn : item.labelNp}
+                   </span>
+                 </button>
+               );
+             })}
+           </div>
+         </div>
+       </div>
+
+       {/* Content based on active tab */}
+       <div className="flex-1 min-w-0">
+         {activeTab === 'analytics' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
               {language === 'en' ? 'Dashboard Overview' : 'ड्यासबोर्ड सारांश'}
@@ -1157,19 +1188,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
             </motion.div>
           )}
 
-          {activeTab === 'calendar' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              <CalendarDeadlines language={language} offices={offices} />
-            </motion.div>
-          )}
-
-          {activeTab === 'calendar' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              <CalendarDeadlines language={language} offices={offices} />
-            </motion.div>
-          )}
-
-          {activeTab === 'feedbacks' && (
+    {activeTab === 'feedbacks' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
                 {language === 'en' ? 'User Feedbacks' : 'प्रयोगकर्ता प्रतिक्रियाहरू'}
@@ -1444,11 +1463,11 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
            </motion.div>
          )}
 
-         {activeTab === 'security-logs' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'Security & System Logs' : 'सुरक्षा र सिस्टम लग'}
-            </h3>
+          {activeTab === 'security-logs' && (
+           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+               {language === 'en' ? 'Security, Performance & System Health' : 'सुरक्षा, कार्यसम्पादन र प्रणाली स्वास्थ्य'}
+             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
                 <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Login Attempts</div>
@@ -1504,79 +1523,71 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                       log.status === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
                     }`}>
                       {log.status}
-                    </span>
-                  </div>
-                ))}
+                  </span>
+                    </div>
+                  ))}
               </div>
             </div>
-          </motion.div>
-        )}
 
-        {activeTab === 'performance' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'Performance Metrics' : 'कार्यसम्पादन मेट्रिक्स'}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">API Latency</div>
-                <div className="text-2xl font-black text-slate-900 dark:text-white">{performanceData?.apiLatency ?? '--'}ms</div>
-                <div className="text-[10px] text-emerald-600 mt-1">
-                  {language === 'en' ? 'Measured live' : 'प्रत्यक्ष मापन'}
+            {/* Performance Metrics */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                {language === 'en' ? 'Performance Metrics' : 'कार्यसम्पादन मेट्रिक्स'}
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                  <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">API Latency</div>
+                  <div className="text-2xl font-black text-slate-900 dark:text-white">{performanceData?.apiLatency ?? '--'}ms</div>
+                  <div className="text-[10px] text-emerald-600 mt-1">
+                    {language === 'en' ? 'Measured live' : 'प्रत्यक्ष मापन'}
+                  </div>
+                </div>
+                <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                  <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Sync Success</div>
+                  <div className="text-2xl font-black text-emerald-600">{performanceData?.syncSuccess ?? 0}%</div>
+                  <div className="text-[10px] text-slate-500 mt-1">{language === 'en' ? 'Last 24 hours' : 'गत २४ घण्टा'}</div>
+                </div>
+                <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                  <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Error Rate</div>
+                  <div className="text-2xl font-black text-slate-900 dark:text-white">{performanceData?.errorRate ?? 0}%</div>
+                  <div className="text-[10px] text-slate-500 mt-1">{language === 'en' ? 'Last 24 hours' : 'गत २४ घण्टा'}</div>
                 </div>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Sync Success</div>
-                <div className="text-2xl font-black text-emerald-600">{performanceData?.syncSuccess ?? 0}%</div>
-                <div className="text-[10px] text-slate-500 mt-1">{language === 'en' ? 'Last 24 hours' : 'गत २४ घण्टा'}</div>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Error Rate</div>
-                <div className="text-2xl font-black text-slate-900 dark:text-white">{performanceData?.errorRate ?? 0}%</div>
-                <div className="text-[10px] text-slate-500 mt-1">{language === 'en' ? 'Last 24 hours' : 'गत २४ घण्टा'}</div>
-              </div>
             </div>
-            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 rounded-xl">
-              <p className="text-[11px] text-blue-800 dark:text-blue-300">
-                {language === 'en'
-                  ? 'Real-time performance monitoring, API health checks, and error tracking will be available here.'
-                  : 'वास्तविक समय कार्यसम्पादन निगरानी, API स्वास्थ्य जाँच, र त्रुटि ट्र्याकिङ यहाँ उपलब्ध हुनेछ।'}
-              </p>
-            </div>
-          </motion.div>
-        )}
 
-        {activeTab === 'system' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'System Health' : 'प्रणाली स्वास्थ्य'}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <SystemCard
-                label={language === 'en' ? 'Firebase Connection' : 'फायरबेस जडान'}
-                status="connected"
-                language={language}
-              />
-              <SystemCard
-                label={language === 'en' ? 'Service Worker' : 'सर्भिस वर्कर'}
-                status={typeof navigator !== 'undefined' && 'serviceWorker' in navigator ? 'active' : 'unsupported'}
-                language={language}
-              />
-              <SystemCard
-                label={language === 'en' ? 'Cache Storage' : 'क्यास स्टोरेज'}
-                status="dorpts-v1"
-                isText
-                language={language}
-              />
-              <SystemCard
-                label={language === 'en' ? 'App Version' : 'अप्लिकेशन संस्करण'}
-                status={APP_VERSION}
-                isText
-                language={language}
-              />
+            {/* System Health */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                {language === 'en' ? 'System Health' : 'प्रणाली स्वास्थ्य'}
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <SystemCard
+                  label={language === 'en' ? 'Firebase Connection' : 'फायरबेस जडान'}
+                  status="connected"
+                  language={language}
+                />
+                <SystemCard
+                  label={language === 'en' ? 'Service Worker' : 'सर्भिस वर्कर'}
+                  status={typeof navigator !== 'undefined' && 'serviceWorker' in navigator ? 'active' : 'unsupported'}
+                  language={language}
+                />
+                <SystemCard
+                  label={language === 'en' ? 'Cache Storage' : 'क्यास स्टोरेज'}
+                  status="dorpts-v1"
+                  isText
+                  language={language}
+                />
+                <SystemCard
+                  label={language === 'en' ? 'App Version' : 'अप्लिकेशन संस्करण'}
+                  status={APP_VERSION}
+                  isText
+                  language={language}
+                />
+              </div>
             </div>
-          </motion.div>
-        )}
-       </motion.div>
-   );
- };
+           </motion.div>
+          )}
+        </div>
+      </motion.div>
+    );
+  };
