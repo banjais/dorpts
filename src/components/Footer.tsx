@@ -397,19 +397,21 @@ export const Footer: React.FC<FooterProps> = ({
                                            : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
                                        : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
                             }`}
-                            title={
-                              item.id === 'btn-menu'
-                                ? (language === 'en' ? 'Open Menu' : 'मेनु खोल्नुहोस्')
-                                : item.id === 'btn-ai'
-                                  ? (language === 'en' ? 'AI Assistant' : 'एआई सहायक')
-                                  : item.id === 'btn-sync'
-                                    ? (language === 'en' ? 'Sync' : 'सिङ्क')
-                                    : item.id === 'btn-install'
-                                      ? (language === 'en' ? 'Install App' : 'अप्लिकेसन इन्स्टल गर्नुहोस्')
-                                       : item.id === 'btn-messaging'
-                                         ? (language === 'en' ? 'Messages' : 'सन्देशहरू')
-                                         : ''
-                            }
+                             title={
+                               item.id === 'btn-reports'
+                                 ? (language === 'en' ? 'Reports' : 'रिपोर्टहरू')
+                                 : item.id === 'btn-menu'
+                                   ? (language === 'en' ? 'Open Menu' : 'मेनु खोल्नुहोस्')
+                                   : item.id === 'btn-ai'
+                                     ? (language === 'en' ? 'AI Assistant' : 'एआई सहायक')
+                                     : item.id === 'btn-sync'
+                                       ? (language === 'en' ? 'Sync' : 'सिङ्क')
+                                       : item.id === 'btn-install'
+                                         ? (language === 'en' ? 'Install App' : 'अप्लिकेसन इन्स्टल गर्नुहोस्')
+                                          : item.id === 'btn-messaging'
+                                            ? (language === 'en' ? 'Messages' : 'सन्देशहरू')
+                                            : ''
+                             }
                          >
                             {item.id === 'btn-ai' && (
                               <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
