@@ -458,6 +458,7 @@ Keep explanationEn and explanationNp concise, precise, and highly professional. 
     try {
       const token = auth.replace('Bearer ', '');
       const sessionRes = await fetch(`${url.origin}/api/verify-session`, {
+        method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
       const session = await sessionRes.json();
@@ -536,6 +537,7 @@ Keep explanationEn and explanationNp concise, precise, and highly professional. 
     const token = auth.replace('Bearer ', '');
     try {
       const sessionRes = await fetch(`${url.origin}/api/verify-session`, {
+        method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
       const session = await sessionRes.json();
@@ -557,6 +559,7 @@ Keep explanationEn and explanationNp concise, precise, and highly professional. 
     try {
       const token = auth.replace('Bearer ', '');
       const sessionRes = await fetch(`${url.origin}/api/verify-session`, {
+        method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
       const session = await sessionRes.json();
