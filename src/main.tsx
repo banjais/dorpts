@@ -3,10 +3,9 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import 'leaflet/dist/leaflet.css';
-import { registerServiceWorker } from './serviceWorkerRegistration';
 
-// Register service worker for offline API & critical stats caching
-registerServiceWorker();
+// Service worker registration is handled automatically by vite-plugin-pwa
+// with registerType: 'autoUpdate' for seamless background updates.
 
 // Filter out benign or non-actionable third-party library warnings/errors (Recharts defaultProps, findDOMNode, Leaflet, WebSocket, etc.)
 const ignoredWarnings = [
