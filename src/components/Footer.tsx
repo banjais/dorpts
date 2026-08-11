@@ -57,6 +57,7 @@ export const Footer: React.FC<FooterProps> = ({
   
   const closeAllPanels = useCallback(() => {
     setIsQrHovered(false);
+    setShowQr(false);
     setShowInstallSteps(false);
     setShowSyncDropdown(false);
   }, []);
