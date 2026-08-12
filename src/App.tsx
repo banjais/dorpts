@@ -51,6 +51,7 @@ import { AnnouncementBoard } from "./components/AnnouncementBoard";
 import { MessagingCenter } from "./components/MessagingCenter";
 import { CalendarDeadlines } from "./components/CalendarDeadlines";
 import { DetailedGalleryView } from "./components/DetailedGalleryView";
+import { useRegisterSW } from "virtual:pwa-register/react";
 import { normalizeCategory, STANDARD_CATEGORIES, DEFAULT_CATEGORY_THEMES } from "./utils/category";
 import { getFiscalYearForBsDateStr, toNepaliNumerals } from "./utils/bsDate";
 import { API_BASE } from "./utils/apiBase";
@@ -282,6 +283,12 @@ function MainAppContent() {
 
   const layout = useDashboardLayout(dashboardWidth);
   useHaptic();
+  const [needRefresh, setNeedRefresh] = useState(false);
+  const { updateServiceWorker } = useRegisterSW({
+    onNeedRefresh: () => {
+      setNeedRefresh(true);
+    },
+  });
   const { language, t, translateOffice, translateUnit } = useLanguage();
   const { accessToken, user, loading: authLoading, isAdmin, isSuperadmin, isDataUpdater, role, logout, refreshAdmins, adminsList, userAssignedOffice } = useAuth();
 
@@ -3538,8 +3545,10 @@ function MainAppContent() {
               onGoHome={() => handleMainViewChange('dashboard')}
               pendingWrites={pendingWrites}
              hasPendingWrites={pendingWrites.length > 0}
-             isAdmin={isAdmin}
-            />
+              isAdmin={isAdmin}
+              needRefresh={needRefresh}
+              onUpdateClick={() => updateServiceWorker(true)}
+             />
 
         {/* Dim Overlay - Outside scaled content */}
         <AnimatePresence>
