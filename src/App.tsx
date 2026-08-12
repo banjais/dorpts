@@ -48,7 +48,6 @@ import { IndicatorHeatmap } from "./components/IndicatorHeatmap";
 import { OfflineSummaryDashboard } from "./components/OfflineSummaryDashboard";
 import { Overview } from "./components/Overview";
 import { AnnouncementBoard } from "./components/AnnouncementBoard";
-import { useRegisterSW } from "virtual:pwa-register/react";
 import { MessagingCenter } from "./components/MessagingCenter";
 import { CalendarDeadlines } from "./components/CalendarDeadlines";
 import { DetailedGalleryView } from "./components/DetailedGalleryView";
@@ -283,12 +282,6 @@ function MainAppContent() {
 
   const layout = useDashboardLayout(dashboardWidth);
   useHaptic();
-  const [needRefresh, setNeedRefresh] = useState(false);
-  const { updateServiceWorker } = useRegisterSW({
-    onNeedRefresh: () => {
-      setNeedRefresh(true);
-    },
-  });
   const { language, t, translateOffice, translateUnit } = useLanguage();
   const { accessToken, user, loading: authLoading, isAdmin, isSuperadmin, isDataUpdater, role, logout, refreshAdmins, adminsList, userAssignedOffice } = useAuth();
 
@@ -3535,10 +3528,8 @@ function MainAppContent() {
               onGoHome={() => handleMainViewChange('dashboard')}
               pendingWrites={pendingWrites}
              hasPendingWrites={pendingWrites.length > 0}
-              isAdmin={isAdmin}
-              needRefresh={needRefresh}
-              onUpdateClick={() => updateServiceWorker(true)}
-             />
+             isAdmin={isAdmin}
+            />
 
         {/* Dim Overlay - Outside scaled content */}
         <AnimatePresence>

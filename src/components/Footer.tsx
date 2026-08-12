@@ -20,8 +20,6 @@ interface FooterProps {
   pendingWrites?: Array<{ id: string; name: string; nameEn?: string }>;
   hasPendingWrites?: boolean;
   isAdmin?: boolean;
-  needRefresh?: boolean;
-  onUpdateClick?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ 
@@ -39,8 +37,6 @@ export const Footer: React.FC<FooterProps> = ({
   pendingWrites = [],
   hasPendingWrites = false,
   isAdmin = false,
-  needRefresh = false,
-  onUpdateClick,
 }) => {
   const { language, t } = useLanguage();
   const [showQr, setShowQr] = useState(false);
@@ -480,24 +476,16 @@ export const Footer: React.FC<FooterProps> = ({
                   </p>
                   <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
                 </div>
-                 <div className="flex items-center justify-center gap-3">
-                  <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
-                    v{APP_VERSION}
-                  </p>
-                  {needRefresh && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); onUpdateClick?.(); }}
-                      className="animate-pulse text-[0.5625rem] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors cursor-pointer"
-                    >
-                      {language === 'en' ? 'Update' : 'अपडेट'}
-                    </button>
-                  )}
-                  {minutesAgo !== null && (
-                  <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium truncate">
-                    {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
-                  </p>
-                )}
-               </div>
+                <div className="flex items-center justify-center gap-3">
+                 <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
+                   v{APP_VERSION}
+                 </p>
+                 {minutesAgo !== null && (
+                 <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium truncate">
+                   {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
+                 </p>
+               )}
+              </div>
              </div>
             </>
           )}
@@ -528,25 +516,6 @@ export const Footer: React.FC<FooterProps> = ({
                     {language === 'en' ? 'Updated' : 'अपडेट भयो'}
                   </span>
                 </motion.div>
-              )}
-              {needRefresh && (
-                <motion.button
-                  onClick={(e) => { e.stopPropagation(); onUpdateClick?.(); }}
-                  animate={{ 
-                    opacity: [0.5, 1, 0.5],
-                    scale: [0.95, 1.05, 0.95]
-                  }}
-                  transition={{ 
-                    duration: 1.5,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-50 dark:bg-rose-500/15 border border-rose-200 dark:border-rose-500/30 cursor-pointer"
-                >
-                  <span className="text-[0.5rem] font-black uppercase tracking-wider text-rose-700 dark:text-rose-300">
-                    {language === 'en' ? 'Update' : 'अपडेट'}
-                  </span>
-                </motion.button>
               )}
               {minutesAgo !== null && !isSyncing && !syncSuccess && showLastSynced && (
                 <span className="text-[0.55rem] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
