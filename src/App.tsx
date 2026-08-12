@@ -3416,21 +3416,21 @@ function MainAppContent() {
                               />
                              </ErrorBoundary>
                             )}
-                         {mainView === "superadmin" && (
-                           <ErrorBoundary
-                             fallback={
-                               <div className="p-8 text-center">
-                                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                                   Super Admin dashboard temporarily unavailable.
-                                 </p>
-                               </div>
-                             }
-                           >
-                              <div className="p-4 sm:p-6 md:p-8 w-full max-w-7xl mx-auto">
-                                <SuperAdminDashboard language={language} activeTab={superAdminActiveTab} onTabChange={setSuperAdminActiveTab} offices={offices} />
-                              </div>
-                           </ErrorBoundary>
-                         )}
+                          {mainView === "superadmin" && (
+                            <div className="fixed inset-0 z-[9000] bg-slate-50 dark:bg-[#0b1329]">
+                              <ErrorBoundary
+                                fallback={
+                                  <div className="p-8 text-center">
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                                      Super Admin dashboard temporarily unavailable.
+                                    </p>
+                                  </div>
+                                }
+                              >
+                                <SuperAdminDashboard language={language} activeTab={superAdminActiveTab} onTabChange={setSuperAdminActiveTab} offices={offices} onClose={() => handleMainViewChange('dashboard')} />
+                              </ErrorBoundary>
+                            </div>
+                          )}
                          {mainView === "admin" && (
                            <ErrorBoundary
                              fallback={

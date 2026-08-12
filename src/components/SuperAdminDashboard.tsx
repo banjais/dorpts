@@ -104,9 +104,10 @@ interface SuperAdminDashboardProps {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   offices?: Array<{ name: string; officeId: string; shortName: string }>;
+  onClose?: () => void;
 }
 
-export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ language, activeTab: externalActiveTab, onTabChange, offices = [] }) => {
+export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ language, activeTab: externalActiveTab, onTabChange, offices = [], onClose }) => {
   const { adminsList, user, isSuperadmin } = useAuth();
 
   if (!isSuperadmin) {
@@ -732,10 +733,29 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
        animate={{ opacity: 1, y: 0 }}
        className="flex items-start gap-4"
      >
-       {/* Left Sidebar Navigation */}
-       <div className="hidden lg:block w-60 shrink-0">
-         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl p-2 sticky top-4">
-           <nav className="flex flex-col gap-1">
+        {/* Left Sidebar Navigation */}
+        <div className="hidden lg:block w-60 shrink-0">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl p-2 sticky top-4">
+            {onClose && (
+              <div className="flex items-center justify-between px-2 py-1.5 mb-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-rose-50 dark:bg-rose-500/20 border border-rose-200 dark:border-rose-500/30 flex items-center justify-center text-rose-700 dark:text-rose-300">
+                    <ShieldCheck size={14} />
+                  </div>
+                  <span className="text-[11px] font-black uppercase tracking-wider text-slate-800 dark:text-white">
+                    {language === 'en' ? 'Super Admin' : 'सुपर एडमिन'}
+                  </span>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                  title={language === 'en' ? 'Close panel' : 'प्यानल बन्द गर्नुहोस्'}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+            <nav className="flex flex-col gap-1">
              {tabs.map((item) => {
                const isActive = activeTab === item.id;
                return (
