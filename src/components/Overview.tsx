@@ -2025,20 +2025,11 @@ export const Overview: React.FC<OverviewProps> = ({
                   </div>
 
                   {/* Prominent Reduce Button */}
-                  <button
-                    onClick={() => {
-                      setActiveExpandedModalCardId(null);
-                      const allCardIds = [
-                        'overall-progress',
-                        'category-status',
-                        'status-breakdown',
-                        'visual-insights',
-                        'budget-card',
-                        'employment-card',
-                        'detailed-gallery'
-                      ];
-                      allCardIds.forEach(cardId => handleDismissCard(cardId));
-                    }}
+                   <button
+                     onClick={() => {
+                       handleDismissCard(activeExpandedModalCardId || '');
+                       setActiveExpandedModalCardId(null);
+                     }}
                     className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95"
                      aria-label={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
                      title={language === 'en' ? 'Reduce / Collapse Card' : 'कार्ड घटाउनुहोस् / सानो बनाउनुहोस्'}
