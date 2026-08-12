@@ -1569,9 +1569,9 @@ function MainAppContent() {
     setIsCommentsModalOpen(true);
   };
 
-  const handleManualSync = async () => {
-    setIsSyncing(true);
-    let isOfflineFallback = !isOnline;
+   const handleManualSync = async (suppressToast = false) => {
+     setIsSyncing(true);
+     let isOfflineFallback = !isOnline;
     try {
       let metadataSnap: any = null;
       let indicatorsSnap: any = null;
@@ -1697,6 +1697,7 @@ function MainAppContent() {
       } catch (_) {}
 
       if (isOfflineFallback) {
+        if (!suppressToast) {
         addToast(
           language === "en"
             ? "Sync Complete (Offline Mode)"
@@ -1706,7 +1707,9 @@ function MainAppContent() {
             : "सुरक्षित स्थानीय डाटा देखाइएको छ। अनलाइन भएपछि पूर्ण सिंक्रोनाइज हुनेछ।",
           "warning",
         );
+        }
       } else {
+        if (!suppressToast) {
         addToast(
           language === "en"
             ? "Data successfully re-synchronized with server"
@@ -1716,20 +1719,23 @@ function MainAppContent() {
             : "डाटा सर्भरसँग सफलतापूर्वक पुन: सिंक्रोनाइज गरियो",
           "success",
         );
+        }
       }
       setPulseKey((prev) => prev + 1);
-    } catch (error) {
-      console.error("Manual re-sync failed:", error);
-      addToast(
-        language === "en"
-          ? "Sync failed. Please check your internet connection."
-          : "सिङ्क असफल भयो। कृपया इन्टरनेट जडान जाँच गर्नुहोस्।",
-        language === "en"
-          ? "Sync failed. Please check your internet connection."
-          : "सिङ्क असफल भयो। कृपया इन्टरनेट जडान जाँच गर्नुहोस्।",
-        "error",
-      );
-    } finally {
+     } catch (error) {
+       console.error("Manual re-sync failed:", error);
+       if (!suppressToast) {
+       addToast(
+         language === "en"
+           ? "Sync failed. Please check your internet connection."
+           : "सिङ्क असफल भयो। कृपया इन्टरनेट जडान जाँच गर्नुहोस्।",
+         language === "en"
+           ? "Sync failed. Please check your internet connection."
+           : "सिङ्क असफल भयो। कृपया इन्टरनेट जडान जाँच गर्नुहोस्।",
+         "error",
+       );
+       }
+     } finally {
       setIsSyncing(false);
     }
   };
@@ -3519,7 +3525,8 @@ function MainAppContent() {
              onManualSync={handleManualSync}
               onOpenDrawer={() => setIsDrawerOpen(true)}
               onOpenMessaging={() => handleMainViewChange('messaging')}
-             pendingWrites={pendingWrites}
+              onGoHome={() => handleMainViewChange('dashboard')}
+              pendingWrites={pendingWrites}
              hasPendingWrites={pendingWrites.length > 0}
              isAdmin={isAdmin}
             />

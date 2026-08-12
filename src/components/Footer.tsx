@@ -14,7 +14,7 @@ interface FooterProps {
   isExpanded?: boolean;
   onExpandChange?: (expanded: boolean) => void;
   isSyncing?: boolean;
-  onManualSync?: () => void;
+  onManualSync?: (suppressToast?: boolean) => void;
   onOpenDrawer?: () => void;
   onGoHome?: () => void;
   pendingWrites?: Array<{ id: string; name: string; nameEn?: string }>;
@@ -155,7 +155,7 @@ export const Footer: React.FC<FooterProps> = ({
 
   const handleQuickSync = async () => {
     setShowSyncDropdown(false);
-    await onManualSync?.();
+    await onManualSync?.(true);
     setSyncSuccess(true);
     setTimeout(() => setSyncSuccess(false), 3000);
     setShowLastSynced(true);
