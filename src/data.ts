@@ -824,9 +824,9 @@ export function parseGoogleSheetsCSV(csvText: string): {
       return s === '' || s === '-' || s.toLowerCase() === 'null' || s.toLowerCase() === 'undefined';
     };
 
-    const finalTotalTarget = isRawBlank(rawTotalTarget) ? 1 : (parseNumber(rawTotalTarget) || 1);
+    const finalTotalTarget = isRawBlank(rawTotalTarget) ? 0 : parseNumber(rawTotalTarget);
     const finalTotalProgress = parseNumber(rawTotalProgress);
-    const finalAnnualTarget = isRawBlank(rawAnnualTarget) ? 1 : (parseNumber(rawAnnualTarget) || 1);
+    const finalAnnualTarget = isRawBlank(rawAnnualTarget) ? 0 : parseNumber(rawAnnualTarget);
     const finalAnnualProgress = parseNumber(rawAnnualProgress);
 
     // Retrieve Office & Gmail values dynamically
