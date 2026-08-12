@@ -776,7 +776,7 @@ function MainAppContent() {
     setLoading(true);
     triggerHaptic("medium");
 
-    const processIndicators = (parsedList: any[], parsedMeta: any) => {
+    const processIndicators = async (parsedList: any[], parsedMeta: any) => {
       if (parsedList && parsedList.length > 0) {
         setIndicators(parsedList);
         setMetadata(parsedMeta);
@@ -786,6 +786,16 @@ function MainAppContent() {
         } catch (_) {
           // Suppress redundant log
         }
+        try {
+          const colRef = collection(db, "indicators");
+          const writes = parsedList.map((ind: any) =>
+            setDoc(doc(colRef, ind.id || `ind_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`), {
+              ...ind,
+              updatedAt: new Date().toISOString(),
+            }).catch(() => {})
+          );
+          Promise.all(writes).catch(() => {});
+        } catch (_) {}
       }
     };
 
