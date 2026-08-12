@@ -1383,15 +1383,13 @@ export const Overview: React.FC<OverviewProps> = ({
           transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
           className="dashboard-cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 pb-10 sm:pb-16"
         >
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence>
 
 {/* Card 0: Overall Progress Performance */}
 {!dismissedCards.has('overall-progress') && (
   <motion.div
     key="overall-progress"
-    layout
     initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
     exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
     transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
     className="w-full col-span-1 md:col-span-2 xl:col-span-3 mb-2 sm:mb-3"
@@ -1401,7 +1399,6 @@ export const Overview: React.FC<OverviewProps> = ({
         role="button"
         tabIndex={0}
         initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.01 }}
@@ -1537,9 +1534,7 @@ export const Overview: React.FC<OverviewProps> = ({
 {!dismissedCards.has('category-status') && (
   <motion.div
     key="category-status"
-    layout
     initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
     exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
     transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
     className="w-full"
@@ -1549,7 +1544,6 @@ export const Overview: React.FC<OverviewProps> = ({
         role="button"
         tabIndex={0}
         initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
@@ -1587,9 +1581,7 @@ export const Overview: React.FC<OverviewProps> = ({
 {!dismissedCards.has('status-breakdown') && (
   <motion.div
     key="status-breakdown"
-    layout
     initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
     exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
     transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
     className="w-full"
@@ -1599,7 +1591,6 @@ export const Overview: React.FC<OverviewProps> = ({
         role="button"
         tabIndex={0}
         initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
@@ -1637,9 +1628,7 @@ export const Overview: React.FC<OverviewProps> = ({
 {!dismissedCards.has('visual-insights') && (
   <motion.div
     key="visual-insights"
-    layout
     initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
     exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
     transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
     className="w-full"
@@ -1649,7 +1638,6 @@ export const Overview: React.FC<OverviewProps> = ({
         role="button"
         tabIndex={0}
         initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
@@ -1684,9 +1672,7 @@ export const Overview: React.FC<OverviewProps> = ({
 {!dismissedCards.has('budget-card') && (
   <motion.div
     key="budget-card"
-    layout
     initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
     exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
     transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
     className="w-full"
@@ -1696,7 +1682,6 @@ export const Overview: React.FC<OverviewProps> = ({
         role="button"
         tabIndex={0}
         initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
@@ -1734,9 +1719,7 @@ export const Overview: React.FC<OverviewProps> = ({
 {!dismissedCards.has('employment-card') && (
   <motion.div
     key="employment-card"
-    layout
     initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
     exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
     transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
     className="w-full"
@@ -1746,7 +1729,6 @@ export const Overview: React.FC<OverviewProps> = ({
         role="button"
         tabIndex={0}
         initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
@@ -1784,9 +1766,7 @@ export const Overview: React.FC<OverviewProps> = ({
 {!dismissedCards.has('detailed-gallery') && (
   <motion.div
     key="detailed-gallery"
-    layout
     initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
     exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
     transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
     className="w-full"
@@ -1796,7 +1776,6 @@ export const Overview: React.FC<OverviewProps> = ({
         role="button"
         tabIndex={0}
         initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
