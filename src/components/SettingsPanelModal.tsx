@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Save, Loader2, RefreshCw } from 'lucide-react';
+import { X, Save, Loader2, RefreshCw, MapPin } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { SystemMetadata } from '../types';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
@@ -27,10 +27,11 @@ interface SettingsPanelModalProps {
     copyrightNp?: string;
     officeBrandingEn?: string;
     officeBrandingNp?: string;
-    sheet1PublishedUrl?: string;
-    sheet2PublishedUrl?: string;
-    sheet3PublishedUrl?: string;
-  };
+     sheet1PublishedUrl?: string;
+     sheet2PublishedUrl?: string;
+     sheet3PublishedUrl?: string;
+     geolocationEnabled?: boolean;
+   };
   addToast: (message: string, messageEn?: string, type?: 'success' | 'info' | 'error' | 'warning', duration?: number) => void;
   language: 'en' | 'ne';
   isSaving: boolean;
@@ -68,6 +69,7 @@ export const SettingsPanelModal: React.FC<SettingsPanelModalProps> = ({
     sheet3PublishedUrl: '',
     autoSyncEnabled: true,
     syncInterval: 5,
+    geolocationEnabled: false,
   });
 
   useEffect(() => {
@@ -97,6 +99,7 @@ export const SettingsPanelModal: React.FC<SettingsPanelModalProps> = ({
         sheet3PublishedUrl: appSettings?.sheet3PublishedUrl || '',
         autoSyncEnabled: appSettings?.autoSyncEnabled !== undefined ? appSettings.autoSyncEnabled : (localAutoSync !== 'false'),
         syncInterval: appSettings?.syncInterval || (localInterval ? parseInt(localInterval) : 5),
+        geolocationEnabled: appSettings?.geolocationEnabled || false,
       });
     }
   }, [metadata, appSettings, isOpen]);
@@ -135,6 +138,7 @@ export const SettingsPanelModal: React.FC<SettingsPanelModalProps> = ({
         sheet3PublishedUrl: form.sheet3PublishedUrl,
         autoSyncEnabled: form.autoSyncEnabled,
         syncInterval: form.syncInterval,
+        geolocationEnabled: form.geolocationEnabled,
         updatedAt: new Date().toISOString(),
         updatedBy: 'superadmin',
       });
@@ -302,6 +306,47 @@ export const SettingsPanelModal: React.FC<SettingsPanelModalProps> = ({
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Geolocation Toggle Card */}
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/80 space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className={`p-2 rounded-lg transition-colors ${form.geolocationEnabled ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        {language === 'en' ? 'Geolocation Tracking' : 'भौगोलिक स्थान ट्र्याकिङ'}
+                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-black uppercase ${form.geolocationEnabled ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400'}`}>
+                          {form.geolocationEnabled ? (language === 'en' ? 'ON' : 'सक्रिय') : (language === 'en' ? 'OFF' : 'निष्क्रिय')}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                        {language === 'en'
+                          ? 'Allow admins to see user locations on the map in real-time'
+                          : 'प्रशासकहरूलाई प्रत्यक्षकालमा यूजरहरूको स्थान मानचित्रमा हेर्न अनुमति दिनुहोस्'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={form.geolocationEnabled}
+                    onClick={() => setForm(prev => ({ ...prev, geolocationEnabled: !prev.geolocationEnabled }))}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500/30 ${
+                      form.geolocationEnabled ? 'bg-emerald-500 dark:bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'
+                    }`}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        form.geolocationEnabled ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

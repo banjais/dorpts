@@ -56,7 +56,10 @@ export const ViewerDashboard: React.FC<ViewerDashboardProps> = ({ language, acti
   };
 
   useEffect(() => {
-    if (activeTab === 'overview') fetchAnalytics();
+    const load = async () => {
+      if (activeTab === 'overview') await fetchAnalytics();
+    };
+    load();
   }, [activeTab]);
 
   return (

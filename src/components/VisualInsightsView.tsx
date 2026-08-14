@@ -39,9 +39,7 @@ export const VisualInsightsView: React.FC<VisualInsightsViewProps> = ({
   const [portfolioMode, setPortfolioMode] = useState<'bar' | 'pie'>('bar');
   const [categoryMode, setCategoryMode] = useState<'bar' | 'pie'>('bar');
 
-  useEffect(() => {
-    setInsightTab(defaultInsightTab);
-  }, [defaultInsightTab]);
+  
 
   const tabContentHeight = 'min-h-[300px]';
 

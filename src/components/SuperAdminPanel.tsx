@@ -47,16 +47,16 @@ export const SuperAdminPanel: React.FC<SuperAdminPanelProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[9000] bg-slate-50 dark:bg-[#0b1329] flex flex-col"
+          className="fixed inset-0 z-[9000] bg-slate-50 dark:bg-[#0b1329] flex flex-col h-screen"
         >
           {/* Top Navigation */}
-          <div className="flex items-center justify-between px-4 sm:px-6 py-3 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/10 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-500/20 border border-rose-200 dark:border-rose-500/30 flex items-center justify-center text-rose-700 dark:text-rose-300">
-                <Shield size={18} />
+          <div className="flex items-center justify-between px-3 sm:px-4 py-2 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/10 shadow-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-500/20 border border-rose-200 dark:border-rose-500/30 flex items-center justify-center text-rose-700 dark:text-rose-300">
+                <Shield size={16} />
               </div>
               <div className="leading-tight">
-                <p className="text-[0.75rem] font-black uppercase text-slate-800 dark:text-white">
+                <p className="text-[0.7rem] font-black uppercase text-slate-800 dark:text-white">
                   {language === 'en' ? 'Super Admin' : 'सुपर एडमिन'}
                 </p>
                 <p className="text-[0.6rem] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
@@ -66,29 +66,29 @@ export const SuperAdminPanel: React.FC<SuperAdminPanelProps> = ({
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
             >
-              <X size={18} />
+              <X size={16} />
             </button>
           </div>
 
           {/* Tab Navigation */}
           <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/10 overflow-x-auto custom-scrollbar">
-            <div className="flex items-center gap-1 px-4 sm:px-6 py-2 min-w-max">
+            <div className="flex items-center gap-1 px-3 sm:px-4 py-1.5 min-w-max">
               {NAV_ITEMS.map((item) => {
                 const isActive = activeTab === item.id;
                 return (
                   <button
                     key={item.id}
                     onClick={() => onTabChange(item.id)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all text-left whitespace-nowrap ${
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all text-left whitespace-nowrap ${
                       isActive
                         ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-200'
                         : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                     }`}
                   >
                     <span
-                      className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                      className={`shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-colors ${
                         isActive
                           ? 'bg-rose-600 text-white'
                           : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
@@ -96,7 +96,7 @@ export const SuperAdminPanel: React.FC<SuperAdminPanelProps> = ({
                     >
                       {item.icon}
                     </span>
-                    <span className="block text-[11px] font-bold leading-tight">
+                    <span className="block text-[10px] font-bold leading-tight">
                       {language === 'en' ? item.labelEn : item.labelNp}
                     </span>
                   </button>
@@ -105,19 +105,12 @@ export const SuperAdminPanel: React.FC<SuperAdminPanelProps> = ({
             </div>
           </div>
 
-          {/* Page Title */}
-          <div className="px-4 sm:px-6 py-3 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/5">
-            <h1 className="text-base font-black text-slate-900 dark:text-white">
-              {activeItem ? (language === 'en' ? activeItem.labelEn : activeItem.labelNp) : ''}
-            </h1>
-          </div>
-
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
+          <div className="flex-1 min-h-0 overflow-hidden">
             {children}
           </div>
         </motion.div>
       )}
     </AnimatePresence>
-  );
-};
+   );
+ };

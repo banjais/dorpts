@@ -70,7 +70,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       labelEn: 'Super Admin',
       labelNp: 'सुपर एडमिन',
       onClick: () => onNavigate('superadmin'),
-      active: false,
+      active: activeView === 'superadmin',
     }] : []),
     {
       id: 'announcements',

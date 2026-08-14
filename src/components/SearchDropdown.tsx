@@ -539,10 +539,13 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({
   };
 
   useEffect(() => {
-    const SpeechRecognition = (window as unknown as { SpeechRecognition: unknown; webkitSpeechRecognition: unknown }).SpeechRecognition || (window as unknown as { webkitSpeechRecognition: unknown }).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setRecognitionSupported(false);
-    }
+    const checkRecognition = async () => {
+      const SpeechRecognition = (window as unknown as { SpeechRecognition: unknown; webkitSpeechRecognition: unknown }).SpeechRecognition || (window as unknown as { webkitSpeechRecognition: unknown }).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        setRecognitionSupported(false);
+      }
+    };
+    checkRecognition();
   }, []);
 
   useEffect(() => {

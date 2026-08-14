@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
-import { useLanguage } from '../context/LanguageContext';
+// import { useLanguage } from '../context/LanguageContext'; // Removed unused import
 import {
-  Users, Activity, MapPin, BarChart3, Bell,
+  Users, Activity, BarChart3,
   Send, CheckCircle, Clock, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone, MessageSquare, FileText
 } from 'lucide-react';
 import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
@@ -13,6 +13,7 @@ import { fetchPublishedCsv, PUBLISHED_CSV_URLS } from '../utils/sheetSync';
 import { parseCSVLine } from '../data';
 import { API_BASE } from '../utils/apiBase';
 import { MessagingCenter } from './MessagingCenter';
+import { UserLocationMap } from './UserLocationMap';
 
 const SystemCard: React.FC<{ label: string; status: string; isText?: boolean; language: 'en' | 'ne' }> = ({ label, status, isText, language }) => {
   const isConnected = status === 'connected' || status === 'active';
@@ -104,10 +105,9 @@ interface SuperAdminDashboardProps {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   offices?: Array<{ name: string; officeId: string; shortName: string }>;
-  onClose?: () => void;
 }
 
-export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ language, activeTab: externalActiveTab, onTabChange, offices = [], onClose }) => {
+export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ language, activeTab: externalActiveTab, onTabChange, offices = [] }) => {
   const { adminsList, user, isSuperadmin } = useAuth();
 
   if (!isSuperadmin) {
@@ -150,6 +150,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [rankingsLoading, setRankingsLoading] = useState(false);
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
   const [feedbacksLoading, setFeedbacksLoading] = useState(false);
+  const [feedbackSearch, setFeedbackSearch] = useState('');
 
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
@@ -168,8 +169,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const activeTab = externalActiveTab || internalActiveTab;
   const handleTabChange = onTabChange || setInternalActiveTab;
 
-  const totalAdmins = useMemo(() => adminsList.length + 1, [adminsList]);
-  const adminEmails = useMemo(() => adminsList.map(a => a.email), [adminsList]);
+  const totalAdmins = useMemo(() => (adminsList?.length ?? 0) + 1, [adminsList]);
+  const adminEmails = useMemo(() => adminsList?.map(a => a.email) ?? [], [adminsList]);
 
   const analyticsCards = useMemo(() => [
     {
@@ -228,15 +229,13 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   };
 
   const tabs = [
-    { id: 'analytics', labelEn: 'Dashboard', labelNp: 'ड्यासबोर्ड', icon: <BarChart3 size={16} /> },
+    { id: 'overview', labelEn: 'Overview & Tracking', labelNp: 'सारांश र ट्र्याकिङ', icon: <BarChart3 size={16} /> },
     { id: 'user-management', labelEn: 'User Management', labelNp: 'प्रयोगकर्ता व्यवस्थापन', icon: <Users size={16} /> },
-    { id: 'data-input', labelEn: 'Data Input', labelNp: 'डाटा इनपुट', icon: <FileText size={16} /> },
-    { id: 'announcements', labelEn: 'Announcements', labelNp: 'घोषणाहरू', icon: <Megaphone size={16} /> },
-    { id: 'messaging', labelEn: 'Messages', labelNp: 'सन्देशहरू', icon: <MessageSquare size={16} /> },
-    { id: 'feedbacks', labelEn: 'Feedbacks', labelNp: 'प्रतिक्रियाहरू', icon: <MessageSquare size={16} /> },
-    { id: 'geolocation', labelEn: 'Geolocation', labelNp: 'भौगोलिक स्थान', icon: <MapPin size={16} /> },
-    { id: 'notifications', labelEn: 'Notifications', labelNp: 'सूचनाहरू', icon: <Bell size={16} /> },
-    { id: 'security-logs', labelEn: 'Security & System', labelNp: 'सुरक्षा र प्रणाली', icon: <Activity size={16} /> },
+    { id: 'data-input', labelEn: 'Data Input & Sync', labelNp: 'डाटा इनपुट र सिङ्क', icon: <FileText size={16} /> },
+    { id: 'communications', labelEn: 'Communications', labelNp: 'सञ्चार', icon: <Megaphone size={16} /> },
+    { id: 'messaging', labelEn: 'Messaging Center', labelNp: 'सन्देश केन्द्र', icon: <MessageSquare size={16} /> },
+    { id: 'feedbacks', labelEn: 'User Feedbacks', labelNp: 'प्रयोगकर्ता प्रतिक्रिया', icon: <MessageSquare size={16} /> },
+    { id: 'system', labelEn: 'System & Security', labelNp: 'प्रणाली र सुरक्षा', icon: <Activity size={16} /> },
   ] as const;
 
   const fetchAnalytics = async () => {
@@ -432,12 +431,44 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const fetchFeedbacks = async () => {
     setFeedbacksLoading(true);
     try {
-      const snap = await getDocs(query(collection(db, 'user_feedback'), orderBy('createdAt', 'desc'), limit(100)));
-      setFeedbacks(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const snap = await getDocs(collection(db, 'user_feedback'));
+      const list = snap.docs.map(d => {
+        const data = d.data();
+        const dateVal = data.createdAt || data.timestamp;
+        let tsStr = '--';
+        let rawTime = 0;
+        if (dateVal?.toDate) {
+          const dObj = dateVal.toDate();
+          tsStr = dObj.toLocaleString();
+          rawTime = dObj.getTime();
+        } else if (dateVal) {
+          const dObj = new Date(dateVal);
+          tsStr = dObj.toLocaleString();
+          rawTime = dObj.getTime();
+        }
+        return {
+          id: d.id,
+          ...data,
+          formattedTime: tsStr,
+          rawTime,
+        };
+      });
+      list.sort((a, b) => b.rawTime - a.rawTime);
+      setFeedbacks(list);
     } catch (err) {
       console.error('Failed to fetch feedbacks:', err);
     } finally {
       setFeedbacksLoading(false);
+    }
+  };
+
+  const handleDeleteFeedback = async (id: string) => {
+    if (!confirm(language === 'en' ? 'Delete this feedback?' : 'यो प्रतिक्रिया मेट्नुहोस्?')) return;
+    try {
+      await deleteDoc(doc(db, 'user_feedback', id));
+      setFeedbacks(prev => prev.filter(f => f.id !== id));
+    } catch (err: any) {
+      alert(err.message);
     }
   };
 
@@ -488,7 +519,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
         email: admin.email,
         name: admin.name || admin.email,
         lastSeen: admin.lastSignInTime || admin.lastLogin || 'unknown',
-        location: admin.location || { lat: 27.7172 + (Math.random() - 0.5) * 0.1, lng: 85.324 + (Math.random() - 0.5) * 0.1 },
+        location: admin.location || null,
         device: admin.device || 'unknown',
       }));
 
@@ -500,23 +531,130 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     }
   };
 
+  useEffect(() => {
+    if (!isSuperadmin || !user?.email) return;
+
+    let watchId: number | null = null;
+
+    const trackLocation = async () => {
+      try {
+        const settingsSnap = await getDoc(doc(db, 'settings', 'system'));
+        const settings = settingsSnap.exists() ? settingsSnap.data() : {};
+        if (!settings.geolocationEnabled) return;
+
+        if (!navigator.geolocation) {
+          console.warn('Geolocation not supported');
+          return;
+        }
+
+        watchId = navigator.geolocation.watchPosition(
+          async (position) => {
+            const { latitude, longitude, accuracy } = position.coords;
+            try {
+              await setDoc(doc(db, 'admins', user.uid), {
+                location: { lat: latitude, lng: longitude, accuracy, updatedAt: new Date().toISOString() },
+                lastSignInTime: new Date().toISOString(),
+              }, { merge: true });
+            } catch (err) {
+              console.error('Failed to update location:', err);
+            }
+          },
+          (err) => {
+            console.error('Geolocation error:', err);
+          },
+          { enableHighAccuracy: true, maximumAge: 30000, timeout: 10000 }
+        );
+      } catch (err) {
+        console.error('Failed to load settings for geolocation:', err);
+      }
+    };
+
+    trackLocation();
+
+    return () => {
+      if (watchId !== null && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, [isSuperadmin, user?.email, user?.uid]);
+
+  const [notificationTitle, setNotificationTitle] = useState('');
+  const [notificationTargetRole, setNotificationTargetRole] = useState<'all' | 'admin' | 'data_updater' | 'viewer'>('all');
+  const [notificationTargetOffice, setNotificationTargetOffice] = useState('');
+  const [notificationChannel, setNotificationChannel] = useState<'all' | 'email' | 'in_app' | 'messaging'>('all');
+  const [notificationLogs, setNotificationLogs] = useState<any[]>([]);
+
+  const fetchNotificationLogs = async () => {
+    try {
+      const snap = await getDocs(query(collection(db, 'notifications'), orderBy('createdAt', 'desc'), limit(50)));
+      setNotificationLogs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      console.error('Failed to fetch notification logs:', err);
+    }
+  };
+
   const handleSendNotification = async () => {
     if (!notificationText.trim()) return;
     setNotificationSending(true);
     try {
       const token = await user?.getIdToken();
-      const res = await fetch(`${API_BASE}/api/superadmin/notifications/send`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ message: notificationText }),
+      let sentCount = 0;
+
+      // 1. Email Broadcast if enabled
+      if (notificationChannel === 'all' || notificationChannel === 'email') {
+        try {
+          const res = await fetch(`${API_BASE}/api/superadmin/notifications/send`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              message: notificationText,
+            }),
+          });
+          const data = await res.json();
+          if (data?.sentTo) sentCount = data.sentTo;
+        } catch (e) {
+          console.warn('Email broadcast skipped or failed:', e);
+        }
+      }
+
+      // 2. Real-Time In-App Push & Announcement Board Broadcast
+      if (notificationChannel === 'all' || notificationChannel === 'in_app') {
+        await addDoc(collection(db, 'announcements'), {
+          title: notificationTitle.trim() || (language === 'en' ? 'Superadmin Notification' : 'सुपरएडमिन सूचना'),
+          message: notificationText.trim(),
+          messageEn: notificationText.trim(),
+          priority: 'urgent',
+          targetOffices: notificationTargetOffice ? [notificationTargetOffice] : [],
+          targetRoles: notificationTargetRole !== 'all' ? [notificationTargetRole] : [],
+          createdBy: user?.email || 'superadmin',
+          createdAt: Timestamp.now(),
+          isActive: true,
+        });
+      }
+
+      // 3. Save Notification Log to Firestore History
+      await addDoc(collection(db, 'notifications'), {
+        title: notificationTitle.trim() || 'Superadmin Notification',
+        message: notificationText.trim(),
+        targetRole: notificationTargetRole,
+        targetOffice: notificationTargetOffice || 'All Offices',
+        channel: notificationChannel,
+        sender: user?.email || 'superadmin',
+        createdAt: Timestamp.now(),
+        sentCount: sentCount || 1,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to send');
+
       setNotificationText('');
-      alert(language === 'en' ? `Notification sent to ${data.sentTo} admins` : `${data.sentTo} प्रशासकहरूलाई सूचना पठाइयो`);
+      setNotificationTitle('');
+      fetchNotificationLogs();
+      alert(
+        language === 'en'
+          ? `Notification successfully relayed across channels!`
+          : `सूचना च्यानलहरू मार्फत सफलतापूर्वक पठाइयो!`
+      );
     } catch (err: any) {
       alert(err.message);
     } finally {
@@ -713,271 +851,188 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
 
   useEffect(() => {
     if (!isSuperadmin) return;
-    if (activeTab === 'analytics') {
-      fetchAnalytics();
-      fetchCollaboration();
-    }
-    if (activeTab === 'user-management') fetchUsers();
-    if (activeTab === 'data-input') fetchIndicators();
-    if (activeTab === 'logs' || activeTab === 'security') { fetchLogs(); fetchSecurity(); }
-    if (activeTab === 'security-logs') { fetchLogs(); fetchSecurity(); fetchPerformance(); }
-    if (activeTab === 'geolocation') fetchGeolocation();
-    if (activeTab === 'announcements') fetchAnnouncements();
-    if (activeTab === 'messaging') { /* messaging handles its own data */ }
-    if (activeTab === 'feedbacks') fetchFeedbacks();
+    const run = async () => {
+      if (activeTab === 'overview') {
+        await fetchAnalytics();
+        await fetchGeolocation();
+      }
+      if (activeTab === 'user-management' || activeTab === 'bulk-roles') await fetchUsers();
+      if (activeTab === 'data-input' || activeTab === 'data-manager') await fetchIndicators();
+      if (activeTab === 'system') {
+        await fetchLogs();
+        await fetchSecurity();
+        await fetchPerformance();
+      }
+      if (activeTab === 'communications') {
+        await fetchAnnouncements();
+        await fetchNotificationLogs();
+      }
+      if (activeTab === 'feedbacks') await fetchFeedbacks();
+    };
+    run();
   }, [activeTab, isSuperadmin]);
 
-   return (
-     <motion.div
-       initial={{ opacity: 0, y: 10 }}
-       animate={{ opacity: 1, y: 0 }}
-       className="flex items-start gap-4"
-     >
-        {/* Left Sidebar Navigation */}
-        <div className="hidden lg:block w-60 shrink-0">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl p-2 sticky top-4">
-            {onClose && (
-              <div className="flex items-center justify-between px-2 py-1.5 mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-rose-50 dark:bg-rose-500/20 border border-rose-200 dark:border-rose-500/30 flex items-center justify-center text-rose-700 dark:text-rose-300">
-                    <ShieldCheck size={14} />
-                  </div>
-                  <span className="text-[11px] font-black uppercase tracking-wider text-slate-800 dark:text-white">
-                    {language === 'en' ? 'Super Admin' : 'सुपर एडमिन'}
-                  </span>
-                </div>
-                <button
-                  onClick={onClose}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
-                  title={language === 'en' ? 'Close panel' : 'प्यानल बन्द गर्नुहोस्'}
-                >
-                  <X size={14} />
-                </button>
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="h-full flex flex-col md:flex-row gap-3 sm:gap-4 items-start"
+      >
+        {/* Left Sidebar Navigation Menu */}
+        <aside className="w-full md:w-56 lg:w-60 shrink-0 h-full">
+          <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-white/10 rounded-2xl p-2.5 sm:p-3 shadow-xl space-y-3 h-full flex flex-col">
+            {/* Header Badge */}
+            <div className="flex items-center gap-2.5 pb-2.5 border-b border-slate-100 dark:border-white/10 px-1">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-rose-600 to-rose-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/20">
+                <ShieldCheck size={16} />
               </div>
-            )}
-            <nav className="flex flex-col gap-1">
-             {tabs.map((item) => {
-               const isActive = activeTab === item.id;
-               return (
-                 <button
-                   key={item.id}
-                   onClick={() => handleTabChange(item.id)}
-                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${
-                     isActive
-                       ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-200'
-                       : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                   }`}
-                 >
-                   <span
-                     className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
-                       isActive
-                         ? 'bg-rose-600 text-white'
-                         : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                     }`}
-                   >
-                     {item.icon}
-                   </span>
-                   <span className="text-[11px] font-bold leading-tight">
-                     {language === 'en' ? item.labelEn : item.labelNp}
-                   </span>
-                 </button>
-               );
-             })}
-           </nav>
-         </div>
-       </div>
-
-       {/* Mobile Tab Bar (visible on small screens) */}
-       <div className="lg:hidden w-full">
-         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl p-1.5 overflow-x-auto custom-scrollbar">
-           <div className="flex items-center gap-1 min-w-max">
-             {tabs.map((item) => {
-               const isActive = activeTab === item.id;
-               return (
-                 <button
-                   key={item.id}
-                   onClick={() => handleTabChange(item.id)}
-                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-left whitespace-nowrap ${
-                     isActive
-                       ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-200'
-                       : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                   }`}
-                 >
-                   <span
-                     className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
-                       isActive
-                       ? 'bg-rose-600 text-white'
-                       : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                   }`}
-                   >
-                     {item.icon}
-                   </span>
-                   <span className="block text-[11px] font-bold leading-tight">
-                     {language === 'en' ? item.labelEn : item.labelNp}
-                   </span>
-                 </button>
-               );
-             })}
-           </div>
-         </div>
-       </div>
-
-       {/* Content based on active tab */}
-       <div className="flex-1 min-w-0">
-         {activeTab === 'analytics' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'Dashboard Overview' : 'ड्यासबोर्ड सारांश'}
-            </h3>
-            <div
-              ref={analyticsCardRef}
-              className="relative w-full overflow-hidden rounded-2xl"
-              style={{ height: 'calc(100vh - 200px)' }}
-            >
-              <div
-                className="flex transition-transform duration-500 ease-out h-full"
-                style={{ transform: `translateX(-${analyticsCardIndex * 100}%)` }}
-              >
-                {analyticsCards.map((card, idx) => (
-                  <div
-                    key={idx}
-                    className="w-full flex-shrink-0 px-2"
-                    style={{ height: '100%' }}
-                  >
-                    <div className={`${card.bgColor} rounded-2xl p-6 border ${card.borderColor} h-full flex flex-col justify-between`}>
-                      <div>
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
-                            {card.icon}
-                          </div>
-                          <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">
-                            {card.label}
-                          </span>
-                        </div>
-                        <div className={`text-5xl font-black ${card.color} mb-2`}>
-                          {card.value}
-                        </div>
-                        <div className="text-[11px] text-slate-400">
-                          {card.sublabel}
-                        </div>
-                      </div>
-                      <div className="mt-4">
-                        <div className="flex gap-1.5 justify-center">
-                          {analyticsCards.map((_, i) => (
-                            <button
-                              key={i}
-                              onClick={() => setAnalyticsCardIndex(i)}
-                              className={`h-1.5 rounded-full transition-all duration-300 ${
-                                i === analyticsCardIndex
-                                  ? 'bg-indigo-500 w-6'
-                                  : 'bg-slate-200 dark:bg-slate-700 w-1.5'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {analyticsCardIndex > 0 && (
-                <button
-                  onClick={() => handleAnalyticsSwipe('right')}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors z-10"
-                >
-                  <ChevronDown size={16} className="rotate-90" />
-                </button>
-              )}
-              {analyticsCardIndex < analyticsCards.length - 1 && (
-                <button
-                  onClick={() => handleAnalyticsSwipe('left')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors z-10"
-                >
-                  <ChevronDown size={16} className="-rotate-90" />
-                </button>
-              )}
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === 'analytics' && officeRankings.length > 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'Office Ranking' : 'कार्यालय रanking'}
-            </h3>
-            <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl p-4 border border-slate-100 dark:border-white/5">
-              <div className="space-y-2.5">
-                {officeRankings.map((office, idx) => (
-                  <div key={office.name} className="flex items-center gap-3">
-                    <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black ${
-                      idx === 0 ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300' :
-                      idx === 1 ? 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300' :
-                      idx === 2 ? 'bg-orange-50 dark:bg-orange-500/10 text-orange-700 dark:text-orange-300' :
-                      'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                    }`}>
-                      {idx + 1}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate pr-2">{office.name}</span>
-                        <span className={`text-[11px] font-black ${
-                          office.completion >= 80 ? 'text-emerald-600' :
-                          office.completion >= 50 ? 'text-amber-600' : 'text-rose-600'
-                        }`}>{office.completion}%</span>
-                      </div>
-                      <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full transition-all duration-500 ${
-                          office.completion >= 80 ? 'bg-emerald-500' :
-                          office.completion >= 50 ? 'bg-amber-500' : 'bg-rose-500'
-                        }`} style={{ width: `${Math.min(100, office.completion)}%` }} />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Admin Collaboration - merged into analytics tab */}
-        {activeTab === 'analytics' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'Admin Activity' : 'प्रशासक गतिविधि'}
-            </h3>
-            <div className="space-y-2">
-              {collaborators.length === 0 && !loading && (
-                <p className="text-[11px] text-slate-400 text-center py-4">
-                  {language === 'en' ? 'No activity data available' : 'गतिविधि डाटा उपलब्ध छैन'}
+              <div>
+                <h2 className="text-[0.65rem] font-black uppercase tracking-wider text-slate-800 dark:text-white">
+                  {language === 'en' ? 'Super Admin Panel' : 'सुपर एडमिन प्यानल'}
+                </h2>
+                <p className="text-[0.55rem] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest">
+                  {language === 'en' ? 'Control Center' : 'नियन्त्रण केन्द्र'}
                 </p>
-              )}
-              {collaborators.map((collab, idx) => (
-                <div key={idx} className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 rounded-lg p-3 border border-slate-100 dark:border-white/5">
-                  <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-xs font-bold">
-                    {collab.email[0].toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{collab.email}</div>
-                    <div className="text-[10px] text-slate-400">
-                      {collab.activityCount} {language === 'en' ? 'activities' : 'गतिविधिहरू'} · {collab.actionTypes?.slice(0, 2).join(', ') || '--'}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className={`w-2 h-2 rounded-full ${collab.status === 'active' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                    <span className="text-[10px] text-slate-500">{collab.status === 'active' ? (language === 'en' ? 'Active' : 'सक्रिय') : (language === 'en' ? 'Inactive' : 'निस्क्रिय')}</span>
-                  </div>
-                </div>
-              ))}
+              </div>
             </div>
-          </motion.div>
-        )}
 
-        {activeTab === 'data-input' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'Data Input / Update' : 'डाटा इनपुट / अपडेट'}
-            </h3>
+            {/* Vertical Left Navigation Items */}
+            <nav className="space-y-1 flex-1 overflow-y-auto custom-scrollbar">
+              {tabs.map((item) => {
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleTabChange(item.id)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left font-bold text-[11px] group relative ${
+                      isActive
+                        ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-200 shadow-sm border border-rose-200/50 dark:border-rose-500/30'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <span
+                      className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
+                        isActive
+                          ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:bg-white dark:group-hover:bg-slate-700'
+                      }`}
+                    >
+                      {item.icon}
+                    </span>
+                    <span className="truncate">
+                      {language === 'en' ? item.labelEn : item.labelNp}
+                    </span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeLeftIndicator"
+                        className="absolute right-2 w-1.5 h-3.5 bg-rose-600 dark:bg-rose-400 rounded-full"
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+        </aside>
 
+        {/* Content based on active tab */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 custom-scrollbar">
+          {activeTab === 'overview' && (
+           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+               {language === 'en' ? 'Overview & Tracking' : 'सारांश र ट्र्याकिङ'}
+             </h3>
+             <div
+               ref={analyticsCardRef}
+               className="relative w-full overflow-hidden rounded-2xl"
+               style={{ height: 'calc(100vh - 200px)' }}
+             >
+               <div
+                 className="flex transition-transform duration-500 ease-out h-full"
+                 style={{ transform: `translateX(-${analyticsCardIndex * 100}%)` }}
+               >
+                 {analyticsCards.map((card, idx) => (
+                   <div
+                     key={idx}
+                     className="w-full flex-shrink-0 px-2"
+                     style={{ height: '100%' }}
+                   >
+                     <div className={`${card.bgColor} rounded-2xl p-6 border ${card.borderColor} h-full flex flex-col justify-between`}>
+                       <div>
+                         <div className="flex items-center gap-3 mb-4">
+                           <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
+                             {card.icon}
+                           </div>
+                           <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+                             {card.label}
+                           </span>
+                         </div>
+                         <div className={`text-5xl font-black ${card.color} mb-2`}>
+                           {card.value}
+                         </div>
+                         <div className="text-[11px] text-slate-400">
+                           {card.sublabel}
+                         </div>
+                       </div>
+                       <div className="mt-4">
+                         <div className="flex gap-1.5 justify-center">
+                           {analyticsCards.map((_, i) => (
+                             <button
+                               key={i}
+                               onClick={() => setAnalyticsCardIndex(i)}
+                               className={`h-1.5 rounded-full transition-all duration-300 ${
+                                 i === analyticsCardIndex
+                                   ? 'bg-indigo-500 w-6'
+                                   : 'bg-slate-200 dark:bg-slate-700 w-1.5'
+                               }`}
+                             />
+                           ))}
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+               {analyticsCardIndex > 0 && (
+                 <button
+                   onClick={() => handleAnalyticsSwipe('right')}
+                   className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors z-10"
+                 >
+                   <ChevronDown size={16} className="rotate-90" />
+                 </button>
+               )}
+               {analyticsCardIndex < analyticsCards.length - 1 && (
+                 <button
+                   onClick={() => handleAnalyticsSwipe('left')}
+                   className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors z-10"
+                 >
+                   <ChevronDown size={16} className="-rotate-90" />
+                 </button>
+               )}
+             </div>
+           </motion.div>
+         )}
+
+         {activeTab === 'overview' && (
+           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+               {language === 'en' ? 'User Locations' : 'यूजरहरूको स्थानहरू'}
+             </h3>
+             <UserLocationMap users={locations.map((loc: any) => ({
+               email: loc.email,
+               name: loc.name,
+               location: loc.location,
+               lastSeen: loc.lastSeen,
+               device: loc.device,
+             }))} language={language} />
+           </motion.div>
+         )}
+
+         {activeTab === 'data-input' && (
+           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+               {language === 'en' ? 'Data Input / Update' : 'डाटा इनपुट / अपडेट'}
+             </h3>
             <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5 space-y-3">
               <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
                 {language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्'}
@@ -1072,8 +1127,9 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
           </motion.div>
         )}
 
-         {activeTab === 'announcements' && (
-           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+          {activeTab === 'communications' && (
+            <>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
              <div className="flex items-center justify-between">
                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
                  {language === 'en' ? 'Announcement Board' : 'घोषणा बोर्ड'}
@@ -1171,80 +1227,261 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                      <div className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">{ann.message}</div>
                    </div>
                    <div className="flex items-center gap-1 shrink-0">
-                     <button
-                       onClick={() => handleToggleAnnouncement(ann)}
-                       className={`p-1.5 rounded-lg transition-all ${ann.isActive ? 'text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10' : 'text-slate-400 hover:text-slate-600'}`}
-                       title={ann.isActive ? (language === 'en' ? 'Deactivate' : 'निस्क्रिय गर्नुहोस्') : (language === 'en' ? 'Activate' : 'सक्रिय गर्नुहोस्')}
-                     >
-                       <CheckCircle size={12} />
-                     </button>
-                     <button
-                       onClick={() => { setEditingAnnouncement(ann); setAnnouncementForm({ title: ann.title, message: ann.message, messageEn: ann.messageEn || '', priority: ann.priority, targetOffices: (ann.targetOffices || []).join(', '), targetRoles: (ann.targetRoles || []).join(', '), expiresAt: ann.expiresAt?.toDate?.()?.toISOString().slice(0, 16) || '' }); setShowAnnouncementForm(true); }}
-                       className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all"
-                       title={language === 'en' ? 'Edit' : 'सम्पादन'}
-                     >
-                       <Edit3 size={12} />
-                     </button>
-                     <button
-                       onClick={() => handleDeleteAnnouncement(ann.id)}
-                       className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all"
-                       title={language === 'en' ? 'Delete' : 'मेटाउनुहोस्'}
-                     >
-                       <Trash2 size={12} />
-                     </button>
-                   </div>
-                 </div>
-               ))}
-             </div>
-           </motion.div>
+                      <button
+                        onClick={() => handleToggleAnnouncement(ann)}
+                        className={`p-1.5 rounded-lg transition-all ${ann.isActive ? 'text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10' : 'text-slate-400 hover:text-slate-600'}`}
+                        title={ann.isActive ? (language === 'en' ? 'Deactivate' : 'निस्क्रिय गर्नुहोस्') : (language === 'en' ? 'Activate' : 'सक्रिय गर्नुहोस्')}
+                      >
+                        <CheckCircle size={12} />
+                      </button>
+                      <button
+                        onClick={() => { setEditingAnnouncement(ann); setAnnouncementForm({ title: ann.title, message: ann.message, messageEn: ann.messageEn || '', priority: ann.priority, targetOffices: (ann.targetOffices || []).join(', '), targetRoles: (ann.targetRoles || []).join(', '), expiresAt: ann.expiresAt?.toDate?.()?.toISOString().slice(0, 16) || '' }); setShowAnnouncementForm(true); }}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all"
+                        title={language === 'en' ? 'Edit' : 'सम्पादन'}
+                      >
+                        <Edit3 size={12} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteAnnouncement(ann.id)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all"
+                        title={language === 'en' ? 'Delete' : 'मेटाउनुहोस्'}
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Notification Relay Center */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                {language === 'en' ? 'Notification Relay Center' : 'सूचना रिले केन्द्र'}
+              </h3>
+
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl p-4 sm:p-5 border border-slate-100 dark:border-white/5 space-y-4 shadow-sm">
+                <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-3">
+                  <Send size={16} className="text-rose-600 dark:text-rose-400" />
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                    {language === 'en' ? 'Relay New Notification' : 'नयाँ सूचना रिले गर्नुहोस्'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                      {language === 'en' ? 'Subject / Title' : 'विषय / शीर्षक'}
+                    </label>
+                    <input
+                      type="text"
+                      value={notificationTitle}
+                      onChange={(e) => setNotificationTitle(e.target.value)}
+                      placeholder={language === 'en' ? 'Announcement Title...' : 'सूचनाको शीर्षक...'}
+                      className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-200"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                      {language === 'en' ? 'Target Role' : 'लक्षित भूमिका'}
+                    </label>
+                    <select
+                      value={notificationTargetRole}
+                      onChange={(e) => setNotificationTargetRole(e.target.value as any)}
+                      className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-200"
+                    >
+                      <option value="all">{language === 'en' ? 'All Registered Users & Admins' : 'सबै प्रयोगकर्ता र प्रशासकहरू'}</option>
+                      <option value="admin">{language === 'en' ? 'Admins Only' : 'प्रशासकहरू मात्र'}</option>
+                      <option value="data_updater">{language === 'en' ? 'Data Updaters Only' : 'डाटा अपडेटरहरू मात्र'}</option>
+                      <option value="viewer">{language === 'en' ? 'General Viewers Only' : 'सामान्य दर्शकहरू मात्र'}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                      {language === 'en' ? 'Target Office (Optional)' : 'लक्षित कार्यालय (वैकल्पिक)'}
+                    </label>
+                    <OfficeDropdown
+                      value={notificationTargetOffice}
+                      onChange={setNotificationTargetOffice}
+                      offices={offices}
+                      language={language}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                      {language === 'en' ? 'Relay Channel' : 'रिले च्यानल'}
+                    </label>
+                    <select
+                      value={notificationChannel}
+                      onChange={(e) => setNotificationChannel(e.target.value as any)}
+                      className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-200"
+                    >
+                      <option value="all">{language === 'en' ? 'All Channels (Email + In-App Live Push Banner)' : 'सबै च्यानलहरू (इमेल + इन-एप लाइभ पुस)'}</option>
+                      <option value="email">{language === 'en' ? 'Email Broadcast Only' : 'इमेल प्रसारण मात्र'}</option>
+                      <option value="in_app">{language === 'en' ? 'In-App Banner & Announcement Board' : 'इन-एप ब्यानर र घोषणा बोर्ड'}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    {language === 'en' ? 'Message Content' : 'सन्देशको विवरण'}
+                  </label>
+                  <textarea
+                    value={notificationText}
+                    onChange={(e) => setNotificationText(e.target.value)}
+                    placeholder={language === 'en' ? 'Write notification message to relay...' : 'रिले गर्न सूचना सन्देश लेख्नुहोस्...'}
+                    className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs resize-none text-slate-800 dark:text-slate-200"
+                    rows={4}
+                  />
+                </div>
+
+                <button
+                  onClick={handleSendNotification}
+                  disabled={notificationSending || !notificationText.trim()}
+                  className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white text-xs font-black rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {notificationSending
+                    ? (language === 'en' ? 'Relaying Notification...' : 'सूचना पठाउँदै...')
+                    : (language === 'en' ? 'Broadcast Notification Now' : 'अहिले नै सूचना प्रसारण गर्नुहोस्')}
+                </button>
+              </div>
+
+              {/* Notification History Logs */}
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl p-4 border border-slate-100 dark:border-white/5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                    {language === 'en' ? 'Relayed Notifications Log' : 'रिले गरिएका सूचनाहरूको लग'}
+                  </span>
+                  <button
+                    onClick={fetchNotificationLogs}
+                    className="text-[10px] font-bold text-rose-600 dark:text-rose-400 hover:underline"
+                  >
+                    {language === 'en' ? 'Refresh Log' : 'लग अपडेट गर्नुहोस्'}
+                  </button>
+                </div>
+
+                <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                  {notificationLogs.length === 0 && (
+                    <p className="text-[11px] text-slate-400 text-center py-4">
+                      {language === 'en' ? 'No past notifications logged' : 'कुनै विगत सूचना लग गरिएको छैन'}
+                    </p>
+                  )}
+                  {notificationLogs.map((log: any) => (
+                    <div key={log.id} className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-100 dark:border-white/5 space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
+                        <span>{log.title}</span>
+                        <span className="text-[10px] text-emerald-600 font-mono">Relayed</span>
+                      </div>
+                      <p className="text-[11px] text-slate-600 dark:text-slate-300 truncate">{log.message}</p>
+                      <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1">
+                        <span>Target: {log.targetRole || 'all'} ({log.targetOffice || 'All Offices'})</span>
+                        <span>{log.createdAt?.toDate?.()?.toLocaleString() || '--'}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </>
           )}
 
           {activeTab === 'messaging' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-                {language === 'en' ? 'Group & Office Messaging' : 'समूह र कार्यालय मेसेजिङ'}
-              </h3>
-              <MessagingCenter language={language} offices={offices} isAdmin={isSuperadmin} />
+              <MessagingCenter language={language} offices={offices} isAdmin={isSuperadmin} users={users} />
             </motion.div>
           )}
 
-    {activeTab === 'feedbacks' && (
+          {activeTab === 'feedbacks' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-                {language === 'en' ? 'User Feedbacks' : 'प्रयोगकर्ता प्रतिक्रियाहरू'}
-              </h3>
-              <div className="space-y-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                    {language === 'en' ? 'General User Feedbacks' : 'आम प्रयोगकर्ता प्रतिक्रियाहरू'}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    {language === 'en' ? `Total Feedbacks Received: ${feedbacks.length}` : `प्राप्त कुल प्रतिक्रियाहरू: ${feedbacks.length}`}
+                  </p>
+                </div>
+                <button
+                  onClick={fetchFeedbacks}
+                  className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg transition-all self-start sm:self-auto"
+                >
+                  {language === 'en' ? 'Refresh' : 'पुनः लोड गर्नुहोस्'}
+                </button>
+              </div>
+
+              <input
+                type="text"
+                value={feedbackSearch}
+                onChange={(e) => setFeedbackSearch(e.target.value)}
+                placeholder={language === 'en' ? 'Search feedback by message text, name, email or role...' : 'पाठ, नाम, इमेल वा भूमिकाद्वारा खोज्नुहोस्...'}
+                className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-200"
+              />
+
+              <div className="space-y-3">
                 {feedbacksLoading && (
-                  <p className="text-[11px] text-slate-400 text-center py-4">
+                  <p className="text-[11px] text-slate-400 text-center py-6">
                     {language === 'en' ? 'Loading feedbacks...' : 'प्रतिक्रियाहरू लोड गर्दै...'}
                   </p>
                 )}
                 {!feedbacksLoading && feedbacks.length === 0 && (
-                  <p className="text-[11px] text-slate-400 text-center py-4">
-                    {language === 'en' ? 'No feedbacks yet' : 'अहिले सम्म कुनै प्रतिक्रिया छैन'}
-                  </p>
+                  <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl p-8 text-center border border-slate-100 dark:border-white/5 space-y-2">
+                    <MessageSquare className="mx-auto text-slate-400" size={32} />
+                    <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                      {language === 'en' ? 'No user feedbacks found' : 'कुनै प्रयोगकर्ता प्रतिक्रिया फेला परेन'}
+                    </p>
+                  </div>
                 )}
-                {feedbacks.map((fb: any) => (
-                  <div key={fb.id} className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                {feedbacks.filter(fb => {
+                  if (!feedbackSearch.trim()) return true;
+                  const q = feedbackSearch.toLowerCase();
+                  return (fb.message || fb.content || fb.text || '').toLowerCase().includes(q) ||
+                         (fb.userName || '').toLowerCase().includes(q) ||
+                         (fb.userEmail || '').toLowerCase().includes(q) ||
+                         (fb.userRole || '').toLowerCase().includes(q);
+                }).map((fb: any) => (
+                  <div key={fb.id} className="bg-slate-50 dark:bg-slate-950 rounded-2xl p-4 border border-slate-100 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10 transition-all shadow-sm">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                            {fb.userName || fb.userEmail || 'Anonymous'}
+                        <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                          <span className="text-xs font-black text-slate-800 dark:text-slate-200 truncate">
+                            {fb.userName || fb.userEmail || (language === 'en' ? 'Anonymous User' : 'अनाम प्रयोगकर्ता')}
+                          </span>
+                          {fb.userEmail && (
+                            <span className="text-[10px] text-slate-400 font-mono">
+                              ({fb.userEmail})
+                            </span>
+                          )}
+                          <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300">
+                            {fb.userRole || 'general_user'}
                           </span>
                           {fb.rating && (
-                            <span className="text-[10px] font-black text-amber-600">
+                            <span className="text-[10px] font-black text-amber-500">
                               {'★'.repeat(fb.rating)}{'☆'.repeat(5 - fb.rating)}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
-                          {fb.message || fb.content || fb.text || '(no message)'}
+                        <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-100 dark:border-white/5">
+                          {fb.message || fb.content || fb.text || '(No message content)'}
                         </p>
-                        <div className="text-[10px] text-slate-400 mt-2">
-                          {fb.createdAt?.toDate?.()?.toLocaleString() || fb.createdAt || '--'}
+                        <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-2">
+                          <Clock size={10} />
+                          <span>{fb.formattedTime || fb.createdAt || '--'}</span>
                         </div>
                       </div>
+                      <button
+                        onClick={() => handleDeleteFeedback(fb.id)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all shrink-0"
+                        title={language === 'en' ? 'Delete feedback' : 'प्रतिक्रिया मेट्नुहोस्'}
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -1252,80 +1489,22 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
             </motion.div>
           )}
 
-          {activeTab === 'geolocation' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'Geolocation Tracking' : 'भौगोलिक स्थान ट्र्याकिङ'}
-            </h3>
-            <div className="space-y-2">
-              {locations.length === 0 && !loading && (
-                <p className="text-[11px] text-slate-400 text-center py-4">
-                  {language === 'en' ? 'No location data available' : 'स्थान डाटा उपलब्ध छैन'}
-                </p>
-              )}
-              {locations.map((loc, idx) => (
-                <div key={idx} className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 rounded-lg p-3 border border-slate-100 dark:border-white/5">
-                  <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-xs font-bold">
-                    {loc.email[0].toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{loc.name}</div>
-                    <div className="text-[10px] text-slate-400">
-                      {language === 'en' ? 'Last seen' : 'अन्तिम पटक देखा परेको'}: {loc.lastSeen}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-[10px] font-mono text-slate-500">
-                      {loc.location.lat.toFixed(4)}, {loc.location.lng.toFixed(4)}
-                    </div>
-                    <div className="text-[10px] text-slate-400">{loc.device}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
+          {activeTab === 'overview' && (
+           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+               {language === 'en' ? 'User Locations' : 'यूजरहरूको स्थानहरू'}
+             </h3>
+             <UserLocationMap users={locations.map((loc: any) => ({
+               email: loc.email,
+               name: loc.name,
+               location: loc.location,
+               lastSeen: loc.lastSeen,
+               device: loc.device,
+             }))} language={language} />
+           </motion.div>
+         )}
 
-        {activeTab === 'notifications' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-              {language === 'en' ? 'Notification Center' : 'सूचना केन्द्र'}
-            </h3>
-            <div className="space-y-3">
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Send size={14} className="text-indigo-600" />
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                    {language === 'en' ? 'Send Announcement' : 'घोषणा पठाउनुहोस्'}
-                  </span>
-                </div>
-                <textarea
-                  value={notificationText}
-                  onChange={(e) => setNotificationText(e.target.value)}
-                  placeholder={language === 'en' ? 'Type your announcement...' : 'तपाईंको घोषणा टाइप गर्नुहोस्...'}
-                  className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs resize-none"
-                  rows={3}
-                />
-                <button
-                  onClick={handleSendNotification}
-                  disabled={notificationSending || !notificationText.trim()}
-                  className="mt-2 px-4 py-2 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {notificationSending ? (language === 'en' ? 'Sending...' : 'पठाउँदै...') : (language === 'en' ? 'Send to All Admins' : 'सबै प्रशासकहरूलाई पठाउनुहोस्')}
-                </button>
-              </div>
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/50 rounded-xl p-4">
-                <p className="text-[11px] text-amber-800 dark:text-amber-300">
-                  {language === 'en'
-                    ? 'Announcements will be sent via email to all registered admins.'
-                    : 'घोषणाहरू सबै दर्ता प्रशासकहरूलाई इमेल मार्फत पठाइनेछ।'}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === 'user-management' && (
+         {activeTab === 'user-management' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
@@ -1483,130 +1662,134 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
            </motion.div>
          )}
 
-          {activeTab === 'security-logs' && (
-           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-               {language === 'en' ? 'Security, Performance & System Health' : 'सुरक्षा, कार्यसम्पादन र प्रणाली स्वास्थ्य'}
-             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Login Attempts</div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{language === 'en' ? 'Today' : 'आज'}</span>
-                  <span className="text-xs font-black text-emerald-600">{securityData?.loginAttempts ?? 0}</span>
-                </div>
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{language === 'en' ? 'Failed' : 'असफल'}</span>
-                  <span className="text-xs font-black text-rose-600">{securityData?.failedAttempts ?? 0}</span>
-                </div>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Active Sessions</div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{securityData?.activeSessions ?? 1} {language === 'en' ? 'active' : 'सक्रिय'}</span>
-                </div>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">2FA Status</div>
-                <div className="flex items-center gap-2">
-                  <ShieldCheck size={14} className="text-emerald-500" />
-                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{language === 'en' ? 'Enabled' : 'सक्षम'}</span>
-                </div>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">IP Tracking</div>
-                <div className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                  {language === 'en' ? 'Enabled' : 'सक्षम'}
-                </div>
-              </div>
-            </div>
-            <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">
-                {language === 'en' ? 'Recent Logs' : 'हालका लगहरू'}
-              </div>
-              <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
-                {logs.length === 0 && !loading && (
-                  <p className="text-[11px] text-slate-400 text-center py-4">
-                    {language === 'en' ? 'No logs available' : 'लग उपलब्ध छैन'}
-                  </p>
-                )}
-                {logs.map((log) => (
-                  <div key={log.id} className="flex items-center justify-between bg-white dark:bg-slate-900 rounded-lg px-3 py-2 border border-slate-100 dark:border-white/5">
-                    <div className="flex items-center gap-2">
-                      <Clock size={10} className="text-slate-400" />
-                      <span className="text-[10px] font-mono text-slate-500">{log.time}</span>
-                    </div>
-                    <span className="text-[10px] font-bold text-slate-700 dark:text-slate-200">{log.action}</span>
-                    <span className="text-[10px] text-slate-500 truncate max-w-[120px]">{log.user}</span>
-                    <span className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${
-                      log.status === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
-                    }`}>
-                      {log.status}
-                  </span>
-                    </div>
-                  ))}
-              </div>
-            </div>
+           {activeTab === 'system' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+                {language === 'en' ? 'System & Security Overview' : 'प्रणाली र सुरक्षा सारांश'}
+              </h3>
 
-            {/* Performance Metrics */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                {language === 'en' ? 'Performance Metrics' : 'कार्यसम्पादन मेट्रिक्स'}
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                  <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">API Latency</div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white">{performanceData?.apiLatency ?? '--'}ms</div>
-                  <div className="text-[10px] text-emerald-600 mt-1">
-                    {language === 'en' ? 'Measured live' : 'प्रत्यक्ष मापन'}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                  {language === 'en' ? 'Security Overview & Audit Logs' : 'सुरक्षा सारांश र अडिट लगहरू'}
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                    <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Login Attempts</div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{language === 'en' ? 'Today' : 'आज'}</span>
+                      <span className="text-xs font-black text-emerald-600">{securityData?.loginAttempts ?? 0}</span>
+                    </div>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{language === 'en' ? 'Failed' : 'असफल'}</span>
+                      <span className="text-xs font-black text-rose-600">{securityData?.failedAttempts ?? 0}</span>
+                    </div>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                    <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Active Sessions</div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{securityData?.activeSessions ?? 1} {language === 'en' ? 'active' : 'सक्रिय'}</span>
+                    </div>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                    <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">2FA Status</div>
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck size={14} className="text-emerald-500" />
+                      <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{language === 'en' ? 'Enabled' : 'सक्षम'}</span>
+                    </div>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                    <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">IP Tracking</div>
+                    <div className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                      {language === 'en' ? 'Enabled' : 'सक्षम'}
+                    </div>
                   </div>
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                  <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Sync Success</div>
-                  <div className="text-2xl font-black text-emerald-600">{performanceData?.syncSuccess ?? 0}%</div>
-                  <div className="text-[10px] text-slate-500 mt-1">{language === 'en' ? 'Last 24 hours' : 'गत २४ घण्टा'}</div>
-                </div>
-                <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
-                  <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Error Rate</div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white">{performanceData?.errorRate ?? 0}%</div>
-                  <div className="text-[10px] text-slate-500 mt-1">{language === 'en' ? 'Last 24 hours' : 'गत २४ घण्टा'}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">
+                    {language === 'en' ? 'Recent Logs' : 'हालका लगहरू'}
+                  </div>
+                  <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                    {logs.length === 0 && !loading && (
+                      <p className="text-[11px] text-slate-400 text-center py-4">
+                        {language === 'en' ? 'No logs available' : 'लग उपलब्ध छैन'}
+                      </p>
+                    )}
+                    {logs.map((log) => (
+                      <div key={log.id} className="flex items-center justify-between bg-white dark:bg-slate-900 rounded-lg px-3 py-2 border border-slate-100 dark:border-white/5">
+                        <div className="flex items-center gap-2">
+                          <Clock size={10} className="text-slate-400" />
+                          <span className="text-[10px] font-mono text-slate-500">{log.time}</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-700 dark:text-slate-200">{log.action}</span>
+                        <span className="text-[10px] text-slate-500 truncate max-w-[120px]">{log.user}</span>
+                        <span className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${
+                          log.status === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                        }`}>
+                          {log.status}
+                      </span>
+                        </div>
+                      ))}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* System Health */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                {language === 'en' ? 'System Health' : 'प्रणाली स्वास्थ्य'}
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <SystemCard
-                  label={language === 'en' ? 'Firebase Connection' : 'फायरबेस जडान'}
-                  status="connected"
-                  language={language}
-                />
-                <SystemCard
-                  label={language === 'en' ? 'Service Worker' : 'सर्भिस वर्कर'}
-                  status={typeof navigator !== 'undefined' && 'serviceWorker' in navigator ? 'active' : 'unsupported'}
-                  language={language}
-                />
-                <SystemCard
-                  label={language === 'en' ? 'Cache Storage' : 'क्यास स्टोरेज'}
-                  status="dorpts-v1"
-                  isText
-                  language={language}
-                />
-                <SystemCard
-                  label={language === 'en' ? 'App Version' : 'अप्लिकेशन संस्करण'}
-                  status={APP_VERSION}
-                  isText
-                  language={language}
-                />
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                  {language === 'en' ? 'Performance Metrics & Diagnostics' : 'कार्यसम्पादन मेट्रिक्स र निदान'}
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                    <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">API Latency</div>
+                    <div className="text-2xl font-black text-slate-900 dark:text-white">{performanceData?.apiLatency ?? '--'}ms</div>
+                    <div className="text-[10px] text-emerald-600 mt-1">
+                      {language === 'en' ? 'Measured live' : 'प्रत्यक्ष मापन'}
+                    </div>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                    <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Sync Success</div>
+                    <div className="text-2xl font-black text-emerald-600">{performanceData?.syncSuccess ?? 0}%</div>
+                    <div className="text-[10px] text-slate-500 mt-1">{language === 'en' ? 'Last 24 hours' : 'गत २४ घण्टा'}</div>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-100 dark:border-white/5">
+                    <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Error Rate</div>
+                    <div className="text-2xl font-black text-slate-900 dark:text-white">{performanceData?.errorRate ?? 0}%</div>
+                    <div className="text-[10px] text-slate-500 mt-1">{language === 'en' ? 'Last 24 hours' : 'गत २४ घण्टा'}</div>
+                  </div>
+                </div>
               </div>
-            </div>
-           </motion.div>
-          )}
+
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                  {language === 'en' ? 'System Health & Services' : 'प्रणाली स्वास्थ्य र सेवाहरू'}
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <SystemCard
+                    label={language === 'en' ? 'Firebase Connection' : 'फायरबेस जडान'}
+                    status="connected"
+                    language={language}
+                  />
+                  <SystemCard
+                    label={language === 'en' ? 'Service Worker' : 'सर्भिस वर्कर'}
+                    status={typeof navigator !== 'undefined' && 'serviceWorker' in navigator ? 'active' : 'unsupported'}
+                    language={language}
+                  />
+                  <SystemCard
+                    label={language === 'en' ? 'Cache Storage' : 'क्यास स्टोरेज'}
+                    status="dorpts-v1"
+                    isText
+                    language={language}
+                  />
+                  <SystemCard
+                    label={language === 'en' ? 'App Version' : 'अप्लिकेशन संस्करण'}
+                    status={APP_VERSION}
+                    isText
+                    language={language}
+                  />
+                </div>
+              </div>
+            </motion.div>
+           )}
         </div>
       </motion.div>
     );

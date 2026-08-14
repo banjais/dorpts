@@ -1805,10 +1805,10 @@ export const Overview: React.FC<OverviewProps> = ({
     </SwipeableCard>
   </motion.div>
 )}
-            </AnimatePresence>
-          </motion.div>
+        </AnimatePresence>
+      </motion.div>
 
-<StatusBreakdownModal
+        <StatusBreakdownModal
         isOpen={showStatusBreakdown}
         onClose={() => setShowStatusBreakdown(false)}
         indicators={indicators}
@@ -2006,7 +2006,9 @@ export const Overview: React.FC<OverviewProps> = ({
                   {/* Prominent Reduce Button */}
                    <button
                      onClick={() => {
-                       handleDismissCard(activeExpandedModalCardId || '');
+                       if (activeExpandedModalCardId) {
+                         handleDismissCard(activeExpandedModalCardId);
+                       }
                        setActiveExpandedModalCardId(null);
                      }}
                     className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs transition-all cursor-pointer shadow-sm border border-slate-200 dark:border-slate-700 hover:scale-105 active:scale-95"

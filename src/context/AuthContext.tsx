@@ -188,7 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         : message.includes('auth/')
           ? message
           : 'Google sign-in failed.';
-      throw new Error(friendly);
+      throw new Error(friendly, { cause: error as Error });
     }
   };
 

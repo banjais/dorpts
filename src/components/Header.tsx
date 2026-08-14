@@ -12,7 +12,7 @@ import { db } from '../firebase';
 import { APP_TITLES } from '../constants/appTitles';
 import { NAV_ITEMS } from './NavigationMenu';
 import type { MainView } from '../types';
-import { LayoutDashboard, TrendingUp, Activity, Building2, Crown, Shield, User } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Activity, Building2, User } from 'lucide-react';
 
 interface HeaderProps {
   lastUpdateDate?: string;
@@ -263,7 +263,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const { textScale, setTextScale, autoAdjust, setAutoAdjust, highContrast, setHighContrast } = useTextScale();
   const [headerStyle, setHeaderStyle] = useState<'auto' | 'bold' | 'trans'>('auto');
-  const { role, isSuperadmin, isAdmin } = useAuth();
+  const { adminsList, user: authUser, isSuperadmin } = useAuth();
 
   const cycleTextScale = () => {
     const currentIndex = TEXT_SCALE_CYCLE.indexOf(textScale);
@@ -271,31 +271,6 @@ export const Header: React.FC<HeaderProps> = ({
     setTextScale(TEXT_SCALE_CYCLE[nextIndex]);
   };
 
-  const getRolePortalConfig = () => {
-    if (isSuperadmin) {
-      return {
-        labelEn: 'Superadmin Portal',
-        labelNp: 'सुपरएडमिन पोर्टल',
-        icon: <Crown size={14} />,
-        onClick: () => onNavigateToSuperadmin?.(),
-        bgColor: 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-300',
-        iconBg: 'bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400',
-      };
-    }
-    if (isAdmin) {
-      return {
-        labelEn: 'Admin Portal',
-        labelNp: 'एडमिन पोर्टल',
-        icon: <Shield size={14} />,
-        onClick: () => onNavigateToAdmin?.(),
-        bgColor: 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300',
-        iconBg: 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400',
-      };
-    }
-    return null;
-  };
-
-  const rolePortal = getRolePortalConfig();
   const hasPendingWrites = Boolean(pendingWrites && pendingWrites.length > 0);
 
   const toggleTheme = () => {
@@ -411,19 +386,25 @@ export const Header: React.FC<HeaderProps> = ({
                    </motion.button>
 
                   {/* Language Toggle */}
-                  <motion.button
-                    whileHover={{ scale: 1.08 }}
-                    whileTap={{ scale: 0.92 }}
-                    onClick={() => {
-                      triggerHaptic('light');
-                      setLanguage(language === 'ne' ? 'en' : 'ne');
-                    }}
-                    className="p-2 sm:p-2.5 rounded-xl text-indigo-700 dark:text-indigo-300 font-extrabold uppercase text-[0.65rem] tracking-wider flex items-center justify-center gap-1 transition-all hover:bg-indigo-50 dark:hover:bg-indigo-500/10 min-w-[36px] sm:min-w-[44px] min-h-[36px] sm:min-h-[44px] active:scale-95"
-                    title={language === 'en' ? 'Switch to Nepali' : 'अंग्रेजीमा स्विच गर्नुहोस्'}
-                  >
-                    <Languages size={14} className="sm:w-4 sm:h-4" />
-                    <span className="hidden sm:inline">{language === 'en' ? 'नेपाली' : 'EN'}</span>
-                  </motion.button>
+                  {(() => {
+                  const { isAdmin, isSuperadmin } = useAuth();
+                  if (isAdmin || isSuperadmin) return null;
+                  return (
+                    <motion.button
+                      whileHover={{ scale: 1.08 }}
+                      whileTap={{ scale: 0.92 }}
+                      onClick={() => {
+                        triggerHaptic('light');
+                        setLanguage(language === 'ne' ? 'en' : 'ne');
+                      }}
+                      className="p-2 sm:p-2.5 rounded-xl text-indigo-700 dark:text-indigo-300 font-extrabold uppercase text-[0.65rem] tracking-wider flex items-center justify-center gap-1 transition-all hover:bg-indigo-50 dark:hover:bg-indigo-500/10 min-w-[36px] sm:min-w-[44px] min-h-[36px] sm:min-h-[44px] active:scale-95"
+                      title={language === 'en' ? 'Switch to Nepali' : 'अंग्रेजीमा स्विच गर्नुहोस्'}
+                    >
+                      <Languages size={14} className="sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">{language === 'en' ? 'नेपाली' : 'EN'}</span>
+                    </motion.button>
+                  );
+                })()}
 
                   {/* Text Size (Cycle) */}
                   <motion.button

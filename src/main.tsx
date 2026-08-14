@@ -3,6 +3,21 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import 'leaflet/dist/leaflet.css';
+import { APP_VERSION } from './constants/appTitles';
+
+// Force fresh version on load: if the cached version differs from the current build,
+// clear caches and reload so the user always gets the latest app in any tab.
+if (typeof window !== 'undefined') {
+  const cachedVersion = localStorage.getItem('dor_app_version');
+  if (cachedVersion && cachedVersion !== APP_VERSION) {
+    localStorage.removeItem('dor_app_version');
+    if ('caches' in window) {
+      caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key)))).catch(() => {});
+    }
+    window.location.reload();
+  }
+  localStorage.setItem('dor_app_version', APP_VERSION);
+}
 
 // Service worker registration is handled automatically by vite-plugin-pwa
 // with registerType: 'autoUpdate' for seamless background updates.

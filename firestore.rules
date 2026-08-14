@@ -74,6 +74,18 @@ service cloud.firestore {
       allow read, write: if isSignedIn() && request.auth.uid == userId;
     }
 
+    // Announcements
+    match /announcements/{announcementId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Notifications Log
+    match /notifications/{notificationId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
     // Feedback
     match /user_feedback/{feedbackId} {
       allow create: if true;
@@ -86,6 +98,25 @@ service cloud.firestore {
       allow create: if isSignedIn() && incoming().userId == request.auth.uid;
       allow update: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin()) && incoming().userId == existing().userId;
       allow delete: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    // Messaging Channels
+    match /channels/{channelId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Messages subcollection
+    match /messages/{channelId}/items/{itemId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Channel Join Requests
+    match /channel_requests/{requestId} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
     }
   }
 }

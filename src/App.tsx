@@ -48,10 +48,10 @@ import { IndicatorHeatmap } from "./components/IndicatorHeatmap";
 import { OfflineSummaryDashboard } from "./components/OfflineSummaryDashboard";
 import { Overview } from "./components/Overview";
 import { AnnouncementBoard } from "./components/AnnouncementBoard";
+import { useRegisterSW } from "virtual:pwa-register/react";
 import { MessagingCenter } from "./components/MessagingCenter";
 import { CalendarDeadlines } from "./components/CalendarDeadlines";
 import { DetailedGalleryView } from "./components/DetailedGalleryView";
-import { useRegisterSW } from "virtual:pwa-register/react";
 import { normalizeCategory, STANDARD_CATEGORIES, DEFAULT_CATEGORY_THEMES } from "./utils/category";
 import { getFiscalYearForBsDateStr, toNepaliNumerals } from "./utils/bsDate";
 import { API_BASE } from "./utils/apiBase";
@@ -783,7 +783,7 @@ function MainAppContent() {
     setLoading(true);
     triggerHaptic("medium");
 
-    const processIndicators = async (parsedList: any[], parsedMeta: any) => {
+    const processIndicators = (parsedList: any[], parsedMeta: any) => {
       if (parsedList && parsedList.length > 0) {
         setIndicators(parsedList);
         setMetadata(parsedMeta);
@@ -793,16 +793,6 @@ function MainAppContent() {
         } catch (_) {
           // Suppress redundant log
         }
-        try {
-          const colRef = collection(db, "indicators");
-          const writes = parsedList.map((ind: any) =>
-            setDoc(doc(colRef, ind.id || `ind_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`), {
-              ...ind,
-              updatedAt: new Date().toISOString(),
-            }).catch(() => {})
-          );
-          Promise.all(writes).catch(() => {});
-        } catch (_) {}
       }
     };
 
@@ -3417,19 +3407,17 @@ function MainAppContent() {
                              </ErrorBoundary>
                             )}
                           {mainView === "superadmin" && (
-                            <div className="fixed inset-0 z-[9000] bg-slate-50 dark:bg-[#0b1329]">
-                              <ErrorBoundary
-                                fallback={
-                                  <div className="p-8 text-center">
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                                      Super Admin dashboard temporarily unavailable.
-                                    </p>
-                                  </div>
-                                }
-                              >
-                                <SuperAdminDashboard language={language} activeTab={superAdminActiveTab} onTabChange={setSuperAdminActiveTab} offices={offices} onClose={() => handleMainViewChange('dashboard')} />
-                              </ErrorBoundary>
-                            </div>
+                            <ErrorBoundary
+                              fallback={
+                                <div className="p-8 text-center">
+                                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                                    Super Admin dashboard temporarily unavailable.
+                                  </p>
+                                </div>
+                              }
+                            >
+                               <SuperAdminDashboard language={language} activeTab={superAdminActiveTab} onTabChange={setSuperAdminActiveTab} offices={offices} />
+                            </ErrorBoundary>
                           )}
                          {mainView === "admin" && (
                            <ErrorBoundary

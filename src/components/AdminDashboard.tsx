@@ -51,7 +51,7 @@ interface AdminDashboardProps {
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ language, activeTab: externalActiveTab, onTabChange, offices = [] }) => {
-  const { user, isAdmin, isSuperadmin, userAssignedOffice } = useAuth();
+  const { user, isAdmin, isSuperadmin, userAssignedOffice, adminsList } = useAuth();
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -414,7 +414,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ language, active
           <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
             {language === 'en' ? 'Group & Office Messaging' : 'समूह र कार्यालय मेसेजिङ'}
           </h3>
-          <MessagingCenter language={language} offices={offices} isAdmin={isAdmin} />
+           <MessagingCenter language={language} offices={offices} isAdmin={isAdmin} users={adminsList.map(a => ({ email: a.email }))} />
         </motion.div>
       )}
 
