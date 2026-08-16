@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Chrome, ShieldCheck, X, Users, BarChart3, MessageSquare, FileText } from 'lucide-react';
+import { Chrome, ShieldCheck, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -47,24 +47,24 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
             </button>
           </div>
         )}
-        <div className="text-center mb-6">
-          <div className="w-14 h-14 mx-auto bg-indigo-600 rounded-2xl flex items-center justify-center mb-3 shadow-lg shadow-indigo-500/25">
-            <ShieldCheck className="text-white w-7 h-7" strokeWidth={2} />
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 mx-auto bg-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/25">
+            <ShieldCheck className="text-white w-8 h-8" strokeWidth={2} />
           </div>
-          <h1 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{APP_NAME}</h1>
-          <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">{APP_SUB}</p>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{APP_NAME}</h1>
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">{APP_SUB}</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-xl shadow-black/5 dark:shadow-black/30 border border-slate-200/60 dark:border-slate-700/50">
-          <div className="space-y-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-xl shadow-black/5 dark:shadow-black/30 border border-slate-200/60 dark:border-slate-700/50">
+          <div className="space-y-5">
             <div className="text-center">
-              <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mb-1">
-                {language === 'en' ? 'Sign in to access the system' : 'प्रणालीमा प्रवेश गर्न साइन इन गर्नुहोस्'}
+              <p className="text-sm text-slate-700 dark:text-slate-200 font-semibold mb-1">
+                {language === 'en' ? 'Welcome back' : 'स्वागत छ'}
               </p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {language === 'en'
-                  ? 'Use your Google account to sign in. Role-based access is managed by your administrator.'
-                  : 'साइन इन गर्न तपाईंको गूगल खाता प्रयोग गर्नुहोस्। भूमिका-आधारित पहुँच तपाईंको प्रशासकद्वारा व्यवस्थापित छ।'
+                  ? 'Sign in with your Google account to continue.'
+                  : 'जारी राख्न तपाईंको गूगल खाता प्रयोग गरेर साइन इन गर्नुहोस्।'
                 }
               </p>
             </div>
@@ -86,7 +86,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
               />
-              <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
+              <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
                 {language === 'en' ? 'Remember me' : 'मलाई सम्झिनुहोस्'}
               </span>
             </label>
@@ -98,11 +98,11 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
               </div>
             )}
 
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
               <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center font-medium">
                 {language === 'en'
-                  ? 'Access roles: Superadmin, Admin, Data Updater, Viewer'
-                  : 'पहुँच भूमिकाहरू: सुपरएडमिन, प्रशासक, डाटा अपडेटर, दर्शक'
+                  ? 'Access roles: Superadmin, System Admin, Office Admin, Viewer'
+                  : 'पहुँच भूमिकाहरू: सुपरप्रशासक, सिस्टम प्रशासक, कार्यालय प्रशासक, दर्शक'
                 }
               </p>
             </div>
@@ -115,7 +115,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="mt-3 flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg px-3 py-2"
+              className="mt-4 flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg px-3 py-2.5"
             >
               <X className="w-3.5 h-3.5 text-red-500 shrink-0" />
               <p className="text-[11px] font-medium text-red-700 dark:text-red-400">{error}</p>
@@ -123,7 +123,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
           )}
         </AnimatePresence>
 
-        <p className="text-center text-[9px] text-slate-400 dark:text-slate-500 mt-4 font-medium">
+        <p className="text-center text-[9px] text-slate-400 dark:text-slate-500 mt-5 font-medium">
           {language === 'en'
             ? 'By signing in, you agree to the Department of Roads guidelines.'
             : 'साइन इन गरेर तपाईं सडक विभाग दिगो निर्देशिकामा सहमति जनाउनुभयो।'

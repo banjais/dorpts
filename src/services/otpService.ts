@@ -108,7 +108,7 @@ export async function validateSession(token: string): Promise<EmailOTPSession | 
 
   return {
     email: raw.email || '',
-    role: (raw.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer') || 'viewer',
+    role: (raw.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer') || 'viewer',
     token: raw.token || token,
     createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : new Date().toISOString(),
     expiresAt: expiresAtMs > 0 ? new Date(expiresAtMs).toISOString() : undefined,

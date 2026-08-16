@@ -10,7 +10,7 @@ export const AdminMgmt: React.FC = () => {
   const { adminsList, isSuperadmin, logActivity, refreshAdmins, user } = useAuth();
   const [newEmail, setNewEmail] = useState('');
   const [newUid, setNewUid] = useState('');
-  const [newRole, setNewRole] = useState<'admin' | 'superadmin'>('admin');
+  const [newRole, setNewRole] = useState<'system_admin' | 'office_admin' | 'viewer'>('system_admin');
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

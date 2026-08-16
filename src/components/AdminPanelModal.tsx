@@ -24,7 +24,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const { isSuperadmin } = useAuth();
   const [activeTab, setActiveTab] = useState<'users' | 'offices'>('users');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<'admin' | 'data_updater'>('admin');
+  const [role, setRole] = useState<'system_admin' | 'office_admin'>('system_admin');
   const [removing, setRemoving] = useState<string | null>(null);
   const [officeSearch, setOfficeSearch] = useState('');
   const [assigningOffice, setAssigningOffice] = useState<string | null>(null);
@@ -117,12 +117,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
 
   const roleLabel = (r: string) => {
     if (r === 'superadmin') return language === 'en' ? 'Superadmin' : 'सुपर एड्मिन';
-    if (r === 'admin') return language === 'en' ? 'Admin' : 'एड्मिन';
-    return language === 'en' ? 'Data Updater' : 'डाटा अपडेटर';
+    if (r === 'system_admin') return language === 'en' ? 'System Admin' : 'सिस्टम प्रशासक';
+    if (r === 'office_admin') return language === 'en' ? 'Office Admin' : 'कार्यालय प्रशासक';
+    return language === 'en' ? 'Viewer' : 'दर्शक';
   };
   const roleBadge = (r: string) => {
     if (r === 'superadmin') return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
-    if (r === 'admin') return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400';
+    if (r === 'system_admin') return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400';
+    if (r === 'office_admin') return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
     return 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400';
   };
 
@@ -203,11 +205,11 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                         />
                         <select
                           value={role}
-                          onChange={(e) => setRole(e.target.value as 'admin' | 'data_updater')}
+                          onChange={(e) => setRole(e.target.value as 'system_admin' | 'office_admin')}
                           className="px-2 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none"
                         >
-                          <option value="admin">{language === 'en' ? 'Admin' : 'एड्मिन'}</option>
-                          <option value="data_updater">{language === 'en' ? 'Data Updater' : 'डाटा अपडेटर'}</option>
+                          <option value="system_admin">{language === 'en' ? 'System Admin' : 'सिस्टम प्रशासक'}</option>
+                          <option value="office_admin">{language === 'en' ? 'Office Admin' : 'कार्यालय प्रशासक'}</option>
                         </select>
                         <button
                           onClick={handleAdd}

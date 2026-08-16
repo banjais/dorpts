@@ -133,7 +133,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [editingUser, setEditingUser] = useState<any>(null);
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserEmailError, setNewUserEmailError] = useState('');
-  const [newUserRole, setNewUserRole] = useState<'superadmin' | 'admin' | 'data_updater' | 'viewer'>('admin');
+  const [newUserRole, setNewUserRole] = useState<'superadmin' | 'system_admin' | 'office_admin' | 'viewer'>('system_admin');
   const [newUserOffice, setNewUserOffice] = useState('');
   const [userSearch, setUserSearch] = useState('');
   const [dataInputOffice, setDataInputOffice] = useState('');
@@ -570,7 +570,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   }, [isSuperadmin, user?.email, user?.uid]);
 
   const [notificationTitle, setNotificationTitle] = useState('');
-  const [notificationTargetRole, setNotificationTargetRole] = useState<'all' | 'admin' | 'data_updater' | 'viewer'>('all');
+  const [notificationTargetRole, setNotificationTargetRole] = useState<'all' | 'system_admin' | 'office_admin' | 'viewer'>('all');
   const [notificationTargetOffice, setNotificationTargetOffice] = useState('');
   const [notificationChannel, setNotificationChannel] = useState<'all' | 'email' | 'in_app' | 'messaging'>('all');
   const [notificationLogs, setNotificationLogs] = useState<any[]>([]);
@@ -706,7 +706,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
 
       setNewUserEmail('');
       setNewUserEmailError('');
-      setNewUserRole('admin');
+      setNewUserRole('system_admin');
       setNewUserOffice('');
       setShowAddUser(false);
       fetchUsers();
@@ -1243,16 +1243,16 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
                       {language === 'en' ? 'Target Role' : 'लक्षित भूमिका'}
                     </label>
-                    <select
-                      value={notificationTargetRole}
-                      onChange={(e) => setNotificationTargetRole(e.target.value as any)}
-                      className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-200"
-                    >
-                      <option value="all">{language === 'en' ? 'All Registered Users & Admins' : 'सबै प्रयोगकर्ता र प्रशासकहरू'}</option>
-                      <option value="admin">{language === 'en' ? 'Admins Only' : 'प्रशासकहरू मात्र'}</option>
-                      <option value="data_updater">{language === 'en' ? 'Data Updaters Only' : 'डाटा अपडेटरहरू मात्र'}</option>
-                      <option value="viewer">{language === 'en' ? 'General Viewers Only' : 'सामान्य दर्शकहरू मात्र'}</option>
-                    </select>
+                     <select
+                       value={notificationTargetRole}
+                       onChange={(e) => setNotificationTargetRole(e.target.value as any)}
+                       className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-200"
+                     >
+                       <option value="all">{language === 'en' ? 'All Registered Users & Admins' : 'सबै प्रयोगकर्ता र प्रशासकहरू'}</option>
+                       <option value="system_admin">{language === 'en' ? 'System Admins Only' : 'सिस्टम प्रशासकहरू मात्र'}</option>
+                       <option value="office_admin">{language === 'en' ? 'Office Admins Only' : 'कार्यालय प्रशासकहरू मात्र'}</option>
+                       <option value="viewer">{language === 'en' ? 'General Viewers Only' : 'सामान्य दर्शकहरू मात्र'}</option>
+                     </select>
                   </div>
                 </div>
 
@@ -1483,12 +1483,11 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 )}
                 <select
                   value={newUserRole}
-                  onChange={(e) => setNewUserRole(e.target.value as 'superadmin' | 'admin' | 'data_updater' | 'viewer')}
+                  onChange={(e) => setNewUserRole(e.target.value as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer')}
                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
                 >
-                  <option value="superadmin">Superadmin</option>
-                  <option value="admin">{language === 'en' ? 'Admin' : 'प्रशासक'}</option>
-                  <option value="data_updater">{language === 'en' ? 'Data Updater' : 'डाटा अपडेटर'}</option>
+                  <option value="system_admin">{language === 'en' ? 'System Admin' : 'सिस्टम प्रशासक'}</option>
+                  <option value="office_admin">{language === 'en' ? 'Office Admin' : 'कार्यालय प्रशासक'}</option>
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
                 {newUserRole !== 'superadmin' && (
@@ -1531,12 +1530,13 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                   <div key={u.id} className="flex items-center justify-between bg-white dark:bg-slate-900 rounded-lg px-3 py-2.5 border border-slate-100 dark:border-white/5">
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{u.email}</div>
-                      <div className="text-[10px] text-slate-400">
-                        {u.role === 'superadmin' ? (language === 'en' ? 'Superadmin' : 'सुपरप्रशासक') :
-                         u.role === 'admin' ? (language === 'en' ? 'Admin' : 'प्रशासक') :
-                         (language === 'en' ? 'Viewer' : 'दर्शक')}
-                        {u.office ? ` · ${u.office}` : ''}
-                      </div>
+                       <div className="text-[10px] text-slate-400">
+                         {u.role === 'superadmin' ? (language === 'en' ? 'Superadmin' : 'सुपरप्रशासक') :
+                          u.role === 'system_admin' ? (language === 'en' ? 'System Admin' : 'सिस्टम प्रशासक') :
+                          u.role === 'office_admin' ? (language === 'en' ? 'Office Admin' : 'कार्यालय प्रशासक') :
+                          (language === 'en' ? 'Viewer' : 'दर्शक')}
+                         {u.office ? ` · ${u.office}` : ''}
+                       </div>
                     </div>
                     <div className="flex items-center gap-1">
                       <button
@@ -1577,12 +1577,11 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 />
                 <select
                   value={editingUser.role}
-                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as 'superadmin' | 'admin' | 'data_updater' | 'viewer' })}
+                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer' })}
                   className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
                 >
-                  <option value="superadmin">Superadmin</option>
-                  <option value="admin">{language === 'en' ? 'Admin' : 'प्रशासक'}</option>
-                  <option value="data_updater">{language === 'en' ? 'Data Updater' : 'डाटा अपडेटर'}</option>
+                  <option value="system_admin">{language === 'en' ? 'System Admin' : 'सिस्टम प्रशासक'}</option>
+                  <option value="office_admin">{language === 'en' ? 'Office Admin' : 'कार्यालय प्रशासक'}</option>
                   <option value="viewer">{language === 'en' ? 'Viewer' : 'दर्शक'}</option>
                 </select>
                 {editingUser.role !== 'superadmin' && editingUser.role !== 'viewer' && (

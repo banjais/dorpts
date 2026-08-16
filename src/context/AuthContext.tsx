@@ -12,7 +12,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isSuperadmin: boolean;
   isDataUpdater: boolean;
-  role: 'superadmin' | 'admin' | 'data_updater' | 'viewer' | null;
+  role: 'superadmin' | 'system_admin' | 'office_admin' | 'viewer' | null;
   adminsList: AdminUser[];
   loginWithGoogle: (rememberMe?: boolean) => Promise<void>;
   logout: () => Promise<void>;
@@ -27,14 +27,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState<'superadmin' | 'admin' | 'data_updater' | 'viewer' | null>(null);
+  const [role, setRole] = useState<'superadmin' | 'system_admin' | 'office_admin' | 'viewer' | null>(null);
   const [adminsList, setAdminsList] = useState<AdminUser[]>([]);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userAssignedOffice, setUserAssignedOffice] = useState<string | null>(null);
 
   const isSuperadmin = role === 'superadmin';
-  const isAdmin = role === 'superadmin' || role === 'admin';
-  const isDataUpdater = role === 'superadmin' || role === 'admin' || role === 'data_updater';
+  const isAdmin = role === 'superadmin' || role === 'system_admin';
+  const isDataUpdater = role === 'superadmin' || role === 'system_admin' || role === 'office_admin';
 
   const logActivity = useCallback(async (actionType: UserActivity['actionType'], details: string) => {
     try {
@@ -54,36 +54,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-   const lookupEmailRole = useCallback(async (email: string): Promise<'superadmin' | 'admin' | 'data_updater' | 'viewer'> => {
-     if (email === SUPERADMIN_EMAIL) return 'superadmin';
-     try {
-       const q = query(collection(db, 'users'), where('email', '==', email));
-       const snap = await getDocs(q);
-       if (!snap.empty) {
-         const data = snap.docs[0].data();
-         const r = data.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer';
-         if (r === 'superadmin' || r === 'admin' || r === 'data_updater' || r === 'viewer') return r;
-       }
-     } catch {
-       // suppress
-     }
-     try {
-       const q = query(collection(db, 'admins'), where('email', '==', email));
-       const snap = await getDocs(q);
-       if (!snap.empty) {
-         const data = snap.docs[0].data();
-         const r = data.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer';
-         if (r === 'superadmin' || r === 'admin' || r === 'data_updater' || r === 'viewer') return r;
-       }
-     } catch {
-       // suppress
-     }
-     return 'viewer';
-   }, []);
+   const lookupEmailRole = useCallback(async (email: string): Promise<'superadmin' | 'system_admin' | 'office_admin' | 'viewer'> => {
+      if (email === SUPERADMIN_EMAIL) return 'superadmin';
+      try {
+        const q = query(collection(db, 'users'), where('email', '==', email));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const data = snap.docs[0].data();
+          const r = data.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
+          if (r === 'superadmin' || r === 'system_admin' || r === 'office_admin' || r === 'viewer') return r;
+        }
+      } catch {
+        // suppress
+      }
+      try {
+        const q = query(collection(db, 'admins'), where('email', '==', email));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const data = snap.docs[0].data();
+          const r = data.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
+          if (r === 'superadmin' || r === 'system_admin' || r === 'office_admin' || r === 'viewer') return r;
+        }
+      } catch {
+        // suppress
+      }
+      return 'viewer';
+    }, []);
 
-  const setRoleAndLoadAdmins = useCallback(async (newRole: 'superadmin' | 'admin' | 'data_updater' | 'viewer') => {
+  const setRoleAndLoadAdmins = useCallback(async (newRole: 'superadmin' | 'system_admin' | 'office_admin' | 'viewer') => {
     setRole(newRole);
-    if (newRole === 'superadmin' || newRole === 'admin') {
+    if (newRole === 'superadmin' || newRole === 'system_admin') {
       try {
         const snap = await getDocs(collection(db, 'admins'));
         const list: AdminUser[] = [];
@@ -131,15 +131,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
            const adminSnap = await getDoc(adminRef);
            if (adminSnap.exists()) {
              const val = adminSnap.data();
-             const detectedRole = val.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer';
-             await setRoleAndLoadAdmins(detectedRole);
-           } else if (currentUser.email === SUPERADMIN_EMAIL) {
-             await setDoc(adminRef, {
-               email: SUPERADMIN_EMAIL,
-               role: 'superadmin',
-               createdAt: serverTimestamp(),
-             });
-             await setRoleAndLoadAdmins('superadmin');
+              const detectedRole = val.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
+              await setRoleAndLoadAdmins(detectedRole);
+            } else if (currentUser.email === SUPERADMIN_EMAIL) {
+              await setDoc(adminRef, {
+                email: SUPERADMIN_EMAIL,
+                role: 'superadmin',
+                createdAt: serverTimestamp(),
+              });
+              await setRoleAndLoadAdmins('superadmin');
              await logActivity('role_change', `Bootstrapped ${SUPERADMIN_EMAIL} as Initial Superadmin`);
            } else {
              try {
@@ -147,8 +147,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                const emailSnap = await getDocs(q);
                if (!emailSnap.empty) {
                  const val = emailSnap.docs[0].data();
-                 const detectedRole = val.role as 'superadmin' | 'admin' | 'data_updater' | 'viewer';
-                 await setRoleAndLoadAdmins(detectedRole);
+                  const detectedRole = val.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
+                  await setRoleAndLoadAdmins(detectedRole);
                } else {
                  await setRoleAndLoadAdmins('viewer');
                }

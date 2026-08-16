@@ -346,7 +346,7 @@ function MainAppContent() {
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [superAdminActiveTab, setSuperAdminActiveTab] = useState('analytics');
   const [newAdminEmail, setNewAdminEmail] = useState('');
-  const [newAdminRole, setNewAdminRole] = useState<'admin' | 'data_updater'>('admin');
+  const [newAdminRole, setNewAdminRole] = useState<'system_admin' | 'office_admin'>('system_admin');
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 
   // Role-based routing: redirect to appropriate dashboard on login
@@ -3157,69 +3157,71 @@ function MainAppContent() {
         />
       )}
 
-      <div
-        className="relative min-h-[100dvh] bg-slate-50 dark:bg-[#0b1329] print:hidden"
-        id="applet-frame"
-      >
+       <div
+         className="relative min-h-[100dvh] bg-slate-50 dark:bg-[#0b1329] print:hidden"
+         id="applet-frame"
+       >
 
-         <Header
-           lastUpdateDate={metadata?.lastUpdateDate}
-           pulseKey={pulseKey}
-           onOpenMap={() => setIsMapModalOpen(true)}
-            isOnline={isOnline}
-            pendingWrites={pendingWrites}
-            offices={offices}
-            onOpenAbout={() => setIsAboutModalOpen(true)}
-            onOpenDrawer={() => setIsDrawerOpen(true)}
-            onMouseEnterAbout={() => setIsHoveringAbout(true)}
-            onMouseLeaveAbout={() => setIsHoveringAbout(false)}
-            mainView={mainView}
-            onViewChange={handleMainViewChange}
-            searchQuery={searchQuery}
-           onSearch={setSearchQuery}
-           sortType={sortType}
-           onSortChange={setSortType}
-           selectedCategory={categoryFilter}
-           onCategoryChange={(cat) => {
-             setSearchQuery("");
-             setCategoryFilter(cat);
-           }}
-           selectedOffice={selectedOffice}
-           isOfficeLocked={!isSuperadmin && !!userAssignedOffice}
-           onOfficeChange={(off) => {
-             if (!isSuperadmin && userAssignedOffice && off !== userAssignedOffice) {
-               return;
-             }
-             setSearchQuery("");
-             setSelectedOffice(off);
-           }}
-           showMilestonesOnly={showMilestonesOnly}
-           onToggleMilestonesOnly={() =>
-             setShowMilestonesOnly(!showMilestonesOnly)
-           }
-            viewMode={viewMode}
-            viewOptions={viewOptions as any}
-            indicators={indicators}
-            metadata={metadata}
-            trackedIds={trackedIds}
-            onToggleTrack={toggleTrack}
-            updatesHistory={visibleHistory}
-            fiscalYear={selectedFiscalYear}
-            onNavigateToSuperadmin={() => handleMainViewChange('superadmin')}
-            onNavigateToAdmin={() => handleMainViewChange('admin')}
-            onNavigateToViewer={() => handleMainViewChange('viewer')}
-          />
+       {!showLogin && (
+         <>
+          <Header
+            lastUpdateDate={metadata?.lastUpdateDate}
+            pulseKey={pulseKey}
+            onOpenMap={() => setIsMapModalOpen(true)}
+             isOnline={isOnline}
+             pendingWrites={pendingWrites}
+             offices={offices}
+             onOpenAbout={() => setIsAboutModalOpen(true)}
+             onOpenDrawer={() => setIsDrawerOpen(true)}
+             onMouseEnterAbout={() => setIsHoveringAbout(true)}
+             onMouseLeaveAbout={() => setIsHoveringAbout(false)}
+             mainView={mainView}
+             onViewChange={handleMainViewChange}
+             searchQuery={searchQuery}
+            onSearch={setSearchQuery}
+            sortType={sortType}
+            onSortChange={setSortType}
+            selectedCategory={categoryFilter}
+            onCategoryChange={(cat) => {
+              setSearchQuery("");
+              setCategoryFilter(cat);
+            }}
+            selectedOffice={selectedOffice}
+            isOfficeLocked={!isSuperadmin && !!userAssignedOffice}
+            onOfficeChange={(off) => {
+              if (!isSuperadmin && userAssignedOffice && off !== userAssignedOffice) {
+                return;
+              }
+              setSearchQuery("");
+              setSelectedOffice(off);
+            }}
+            showMilestonesOnly={showMilestonesOnly}
+            onToggleMilestonesOnly={() =>
+              setShowMilestonesOnly(!showMilestonesOnly)
+            }
+             viewMode={viewMode}
+             viewOptions={viewOptions as any}
+             indicators={indicators}
+             metadata={metadata}
+             trackedIds={trackedIds}
+             onToggleTrack={toggleTrack}
+             updatesHistory={visibleHistory}
+             fiscalYear={selectedFiscalYear}
+             onNavigateToSuperadmin={() => handleMainViewChange('superadmin')}
+             onNavigateToAdmin={() => handleMainViewChange('admin')}
+             onNavigateToViewer={() => handleMainViewChange('viewer')}
+           />
 
-        <div
-          className={`flex flex-col min-h-[100dvh] transition-all duration-700 ease-in-out pt-2 sm:pt-4 pb-28 sm:pb-32 ${
-            isFooterExpanded ? "opacity-0 pointer-events-none scale-[0.98]" : "opacity-100"
-          }`}
-        >
-          <OfflineStatusBar />
-            <main
-              className="flex-1 container mx-auto px-4 md:pl-16 lg:pl-20 pb-8 max-w-7xl relative z-10 pt-[134px] sm:pt-[152px]"
-              style={{ transition: "padding-top 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
-             >
+         <div
+           className={`flex flex-col min-h-[100dvh] transition-all duration-700 ease-in-out pt-2 sm:pt-4 pb-28 sm:pb-32 ${
+             isFooterExpanded ? "opacity-0 pointer-events-none scale-[0.98]" : "opacity-100"
+           }`}
+         >
+           <OfflineStatusBar />
+             <main
+               className="flex-1 container mx-auto px-4 md:pl-16 lg:pl-20 pb-8 max-w-7xl relative z-10 pt-[134px] sm:pt-[152px]"
+               style={{ transition: "padding-top 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
+              >
 
               <AnimatePresence mode="wait">
                {authLoading ? (
@@ -3562,11 +3564,15 @@ function MainAppContent() {
                  </motion.div>
                )}
              </AnimatePresence>
-           </main>
-         </div>
+            </main>
+          </div>
+        </>
+        )}
 
-         {/* Footer */}
-          <Footer
+        {!showLogin && (
+          <>
+          {/* Footer */}
+           <Footer
              onOpenReportBuilder={() => setIsReportBuilderOpen(true)}
              onOpenAI={() => setIsAIAssistantOpen(true)}
               isScrolled={isScrolled}
@@ -4192,6 +4198,8 @@ function MainAppContent() {
             </motion.div>
           )}
         </AnimatePresence>
+        </>
+        )}
 
         <PWAInstallBanner />
 

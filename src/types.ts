@@ -22,7 +22,7 @@ export interface Indicator {
 export interface AdminUser {
   uid: string;
   email: string;
-  role: 'superadmin' | 'admin' | 'data_updater';
+  role: 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
   createdAt: string;
   office?: string | null;
 }
@@ -71,7 +71,7 @@ export interface SystemSettings {
 
 export interface EmailOTPSession {
   email: string;
-  role: 'superadmin' | 'admin' | 'data_updater' | 'viewer';
+  role: 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
   token: string;
   createdAt: string;
   expiresAt?: string;
