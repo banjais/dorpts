@@ -1722,9 +1722,9 @@ export const Overview: React.FC<OverviewProps> = ({
              <Building2 size={16} className="text-violet-600 dark:text-violet-400" />
            </span>
            <div>
-             <span className="text-sm sm:text-base font-black uppercase tracking-[0.1em] text-slate-900 dark:text-slate-100">
-               {language === 'en' ? 'Reporting Field Offices' : 'रिपोर्टिङ क्षेत्र कार्यालयहरू'}
-             </span>
+                <span className="text-sm sm:text-base font-black uppercase tracking-[0.1em] text-slate-900 dark:text-slate-100">
+                  {language === 'en' ? 'REPORTING OFFICES' : 'रिपोर्टिङ कार्यालयहरू'}
+                </span>
              <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
                {language === 'en' ? 'Breakdown by office' : 'कार्यालय अनुसार विवरण'}
              </p>
