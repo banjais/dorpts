@@ -142,8 +142,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [dataInputSaving, setDataInputSaving] = useState(false);
   const [dataInputSheetHeaders, setDataInputSheetHeaders] = useState<string[]>([]);
   const [dataInputSheetOffices, setDataInputSheetOffices] = useState<string[]>([]);
-  const [analyticsCardIndex, setAnalyticsCardIndex] = useState(0);
-  const analyticsCardRef = useRef<HTMLDivElement>(null);
+
   const [internalActiveTab, setInternalActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [officeRankings, setOfficeRankings] = useState<Array<{ name: string; completion: number; total: number; progress: number }>>([]);
@@ -219,14 +218,6 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
       icon: <BarChart3 size={20} className="text-slate-600 dark:text-slate-300" />,
     },
   ], [analyticsData, totalAdmins, user?.email, language]);
-
-  const handleAnalyticsSwipe = (direction: 'left' | 'right') => {
-    if (direction === 'left') {
-      setAnalyticsCardIndex(prev => Math.min(prev + 1, analyticsCards.length - 1));
-    } else {
-      setAnalyticsCardIndex(prev => Math.max(prev - 1, 0));
-    }
-  };
 
   const tabs = [
     { id: 'overview', labelEn: 'Overview & Tracking', labelNp: 'सारांश र ट्र्याकिङ', icon: <BarChart3 size={16} /> },
@@ -956,93 +947,43 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
         {/* Content based on active tab */}
         <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 custom-scrollbar">
           {activeTab === 'overview' && (
-           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-               {language === 'en' ? 'Overview & Tracking' : 'सारांश र ट्र्याकिङ'}
-             </h3>
-               <div
-                 ref={analyticsCardRef}
-                 className="relative w-full overflow-hidden rounded-2xl h-[500px]"
-               >
-                <div
-                  className="flex transition-transform duration-500 ease-out h-full"
-                  style={{ transform: `translateX(-${analyticsCardIndex * 100}%)` }}
-                >
-                  {analyticsCards.map((card, idx) => (
-                    <div
-                      key={idx}
-                      className="w-full flex-shrink-0 px-2 h-full"
-                    >
-                      <div className={`${card.bgColor} rounded-2xl p-6 border ${card.borderColor} h-full flex flex-col justify-between`}>
-                       <div>
-                         <div className="flex items-center gap-3 mb-4">
-                           <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
-                             {card.icon}
-                           </div>
-                           <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">
-                             {card.label}
-                           </span>
-                         </div>
-                         <div className={`text-5xl font-black ${card.color} mb-2`}>
-                           {card.value}
-                         </div>
-                         <div className="text-[11px] text-slate-400">
-                           {card.sublabel}
-                         </div>
-                       </div>
-                       <div className="mt-4">
-                         <div className="flex gap-1.5 justify-center">
-                           {analyticsCards.map((_, i) => (
-                             <button
-                               key={i}
-                               onClick={() => setAnalyticsCardIndex(i)}
-                               className={`h-1.5 rounded-full transition-all duration-300 ${
-                                 i === analyticsCardIndex
-                                   ? 'bg-indigo-500 w-6'
-                                   : 'bg-slate-200 dark:bg-slate-700 w-1.5'
-                               }`}
-                             />
-                           ))}
-                         </div>
-                       </div>
-                     </div>
-                   </div>
-                 ))}
-               </div>
-               {analyticsCardIndex > 0 && (
-                 <button
-                   onClick={() => handleAnalyticsSwipe('right')}
-                   className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors z-10"
-                 >
-                   <ChevronDown size={16} className="rotate-90" />
-                 </button>
-               )}
-               {analyticsCardIndex < analyticsCards.length - 1 && (
-                 <button
-                   onClick={() => handleAnalyticsSwipe('left')}
-                   className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors z-10"
-                 >
-                   <ChevronDown size={16} className="-rotate-90" />
-                 </button>
-               )}
-             </div>
-           </motion.div>
-         )}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
+                {language === 'en' ? 'Overview & Tracking' : 'सारांश र ट्र्याकिङ'}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {analyticsCards.map((card, idx) => (
+                  <div key={idx} className={`${card.bgColor} rounded-2xl p-5 border ${card.borderColor}`}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-9 h-9 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
+                        {card.icon}
+                      </div>
+                      <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+                        {card.label}
+                      </span>
+                    </div>
+                    <div className={`text-4xl font-black ${card.color} mb-1`}>
+                      {card.value}
+                    </div>
+                    <div className="text-[11px] text-slate-400">
+                      {card.sublabel}
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-         {activeTab === 'overview' && (
-           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-               {language === 'en' ? 'User Locations' : 'यूजरहरूको स्थानहरू'}
-             </h3>
-             <UserLocationMap users={locations.map((loc: any) => ({
-               email: loc.email,
-               name: loc.name,
-               location: loc.location,
-               lastSeen: loc.lastSeen,
-               device: loc.device,
-             }))} language={language} />
-           </motion.div>
-         )}
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-2">
+                {language === 'en' ? 'User Locations' : 'यूजरहरूको स्थानहरू'}
+              </h3>
+              <UserLocationMap users={locations.map((loc: any) => ({
+                email: loc.email,
+                name: loc.name,
+                location: loc.location,
+                lastSeen: loc.lastSeen,
+                device: loc.device,
+              }))} language={language} />
+            </motion.div>
+          )}
 
          {activeTab === 'data-input' && (
            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
@@ -1505,22 +1446,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
             </motion.div>
           )}
 
-          {activeTab === 'overview' && (
-           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
-               {language === 'en' ? 'User Locations' : 'यूजरहरूको स्थानहरू'}
-             </h3>
-             <UserLocationMap users={locations.map((loc: any) => ({
-               email: loc.email,
-               name: loc.name,
-               location: loc.location,
-               lastSeen: loc.lastSeen,
-               device: loc.device,
-             }))} language={language} />
-           </motion.div>
-         )}
-
-         {activeTab === 'user-management' && (
+          {activeTab === 'user-management' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
