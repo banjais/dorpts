@@ -885,7 +885,6 @@ export const Overview: React.FC<OverviewProps> = ({
   const [showTotalIndicators, setShowTotalIndicators] = useState(false);
   const [showReportingOffices, setShowReportingOffices] = useState(false);
   const [showCategoryStatus, setShowCategoryStatus] = useState(false);
-  const [showCard0ReportingOffices, setShowCard0ReportingOffices] = useState(false);
   const [activeExpandedModalCardId, setActiveExpandedModalCardId] = useState<string | null>(null);
   const [modalSearchQuery, setModalSearchQuery] = useState('');
   const [modalCategoryFilter, setModalCategoryFilter] = useState('All');
@@ -1520,10 +1519,20 @@ export const Overview: React.FC<OverviewProps> = ({
 
           {/* Bottom Action Footer */}
           <div className="flex items-center justify-between text-[10px] sm:text-xs font-extrabold text-slate-600 dark:text-indigo-200/80 pt-1.5 border-t border-slate-200/80 dark:border-white/10">
-            <div className="flex flex-col gap-0.5">
-              <span>{language === 'en' ? 'Total Indicators:' : 'कुल सूचकहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(stats.total)}</strong></span>
-              <span>{language === 'en' ? 'Reporting Offices:' : 'रिपोर्टिङ कार्यालयहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(reportingOffices.length)}</strong></span>
-            </div>
+             <div className="flex flex-col gap-0.5">
+               <span>{language === 'en' ? 'Total Indicators:' : 'कुल सूचकहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(stats.total)}</strong></span>
+               <button
+                 type="button"
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   setActiveExpandedModalCardId('reporting-offices');
+                   toggleCard(setShowReportingOffices, showReportingOffices);
+                 }}
+                 className="text-left text-indigo-600 dark:text-indigo-300 hover:underline underline-offset-2"
+               >
+                 {language === 'en' ? 'Reporting Offices:' : 'रिपोर्टिङ कार्यालयहरू:'} <strong className="text-slate-900 dark:text-white">{fmt(reportingOffices.length)}</strong>
+               </button>
+             </div>
             <div className="flex items-center gap-1 text-indigo-600 dark:text-indigo-300 font-bold">
               <ChevronDown size={14} className={`transform transition-transform ${showOverallProgress ? 'rotate-180' : ''}`} />
             </div>
@@ -1679,9 +1688,59 @@ export const Overview: React.FC<OverviewProps> = ({
       </motion.div>
     </SwipeableCard>
   </motion.div>
-)}
+ )}
 
-{/* Card 5: Budget & Capital Expenditure */}
+ {/* Card 4: Reporting Field Offices */}
+ {!dismissedCards.has('reporting-offices') && (
+           <motion.div
+             key="reporting-offices"
+             layout
+             initial={{ opacity: 0, scale: 0.95 }}
+             animate={{ opacity: 1, scale: 1 }}
+             exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
+             transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
+             className="w-full"
+           >
+             <SwipeableCard cardId="reporting-offices" onDismiss={() => handleDismissCard('reporting-offices')}>
+               <motion.div
+                 role="button"
+                 tabIndex={0}
+                 initial={{ opacity: 0, scale: 0.95 }}
+                 animate={{ opacity: 1, scale: 1 }}
+                 exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+                 transition={{ duration: 0.3, ease: 'easeInOut' }}
+                 whileHover={{ scale: 1.02 }}
+                 whileTap={{ scale: 0.98 }}
+                 onClick={() => {
+           setActiveExpandedModalCardId('reporting-offices');
+           toggleCard(setShowReportingOffices, showReportingOffices);
+         }}
+           className="group relative w-full cursor-pointer bg-gradient-to-br from-violet-100 via-violet-50 to-slate-100 dark:from-violet-900/60 dark:via-violet-950/40 dark:to-slate-900 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-violet-200 dark:border-violet-700/50 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
+       >
+         <div className="absolute top-0 right-0 w-80 h-80 bg-violet-500/10 dark:bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
+         <div className="flex items-center gap-2 sm:gap-3">
+           <span className="p-2 bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 rounded-xl border border-violet-200 dark:border-violet-500/30 shadow-inner">
+             <Building2 size={16} className="text-violet-600 dark:text-violet-400" />
+           </span>
+           <div>
+             <span className="text-sm sm:text-base font-black uppercase tracking-[0.1em] text-slate-900 dark:text-slate-100">
+               {language === 'en' ? 'Reporting Field Offices' : 'रिपोर्टिङ क्षेत्र कार्यालयहरू'}
+             </span>
+             <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
+               {language === 'en' ? 'Breakdown by office' : 'कार्यालय अनुसार विवरण'}
+             </p>
+           </div>
+         </div>
+
+         <div className="flex items-center justify-end text-xs font-bold text-slate-500 dark:text-slate-400">
+           <ChevronDown size={14} className={`transform transition-transform ${showReportingOffices ? 'rotate-180' : ''}`} />
+         </div>
+       </motion.div>
+     </SwipeableCard>
+   </motion.div>
+ )}
+
+ {/* Card 5: Budget & Capital Expenditure */}
 {!dismissedCards.has('budget-card') && (
           <motion.div
             key="budget-card"
@@ -2169,89 +2228,28 @@ export const Overview: React.FC<OverviewProps> = ({
 
                       {/* Reporting Field Offices Section in Card 0 Modal */}
                       <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-                        <button
-                          type="button"
-                          onClick={() => setShowCard0ReportingOffices(v => !v)}
-                          className="flex items-center justify-between w-full"
-                        >
+                        <div className="flex items-center justify-between">
                           <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
                             <Building2 size={16} className="text-indigo-600 dark:text-indigo-400" />
                             {language === 'en' ? 'Reporting Field Offices Breakdown' : 'रिपोर्टिङ क्षेत्र कार्यालयहरूको पूर्ण विवरण'} ({reportingOffices.length})
                           </h4>
-                          <ChevronDown size={14} className={`text-indigo-600 dark:text-indigo-300 transform transition-transform ${showCard0ReportingOffices ? 'rotate-180' : ''}`} />
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveExpandedModalCardId('reporting-offices');
+                              toggleCard(setShowReportingOffices, showReportingOffices);
+                            }}
+                            className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-300 hover:underline underline-offset-2"
+                          >
+                            {language === 'en' ? 'Open Card' : 'कार्ड खोल्नुहोस्'}
+                          </button>
+                        </div>
 
-                        {showCard0ReportingOffices && (
-                          <>
-                            {/* Explanation Info Banner */}
-                            <div className="bg-indigo-50/70 dark:bg-indigo-950/40 p-3 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 flex items-start gap-2.5 text-xs text-indigo-950 dark:text-indigo-200">
-                              <Info size={15} className="text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
-                              <p className="text-[11px] leading-relaxed">
-                                {language === 'en'
-                                  ? 'Each card shows the office ID, assigned superadmin email, and the percentage score representing the overall combined progress across all indicators of that office.'
-                                  : 'प्रत्येक कार्डमा कार्यालय कोड, तोकिएको प्रशासक इमेल, र अन्तिम पंक्तिमा सो कार्यालयका सम्पूर्ण सूचकहरूको संयुक्त समग्र उपलब्धि दर देखाइएको छ।'}
-                              </p>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                              {reportingOffices.map((off) => {
-                                const rawName = translateOffice(off.office);
-                                const cleanName = rawName.replace(/^[\d.]+\s*[-–—]?\s*/, '').trim();
-
-                                return (
-                                  <div
-                                    key={off.office}
-                                    className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition-all flex flex-col justify-between gap-3"
-                                  >
-                                    <div className="space-y-1.5 min-w-0">
-                                      {/* Line 1: Prefix numeric (office ID) */}
-                                      <div className="flex items-center justify-between gap-1.5">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/40 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
-                                          <Building2 size={10} className="shrink-0" />
-                                          {language === "en"
-                                            ? `ID: ${off.officeId || "—"}`
-                                            : `कार्यालय कोड: ${toNepaliNumerals(off.officeId || "—")}`}
-                                        </span>
-                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                                          {language === 'en' ? 'Active Unit' : 'सक्रिय एकाइ'}
-                                        </span>
-                                      </div>
-
-                                      {/* Line 2: Clean Name without duplicate ID prefix */}
-                                      <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 leading-snug pt-0.5">
-                                        {cleanName}
-                                      </h4>
-
-                                      {/* Line 3: Admin email */}
-                                      <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-400 truncate pt-0.5">
-                                        <Mail size={12} className="shrink-0 text-indigo-500" />
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">
-                                          {language === 'en' ? 'Admin:' : 'प्रशासक:'}
-                                        </span>
-                                        <span className="truncate font-mono text-xs text-slate-700 dark:text-slate-300">
-                                          {off.adminEmail || (language === 'en' ? 'Unassigned' : 'अपरिभाषित')}
-                                        </span>
-                                      </div>
-                                    </div>
-
-                                    {/* Last Line: Percentage score & description */}
-                                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2 text-xs">
-                                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1 min-w-0 truncate" title={language === 'en' ? 'Combined completion rate across all indicators for this office' : 'यस कार्यालयका संयुक्त सूचकहरूको समग्र उपलब्धि दर'}>
-                                        <CheckCircle2 size={11} className="text-emerald-500 shrink-0" />
-                                        <span className="truncate">
-                                          {language === 'en' ? 'Overall Progress:' : 'समग्र उपलब्धि दर:'}
-                                        </span>
-                                      </span>
-                                      <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/50 shrink-0">
-                                        {off.score > 0 ? (language === 'en' ? `${off.score}%` : `${toNepaliNumerals(off.score)}%`) : "—"}
-                                      </span>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </>
-                        )}
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                          {language === 'en'
+                            ? 'Expand the dedicated Reporting Field Offices card to view the full office breakdown.'
+                            : 'पूर्ण कार्यालय विवरण हेर्न विशेष रिपोर्टिङ क्षेत्र कार्यालय कार्ड विस्तार गर्नुहोस्।'}
+                        </p>
                       </div>
                    </div>
                  )}
