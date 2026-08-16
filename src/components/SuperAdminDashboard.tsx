@@ -1409,7 +1409,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
 
           {activeTab === 'messaging' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              <MessagingCenter language={language} offices={offices} isAdmin={isSuperadmin} users={users} />
+              <MessagingCenter language={language} offices={offices} isAdmin={isSuperadmin} users={users} userRole={isSuperadmin ? 'superadmin' : 'admin'} />
             </motion.div>
           )}
 
