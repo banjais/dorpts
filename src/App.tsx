@@ -285,10 +285,23 @@ function MainAppContent() {
   useHaptic();
   const [needRefresh, setNeedRefresh] = useState(false);
   const { updateServiceWorker } = useRegisterSW({
+    // Check for new service worker every 60 seconds (prevents stale cache)
+    intervalMS: 60 * 1000,
     onNeedRefresh: () => {
       setNeedRefresh(true);
+      // Auto-update after 3 seconds if user doesn't interact
+      setTimeout(() => {
+        updateServiceWorker(true);
+      }, 3000);
+    },
+    onRegisteredSW: (swUrl, registration) => {
+      // Force immediate update check on page load
+      if (registration) {
+        registration.update();
+      }
     },
   });
+
   const { language, t, translateOffice, translateUnit } = useLanguage();
   const { accessToken, user, loading: authLoading, isAdmin, isSuperadmin, isDataUpdater, role, logout, refreshAdmins, adminsList, userAssignedOffice } = useAuth();
 
