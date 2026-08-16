@@ -28,5 +28,4 @@ replace.py
 calculate_weighted.ts
 fetch_sheet.ts
 fetch_sheet_all.ts
-server.ts
 bun.lock
