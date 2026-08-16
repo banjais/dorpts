@@ -14,3 +14,19 @@ firebase-functions/node_modules/
 .cache/
 .eslintcache
 *.tmp
+
+# Lint reports & logs
+eslint-report.json
+eslint-app.txt
+lint-app.txt
+lint-compact.txt
+
+# Generated / temp files
+dor.html
+*.patch
+replace.py
+calculate_weighted.ts
+fetch_sheet.ts
+fetch_sheet_all.ts
+server.ts
+bun.lock
