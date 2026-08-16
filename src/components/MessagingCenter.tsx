@@ -65,6 +65,7 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
   const [messageSearch, setMessageSearch] = useState('');
   const [channelNotice, setChannelNotice] = useState<{ text: string; type: 'join' | 'leave' } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const userEmail = user?.email || '';
   const currentUserRole = userRole || (isAdmin ? 'admin' : 'viewer');
@@ -344,294 +345,299 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
     };
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && showChannelList) {
+        setShowChannelList(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showChannelList]);
+
   return (
     <div className="h-full flex flex-col md:flex-row rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900">
       {/* Sidebar */}
-      <div className={`${showChannelList ? 'w-64' : 'w-0'} md:w-64 border-r border-slate-200 dark:border-slate-700 flex flex-col transition-all duration-300 overflow-hidden`}>
-        <div className="p-3 border-b border-slate-200 dark:border-slate-700">
-          <div className="flex items-center gap-2 mb-3">
-            <MessageSquare size={16} className="text-indigo-600" />
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-200">
-              {language === 'en' ? 'Messaging' : 'मेसेजिङ'}
-            </h3>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setSidebarSection('my-channels')}
-              className={`flex-1 py-1.5 text-[10px] font-black rounded-lg transition-colors ${
-                sidebarSection === 'my-channels'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              {language === 'en' ? 'My Channels' : 'मेरो च्यानलहरू'}
-            </button>
-            <button
-              onClick={() => setSidebarSection('available')}
-              className={`flex-1 py-1.5 text-[10px] font-black rounded-lg transition-colors ${
-                sidebarSection === 'available'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              {language === 'en' ? 'Discover' : 'अन्वेषण'}
-            </button>
-          </div>
-          {currentUserRole === 'superadmin' && (
-            <button
-              onClick={() => setSidebarSection('requests')}
-              className={`w-full mt-1.5 py-1.5 text-[10px] font-black rounded-lg transition-colors flex items-center justify-center gap-1 ${
-                sidebarSection === 'requests'
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-500/20'
-              }`}
-            >
-              <Clock size={10} />
-              {language === 'en' ? `Requests (${pendingRequestsForUser.length})` : `अनुरोधहरू (${pendingRequestsForUser.length})`}
-            </button>
-          )}
-        </div>
-
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
-          {sidebarSection === 'my-channels' && (
-            <div className="p-2 space-y-1">
-              {myChannels.length === 0 && (
-                <p className="text-[10px] text-slate-400 text-center py-4">
-                  {language === 'en' ? 'No channels yet' : 'अहिले सम्म कुनै च्यानल छैन'}
-                </p>
-              )}
-              {myChannels.map((ch) => {
-                const isCreator = ch.createdBy === userEmail;
-                const activity = getChannelActivity(ch);
-                return (
-                  <button
-                    key={ch.id}
-                    onClick={() => { setActiveChannel(ch.id); setShowChannelList(false); }}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-left ${
-                      activeChannel === ch.id
-                        ? 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-200'
-                        : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
-                    }`}
-                  >
-                    <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-                      ch.type === 'office' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' :
-                      ch.type === 'group' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' :
-                      'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300'
-                    }`}>
-                      {ch.type === 'office' ? <Users size={14} /> : <Hash size={14} />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-bold truncate">{language === 'en' ? ch.nameEn || ch.name : ch.name}</div>
-                      {ch.lastMessage && (
-                        <div className="text-[10px] text-slate-400 truncate">{ch.lastMessage}</div>
-                      )}
-                      {currentUserRole === 'superadmin' && (activity.joins > 0 || activity.leaves > 0) && (
-                        <div className="text-[9px] text-slate-400 flex items-center gap-2">
-                          {activity.joins > 0 && <span className="text-emerald-600">+{activity.joins} joined</span>}
-                          {activity.leaves > 0 && <span className="text-rose-600">-{activity.leaves} left</span>}
-                        </div>
-                      )}
-                    </div>
-                    {(isCreator || currentUserRole === 'superadmin') ? (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDeleteChannel(ch.id); }}
-                        className="shrink-0 p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
-                        title={language === 'en' ? 'Delete channel' : 'च्यानल हटाउनुहोस्'}
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    ) : (
-                      !isCreator && currentUserRole !== 'superadmin' && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleLeaveChannel(ch.id); }}
-                          className="shrink-0 p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
-                          title={language === 'en' ? 'Leave channel' : 'च्यानलबाट बाहिर हुनुहोस्'}
-                        >
-                          <LogOut size={12} />
-                        </button>
-                      )
-                    )}
-                  </button>
-                );
-              })}
+      <AnimatePresence>
+        {showChannelList && (
+          <motion.div
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -20, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            ref={sidebarRef}
+            className="w-20 border-r border-slate-200 dark:border-slate-700 flex flex-col items-center py-3 gap-1.5 bg-slate-50 dark:bg-slate-800/50"
+          >
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white mb-1">
+              <MessageSquare size={18} />
             </div>
-          )}
 
-          {sidebarSection === 'available' && (
-            <div className="p-2 space-y-1">
-              {availableChannels.length === 0 && (
-                <p className="text-[10px] text-slate-400 text-center py-4">
-                  {language === 'en' ? 'No available channels' : 'कुनै उपलब्ध च्यानल छैन'}
-                </p>
-              )}
-              {availableChannels.map((ch) => {
-                return (
-                  <div
-                    key={ch.id}
-                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
-                  >
-                    <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-                      ch.type === 'office' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' :
-                      ch.type === 'group' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' :
-                      'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300'
-                    }`}>
-                      {ch.type === 'office' ? <Users size={14} /> : <Hash size={14} />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-bold truncate">{language === 'en' ? ch.nameEn || ch.name : ch.name}</div>
-                      <div className="text-[10px] text-slate-400">
-                        {ch.members.length} {language === 'en' ? 'members' : 'सदस्यहरू'}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleJoinChannel(ch.id)}
-                      className="text-[9px] font-black bg-indigo-600 text-white px-2 py-1 rounded-lg hover:bg-indigo-700 transition-colors"
-                    >
-                      {language === 'en' ? 'Join' : 'सामेल हुनुहोस्'}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {sidebarSection === 'requests' && (
-            <div className="p-2 space-y-1">
-              {pendingRequestsForUser.length === 0 && (
-                <p className="text-[10px] text-slate-400 text-center py-4">
-                  {language === 'en' ? 'No pending requests' : 'कुनै पेन्डिङ अनुरोध छैन'}
-                </p>
-              )}
-              {pendingRequestsForUser.map((req) => {
-                const channel = allChannels.find(ch => ch.id === req.channelId);
-                if (!channel) return null;
-                return (
-                  <div key={req.id} className="px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className={`shrink-0 w-6 h-6 rounded-md flex items-center justify-center ${
-                        channel.type === 'office' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' :
-                        channel.type === 'group' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' :
-                        'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300'
-                      }`}>
-                        <Hash size={10} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[11px] font-bold truncate">{channel.name}</div>
-                        <div className="text-[9px] text-slate-400 truncate">{req.userEmail}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => handleApproveRequest(req.id, req.channelId, req.userEmail)}
-                        className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-emerald-600 text-white text-[9px] font-black rounded-lg hover:bg-emerald-700 transition-colors"
-                      >
-                        <CheckCircle size={10} /> {language === 'en' ? 'Approve' : 'स्वीकृत'}
-                      </button>
-                      <button
-                        onClick={() => handleDenyRequest(req.id)}
-                        className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-rose-600 text-white text-[9px] font-black rounded-lg hover:bg-rose-700 transition-colors"
-                      >
-                        <XCircle size={10} /> {language === 'en' ? 'Deny' : 'अस्वीकृत'}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className="p-2 border-t border-slate-200 dark:border-slate-700 space-y-1">
-          {(currentUserRole === 'superadmin' || currentUserRole === 'admin') && (
-            !showCreateChannel ? (
+            <div className="flex items-center gap-1 w-full px-2 justify-center">
               <button
-                onClick={() => setShowCreateChannel(true)}
-                className="w-full mt-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-colors"
+                onClick={() => setSidebarSection('my-channels')}
+                className={`flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${
+                  sidebarSection === 'my-channels'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+                title={language === 'en' ? 'My Channels' : 'मेरो च्यानलहरू'}
               >
-                <Plus size={12} />
-                {language === 'en' ? 'New Channel' : 'नयाँ च्यानल'}
+                <Hash size={18} />
               </button>
-            ) : (
-              <div className="mt-1 space-y-2 bg-slate-50 dark:bg-slate-800 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
-                <input
-                  type="text"
-                  value={newChannelName}
-                  onChange={(e) => setNewChannelName(e.target.value)}
-                  placeholder={language === 'en' ? 'Channel name' : 'च्यानलको नाम'}
-                  className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"
-                />
-                <select
-                  value={newChannelType}
-                  onChange={(e) => setNewChannelType(e.target.value as any)}
-                  className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"
+              <button
+                onClick={() => setSidebarSection('available')}
+                className={`flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${
+                  sidebarSection === 'available'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+                title={language === 'en' ? 'Discover' : 'अन्वेषण'}
+              >
+                <Users size={18} />
+              </button>
+              {currentUserRole === 'superadmin' && (
+                <button
+                  onClick={() => setSidebarSection('requests')}
+                  className={`flex items-center justify-center w-9 h-9 rounded-xl transition-colors relative ${
+                    sidebarSection === 'requests'
+                      ? 'bg-amber-500 text-white shadow-md'
+                      : 'text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-500/20'
+                  }`}
+                  title={language === 'en' ? `Requests (${pendingRequestsForUser.length})` : `अनुरोधहरू (${pendingRequestsForUser.length})`}
                 >
-                  <option value="group">{language === 'en' ? 'Group' : 'समूह'}</option>
-                  <option value="office">{language === 'en' ? 'Office' : 'कार्यालय'}</option>
-                  <option value="direct">{language === 'en' ? 'Direct' : 'प्रत्यक्ष'}</option>
-                </select>
-                {currentUserRole === 'superadmin' && (
-                  <p className="text-[9px] text-slate-400">
-                    {language === 'en' ? 'All admins will be added automatically' : 'सबै प्रशासकहरू स्वतः थपिनेछन्'}
-                  </p>
-                )}
-                {currentUserRole === 'admin' && (
-                  <div className="space-y-1">
-                    <p className="text-[9px] text-slate-400">
-                      {language === 'en' ? 'Invite admins or superadmin' : 'प्रशासक वा सुपरएडमिनलाई आमंत्रण गर्नुहोस्'}
+                  <Clock size={18} />
+                  {pendingRequestsForUser.length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">
+                      {pendingRequestsForUser.length}
+                    </span>
+                  )}
+                </button>
+              )}
+            </div>
+
+            <div className="flex-1 overflow-y-auto custom-scrollbar w-full px-2 mt-1">
+              {sidebarSection === 'my-channels' && (
+                <div className="flex flex-col gap-1">
+                  {myChannels.length === 0 && (
+                    <p className="text-[9px] text-slate-400 text-center py-2">
+                      {language === 'en' ? 'No channels' : 'च्यानल छैन'}
                     </p>
-                    <select
-                      multiple
-                      value={selectedMembers}
-                      onChange={(e) => {
-                        const values = Array.from((e.target as HTMLSelectElement).selectedOptions).map(opt => opt.value);
-                        setSelectedMembers(values);
-                      }}
-                      className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs h-24 custom-scrollbar"
-                    >
-                      {allUsers.filter(u => u.email !== userEmail).map((u) => (
-                        <option key={u.email} value={u.email} className="py-1">
-                          {u.displayName || u.email} {u.email === userEmail ? `(${language === 'en' ? 'you' : 'तपाईं'})` : ''}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="text-[9px] text-slate-400">
-                      {language === 'en' ? 'Hold Ctrl/Cmd to select multiple' : 'अन्य सदस्यहरू छान्न Ctrl/Cmd थिच्नुहोस्'}
-                    </p>
-                  </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleCreateChannel}
-                    disabled={!newChannelName.trim()}
-                    className="flex-1 py-1.5 bg-emerald-600 text-white text-[10px] font-black rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {language === 'en' ? 'Create' : 'सिर्जना'}
-                  </button>
-                  <button
-                    onClick={() => { setShowCreateChannel(false); setNewChannelName(''); setSelectedMembers([]); }}
-                    className="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-black rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
-                  >
-                    {language === 'en' ? 'Cancel' : 'रद्द'}
-                  </button>
+                  )}
+                  {myChannels.map((ch) => {
+                    const isCreator = ch.createdBy === userEmail;
+                    return (
+                      <div
+                        key={ch.id}
+                        onClick={() => { setActiveChannel(ch.id); setShowChannelList(false); }}
+                        className={`w-full flex items-center gap-1.5 px-2 py-1.5 rounded-xl transition-all cursor-pointer ${
+                          activeChannel === ch.id
+                            ? 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-200'
+                            : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500'
+                        }`}
+                        title={language === 'en' ? ch.nameEn || ch.name : ch.name}
+                      >
+                        <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${
+                          ch.type === 'office' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' :
+                          ch.type === 'group' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' :
+                          'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300'
+                        }`}>
+                          {ch.type === 'office' ? <Users size={12} /> : <Hash size={12} />}
+                        </div>
+                        <span className="flex-1 text-[9px] font-bold truncate leading-tight">
+                          {language === 'en' ? ch.nameEn || ch.name : ch.name}
+                        </span>
+                        {(isCreator || currentUserRole === 'superadmin') ? (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeleteChannel(ch.id); }}
+                            className="shrink-0 p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
+                            title={language === 'en' ? 'Delete channel' : 'च्यानल हटाउनुहोस्'}
+                          >
+                            <Trash2 size={10} />
+                          </button>
+                        ) : (
+                          !isCreator && currentUserRole !== 'superadmin' && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleLeaveChannel(ch.id); }}
+                              className="shrink-0 p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
+                              title={language === 'en' ? 'Leave channel' : 'च्यानलबाट बाहिर हुनुहोस्'}
+                            >
+                              <LogOut size={10} />
+                            </button>
+                          )
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
-            )
-          )}
-        </div>
-      </div>
+              )}
+
+              {sidebarSection === 'available' && (
+                <div className="flex flex-col gap-1">
+                  {availableChannels.length === 0 && (
+                    <p className="text-[9px] text-slate-400 text-center py-2">
+                      {language === 'en' ? 'No channels' : 'च्यानल छैन'}
+                    </p>
+                  )}
+                  {availableChannels.map((ch) => {
+                    return (
+                      <div
+                        key={ch.id}
+                        className="flex items-center gap-1.5 px-2 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
+                      >
+                        <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${
+                          ch.type === 'office' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' :
+                          ch.type === 'group' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' :
+                          'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300'
+                        }`}>
+                          {ch.type === 'office' ? <Users size={12} /> : <Hash size={12} />}
+                        </div>
+                        <span className="flex-1 text-[9px] font-bold truncate leading-tight">
+                          {language === 'en' ? ch.nameEn || ch.name : ch.name}
+                        </span>
+                        <button
+                          onClick={() => handleJoinChannel(ch.id)}
+                          className="shrink-0 text-[8px] font-black bg-indigo-600 text-white px-1.5 py-0.5 rounded-md hover:bg-indigo-700 transition-colors"
+                        >
+                          {language === 'en' ? 'Join' : 'सामेल'}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {sidebarSection === 'requests' && (
+                <div className="flex flex-col gap-1">
+                  {pendingRequestsForUser.length === 0 && (
+                    <p className="text-[9px] text-slate-400 text-center py-2">
+                      {language === 'en' ? 'No requests' : 'अनुरोध छैन'}
+                    </p>
+                  )}
+                  {pendingRequestsForUser.map((req) => {
+                    const channel = allChannels.find(ch => ch.id === req.channelId);
+                    if (!channel) return null;
+                    return (
+                      <div key={req.id} className="px-2 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 space-y-1">
+                        <div className="flex items-center gap-1">
+                          <div className={`shrink-0 w-6 h-6 rounded-md flex items-center justify-center ${
+                            channel.type === 'office' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' :
+                            channel.type === 'group' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' :
+                            'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300'
+                          }`}>
+                            <Hash size={10} />
+                          </div>
+                          <div className="text-[9px] font-bold truncate">{channel.name}</div>
+                        </div>
+                        <div className="text-[8px] text-slate-400 text-center truncate">{req.userEmail}</div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleApproveRequest(req.id, req.channelId, req.userEmail)}
+                            className="flex-1 flex items-center justify-center gap-0.5 py-1 bg-emerald-600 text-white text-[8px] font-black rounded-lg hover:bg-emerald-700 transition-colors"
+                          >
+                            <CheckCircle size={10} />
+                          </button>
+                          <button
+                            onClick={() => handleDenyRequest(req.id)}
+                            className="flex-1 flex items-center justify-center gap-0.5 py-1 bg-rose-600 text-white text-[8px] font-black rounded-lg hover:bg-rose-700 transition-colors"
+                          >
+                            <XCircle size={10} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-auto pt-2 border-t border-slate-200 dark:border-slate-700 w-full flex flex-col items-center gap-1">
+              {(currentUserRole === 'superadmin' || currentUserRole === 'admin') && (
+                !showCreateChannel ? (
+                  <button
+                    onClick={() => setShowCreateChannel(true)}
+                    className="flex items-center justify-center w-9 h-9 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors"
+                    title={language === 'en' ? 'New Channel' : 'नयाँ च्यानल'}
+                  >
+                    <Plus size={18} />
+                  </button>
+                ) : (
+                  <div className="w-full px-2 space-y-1.5 bg-slate-100 dark:bg-slate-700 p-2 rounded-xl border border-slate-200 dark:border-slate-600">
+                    <input
+                      type="text"
+                      value={newChannelName}
+                      onChange={(e) => setNewChannelName(e.target.value)}
+                      placeholder={language === 'en' ? 'Channel name' : 'च्यानलको नाम'}
+                      className="w-full p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-[10px]"
+                    />
+                    <select
+                      value={newChannelType}
+                      onChange={(e) => setNewChannelType(e.target.value as any)}
+                      className="w-full p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-[10px]"
+                    >
+                      <option value="group">{language === 'en' ? 'Group' : 'समूह'}</option>
+                      <option value="office">{language === 'en' ? 'Office' : 'कार्यालय'}</option>
+                      <option value="direct">{language === 'en' ? 'Direct' : 'प्रत्यक्ष'}</option>
+                    </select>
+                    {currentUserRole === 'superadmin' && (
+                      <p className="text-[8px] text-slate-400 text-center">
+                        {language === 'en' ? 'All admins added' : 'सबै प्रशासकहरू थपिनेछन्'}
+                      </p>
+                    )}
+                    {currentUserRole === 'admin' && (
+                      <div className="space-y-1">
+                        <select
+                          multiple
+                          value={selectedMembers}
+                          onChange={(e) => {
+                            const values = Array.from((e.target as HTMLSelectElement).selectedOptions).map(opt => opt.value);
+                            setSelectedMembers(values);
+                          }}
+                          className="w-full p-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-[10px] h-20 custom-scrollbar"
+                        >
+                          {allUsers.filter(u => u.email !== userEmail).map((u) => (
+                            <option key={u.email} value={u.email} className="py-0.5">
+                              {u.displayName || u.email}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={handleCreateChannel}
+                        disabled={!newChannelName.trim()}
+                        className="flex-1 py-1 bg-emerald-600 text-white text-[9px] font-black rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {language === 'en' ? 'Create' : 'सिर्जना'}
+                      </button>
+                      <button
+                        onClick={() => { setShowCreateChannel(false); setNewChannelName(''); setSelectedMembers([]); }}
+                        className="px-2 py-1 bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 text-[9px] font-black rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors"
+                      >
+                        {language === 'en' ? 'Cancel' : 'रद्द'}
+                      </button>
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Chat Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {activeChannelData ? (
           <>
             <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
-              <button
-                onClick={() => setShowChannelList(true)}
-                className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
-              >
-                <MessageSquare size={16} />
-              </button>
+              {!showChannelList && (
+                <button
+                  onClick={() => setShowChannelList(true)}
+                  className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                >
+                  <MessageSquare size={16} />
+                </button>
+              )}
               <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
                 activeChannelData.type === 'office' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' :
                 activeChannelData.type === 'group' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' :
@@ -644,7 +650,7 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
                   {language === 'en' ? activeChannelData.nameEn || activeChannelData.name : activeChannelData.name}
                 </h3>
                 <div className="relative">
-                  <button 
+                  <button
                     onClick={() => setShowMembers(!showMembers)}
                     className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                   >
@@ -658,8 +664,8 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
                   {channelNotice && activeChannel === activeChannelData.id && (
                     <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl p-2 z-20 min-w-[180px]">
                       <div className={`text-[10px] font-black px-2 py-1 rounded-lg ${
-                        channelNotice.type === 'join' 
-                          ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' 
+                        channelNotice.type === 'join'
+                          ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
                           : 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300'
                       }`}>
                         {channelNotice.text}
@@ -682,9 +688,9 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
                 </div>
               </div>
               <div className="relative">
-                <button 
+                <button
                   onClick={() => setShowMembers(!showMembers)}
-                  className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                  className="hidden lg:block p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
                 >
                   <Users size={16} />
                 </button>
@@ -692,8 +698,8 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
               <button
                 onClick={() => setMessageSearch(!messageSearch)}
                 className={`p-1.5 rounded-lg transition-colors ${
-                  messageSearch 
-                    ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' 
+                  messageSearch
+                    ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300'
                     : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500'
                 }`}
                 title={language === 'en' ? 'Search messages' : 'सन्देश खोज्नुहोस्'}
