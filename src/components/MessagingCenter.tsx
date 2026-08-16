@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, MessageSquare, Users, Hash, X, Plus, CheckCircle, XCircle, Clock, LogOut, Trash2, Search } from 'lucide-react';
+import { Send, MessageSquare, Users, Hash, X, Plus, CheckCircle, XCircle, Clock, LogOut, Trash2, Search, RefreshCw } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, limit, doc, updateDoc, getDoc, getDocs, deleteDoc } from 'firebase/firestore';
@@ -292,6 +292,24 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
     }
   };
 
+  const handleClearChannelMessages = async (channelId: string) => {
+    if (!window.confirm(language === 'en' ? 'Clear all messages in this channel?' : 'यो च्यानलमा सबै सन्देशहरू मेट्नुहोस्?')) return;
+    try {
+      const messagesRef = collection(db, 'messages', channelId, 'items');
+      const msgsSnap = await getDocs(messagesRef);
+      const batch = [];
+      for (const docSnap of msgsSnap.docs) {
+        batch.push(deleteDoc(docSnap.ref));
+      }
+      await Promise.all(batch);
+      if (activeChannel === channelId) {
+        setMessages([]);
+      }
+    } catch (err: any) {
+      console.error('Failed to clear channel messages:', err);
+    }
+  };
+
   const handleApproveRequest = async (requestId: string, channelId: string, requesterEmail: string) => {
     try {
       const channelRef = doc(db, 'channels', channelId);
@@ -446,6 +464,15 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
                         <span className="flex-1 text-[9px] font-bold truncate leading-tight">
                           {language === 'en' ? ch.nameEn || ch.name : ch.name}
                         </span>
+                        {(isCreator || currentUserRole === 'superadmin') && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleClearChannelMessages(ch.id); }}
+                            className="shrink-0 p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors"
+                            title={language === 'en' ? 'Clear chat' : 'च्याट मेट्नुहोस्'}
+                          >
+                            <RefreshCw size={10} />
+                          </button>
+                        )}
                         {(isCreator || currentUserRole === 'superadmin') ? (
                           <button
                             onClick={(e) => { e.stopPropagation(); handleDeleteChannel(ch.id); }}
@@ -706,6 +733,15 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
               >
                 <Search size={16} />
               </button>
+              {(activeChannelData.createdBy === userEmail || currentUserRole === 'superadmin') && (
+                <button
+                  onClick={() => handleClearChannelMessages(activeChannelData.id)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 text-[10px] font-black rounded-lg hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors"
+                  title={language === 'en' ? 'Clear chat' : 'च्याट मेट्नुहोस्'}
+                >
+                  <RefreshCw size={12} />
+                </button>
+              )}
               {(activeChannelData.createdBy === userEmail || currentUserRole === 'superadmin') ? (
                 <button
                   onClick={() => handleDeleteChannel(activeChannelData.id)}
