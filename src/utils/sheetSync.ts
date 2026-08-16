@@ -146,10 +146,10 @@ export async function syncPublishedSheets(urls?: { dashboard?: string; offices?:
       }
 
       const dashIdx = officeName.indexOf('-');
-      const officeId = dashIdx !== -1 ? officeName.slice(0, dashIdx).trim() : (officeName.match(/\d+/)?.[0] || '33701');
+      const officeId = dashIdx !== -1 ? officeName.slice(0, dashIdx).trim() : (officeName.match(/^\d+/)?.[0] || '');
       const shortName = dashIdx !== -1 ? officeName.slice(dashIdx + 1).trim() : officeName;
 
-      if (!officeId && !shortName) continue;
+      if (!officeId || !shortName) continue;
 
       let sumWeightedCompletion = 0;
       let totalWeightSum = 0;
@@ -179,7 +179,7 @@ export async function syncPublishedSheets(urls?: { dashboard?: string; offices?:
 
       parsedOffices.push({ 
         name: officeName, 
-        officeId: officeId || '33701', 
+        officeId, 
         shortName, 
         updated: 'Updated recently',
         avgCompletion,

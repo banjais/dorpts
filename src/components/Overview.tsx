@@ -52,7 +52,6 @@ import {
   Minimize2,
   Maximize2,
   Zap,
-  Search,
   Mail,
 } from 'lucide-react';
 import {
@@ -2156,9 +2155,45 @@ export const Overview: React.FC<OverviewProps> = ({
                            ? 'Weighted Progress Rate = Σ [ (Indicator Progress ÷ Target) × Weight ] ÷ Σ (Total Weights). All values are synchronized in real-time from official Google Sheets.'
                            : 'भारित प्रगति दर = Σ [ (सूचक प्रगति ÷ लक्ष्य) × भार ] ÷ Σ (कुल भार)। सबै मानहरू आधिकारिक गुगल शीटबाट प्रत्यक्ष अद्यावधिक हुन्छन्।'}
                        </p>
-                     </div>
+                      </div>
 
-                      {/* Navigation to other cards */}
+                      {/* Indicator short brief */}
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                          {language === 'en' ? 'Indicators Overview' : 'सूचकहरूको सारांश'} ({indicators.length})
+                        </h4>
+                        <div className="divide-y divide-slate-100 dark:divide-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden max-h-[300px] overflow-y-auto">
+                          {indicators.slice(0, 50).map((ind) => {
+                            if (!ind) return null;
+                            const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
+                            return (
+                              <div key={ind.id} className="p-3 bg-white dark:bg-slate-900 flex items-center justify-between gap-3">
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-xs font-black text-slate-800 dark:text-slate-200 truncate">
+                                    {language === 'en' ? ind.nameEn || ind.name : ind.name}
+                                  </p>
+                                  <div className="flex flex-wrap items-center gap-2 mt-0.5 text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
+                                    <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-bold text-slate-600 dark:text-slate-300">
+                                      {translateCategory(ind.category)}
+                                    </span>
+                                    <span>
+                                      {translateUnit(ind.unit)} • {language === 'en' ? 'Progress:' : 'प्रगति:'} {fmt(ind.annualProgress)} / {fmt(ind.annualTarget)}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0 text-right">
+                                  <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 block">{pct}%</span>
+                                  <div className="w-16 bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden hidden sm:block">
+                                    <div className="bg-indigo-600 h-full rounded-full" style={{ width: `${pct}%` }} />
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                       {/* Navigation to other cards */}
                       <div className="space-y-3 pt-2">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <button
