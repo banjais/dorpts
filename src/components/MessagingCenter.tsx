@@ -66,6 +66,7 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
   const [channelNotice, setChannelNotice] = useState<{ text: string; type: 'join' | 'leave' } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const userEmail = user?.email || '';
   const currentUserRole = userRole || (isAdmin ? 'admin' : 'viewer');
@@ -375,6 +376,52 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
 
   return (
     <div className="h-full flex flex-col md:flex-row rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900">
+      {/* Mobile Header */}
+      <div className="md:hidden flex items-center gap-2 px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 rounded-xl bg-indigo-600 text-white"
+          title={language === 'en' ? 'Menu' : 'मेनु'}
+        >
+          <MessageSquare size={16} />
+        </button>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-xs font-black text-slate-800 dark:text-slate-200 truncate">
+            {language === 'en' ? 'Messaging' : 'मेसेजिङ'}
+          </h3>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setSidebarSection('my-channels')}
+            className={`p-2 rounded-lg transition-colors ${sidebarSection === 'my-channels' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' : 'text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+            title={language === 'en' ? 'My Channels' : 'मेरो च्यानलहरू'}
+          >
+            <Hash size={16} />
+          </button>
+          <button
+            onClick={() => setSidebarSection('available')}
+            className={`p-2 rounded-lg transition-colors ${sidebarSection === 'available' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' : 'text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+            title={language === 'en' ? 'Discover' : 'अन्वेषण'}
+          >
+            <Users size={16} />
+          </button>
+          {currentUserRole === 'superadmin' && (
+            <button
+              onClick={() => setSidebarSection('requests')}
+              className={`p-2 rounded-lg transition-colors relative ${sidebarSection === 'requests' ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300' : 'text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-500/20'}`}
+              title={language === 'en' ? `Requests (${pendingRequestsForUser.length})` : `अनुरोधहरू (${pendingRequestsForUser.length})`}
+            >
+              <Clock size={16} />
+              {pendingRequestsForUser.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">
+                  {pendingRequestsForUser.length}
+                </span>
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Sidebar */}
       <AnimatePresence>
         {showChannelList && (
@@ -384,9 +431,9 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
             exit={{ x: -20, opacity: 0 }}
             transition={{ duration: 0.2 }}
             ref={sidebarRef}
-            className="w-20 border-r border-slate-200 dark:border-slate-700 flex flex-col items-center py-3 gap-1.5 bg-slate-50 dark:bg-slate-800/50"
+            className="fixed inset-0 z-50 md:relative md:inset-auto md:z-auto w-20 border-r border-slate-200 dark:border-slate-700 flex flex-col items-center py-3 gap-1.5 bg-slate-50 dark:bg-slate-800/50 md:bg-slate-50 dark:md:bg-slate-800/50"
           >
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white mb-1">
+            <div className="hidden md:flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white mb-1">
               <MessageSquare size={18} />
             </div>
 

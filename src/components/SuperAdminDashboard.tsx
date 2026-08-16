@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 // import { useLanguage } from '../context/LanguageContext'; // Removed unused import
 import {
   Users, Activity, BarChart3,
-  Send, CheckCircle, Clock, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone, MessageSquare, FileText
+  Send, CheckCircle, Clock, ShieldCheck, Trash2, Edit3, Plus, X, ChevronDown, LogIn, Megaphone, MessageSquare, FileText, Menu
 } from 'lucide-react';
 import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -144,9 +144,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
   const [dataInputSheetOffices, setDataInputSheetOffices] = useState<string[]>([]);
   const [analyticsCardIndex, setAnalyticsCardIndex] = useState(0);
   const analyticsCardRef = useRef<HTMLDivElement>(null);
-  const [internalActiveTab, setInternalActiveTab] = useState('analytics');
-
+  const [internalActiveTab, setInternalActiveTab] = useState('overview');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [officeRankings, setOfficeRankings] = useState<Array<{ name: string; completion: number; total: number; progress: number }>>([]);
+
+  const activeTab = externalActiveTab || internalActiveTab;
+  const handleTabChange = onTabChange || setInternalActiveTab;
   const [rankingsLoading, setRankingsLoading] = useState(false);
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
   const [feedbacksLoading, setFeedbacksLoading] = useState(false);
@@ -165,9 +168,6 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
     expiresAt: '',
   });
   const [announcementSaving, setAnnouncementSaving] = useState(false);
-
-  const activeTab = externalActiveTab || internalActiveTab;
-  const handleTabChange = onTabChange || setInternalActiveTab;
 
   const totalAdmins = useMemo(() => (adminsList?.length ?? 0) + 1, [adminsList]);
   const adminEmails = useMemo(() => adminsList?.map(a => a.email) ?? [], [adminsList]);
@@ -876,64 +876,82 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="h-full flex flex-col md:flex-row gap-3 sm:gap-4 items-start"
+        className="h-[100dvh] flex flex-col overflow-hidden"
       >
-        {/* Left Sidebar Navigation Menu */}
-        <aside className="w-full md:w-56 lg:w-60 shrink-0 h-full">
-          <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-white/10 rounded-2xl p-2.5 sm:p-3 shadow-xl space-y-3 h-full flex flex-col">
-            {/* Header Badge */}
-            <div className="flex items-center gap-2.5 pb-2.5 border-b border-slate-100 dark:border-white/10 px-1">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-rose-600 to-rose-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/20">
-                <ShieldCheck size={16} />
-              </div>
-              <div>
-                <h2 className="text-[0.65rem] font-black uppercase tracking-wider text-slate-800 dark:text-white">
-                  {language === 'en' ? 'Super Admin Panel' : 'सुपर एडमिन प्यानल'}
-                </h2>
-                <p className="text-[0.55rem] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest">
-                  {language === 'en' ? 'Control Center' : 'नियन्त्रण केन्द्र'}
-                </p>
-              </div>
-            </div>
+        {/* Mobile header with menu toggle */}
+        <div className="md:hidden flex items-center gap-2 px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shrink-0">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-black text-slate-700 dark:text-slate-200"
+          >
+            <Menu size={16} />
+            {language === 'en' ? 'Menu' : 'मेनु'}
+          </button>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-[0.65rem] font-black uppercase tracking-wider text-slate-800 dark:text-white truncate">
+              {language === 'en' ? 'Super Admin Panel' : 'सुपर एडमिन प्यानल'}
+            </h2>
+          </div>
+        </div>
 
-            {/* Vertical Left Navigation Items */}
-            <nav className="space-y-1 flex-1 overflow-y-auto custom-scrollbar">
-              {tabs.map((item) => {
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleTabChange(item.id)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left font-bold text-[11px] group relative ${
-                      isActive
-                        ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-200 shadow-sm border border-rose-200/50 dark:border-rose-500/30'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    <span
-                      className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
+        {/* Main layout: sidebar + content */}
+        <div className="flex-1 flex flex-col md:flex-row gap-3 sm:gap-4 items-start overflow-hidden">
+          {/* Left Sidebar Navigation Menu */}
+          <aside className={`${sidebarOpen ? 'fixed inset-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl p-4' : 'hidden'} md:relative md:block md:bg-transparent md:dark:bg-transparent md:p-0 md:z-auto md:inset-auto md:backdrop-blur-none w-full md:w-56 lg:w-60 shrink-0 h-full`}>
+            <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-white/10 rounded-2xl p-2.5 sm:p-3 shadow-xl space-y-3 h-full flex flex-col">
+              {/* Header Badge */}
+              <div className="hidden md:flex items-center gap-2.5 pb-2.5 border-b border-slate-100 dark:border-white/10 px-1">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-rose-600 to-rose-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/20">
+                  <ShieldCheck size={16} />
+                </div>
+                <div>
+                  <h2 className="text-[0.65rem] font-black uppercase tracking-wider text-slate-800 dark:text-white">
+                    {language === 'en' ? 'Super Admin Panel' : 'सुपर एडमिन प्यानल'}
+                  </h2>
+                  <p className="text-[0.55rem] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest">
+                    {language === 'en' ? 'Control Center' : 'नियन्त्रण केन्द्र'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Vertical Left Navigation Items */}
+              <nav className="space-y-1 flex-1 overflow-y-auto custom-scrollbar">
+                {tabs.map((item) => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => { handleTabChange(item.id); setSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left font-bold text-[11px] group relative ${
                         isActive
-                          ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:bg-white dark:group-hover:bg-slate-700'
+                          ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-200 shadow-sm border border-rose-200/50 dark:border-rose-500/30'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
-                      {item.icon}
-                    </span>
-                    <span className="truncate">
-                      {language === 'en' ? item.labelEn : item.labelNp}
-                    </span>
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeLeftIndicator"
-                        className="absolute right-2 w-1.5 h-3.5 bg-rose-600 dark:bg-rose-400 rounded-full"
-                      />
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </aside>
+                      <span
+                        className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
+                          isActive
+                            ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:bg-white dark:group-hover:bg-slate-700'
+                        }`}
+                      >
+                        {item.icon}
+                      </span>
+                      <span className="truncate">
+                        {language === 'en' ? item.labelEn : item.labelNp}
+                      </span>
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeLeftIndicator"
+                          className="absolute right-2 w-1.5 h-3.5 bg-rose-600 dark:bg-rose-400 rounded-full"
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+          </aside>
 
         {/* Content based on active tab */}
         <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 custom-scrollbar">
@@ -1787,8 +1805,9 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                 </div>
               </div>
             </motion.div>
-           )}
+            )}
         </div>
-      </motion.div>
-    );
-  };
+      </div>
+    </motion.div>
+  );
+};
