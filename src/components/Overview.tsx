@@ -2193,80 +2193,54 @@ export const Overview: React.FC<OverviewProps> = ({
                         </div>
                       </div>
 
-                       {/* Navigation to other cards */}
-                      <div className="space-y-3 pt-2">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setActiveExpandedModalCardId('detailed-gallery');
-                              toggleCard(setShowReportingOffices, showReportingOffices);
-                            }}
-                            className="flex items-center gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all text-left"
-                          >
-                            <span className="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
-                              <ImageIcon size={18} />
-                            </span>
-                            <div>
-                              <span className="text-xs font-black text-slate-900 dark:text-slate-100 block">
-                                {language === 'en' ? 'Detailed Gallery' : 'विस्तृत ग्यालेरी'}
-                              </span>
-                              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                                {language === 'en' ? 'Full indicators view' : 'पूर्ण सूचक अवलोकन'}
-                              </span>
-                            </div>
-                          </button>
+                        {/* Navigation to other cards */}
+                       <div className="space-y-3 pt-2">
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                           <button
+                             type="button"
+                             onClick={() => {
+                               setActiveExpandedModalCardId('detailed-gallery');
+                               onNavigateToView?.('detailed-gallery');
+                             }}
+                             className="flex items-center gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all text-left"
+                           >
+                             <span className="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
+                               <ImageIcon size={18} />
+                             </span>
+                             <div>
+                               <span className="text-xs font-black text-slate-900 dark:text-slate-100 block">
+                                 {language === 'en' ? 'Detailed Gallery' : 'विस्तृत ग्यालेरी'}
+                               </span>
+                               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                 {language === 'en' ? 'Full indicators view' : 'पूर्ण सूचक अवलोकन'}
+                               </span>
+                             </div>
+                           </button>
 
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setActiveExpandedModalCardId('reporting-offices');
-                              toggleCard(setShowReportingOffices, showReportingOffices);
-                            }}
-                            className="flex items-center gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all text-left"
-                          >
-                            <span className="p-2 rounded-xl bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300">
-                              <Building2 size={18} />
-                            </span>
-                            <div>
-                              <span className="text-xs font-black text-slate-900 dark:text-slate-100 block">
-                                {language === 'en' ? 'Reporting Offices' : 'रिपोर्टिङ कार्यालयहरू'}
-                              </span>
-                              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                                {language === 'en' ? 'Office breakdown' : 'कार्यालय विवरण'}
-                              </span>
-                            </div>
-                          </button>
-                        </div>
-                      </div>
-
-                       {/* Reporting Field Offices Section in Card 0 Modal */}
-                      <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                            <Building2 size={16} className="text-indigo-600 dark:text-indigo-400" />
-                            {language === 'en' ? 'Reporting Field Offices Breakdown' : 'रिपोर्टिङ क्षेत्र कार्यालयहरूको पूर्ण विवरण'} ({reportingOffices.length})
-                          </h4>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setActiveExpandedModalCardId('reporting-offices');
-                              toggleCard(setShowReportingOffices, showReportingOffices);
-                            }}
-                            className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-300 hover:underline underline-offset-2"
-                          >
-                            {language === 'en' ? 'Open Card' : 'कार्ड खोल्नुहोस्'}
-                          </button>
-                        </div>
-
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                          {language === 'en'
-                            ? 'Expand the dedicated Reporting Field Offices card to view the full office breakdown.'
-                            : 'पूर्ण कार्यालय विवरण हेर्न विशेष रिपोर्टिङ क्षेत्र कार्यालय कार्ड विस्तार गर्नुहोस्।'}
-                        </p>
-                      </div>
-                   </div>
-                 )}
+                           <button
+                             type="button"
+                             onClick={() => {
+                               setActiveExpandedModalCardId('reporting-offices');
+                               toggleCard(setShowReportingOffices, showReportingOffices);
+                             }}
+                             className="flex items-center gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all text-left"
+                           >
+                             <span className="p-2 rounded-xl bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300">
+                               <Building2 size={18} />
+                             </span>
+                             <div>
+                               <span className="text-xs font-black text-slate-900 dark:text-slate-100 block">
+                                 {language === 'en' ? 'Reporting Offices' : 'रिपोर्टिङ कार्यालयहरू'}
+                               </span>
+                               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                 {language === 'en' ? 'Office breakdown' : 'कार्यालय विवरण'}
+                               </span>
+                             </div>
+                           </button>
+                         </div>
+                       </div>
+                    </div>
+                  )}
 
                    {/* Card 1: Category Status Modal */}
                    {activeExpandedModalCardId === 'category-status' && (
