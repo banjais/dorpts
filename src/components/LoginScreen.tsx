@@ -9,6 +9,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
   const { loginWithGoogle, loading } = useAuth();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const APP_NAME = language === 'en' ? 'DORPTS' : 'डी.ओ.आर.पी.टी.एस.';
   const APP_SUB = language === 'en' ? 'Performance Tracking System' : 'सम्पादन अनुगमन प्रणाली';
@@ -17,7 +18,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
     setError('');
     setIsLoading(true);
     try {
-      await loginWithGoogle();
+      await loginWithGoogle(rememberMe);
       onClose?.();
     } catch (err: any) {
       const msg = err?.message || 'Google sign-in failed.';
@@ -77,6 +78,18 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
               <Chrome className="w-5 h-5 text-red-500" />
               <span>{language === 'en' ? 'Sign in with Google' : 'गूगलले साइन इन गर्नुहोस्'}</span>
             </button>
+
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+              />
+              <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                {language === 'en' ? 'Remember me' : 'मलाई सम्झिनुहोस्'}
+              </span>
+            </label>
 
             {isLoading && (
               <div className="flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">

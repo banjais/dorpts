@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { User, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider } from 'firebase/auth';
+import { User, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../firebase';
 import { AdminUser, UserActivity } from '../types';
@@ -14,7 +14,7 @@ interface AuthContextType {
   isDataUpdater: boolean;
   role: 'superadmin' | 'admin' | 'data_updater' | 'viewer' | null;
   adminsList: AdminUser[];
-  loginWithGoogle: () => Promise<void>;
+  loginWithGoogle: (rememberMe?: boolean) => Promise<void>;
   logout: () => Promise<void>;
   logActivity: (actionType: UserActivity['actionType'], details: string) => Promise<void>;
   refreshAdmins: () => Promise<void>;
@@ -173,8 +173,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, [setRoleAndLoadAdmins, logActivity, loadUserAssignedOffice]);
 
-  const loginWithGoogle = async () => {
+  const loginWithGoogle = async (rememberMe = false) => {
     try {
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
       const result = await signInWithPopup(auth, googleProvider);
       const credential = GoogleAuthProvider.credentialFromResult(result);
       if (credential?.accessToken) {
@@ -254,7 +255,7 @@ const defaultAuthContext: AuthContextType = {
   isDataUpdater: false,
   role: null,
   adminsList: [],
-  loginWithGoogle: async () => {},
+  loginWithGoogle: async (rememberMe?: boolean) => {},
   logout: async () => {},
   logActivity: async () => {},
   refreshAdmins: async () => {},
