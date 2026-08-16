@@ -886,7 +886,6 @@ export const Overview: React.FC<OverviewProps> = ({
   const [showReportingOffices, setShowReportingOffices] = useState(false);
   const [showCategoryStatus, setShowCategoryStatus] = useState(false);
   const [activeExpandedModalCardId, setActiveExpandedModalCardId] = useState<string | null>(null);
-  const [modalSearchQuery, setModalSearchQuery] = useState('');
   const [modalCategoryFilter, setModalCategoryFilter] = useState('All');
 
   const [speechState, setSpeechState] = useState<ReturnType<typeof speechPlayer.getState>>(speechPlayer.getState());
@@ -2159,74 +2158,54 @@ export const Overview: React.FC<OverviewProps> = ({
                        </p>
                      </div>
 
-                     {/* Indicator list inside expanded modal */}
-                     <div className="space-y-3">
-                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                         <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
-                           {language === 'en' ? 'Complete System Indicators' : 'सबै सूचकहरूको पूर्ण विवरण'} ({indicators.length})
-                         </h4>
-                         <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
-                           <Search size={14} className="text-slate-400" />
-                           <input
-                             type="text"
-                             value={modalSearchQuery}
-                             onChange={(e) => setModalSearchQuery(e.target.value)}
-                             placeholder={language === 'en' ? 'Search indicators...' : 'सूचकहरू खोज्नुहोस्...'}
-                             className="w-full sm:w-48 bg-transparent text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none"
-                           />
-                         </div>
-                       </div>
+                      {/* Navigation to other cards */}
+                      <div className="space-y-3 pt-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveExpandedModalCardId('detailed-gallery');
+                              toggleCard(setShowReportingOffices, showReportingOffices);
+                            }}
+                            className="flex items-center gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all text-left"
+                          >
+                            <span className="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
+                              <ImageIcon size={18} />
+                            </span>
+                            <div>
+                              <span className="text-xs font-black text-slate-900 dark:text-slate-100 block">
+                                {language === 'en' ? 'Detailed Gallery' : 'विस्तृत ग्यालेरी'}
+                              </span>
+                              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                {language === 'en' ? 'Full indicators view' : 'पूर्ण सूचक अवलोकन'}
+                              </span>
+                            </div>
+                          </button>
 
-                       <div className="divide-y divide-slate-100 dark:divide-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden max-h-[450px] overflow-y-auto">
-                         {indicators
-                           .filter((ind) => {
-                             if (!ind) return false;
-                             if (!modalSearchQuery) return true;
-                             const q = modalSearchQuery.toLowerCase();
-                             return (
-                               (ind.name || '').toLowerCase().includes(q) ||
-                               (ind.nameEn || '').toLowerCase().includes(q) ||
-                               (ind.category || '').toLowerCase().includes(q)
-                             );
-                           })
-                           .map((ind) => {
-                             if (!ind) return null;
-                             const pct = ind.annualTarget > 0 ? Math.min(100, Math.round((ind.annualProgress / ind.annualTarget) * 100)) : 0;
-                             return (
-                               <div
-                                 key={ind.id}
-                                 onClick={() => handleIndicatorAction(ind, 'click')}
-                                 className="p-3 bg-white dark:bg-slate-900 flex items-center justify-between gap-3 hover:bg-indigo-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
-                               >
-                                 <div className="min-w-0 flex-1">
-                                   <p className="text-xs font-black text-slate-800 dark:text-slate-200 truncate">
-                                     {language === 'en' ? ind.nameEn || ind.name : ind.name}
-                                   </p>
-                                   <div className="flex flex-wrap items-center gap-2 mt-0.5 text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
-                                     <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-bold text-slate-600 dark:text-slate-300">
-                                       {translateCategory(ind.category)}
-                                     </span>
-                                     <span>
-                                       {translateUnit(ind.unit)} • {language === 'en' ? 'Target:' : 'लक्ष्य:'} {fmt(ind.annualTarget)} | {language === 'en' ? 'Progress:' : 'प्रगति:'} {fmt(ind.annualProgress)}
-                                     </span>
-                                   </div>
-                                 </div>
-                                 <div className="flex items-center gap-2 shrink-0 text-right">
-                                   <div>
-                                     <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 block">{pct}%</span>
-                                     <span className="text-[10px] font-bold text-slate-400">{ind.weight || 0}% {language === 'en' ? 'Weight' : 'भार'}</span>
-                                   </div>
-                                   <div className="w-16 bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden hidden sm:block">
-                                     <div className="bg-indigo-600 h-full rounded-full" style={{ width: `${pct}%` }} />
-                                   </div>
-                                 </div>
-                               </div>
-                             );
-                           })}
-                       </div>
-                     </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveExpandedModalCardId('reporting-offices');
+                              toggleCard(setShowReportingOffices, showReportingOffices);
+                            }}
+                            className="flex items-center gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all text-left"
+                          >
+                            <span className="p-2 rounded-xl bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300">
+                              <Building2 size={18} />
+                            </span>
+                            <div>
+                              <span className="text-xs font-black text-slate-900 dark:text-slate-100 block">
+                                {language === 'en' ? 'Reporting Offices' : 'रिपोर्टिङ कार्यालयहरू'}
+                              </span>
+                              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                {language === 'en' ? 'Office breakdown' : 'कार्यालय विवरण'}
+                              </span>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
 
-                      {/* Reporting Field Offices Section in Card 0 Modal */}
+                       {/* Reporting Field Offices Section in Card 0 Modal */}
                       <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800">
                         <div className="flex items-center justify-between">
                           <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
