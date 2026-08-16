@@ -1383,30 +1383,33 @@ export const Overview: React.FC<OverviewProps> = ({
           transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
           className="dashboard-cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 pb-10 sm:pb-16"
         >
-          <AnimatePresence>
+           <AnimatePresence mode="popLayout">
 
-{/* Card 0: Overall Progress Performance */}
-{!dismissedCards.has('overall-progress') && (
-  <motion.div
-    key="overall-progress"
-    initial={{ opacity: 0, scale: 0.95 }}
-    exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
-    transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
-    className="w-full col-span-1 md:col-span-2 xl:col-span-3 mb-2 sm:mb-3"
-  >
-    <SwipeableCard cardId="overall-progress" onDismiss={() => handleDismissCard('overall-progress')}>
-      <motion.div
-        role="button"
-        tabIndex={0}
-        initial={{ opacity: 0, scale: 0.95 }}
-        exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        whileHover={{ scale: 1.01 }}
-        onClick={() => {
+          {/* Card 0: Overall Progress Performance */}
+          {!dismissedCards.has('overall-progress') && (
+            <motion.div
+              key="overall-progress"
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
+              transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
+              className="w-full col-span-1 md:col-span-2 xl:col-span-3 mb-2 sm:mb-3"
+            >
+              <SwipeableCard cardId="overall-progress" onDismiss={() => handleDismissCard('overall-progress')}>
+                <motion.div
+                  role="button"
+                  tabIndex={0}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  whileHover={{ scale: 1.01 }}
+                  onClick={() => {
           setActiveExpandedModalCardId('overall-progress');
           toggleCard(setShowOverallProgress, showOverallProgress);
         }}
-         className="group relative w-full cursor-pointer bg-gradient-to-br from-indigo-50/90 via-white to-slate-50 dark:from-indigo-900/90 dark:via-slate-900 dark:to-indigo-950 text-slate-900 dark:text-white rounded-[28px] p-3 sm:p-4 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-indigo-200/80 dark:border-indigo-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex flex-col justify-between overflow-hidden hover:-translate-y-1"
+         className="group relative w-full cursor-pointer bg-gradient-to-br from-indigo-100 via-indigo-50 to-slate-100 dark:from-indigo-900/60 dark:via-indigo-950/40 dark:to-slate-900 text-slate-900 dark:text-white rounded-[28px] p-3 sm:p-4 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-indigo-200 dark:border-indigo-700/50 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex flex-col justify-between overflow-hidden hover:-translate-y-1"
       >
         <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col justify-between h-full gap-2 sm:gap-3">
@@ -1532,19 +1535,22 @@ export const Overview: React.FC<OverviewProps> = ({
 
 {/* Card 1: Category Status */}
 {!dismissedCards.has('category-status') && (
-  <motion.div
-    key="category-status"
-    initial={{ opacity: 0, scale: 0.95 }}
-    exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
-    transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
-    className="w-full"
-  >
-    <SwipeableCard cardId="category-status" onDismiss={() => handleDismissCard('category-status')}>
-      <motion.div
-        role="button"
-        tabIndex={0}
-        initial={{ opacity: 0, scale: 0.95 }}
-        exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+          <motion.div
+            key="category-status"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
+            transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
+            className="w-full"
+          >
+            <SwipeableCard cardId="category-status" onDismiss={() => handleDismissCard('category-status')}>
+              <motion.div
+                role="button"
+                tabIndex={0}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -1552,7 +1558,7 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('category-status');
           toggleCard(setShowCategoryStatus, showCategoryStatus);
          }}
-          className="group relative w-full cursor-pointer bg-gradient-to-br from-cyan-50/90 via-white to-slate-50 dark:from-cyan-900/90 dark:via-slate-900 dark:to-cyan-950 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-cyan-200/80 dark:border-cyan-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
+          className="group relative w-full cursor-pointer bg-gradient-to-br from-cyan-100 via-cyan-50 to-slate-100 dark:from-cyan-900/60 dark:via-cyan-950/40 dark:to-slate-900 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-cyan-200 dark:border-cyan-700/50 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 dark:bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -1579,19 +1585,22 @@ export const Overview: React.FC<OverviewProps> = ({
 
 {/* Card 2: Status Breakdown */}
 {!dismissedCards.has('status-breakdown') && (
-  <motion.div
-    key="status-breakdown"
-    initial={{ opacity: 0, scale: 0.95 }}
-    exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
-    transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
-    className="w-full"
-  >
-    <SwipeableCard cardId="status-breakdown" onDismiss={() => handleDismissCard('status-breakdown')}>
-      <motion.div
-        role="button"
-        tabIndex={0}
-        initial={{ opacity: 0, scale: 0.95 }}
-        exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+          <motion.div
+            key="status-breakdown"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
+            transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
+            className="w-full"
+          >
+            <SwipeableCard cardId="status-breakdown" onDismiss={() => handleDismissCard('status-breakdown')}>
+              <motion.div
+                role="button"
+                tabIndex={0}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -1599,7 +1608,7 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('status-breakdown');
           toggleCard(setShowStatusDetails, showStatusDetails);
         }}
-          className="group relative w-full cursor-pointer bg-gradient-to-br from-amber-50/90 via-white to-slate-50 dark:from-amber-900/90 dark:via-slate-900 dark:to-amber-950 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-amber-200/80 dark:border-amber-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
+          className="group relative w-full cursor-pointer bg-gradient-to-br from-amber-100 via-amber-50 to-slate-100 dark:from-amber-900/60 dark:via-amber-950/40 dark:to-slate-900 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-amber-200 dark:border-amber-700/50 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -1626,24 +1635,27 @@ export const Overview: React.FC<OverviewProps> = ({
 
 {/* Card 7: Visual Insights */}
 {!dismissedCards.has('visual-insights') && (
-  <motion.div
-    key="visual-insights"
-    initial={{ opacity: 0, scale: 0.95 }}
-    exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
-    transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
-    className="w-full"
-  >
+          <motion.div
+            key="visual-insights"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
+            transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
+            className="w-full"
+          >
     <SwipeableCard cardId="visual-insights" onDismiss={() => handleDismissCard('visual-insights')}>
       <motion.div
         role="button"
         tabIndex={0}
         initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => onNavigateToView?.('insights')}
-          className="group relative w-full cursor-pointer bg-gradient-to-br from-purple-50/90 via-white to-slate-50 dark:from-purple-900/90 dark:via-slate-900 dark:to-purple-950 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-purple-200/80 dark:border-purple-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
+          className="group relative w-full cursor-pointer bg-gradient-to-br from-purple-100 via-purple-50 to-slate-100 dark:from-purple-900/60 dark:via-purple-950/40 dark:to-slate-900 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-purple-200 dark:border-purple-700/50 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-2 sm:gap-3 mb-1">
@@ -1670,19 +1682,22 @@ export const Overview: React.FC<OverviewProps> = ({
 
 {/* Card 5: Budget & Capital Expenditure */}
 {!dismissedCards.has('budget-card') && (
-  <motion.div
-    key="budget-card"
-    initial={{ opacity: 0, scale: 0.95 }}
-    exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
-    transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
-    className="w-full"
-  >
-    <SwipeableCard cardId="budget-card" onDismiss={() => handleDismissCard('budget-card')}>
-      <motion.div
-        role="button"
-        tabIndex={0}
-        initial={{ opacity: 0, scale: 0.95 }}
-        exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+          <motion.div
+            key="budget-card"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
+            transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
+            className="w-full"
+          >
+            <SwipeableCard cardId="budget-card" onDismiss={() => handleDismissCard('budget-card')}>
+              <motion.div
+                role="button"
+                tabIndex={0}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -1690,7 +1705,7 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('budget-card');
           toggleCard(setShowBudgetCard, showBudgetCard);
         }}
-          className="group relative w-full cursor-pointer bg-gradient-to-br from-blue-50/90 via-white to-slate-50 dark:from-blue-900/90 dark:via-slate-900 dark:to-blue-950 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-blue-200/80 dark:border-blue-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
+          className="group relative w-full cursor-pointer bg-gradient-to-br from-blue-100 via-blue-50 to-slate-100 dark:from-blue-900/60 dark:via-blue-950/40 dark:to-slate-900 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-blue-200 dark:border-blue-700/50 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -1717,19 +1732,22 @@ export const Overview: React.FC<OverviewProps> = ({
 
 {/* Card 6: Employment Creation */}
 {!dismissedCards.has('employment-card') && (
-  <motion.div
-    key="employment-card"
-    initial={{ opacity: 0, scale: 0.95 }}
-    exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
-    transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
-    className="w-full"
-  >
-    <SwipeableCard cardId="employment-card" onDismiss={() => handleDismissCard('employment-card')}>
-      <motion.div
-        role="button"
-        tabIndex={0}
-        initial={{ opacity: 0, scale: 0.95 }}
-        exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+          <motion.div
+            key="employment-card"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
+            transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
+            className="w-full"
+          >
+            <SwipeableCard cardId="employment-card" onDismiss={() => handleDismissCard('employment-card')}>
+              <motion.div
+                role="button"
+                tabIndex={0}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -1737,7 +1755,7 @@ export const Overview: React.FC<OverviewProps> = ({
           setActiveExpandedModalCardId('employment-card');
           toggleCard(setShowEmploymentCard, showEmploymentCard);
         }}
-          className="group relative w-full cursor-pointer bg-gradient-to-br from-teal-50/90 via-white to-slate-50 dark:from-teal-900/90 dark:via-slate-900 dark:to-teal-950 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-teal-200/80 dark:border-teal-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
+          className="group relative w-full cursor-pointer bg-gradient-to-br from-teal-100 via-teal-50 to-slate-100 dark:from-teal-900/60 dark:via-teal-950/40 dark:to-slate-900 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-teal-200 dark:border-teal-700/50 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/10 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -1764,24 +1782,27 @@ export const Overview: React.FC<OverviewProps> = ({
 
 {/* Card: Detailed Gallery */}
 {!dismissedCards.has('detailed-gallery') && (
-  <motion.div
-    key="detailed-gallery"
-    initial={{ opacity: 0, scale: 0.95 }}
-    exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
-    transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
-    className="w-full"
-  >
-    <SwipeableCard cardId="detailed-gallery" onDismiss={() => handleDismissCard('detailed-gallery')}>
-      <motion.div
-        role="button"
-        tabIndex={0}
-        initial={{ opacity: 0, scale: 0.95 }}
-        exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
+          <motion.div
+            key="detailed-gallery"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85, y: -20, transition: { duration: 0.22 } }}
+            transition={{ layout: { type: 'spring', stiffness: 220, damping: 24 } }}
+            className="w-full"
+          >
+            <SwipeableCard cardId="detailed-gallery" onDismiss={() => handleDismissCard('detailed-gallery')}>
+              <motion.div
+                role="button"
+                tabIndex={0}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, y: -20, x: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => onNavigateToView?.('detailed-gallery')}
-          className="group relative w-full cursor-pointer bg-gradient-to-br from-indigo-50/90 via-white to-slate-50 dark:from-indigo-900/90 dark:via-slate-900 dark:to-indigo-950 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-indigo-200/80 dark:border-indigo-500/30 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
+          className="group relative w-full cursor-pointer bg-gradient-to-br from-indigo-100 via-indigo-50 to-slate-100 dark:from-indigo-900/60 dark:via-indigo-950/40 dark:to-slate-900 text-slate-900 dark:text-white rounded-[28px] p-2.5 sm:p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_12px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.1),0_20px_48px_rgba(0,0,0,0.12)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_2px_4px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.4),0_20px_48px_rgba(0,0,0,0.5)] border border-indigo-200 dark:border-indigo-700/50 transition-all duration-300 min-h-[100px] sm:min-h-[140px] flex items-center justify-between hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-2 sm:gap-3 mb-2">

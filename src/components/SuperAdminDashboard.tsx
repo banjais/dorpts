@@ -178,45 +178,45 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
       value: analyticsData?.totalAdmins ?? totalAdmins,
       sublabel: language === 'en' ? 'Registered admins' : 'दर्ता प्रशासकहरू',
       color: 'text-slate-900 dark:text-white',
-      bgColor: 'bg-slate-50 dark:bg-slate-950',
-      borderColor: 'border-slate-100 dark:border-white/5',
-      icon: <Users size={20} className="text-slate-400" />,
+      bgColor: 'bg-slate-200 dark:bg-slate-800',
+      borderColor: 'border-slate-300 dark:border-slate-600',
+      icon: <Users size={20} className="text-slate-600 dark:text-slate-300" />,
     },
     {
       label: language === 'en' ? 'Active Sessions' : 'सक्रिय सत्रहरू',
       value: analyticsData?.activeSessions ?? 1,
       sublabel: language === 'en' ? 'Current session' : 'हालको सत्र',
-      color: 'text-emerald-600',
-      bgColor: 'bg-slate-50 dark:bg-slate-950',
-      borderColor: 'border-slate-100 dark:border-white/5',
-      icon: <Activity size={20} className="text-emerald-400" />,
+      color: 'text-emerald-800',
+      bgColor: 'bg-emerald-200 dark:bg-emerald-900/40',
+      borderColor: 'border-emerald-300 dark:border-emerald-700',
+      icon: <Activity size={20} className="text-emerald-700 dark:text-emerald-300" />,
     },
     {
       label: language === 'en' ? 'Superadmin' : 'सुपरप्रशासक',
       value: 1,
       sublabel: analyticsData?.superadminEmail ?? (user?.email || ''),
-      color: 'text-indigo-600',
-      bgColor: 'bg-slate-50 dark:bg-slate-950',
-      borderColor: 'border-slate-100 dark:border-white/5',
-      icon: <ShieldCheck size={20} className="text-indigo-400" />,
+      color: 'text-indigo-800',
+      bgColor: 'bg-indigo-200 dark:bg-indigo-900/40',
+      borderColor: 'border-indigo-300 dark:border-indigo-700',
+      icon: <ShieldCheck size={20} className="text-indigo-700 dark:text-indigo-300" />,
     },
     {
       label: language === 'en' ? "Today's Logins" : "आजको लगइनहरू",
       value: analyticsData?.todayLogins ?? 0,
       sublabel: language === 'en' ? 'Login events today' : 'आजको लगइन घटनाहरू',
       color: 'text-slate-900 dark:text-white',
-      bgColor: 'bg-slate-50 dark:bg-slate-950',
-      borderColor: 'border-slate-100 dark:border-white/5',
-      icon: <LogIn size={20} className="text-slate-400" />,
+      bgColor: 'bg-slate-200 dark:bg-slate-800',
+      borderColor: 'border-slate-300 dark:border-slate-600',
+      icon: <LogIn size={20} className="text-slate-600 dark:text-slate-300" />,
     },
     {
       label: language === 'en' ? "Today's Activities" : "आजको गतिविधिहरू",
       value: analyticsData?.todayActivities ?? 0,
       sublabel: language === 'en' ? 'Total events today' : 'आजको कुल घटनाहरू',
       color: 'text-slate-900 dark:text-white',
-      bgColor: 'bg-slate-50 dark:bg-slate-950',
-      borderColor: 'border-slate-100 dark:border-white/5',
-      icon: <BarChart3 size={20} className="text-slate-400" />,
+      bgColor: 'bg-slate-200 dark:bg-slate-800',
+      borderColor: 'border-slate-300 dark:border-slate-600',
+      icon: <BarChart3 size={20} className="text-slate-600 dark:text-slate-300" />,
     },
   ], [analyticsData, totalAdmins, user?.email, language]);
 
@@ -942,22 +942,20 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4">
                {language === 'en' ? 'Overview & Tracking' : 'सारांश र ट्र्याकिङ'}
              </h3>
-             <div
-               ref={analyticsCardRef}
-               className="relative w-full overflow-hidden rounded-2xl"
-               style={{ height: 'calc(100vh - 200px)' }}
-             >
                <div
-                 className="flex transition-transform duration-500 ease-out h-full"
-                 style={{ transform: `translateX(-${analyticsCardIndex * 100}%)` }}
+                 ref={analyticsCardRef}
+                 className="relative w-full overflow-hidden rounded-2xl h-[500px]"
                >
-                 {analyticsCards.map((card, idx) => (
-                   <div
-                     key={idx}
-                     className="w-full flex-shrink-0 px-2"
-                     style={{ height: '100%' }}
-                   >
-                     <div className={`${card.bgColor} rounded-2xl p-6 border ${card.borderColor} h-full flex flex-col justify-between`}>
+                <div
+                  className="flex transition-transform duration-500 ease-out h-full"
+                  style={{ transform: `translateX(-${analyticsCardIndex * 100}%)` }}
+                >
+                  {analyticsCards.map((card, idx) => (
+                    <div
+                      key={idx}
+                      className="w-full flex-shrink-0 px-2 h-full"
+                    >
+                      <div className={`${card.bgColor} rounded-2xl p-6 border ${card.borderColor} h-full flex flex-col justify-between`}>
                        <div>
                          <div className="flex items-center gap-3 mb-4">
                            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
