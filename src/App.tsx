@@ -284,23 +284,58 @@ function MainAppContent() {
   const layout = useDashboardLayout(dashboardWidth);
   useHaptic();
   const [needRefresh, setNeedRefresh] = useState(false);
+  const swRegistrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const { updateServiceWorker } = useRegisterSW({
-    // Check for new service worker every 60 seconds (prevents stale cache)
+    // Check for new service worker every 60 seconds
     intervalMS: 60 * 1000,
     onNeedRefresh: () => {
       setNeedRefresh(true);
-      // Auto-update after 3 seconds if user doesn't interact
+      // Auto-reload after 2 seconds to apply the update
       setTimeout(() => {
         updateServiceWorker(true);
-      }, 3000);
+      }, 2000);
     },
-    onRegisteredSW: (swUrl, registration) => {
-      // Force immediate update check on page load
+    onRegisteredSW: (_swUrl, registration) => {
       if (registration) {
+        swRegistrationRef.current = registration;
+        // Force immediate update check on page load
         registration.update();
       }
     },
   });
+
+  // Auto-reload when a new service worker takes control (covers all entry points)
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return;
+    const onControllerChange = () => {
+      // New SW activated — reload to get fresh content
+      window.location.reload();
+    };
+    navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
+
+    // Check for updates when user returns to the tab/app (covers PWA icon click, tab switch)
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && swRegistrationRef.current) {
+        swRegistrationRef.current.update();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    // Also check on window focus (covers alt-tab, mobile app switch)
+    const onFocus = () => {
+      if (swRegistrationRef.current) {
+        swRegistrationRef.current.update();
+      }
+    };
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, []);
+
 
   const { language, t, translateOffice, translateUnit } = useLanguage();
   const { accessToken, user, loading: authLoading, isAdmin, isSuperadmin, isDataUpdater, role, logout, refreshAdmins, adminsList, userAssignedOffice } = useAuth();

@@ -76,10 +76,10 @@ export default defineConfig(() => {
               handler: 'NetworkFirst',
               options: {
                 cacheName: 'critical-api-stats-cache',
-                networkTimeoutSeconds: 3,
+                networkTimeoutSeconds: 5,
                 expiration: {
                   maxEntries: 100,
-                  maxAgeSeconds: 60 * 60 * 24 * 14 // 14 days
+                  maxAgeSeconds: 60 * 60 * 24 // 1 day (was 14 days)
                 },
                 cacheableResponse: {
                   statuses: [0, 200]
@@ -88,19 +88,22 @@ export default defineConfig(() => {
             },
             {
               // Google Sheets published CSV feeds (Overall Weight Progress & Indicator stats)
+              // NetworkFirst: always fetch fresh data, only use cache when offline
               urlPattern: /^https:\/\/docs\.google\.com\/spreadsheets\/.*/i,
-              handler: 'StaleWhileRevalidate',
+              handler: 'NetworkFirst',
               options: {
                 cacheName: 'indicator-overall-weight-csv-cache',
+                networkTimeoutSeconds: 5,
                 expiration: {
                   maxEntries: 50,
-                  maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                  maxAgeSeconds: 60 * 60 * 24 // 1 day (was 30 days)
                 },
                 cacheableResponse: {
                   statuses: [0, 200]
                 }
               }
             },
+
             {
               urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*/i,
               handler: 'NetworkFirst',
@@ -108,7 +111,7 @@ export default defineConfig(() => {
                 cacheName: 'firestore-cache',
                 expiration: {
                   maxEntries: 100,
-                  maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                  maxAgeSeconds: 60 * 60 * 24 // 1 day (was 30 days)
                 },
                 cacheableResponse: {
                   statuses: [0, 200]
