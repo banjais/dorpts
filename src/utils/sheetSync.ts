@@ -149,7 +149,7 @@ export async function syncPublishedSheets(urls?: { dashboard?: string; offices?:
       const officeId = dashIdx !== -1 ? officeName.slice(0, dashIdx).trim() : (officeName.match(/^\d+/)?.[0] || '');
       const shortName = dashIdx !== -1 ? officeName.slice(dashIdx + 1).trim() : officeName;
 
-      if (!officeId || !shortName) continue;
+      if (!officeId || !/^\d+/.test(officeId) || !shortName) continue;
 
       let sumWeightedCompletion = 0;
       let totalWeightSum = 0;

@@ -375,7 +375,51 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
   }, [showChannelList]);
 
   return (
-    <div className="h-full flex flex-col md:flex-row rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900">
+    <div className="h-full flex flex-col rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900">
+      {/* Desktop Top Tabs */}
+      <div className="hidden md:flex items-center gap-1 px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+        <button
+          onClick={() => setSidebarSection('my-channels')}
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black transition-colors ${
+            sidebarSection === 'my-channels'
+              ? 'bg-indigo-600 text-white shadow-md'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+          }`}
+        >
+          <Hash size={14} />
+          <span>{language === 'en' ? 'My Channels' : 'मेरो च्यानलहरू'}</span>
+        </button>
+        <button
+          onClick={() => setSidebarSection('available')}
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black transition-colors ${
+            sidebarSection === 'available'
+              ? 'bg-indigo-600 text-white shadow-md'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+          }`}
+        >
+          <Users size={14} />
+          <span>{language === 'en' ? 'Discover' : 'अन्वेषण'}</span>
+        </button>
+        {currentUserRole === 'superadmin' && (
+          <button
+            onClick={() => setSidebarSection('requests')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black transition-colors relative ${
+              sidebarSection === 'requests'
+                ? 'bg-amber-500 text-white shadow-md'
+                : 'text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-500/20'
+            }`}
+          >
+            <Clock size={14} />
+            <span>{language === 'en' ? 'Requests' : 'अनुरोधहरू'}</span>
+            {pendingRequestsForUser.length > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 bg-rose-500 text-white text-[9px] font-black rounded-full">
+                {pendingRequestsForUser.length}
+              </span>
+            )}
+          </button>
+        )}
+      </div>
+
       {/* Mobile Header */}
       <div className="md:hidden flex items-center gap-2 px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
         <button
@@ -390,94 +434,14 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
             {language === 'en' ? 'Messaging' : 'मेसेजिङ'}
           </h3>
         </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setSidebarSection('my-channels')}
-            className={`p-2 rounded-lg transition-colors ${sidebarSection === 'my-channels' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' : 'text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-            title={language === 'en' ? 'My Channels' : 'मेरो च्यानलहरू'}
-          >
-            <Hash size={16} />
-          </button>
-          <button
-            onClick={() => setSidebarSection('available')}
-            className={`p-2 rounded-lg transition-colors ${sidebarSection === 'available' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' : 'text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-            title={language === 'en' ? 'Discover' : 'अन्वेषण'}
-          >
-            <Users size={16} />
-          </button>
-          {currentUserRole === 'superadmin' && (
-            <button
-              onClick={() => setSidebarSection('requests')}
-              className={`p-2 rounded-lg transition-colors relative ${sidebarSection === 'requests' ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300' : 'text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-500/20'}`}
-              title={language === 'en' ? `Requests (${pendingRequestsForUser.length})` : `अनुरोधहरू (${pendingRequestsForUser.length})`}
-            >
-              <Clock size={16} />
-              {pendingRequestsForUser.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">
-                  {pendingRequestsForUser.length}
-                </span>
-              )}
-            </button>
-          )}
-        </div>
       </div>
 
-      {/* Sidebar */}
-      <AnimatePresence>
-        {showChannelList && (
-          <motion.div
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -20, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            ref={sidebarRef}
-            className="fixed inset-0 z-50 md:relative md:inset-auto md:z-auto w-20 border-r border-slate-200 dark:border-slate-700 flex flex-col items-center py-3 gap-1.5 bg-slate-50 dark:bg-slate-800/50 md:bg-slate-50 dark:md:bg-slate-800/50"
-          >
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col md:flex-row min-w-0">
+        {/* Channel List Sidebar */}
+        <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700 flex flex-col bg-slate-50 dark:bg-slate-800/50">
             <div className="hidden md:flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white mb-1">
               <MessageSquare size={18} />
-            </div>
-
-            <div className="flex items-center gap-1 w-full px-2 justify-center">
-              <button
-                onClick={() => setSidebarSection('my-channels')}
-                className={`flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${
-                  sidebarSection === 'my-channels'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'
-                }`}
-                title={language === 'en' ? 'My Channels' : 'मेरो च्यानलहरू'}
-              >
-                <Hash size={18} />
-              </button>
-              <button
-                onClick={() => setSidebarSection('available')}
-                className={`flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${
-                  sidebarSection === 'available'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'
-                }`}
-                title={language === 'en' ? 'Discover' : 'अन्वेषण'}
-              >
-                <Users size={18} />
-              </button>
-              {currentUserRole === 'superadmin' && (
-                <button
-                  onClick={() => setSidebarSection('requests')}
-                  className={`flex items-center justify-center w-9 h-9 rounded-xl transition-colors relative ${
-                    sidebarSection === 'requests'
-                      ? 'bg-amber-500 text-white shadow-md'
-                      : 'text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-500/20'
-                  }`}
-                  title={language === 'en' ? `Requests (${pendingRequestsForUser.length})` : `अनुरोधहरू (${pendingRequestsForUser.length})`}
-                >
-                  <Clock size={18} />
-                  {pendingRequestsForUser.length > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">
-                      {pendingRequestsForUser.length}
-                    </span>
-                  )}
-                </button>
-              )}
             </div>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar w-full px-2 mt-1">
@@ -694,10 +658,8 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
                   </div>
                 )
               )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+             </div>
+           </div>
 
       {/* Chat Area */}
       <div className="flex-1 flex flex-col min-w-0">
@@ -910,5 +872,6 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
         )}
       </div>
     </div>
-  );
+  </div>
+);
 };

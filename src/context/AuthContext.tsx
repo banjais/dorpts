@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { User, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
+import { User, onAuthStateChanged, signInWithRedirect, getRedirectResult, signOut, GoogleAuthProvider, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../firebase';
 import { AdminUser, UserActivity } from '../types';
@@ -176,22 +176,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithGoogle = async (rememberMe = false) => {
     try {
       await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
-      const result = await signInWithPopup(auth, googleProvider);
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      if (credential?.accessToken) {
-        setAccessToken(credential.accessToken);
-      }
+      await signInWithRedirect(auth, googleProvider);
     } catch (error: any) {
       console.error('Login action encountered error:', error);
       const message = error?.message || error?.code || String(error);
-      const friendly = message.includes('popup')
-        ? 'Popup blocked. Please allow popups for this site.'
+      const friendly = message.includes('redirect')
+        ? 'Sign-in redirect failed.'
         : message.includes('auth/')
           ? message
           : 'Google sign-in failed.';
       throw new Error(friendly, { cause: error as Error });
     }
   };
+
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          if (credential?.accessToken) {
+            setAccessToken(credential.accessToken);
+          }
+        }
+      } catch (error) {
+        console.error('Redirect result error:', error);
+      }
+    };
+    handleRedirectResult();
+  }, []);
 
   const logout = async () => {
     try {

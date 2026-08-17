@@ -10,7 +10,7 @@ import { collection, getDocs, orderBy, query, limit, Timestamp, addDoc, doc, set
 import { db } from '../firebase';
 import { APP_VERSION } from '../constants/appTitles';
 import { fetchPublishedCsv, PUBLISHED_CSV_URLS } from '../utils/sheetSync';
-import { parseCSVLine } from '../data';
+import { parseCSVLine, translateOffice } from '../data';
 import { API_BASE } from '../utils/apiBase';
 import { MessagingCenter } from './MessagingCenter';
 import { UserLocationMap } from './UserLocationMap';
@@ -73,7 +73,7 @@ const OfficeDropdown: React.FC<{
         className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-left flex items-center justify-between"
       >
         <span className={value ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'}>
-          {value || (language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्')}
+          {value ? translateOffice(value, 'en') : (language === 'en' ? 'Select Office' : 'कार्यालय छान्नुहोस्')}
         </span>
         <ChevronDown size={14} className={`text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
@@ -91,7 +91,7 @@ const OfficeDropdown: React.FC<{
                 value === o.name ? 'bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'
               }`}
             >
-              {o.name}
+               {translateOffice(o.name, 'en')}
             </button>
           ))}
         </div>
@@ -791,9 +791,11 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
         const cols = parseCSVLine(lines[i]);
         if (cols.length > 1) {
           const name = cols[1]?.trim();
-          if (name && name !== 'Total' && name !== 'कुल' && name.length > 3) {
-            officeNames.push(name);
-          }
+          const dashIdx = name.indexOf('-');
+          const officeId = dashIdx !== -1 ? name.slice(0, dashIdx).trim() : (name.match(/^\d+/)?.[0] || '');
+          if (!name || name === 'Total' || name === 'कुल') continue;
+          if (!officeId || !/^\d+/.test(officeId)) continue;
+          officeNames.push(name);
         }
       }
       setDataInputSheetOffices(officeNames);
@@ -827,9 +829,11 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
         const cols = parseCSVLine(lines[i]);
         if (cols.length > 1) {
           const name = cols[1]?.trim();
-          if (name && name !== 'Total' && name !== 'कुल' && name.length > 3) {
-            officeNames.push(name);
-          }
+          const dashIdx = name.indexOf('-');
+          const officeId = dashIdx !== -1 ? name.slice(0, dashIdx).trim() : (name.match(/^\d+/)?.[0] || '');
+          if (!name || name === 'Total' || name === 'कुल') continue;
+          if (!officeId || !/^\d+/.test(officeId)) continue;
+          officeNames.push(name);
         }
       }
       setDataInputSheetOffices(officeNames);
@@ -1535,7 +1539,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ langua
                           u.role === 'system_admin' ? (language === 'en' ? 'System Admin' : 'सिस्टम प्रशासक') :
                           u.role === 'office_admin' ? (language === 'en' ? 'Office Admin' : 'कार्यालय प्रशासक') :
                           (language === 'en' ? 'Viewer' : 'दर्शक')}
-                         {u.office ? ` · ${u.office}` : ''}
+                          {u.office ? ` · ${translateOffice(u.office, 'en')}` : ''}
                        </div>
                     </div>
                     <div className="flex items-center gap-1">

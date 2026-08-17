@@ -7,7 +7,7 @@ import { AdminUser } from '../types';
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { getOfficeByEmail } from '../utils/officeDetector';
-import { DOR_OFFICES_LIST } from '../data';
+import { DOR_OFFICES_LIST, translateOffice } from '../data';
 
 interface AdminPanelModalProps {
   isOpen: boolean;
@@ -247,7 +247,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                           {u.office && (
                             <span className="text-[9px] text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-1 mt-0.5">
                               <Building2 size={9} className="shrink-0" />
-                              {u.office}
+                              {translateOffice(u.office, 'en')}
                             </span>
                           )}
                         </div>
@@ -300,7 +300,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
 
                   <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
                     {DOR_OFFICES_LIST.filter(office =>
-                      (language === 'en' ? office.name : office.name).toLowerCase().includes(officeSearch.toLowerCase())
+                      translateOffice(office.name, 'en').toLowerCase().includes(officeSearch.toLowerCase())
                     ).map((office, idx) => {
                       const assignedAdmin = adminsList.find(a => a.office === office.name);
                       return (
@@ -309,7 +309,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                             <Building2 size={14} className="text-slate-500 dark:text-slate-400" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate">{office.name}</p>
+                             <p className="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate">{translateOffice(office.name, 'en')}</p>
                             {assignedAdmin ? (
                               <span className="text-[9px] text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-1 mt-0.5">
                                 {assignedAdmin.email}

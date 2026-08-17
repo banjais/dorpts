@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ChevronLeft, ChevronRight, CalendarDays, Clock, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { translateOffice } from '../data';
 import { adToBs, formatBs, BSDate, toNepaliNumerals } from '../utils/bsDate';
 import { collection, query, where, onSnapshot, limit, Timestamp, orderBy } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -20,7 +21,7 @@ const BS_MONTHS_EN = ['Baisakh', 'Jestha', 'Ashadh', 'Shrawan', 'Bhadra', 'Ashwi
 const BS_MONTHS_NP = ['वैशाख', 'जेष्ठ', 'आषाढ', 'श्रावण', 'भाद्र', 'आश्विन', 'कार्तिक', 'मंसिर', 'पौष', 'माघ', 'फाल्गुन', 'चैत'];
 
 export const CalendarDeadlines: React.FC<{ language: 'en' | 'ne'; offices: Array<{ name: string }> }> = ({ language, offices = [] }) => {
-  const { t } = useLanguage();
+  const { t, translateOffice } = useLanguage();
   const [currentBsDate, setCurrentBsDate] = useState<BSDate>(() => adToBs(new Date()) || { year: 2081, month: 1, day: 1 });
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -220,7 +221,7 @@ export const CalendarDeadlines: React.FC<{ language: 'en' | 'ne'; offices: Array
                         {language === 'en' ? (deadline.titleEn || deadline.title) : deadline.title}
                       </div>
                       {deadline.office && (
-                        <div className="text-[10px] opacity-80 mt-0.5">{deadline.office}</div>
+                        <div className="text-[10px] opacity-80 mt-0.5">{translateOffice(deadline.office)}</div>
                       )}
                       <div className="text-[10px] opacity-70 mt-1">
                         {new Date(deadline.dueDate).toLocaleDateString(language === 'ne' ? 'ne-NP' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}

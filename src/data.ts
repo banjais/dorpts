@@ -78,7 +78,7 @@ export const OFFICE_ENGLISH_TRANSLATIONS: Record<string, string> = {
   '337014901-सडक, शिवपुर': '337014901-Shivapur Road Office',
   '337014901-सडक डिभिजन, शिवपुर': '337014901-Road Division, Shivapur',
   '337014902-हुलाकि राजमार्ग निर्देशनालय, योजना कार्यालय, शिवनगर, कपिलवस्तु': '337014902-Feeder Road Directorate, Project Office, Shivnagar, Kapilvastu',
-  '33701702-हुलाकी राजमार्ग निर्देशनालय, योजना कार्यालय, धनगढी , कैलाली': '33701702-Feeder Road Directorate, Project Office, Dhangadhi, Kailali',
+  '33701702-हुलाकी राजमार्ग निर्देशनालय, योजना कार्यालय, धनगढी, कैलाली': '33701702-Feeder Road Directorate, Project Office, Dhangadhi, Kailali',
   '337015001-सडक डिभिजन, पाल्पा': '337015001-Road Division, Palpa',
   '337015101-सालझण्डी-सन्धिखर्क-ढोरपाटन सडक योजना': '337015101-Saljhandi-Sandhikharka-Dhorpatan Road Project',
   '337015401-शहिद मार्ग सडक योजना': '337015401-Martyr Road Project',
@@ -122,8 +122,24 @@ export function translateOffice(name: string, language: 'en' | 'ne'): string {
   const normalized = name.replace(/सडक सडक/g, 'सडक डिभिजन');
   if (language === 'ne') return normalized;
 
-  if (OFFICE_ENGLISH_TRANSLATIONS[normalized]) return OFFICE_ENGLISH_TRANSLATIONS[normalized];
+  const trimmed = normalized.trim();
+  const normalizedForLookup = trimmed
+    .replace(/\s*,\s*/g, ', ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/-\s+/g, '-')
+    .replace(/\s+-/g, '-');
+
+  if (OFFICE_ENGLISH_TRANSLATIONS[normalizedForLookup]) return OFFICE_ENGLISH_TRANSLATIONS[normalizedForLookup];
+  if (OFFICE_ENGLISH_TRANSLATIONS[trimmed]) return OFFICE_ENGLISH_TRANSLATIONS[trimmed];
   if (OFFICE_ENGLISH_TRANSLATIONS[name]) return OFFICE_ENGLISH_TRANSLATIONS[name];
+
+  // Try without the numeric ID prefix (e.g. "337013516-हुलाकी राजमार्ग")
+  const idMatch = normalized.match(/^(\d+-\s*)?(.*)$/);
+  const withoutId = idMatch ? idMatch[2] : normalized;
+  const withoutIdTrimmed = withoutId.trim();
+  if (OFFICE_ENGLISH_TRANSLATIONS[withoutIdTrimmed]) {
+    return normalized.replace(withoutId, OFFICE_ENGLISH_TRANSLATIONS[withoutIdTrimmed]);
+  }
 
   let res = normalized;
   const dict: [RegExp, string][] = [
@@ -141,9 +157,10 @@ export function translateOffice(name: string, language: 'en' | 'ne'): string {
     [/गुणस्तर, अनुसन्धान तथा विकास केन्द्र/g, 'Quality, Research & Development Center'],
     [/काठमाण्डौ उपत्यका सडक विस्तार आयोजना/g, 'Kathmandu Valley Road Expansion Project'],
     [/हुलाकी राजमार्ग/g, 'Feeder Road (Hulaki Rajmarg)'],
+    [/हुलाकि राजमार्ग/g, 'Feeder Road (Hulaki Rajmarg)'],
     [/पुष्पलाल \(मध्य पहाडी\)/g, 'Pushpalal (Mid-Hills)'],
     [/मध्यपहाडी/g, 'Mid-Hills'],
-    [/काठमाडौ/g, 'Kathmandu'],
+    [/काठमाण्डौ/g, 'Kathmandu'],
     [/ललितपुर/g, 'Lalitpur'],
     [/भक्तपुर/g, 'Bhaktapur'],
     [/पोखरा/g, 'Pokhara'],
@@ -171,18 +188,48 @@ export function translateOffice(name: string, language: 'en' | 'ne'): string {
     [/घोराही/g, 'Ghorahi'],
     [/तुलशीपुर/g, 'Tulsipur'],
     [/पूर्बी/g, 'Eastern'],
-    [/पूर्वी/g, 'Eastern'],
     [/पश्चिम/g, 'Western'],
     [/उत्तर/g, 'Northern'],
     [/दक्षीण/g, 'Southern'],
-    [/दक्षिण/g, 'Southern'],
     [/खण्ड/g, 'Section'],
-    [/कार्यालय/g, 'Office']
+    [/कार्यालय/g, 'Office'],
+    // Additional patterns for remaining Nepali words
+    [/ब्यापारीक मार्ग/g, 'Trade Route'],
+    [/व्यापारीक मार्ग/g, 'Trade Route'],
+    [/सुधार/g, 'Improvement'],
+    [/विकास/g, 'Development'],
+    [/निर्माण/g, 'Construction'],
+    [/सुरुङ्ग/g, 'Tunnel'],
+    [/मार्ग/g, 'Road/Margin'],
+    [/यातायात/g, 'Traffic'],
+    [/सुरक्षा/g, 'Security'],
+    [/विद्युत/g, 'Electrical'],
+    [/जल/g, 'Water'],
+    [/ग्राउन्ड/g, 'Ground'],
+    [/ब्रिज/g, 'Bridge'],
+    [/सडक/g, 'Road'],
+    [/दुर्घटना/g, 'Accident'],
+    [/सुधार/g, 'Improvement'],
+    [/परिवहन/g, 'Transport'],
+    [/संधि/g, 'Border'],
+    [/खण्ड/g, 'Section'],
+    [/वडा/g, 'Ward'],
+    [/नगरपालिका/g, 'Municipality'],
+    [/गाउँपालिका/g, 'Rural Municipality'],
+    [/महानगरपालिका/g, 'Metropolitan City'],
+    [/जिला/g, 'District'],
+    [/प्रशासन/g, 'Administration'],
+    [/लड्दू/g, 'Laddoo'],
   ];
 
   dict.forEach(([regex, repl]) => {
     res = res.replace(regex, repl);
   });
+
+  // Final cleanup: strip any remaining Devanagari characters
+  res = res.replace(/[\u0900-\u097F]/g, '').trim();
+  if (res.endsWith('-')) res = res.slice(0, -1).trim();
+  if (res.endsWith(',')) res = res.slice(0, -1).trim();
 
   return res;
 }

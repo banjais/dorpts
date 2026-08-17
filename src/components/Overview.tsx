@@ -1158,6 +1158,10 @@ export const Overview: React.FC<OverviewProps> = ({
     });
 
     return (offices || [])
+      .filter((office) => {
+        const id = office.officeId || (office.name.match(/^\d+/)?.[0] || '');
+        return /^\d+/.test(id);
+      })
       .map((office) => {
         const avgCompletion = office.avgCompletion ?? 0;
         const emails = emailMap.get(office.name) || new Set<string>();

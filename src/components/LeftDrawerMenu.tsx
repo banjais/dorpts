@@ -72,7 +72,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       onClick: () => onNavigate('superadmin'),
       active: activeView === 'superadmin',
     }] : []),
-    {
+    ...(isSuperadmin ? [] : [{
       id: 'announcements',
       icon: <Megaphone size={18} />,
       labelEn: 'Announcements',
@@ -81,8 +81,8 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
         onNavigate('announcements');
         onClose();
       },
-    },
-    ...(isAdmin ? [{
+    }]),
+    ...(isAdmin && !isSuperadmin ? [{
       id: 'messaging',
       icon: <MessageSquare size={18} />,
       labelEn: 'Messages',

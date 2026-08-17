@@ -75,6 +75,7 @@ import { PWAInstallBanner } from "./components/PWAInstallBanner";
 import { OfflineStatusBar } from "./components/OfflineStatusBar";
 import { LoginScreen } from "./components/LoginScreen";
 import { SuperAdminDashboard } from "./components/SuperAdminDashboard";
+import { UserFeedbackView } from "./components/UserFeedbackView";
 import { AdminDashboard } from "./components/AdminDashboard";
 import { ViewerDashboard } from "./components/ViewerDashboard";
 import { SettingsPanelModal } from "./components/SettingsPanelModal";
@@ -891,11 +892,11 @@ function MainAppContent() {
           continue;
         }
 
-        const dashIdx = officeName.indexOf('-');
-        const officeId = dashIdx !== -1 ? officeName.slice(0, dashIdx).trim() : '';
+         const dashIdx = officeName.indexOf('-');
+        const officeId = dashIdx !== -1 ? officeName.slice(0, dashIdx).trim() : (officeName.match(/^\d+/)?.[0] || '');
         const shortName = dashIdx !== -1 ? officeName.slice(dashIdx + 1).trim() : officeName;
         
-        if (!officeId) continue;
+        if (!officeId || !/^\d+/.test(officeId)) continue;
 
         parsedOffices.push({ 
           name: officeName, 
@@ -2061,24 +2062,34 @@ function MainAppContent() {
       q,
       { includeMetadataChanges: true },
       (snap) => {
-        if (!snap.empty) {
+         if (!snap.empty) {
           const list: Indicator[] = [];
           const pending: Indicator[] = [];
           snap.forEach((d) => {
             const data = d.data() as Indicator;
+            const annualTarget = typeof data.annualTarget === 'number' && data.annualTarget > 0 ? data.annualTarget : (data.totalTarget || 0);
+            const annualProgress = typeof data.annualProgress === 'number' ? data.annualProgress : 0;
+            // Skip Firestore indicators whose progress values are all zero — these
+            // represent incomplete/blank rows that would overwrite good data.
+            if (annualTarget === 0 && annualProgress === 0) return;
             list.push(data);
             if (d.metadata.hasPendingWrites) {
               pending.push(data);
             }
           });
-          setIndicators(list);
-          setPendingWrites(pending);
+          // Only update if Firestore returned meaningful data
+          if (list.length > 0) {
+            setIndicators(list);
+            setPendingWrites(pending);
+          }
           try {
-            localStorage.setItem("dor_indicators_cache", JSON.stringify(list));
-            localStorage.setItem(
-              "dor_last_sync_timestamp",
-              new Date().toISOString(),
-            );
+            if (list.length > 0) {
+              localStorage.setItem("dor_indicators_cache", JSON.stringify(list));
+              localStorage.setItem(
+                "dor_last_sync_timestamp",
+                new Date().toISOString(),
+              );
+            }
           } catch (_) {
             // Suppress redundant log
           }
