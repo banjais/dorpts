@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { User, onAuthStateChanged, signInWithRedirect, getRedirectResult, signOut, GoogleAuthProvider, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../firebase';
@@ -9,6 +9,7 @@ import { SUPERADMIN_EMAIL } from '../config/superadmin';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  ready: boolean;
   isAdmin: boolean;
   isSuperadmin: boolean;
   isDataUpdater: boolean;
@@ -27,10 +28,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(false);
   const [role, setRole] = useState<'superadmin' | 'system_admin' | 'office_admin' | 'viewer' | null>(null);
   const [adminsList, setAdminsList] = useState<AdminUser[]>([]);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userAssignedOffice, setUserAssignedOffice] = useState<string | null>(null);
+  const loadingRef = useRef(false);
 
   const isSuperadmin = role === 'superadmin';
   const isAdmin = role === 'superadmin' || role === 'system_admin';
@@ -53,33 +56,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // suppress
     }
   }, [user]);
-
-   const lookupEmailRole = useCallback(async (email: string): Promise<'superadmin' | 'system_admin' | 'office_admin' | 'viewer'> => {
-      if (email === SUPERADMIN_EMAIL) return 'superadmin';
-      try {
-        const q = query(collection(db, 'users'), where('email', '==', email));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          const data = snap.docs[0].data();
-          const r = data.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
-          if (r === 'superadmin' || r === 'system_admin' || r === 'office_admin' || r === 'viewer') return r;
-        }
-      } catch {
-        // suppress
-      }
-      try {
-        const q = query(collection(db, 'admins'), where('email', '==', email));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          const data = snap.docs[0].data();
-          const r = data.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
-          if (r === 'superadmin' || r === 'system_admin' || r === 'office_admin' || r === 'viewer') return r;
-        }
-      } catch {
-        // suppress
-      }
-      return 'viewer';
-    }, []);
 
   const setRoleAndLoadAdmins = useCallback(async (newRole: 'superadmin' | 'system_admin' | 'office_admin' | 'viewer') => {
     setRole(newRole);
@@ -121,57 +97,79 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   }, []);
 
-  // Google auth state listener
+  const loadUserRole = useCallback(async (currentUser: User) => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    setReady(false);
+    try {
+      const adminRef = doc(db, 'admins', currentUser.uid);
+      const adminSnap = await getDoc(adminRef);
+      if (adminSnap.exists()) {
+        const val = adminSnap.data();
+        const detectedRole = val.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
+        await setRoleAndLoadAdmins(detectedRole);
+      } else if (currentUser.email === SUPERADMIN_EMAIL) {
+        await setDoc(adminRef, {
+          email: SUPERADMIN_EMAIL,
+          role: 'superadmin',
+          createdAt: serverTimestamp(),
+        });
+        await setRoleAndLoadAdmins('superadmin');
+        await logActivity('role_change', `Bootstrapped ${SUPERADMIN_EMAIL} as Initial Superadmin`);
+      } else {
+        try {
+          const q = query(collection(db, 'admins'), where('email', '==', currentUser.email));
+          const emailSnap = await getDocs(q);
+          if (!emailSnap.empty) {
+            const val = emailSnap.docs[0].data();
+            const detectedRole = val.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
+            await setRoleAndLoadAdmins(detectedRole);
+          } else {
+            await setRoleAndLoadAdmins('viewer');
+          }
+        } catch {
+          await setRoleAndLoadAdmins('viewer');
+        }
+      }
+      const assignedOffice = await loadUserAssignedOffice(currentUser.email);
+      setUserAssignedOffice(assignedOffice);
+      await logActivity('login', `Google login: ${currentUser.email}`);
+    } catch {
+      await setRoleAndLoadAdmins('viewer');
+    } finally {
+      setReady(true);
+      setLoading(false);
+      loadingRef.current = false;
+    }
+  }, [setRoleAndLoadAdmins, logActivity, loadUserAssignedOffice]);
+
+  // Google auth state listener - keep it lightweight
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        try {
-           const adminRef = doc(db, 'admins', currentUser.uid);
-           const adminSnap = await getDoc(adminRef);
-           if (adminSnap.exists()) {
-             const val = adminSnap.data();
-              const detectedRole = val.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
-              await setRoleAndLoadAdmins(detectedRole);
-            } else if (currentUser.email === SUPERADMIN_EMAIL) {
-              await setDoc(adminRef, {
-                email: SUPERADMIN_EMAIL,
-                role: 'superadmin',
-                createdAt: serverTimestamp(),
-              });
-              await setRoleAndLoadAdmins('superadmin');
-             await logActivity('role_change', `Bootstrapped ${SUPERADMIN_EMAIL} as Initial Superadmin`);
-           } else {
-             try {
-               const q = query(collection(db, 'admins'), where('email', '==', currentUser.email));
-               const emailSnap = await getDocs(q);
-               if (!emailSnap.empty) {
-                 const val = emailSnap.docs[0].data();
-                  const detectedRole = val.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
-                  await setRoleAndLoadAdmins(detectedRole);
-               } else {
-                 await setRoleAndLoadAdmins('viewer');
-               }
-             } catch {
-               await setRoleAndLoadAdmins('viewer');
-             }
-           }
-          const assignedOffice = await loadUserAssignedOffice(currentUser.email);
-          setUserAssignedOffice(assignedOffice);
-          await logActivity('login', `Google login: ${currentUser.email}`);
-        } catch {
-          await setRoleAndLoadAdmins('viewer');
-        }
       } else {
         setUser(null);
         setRole(null);
         setAccessToken(null);
         setAdminsList([]);
+        setUserAssignedOffice(null);
+        setReady(true);
+        setLoading(false);
       }
-      setLoading(false);
     });
     return unsubscribe;
-  }, [setRoleAndLoadAdmins, logActivity, loadUserAssignedOffice]);
+  }, []);
+
+  // Load role data when user changes
+  useEffect(() => {
+    if (user) {
+      loadUserRole(user);
+    } else {
+      setReady(true);
+      setLoading(false);
+    }
+  }, [user, loadUserRole]);
 
   const loginWithGoogle = async (rememberMe = false) => {
     try {
@@ -243,6 +241,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider value={{
       user,
       loading,
+      ready,
       isAdmin,
       isSuperadmin,
       isDataUpdater,
@@ -263,6 +262,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 const defaultAuthContext: AuthContextType = {
   user: null,
   loading: false,
+  ready: true,
   isAdmin: false,
   isSuperadmin: false,
   isDataUpdater: false,

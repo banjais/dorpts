@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 
 export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
   const { language } = useLanguage();
-  const { loginWithGoogle, loading } = useAuth();
+  const { loginWithGoogle } = useAuth();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -72,7 +72,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
             <button
               type="button"
               onClick={handleGoogleLogin}
-              disabled={isLoading || loading}
+              disabled={isLoading}
               className="w-full py-3 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-600 text-slate-700 dark:text-slate-200 text-sm font-bold rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <Chrome className="w-5 h-5 text-red-500" />

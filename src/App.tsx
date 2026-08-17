@@ -339,7 +339,7 @@ function MainAppContent() {
 
 
   const { language, t, translateOffice, translateUnit } = useLanguage();
-  const { accessToken, user, loading: authLoading, isAdmin, isSuperadmin, isDataUpdater, role, logout, refreshAdmins, adminsList, userAssignedOffice } = useAuth();
+  const { accessToken, user, loading: authLoading, ready: authReady, isAdmin, isSuperadmin, isDataUpdater, role, logout, refreshAdmins, adminsList, userAssignedOffice } = useAuth();
 
   const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -349,21 +349,6 @@ function MainAppContent() {
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminRole, setNewAdminRole] = useState<'system_admin' | 'office_admin'>('system_admin');
   const [isSavingSettings, setIsSavingSettings] = useState(false);
-
-  // Role-based routing: redirect to appropriate dashboard on login
-  useEffect(() => {
-    if (!user) return;
-    const targetView = isSuperadmin ? 'superadmin' : isAdmin ? 'admin' : 'viewer';
-    if (mainView === 'dashboard' || mainView === 'superadmin' || mainView === 'admin' || mainView === 'viewer') {
-      handleMainViewChange(targetView);
-    }
-  }, [user, isSuperadmin, isAdmin]);
-
-  useEffect(() => {
-    if (user && showLogin) {
-      setShowLogin(false);
-    }
-  }, [user, showLogin]);
 
   const [pwaDismissed, setPwaDismissed] = useState(() => sessionStorage.getItem('pwa-update-dismissed') === 'true');
 
@@ -1457,8 +1442,23 @@ function MainAppContent() {
          setTimeout(() => {
            try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
          }, 50);
-       }
+        }
     }, [mainView]);
+
+  // Role-based routing: redirect to appropriate dashboard on login
+  useEffect(() => {
+    if (!user || !authReady) return;
+    const targetView = isSuperadmin ? 'superadmin' : isAdmin ? 'admin' : 'viewer';
+    if (mainView === 'dashboard' || mainView === 'superadmin' || mainView === 'admin' || mainView === 'viewer') {
+      handleMainViewChange(targetView);
+    }
+  }, [user, isSuperadmin, isAdmin, authReady, mainView, handleMainViewChange]);
+
+  useEffect(() => {
+    if (user && authReady && showLogin) {
+      setShowLogin(false);
+    }
+  }, [user, authReady, showLogin]);
 
   const goToIndicators = useCallback(() => {
     setMainView('dashboard');
@@ -3235,33 +3235,33 @@ function MainAppContent() {
               >
 
               <AnimatePresence mode="wait">
-               {authLoading ? (
+                {!authReady ? (
+                  <motion.div
+                    key="auth-loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex items-center justify-center min-h-[50vh]"
+                  >
+                    <div className="text-center space-y-3">
+                      <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                      <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                        {language === 'en' ? 'Signing in...' : 'साइन इन हुँदै...'}
+                      </p>
+                    </div>
+                  </motion.div>
+                ) : loading ? (
                  <motion.div
-                   key="auth-loading"
+                   key="loading"
                    initial={{ opacity: 0 }}
                    animate={{ opacity: 1 }}
                    exit={{ opacity: 0 }}
                    transition={{ duration: 0.3 }}
-                   className="flex items-center justify-center min-h-[50vh]"
                  >
-                   <div className="text-center space-y-3">
-                     <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                     <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                       {language === 'en' ? 'Signing in...' : 'साइन इन हुँदै...'}
-                     </p>
-                   </div>
+                   <LoadingSkeleton />
                  </motion.div>
-               ) : loading ? (
-                <motion.div
-                  key="loading"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <LoadingSkeleton />
-                </motion.div>
-              ) : !isOnline && !dismissedOfflineDashboard ? (
+               ) : !isOnline && !dismissedOfflineDashboard ? (
                 <motion.div
                   key="offline-dashboard"
                   initial={{ opacity: 0, scale: 0.98 }}
