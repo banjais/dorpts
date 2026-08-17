@@ -872,7 +872,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
       </div>
 
       {/* Indicator Grid */}
-      {filteredIndicators.length === 0 ? (
+      {!expandedId && filteredIndicators.length === 0 ? (
         <div className="text-center py-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
           <div className="p-3 bg-slate-100 dark:bg-slate-800 inline-block rounded-full mb-3">
             <Filter className="text-slate-400" size={24} />
@@ -917,6 +917,171 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
           </AnimatePresence>
         </div>
       )}
+
+      {/* Full-screen expanded card modal - hides all other cards */}
+      <AnimatePresence>
+        {expandedId && (() => {
+          const expandedIndicator = indicators.find(ind => ind.id === expandedId);
+          if (!expandedIndicator) return null;
+          const pct = expandedIndicator.annualTarget > 0 ? Math.min(100, Math.round((expandedIndicator.annualProgress / expandedIndicator.annualTarget) * 100)) : 0;
+          const status = getStatusBadge(pct, t);
+          const sparkline = getSparklineData(expandedIndicator.id, expandedIndicator.annualProgress, expandedIndicator.annualTarget, metadata?.lastUpdateDate);
+          const catColor = getCategoryColor(expandedIndicator.category);
+          const weight = expandedIndicator.weight || 0;
+          const trendDirection = sparkline.length >= 2 ? sparkline[sparkline.length - 1].value - sparkline[0].value : 0;
+          const isTrendUp = trendDirection > 0;
+          const isTrendDown = trendDirection < 0;
+          return (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9990] bg-white dark:bg-slate-900 overflow-y-auto"
+              onClick={() => setExpandedId(null)}
+            >
+              <div className="sticky top-0 z-20 flex items-center justify-between p-3 sm:p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <span className="p-2 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-xl border border-indigo-200 dark:border-indigo-500/30">
+                    <TrendingUp size={18} className="text-indigo-600 dark:text-indigo-400" />
+                  </span>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {language === 'en' ? expandedIndicator.nameEn : expandedIndicator.name}
+                    </h2>
+                    <span className="text-[10px] sm:text-xs font-extrabold text-indigo-600 dark:text-indigo-300 uppercase tracking-widest">
+                      {normalizeCategory(expandedIndicator.category).split(' ')[0]}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setExpandedId(null)}
+                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-4 sm:p-6 max-w-4xl mx-auto">
+                <div className="flex items-end justify-between gap-4 mb-6">
+                  <div>
+                    <div className="text-5xl sm:text-6xl font-black text-slate-900 dark:text-white leading-none">
+                      {language === 'ne' ? toNepaliNumerals(pct.toString()) : pct}%
+                    </div>
+                    <div className="flex items-center gap-3 mt-2">
+                      <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                        {language === 'en' ? 'Weight' : 'भार'}: {language === 'ne' ? toNepaliNumerals(weight.toString()) : weight}%
+                      </span>
+                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                        {fmt(expandedIndicator.annualProgress?.toLocaleString() ?? 0)} / {fmt(expandedIndicator.annualTarget?.toLocaleString() ?? 0)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {isTrendUp && <TrendingUp size={20} className="text-emerald-500" />}
+                    {isTrendDown && <TrendingDown size={20} className="text-rose-500" />}
+                    <span className={`text-xs font-black px-3 py-1.5 rounded-full ${status.className}`}>
+                      {status.label}
+                    </span>
+                  </div>
+                </div>
+                <div className="h-[200px] sm:h-[250px] w-full mb-6">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={sparkline} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                      <defs>
+                        <linearGradient id={`grad-expanded-${expandedIndicator.id}`} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={catColor.hex} stopOpacity={0.3} />
+                          <stop offset="95%" stopColor={catColor.hex} stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                      <XAxis dataKey="date" stroke="#94a3b8" fontSize={10} fontWeight={600} />
+                      <YAxis domain={[0, 100]} stroke="#94a3b8" fontSize={10} fontWeight={600} />
+                      <RechartsTooltip content={<CustomSparklineTooltip language={language} />} />
+                      <Area type="monotone" dataKey="value" stroke={catColor.hex} strokeWidth={2} fill={`url(#grad-expanded-${expandedIndicator.id})`} dot={{ r: 4, fill: catColor.hex, strokeWidth: 0 }} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                      {language === 'en' ? 'Target vs Progress' : 'लक्ष्य र प्रगति'}
+                    </span>
+                    <span className={`text-sm font-black ${pct >= 60 ? 'text-emerald-600' : pct >= 40 ? 'text-amber-600' : 'text-rose-600'}`}>
+                      {fmt(pct)}%
+                    </span>
+                  </div>
+                  <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ backgroundColor: catColor.hex }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min(pct, 100)}%` }}
+                      transition={{ duration: 0.8, ease: 'easeOut' }}
+                    />
+                  </div>
+                  <div className="flex justify-between mt-2">
+                    <span className="text-xs font-bold text-slate-500 dark:text-slate-300">
+                      {language === 'en' ? 'Target' : 'लक्ष्य'}: {fmt(expandedIndicator.annualTarget?.toLocaleString() ?? 0)}
+                    </span>
+                    <span className="text-xs font-bold text-slate-500 dark:text-slate-300">
+                      {language === 'en' ? 'Progress' : 'प्रगति'}: {fmt(expandedIndicator.annualProgress?.toLocaleString() ?? 0)}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                  {onViewHistory && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onViewHistory(expandedIndicator);
+                        triggerHaptic('light');
+                      }}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 transition-all text-xs font-bold"
+                    >
+                      <Clock size={14} />
+                      {language === 'en' ? 'History' : 'इतिहास'}
+                    </button>
+                  )}
+                  {onOpenComments && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenComments(expandedIndicator);
+                        triggerHaptic('light');
+                      }}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 transition-all text-xs font-bold"
+                    >
+                      <MessageSquare size={14} />
+                      {language === 'en' ? 'Comments' : 'टिप्पणीहरू'}
+                    </button>
+                  )}
+                  {isAdmin && onIndicatorClick && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onIndicatorClick(expandedIndicator);
+                        triggerHaptic('light');
+                      }}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-all text-xs font-bold"
+                    >
+                      <Edit3 size={14} />
+                      {language === 'en' ? 'Edit' : 'सम्पादन'}
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center justify-center gap-2 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 dark:text-slate-500 font-semibold">
+                  <Calendar size={12} />
+                  <span>
+                    {expandedIndicator.updatedAt
+                      ? formatNepaliDate(expandedIndicator.updatedAt, language === 'ne' ? 'np' : 'en')
+                      : '—'}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
 
       {/* Modals */}
       <StatusBreakdownModal

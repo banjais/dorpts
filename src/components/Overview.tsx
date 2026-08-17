@@ -2001,24 +2001,24 @@ export const Overview: React.FC<OverviewProps> = ({
          defaultTab="indicators"
        />
 
-         {/* Device-Adaptive Modal Overlay for Card Expansion with Reduce Option */}
-         <AnimatePresence>
-           {activeExpandedModalCardId && (
-             <motion.div
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               exit={{ opacity: 0 }}
-               className="fixed inset-0 z-[9990] flex items-start justify-center bg-slate-950/30 md:bg-slate-950/80 backdrop-blur-sm md:backdrop-blur-md p-2 sm:p-3 md:p-6 overflow-y-auto"
-               onClick={() => setActiveExpandedModalCardId(null)}
-             >
-               <motion.div
-                 initial={{ scale: 0.93, opacity: 0, y: 15 }}
-                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                 exit={{ scale: 0.93, opacity: 0, y: 15 }}
-                 transition={{ type: 'spring', damping: 25, stiffness: 280 }}
-                 onClick={(e) => e.stopPropagation()}
-                 className="relative w-full max-w-4xl max-h-[70dvh] sm:max-h-[80dvh] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col mt-4 sm:mt-6 md:mt-8"
-               >
+          {/* Device-Adaptive Modal Overlay for Card Expansion with Reduce Option */}
+          <AnimatePresence>
+            {activeExpandedModalCardId && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[9990] flex items-start justify-center bg-slate-950 dark:bg-slate-950 p-0 sm:p-3 md:p-6 overflow-y-auto"
+                onClick={() => setActiveExpandedModalCardId(null)}
+              >
+                <motion.div
+                  initial={{ scale: 0.93, opacity: 0, y: 15 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.93, opacity: 0, y: 15 }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 280 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="relative w-full max-w-4xl max-h-[100dvh] sm:max-h-[90dvh] md:max-h-[80dvh] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col mt-0 sm:mt-4 md:mt-8"
+                >
                 {/* Sticky Header with Title and Prominent REDUCE option */}
                 <div className="sticky top-0 z-20 flex items-center justify-between p-2.5 sm:p-3 md:p-5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/80">
                   <div className="flex items-center gap-3">

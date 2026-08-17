@@ -286,25 +286,55 @@ function MainAppContent() {
   useHaptic();
   const [needRefresh, setNeedRefresh] = useState(false);
   const swRegistrationRef = useRef<ServiceWorkerRegistration | null>(null);
+  // Service worker update handling (vite-plugin-pwa handles registration automatically)
+  // Auto-reload after 2 seconds to apply the update
   const { updateServiceWorker } = useRegisterSW({
     intervalMS: 60 * 1000,
-    onNeedReload: () => {
+    onNeedRefresh: () => {
       setNeedRefresh(true);
+      setTimeout(() => {
+        updateServiceWorker(true);
+      }, 2000);
     },
     onRegisteredSW: (_swUrl, registration) => {
       if (registration) {
         swRegistrationRef.current = registration;
+        registration.update();
       }
     },
   });
 
-  // Service worker update handling (vite-plugin-pwa handles registration automatically)
-  // Need-refresh prompt is shown via Footer; we avoid auto-reload on controllerchange
-  // because that interferes with redirect-based login and can cause reload loops.
+  // Auto-reload when a new service worker takes control (covers all entry points)
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return;
+    const onControllerChange = () => {
+      window.location.reload();
+    };
+    navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
 
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && swRegistrationRef.current) {
+        swRegistrationRef.current.update();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    const onFocus = () => {
+      if (swRegistrationRef.current) {
+        swRegistrationRef.current.update();
+      }
+    };
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, []);
 
   const { language, t, translateOffice, translateUnit } = useLanguage();
-  const { accessToken, user, loading: authLoading, ready: authReady, isAdmin, isSuperadmin, isDataUpdater, role, logout, refreshAdmins, adminsList, userAssignedOffice } = useAuth();
+  const { accessToken, user, loading: authLoading, isAdmin, isSuperadmin, isDataUpdater, role, logout, refreshAdmins, adminsList, userAssignedOffice } = useAuth();
 
   const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -1412,18 +1442,18 @@ function MainAppContent() {
 
   // Role-based routing: redirect to appropriate dashboard on login
   useEffect(() => {
-    if (!user || !authReady) return;
+    if (!user || authLoading) return;
     const targetView = isSuperadmin ? 'superadmin' : isAdmin ? 'admin' : 'viewer';
     if (mainView === 'dashboard' || mainView === 'superadmin' || mainView === 'admin' || mainView === 'viewer') {
       handleMainViewChange(targetView);
     }
-  }, [user, isSuperadmin, isAdmin, authReady, mainView, handleMainViewChange]);
+  }, [user, isSuperadmin, isAdmin, authLoading, mainView, handleMainViewChange]);
 
   useEffect(() => {
-    if (user && authReady && showLogin) {
+    if (user && !authLoading && showLogin) {
       setShowLogin(false);
     }
-  }, [user, authReady, showLogin]);
+  }, [user, authLoading, showLogin]);
 
   const goToIndicators = useCallback(() => {
     setMainView('dashboard');
@@ -3200,7 +3230,7 @@ function MainAppContent() {
               >
 
               <AnimatePresence mode="wait">
-                {!authReady ? (
+                {authLoading ? (
                   <motion.div
                     key="auth-loading"
                     initial={{ opacity: 0 }}
