@@ -291,10 +291,6 @@ function MainAppContent() {
     intervalMS: 60 * 1000,
     onNeedRefresh: () => {
       setNeedRefresh(true);
-      // Auto-reload after 2 seconds to apply the update
-      setTimeout(() => {
-        updateServiceWorker(true);
-      }, 2000);
     },
     onRegisteredSW: (_swUrl, registration) => {
       if (registration) {
