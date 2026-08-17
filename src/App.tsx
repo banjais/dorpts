@@ -287,9 +287,8 @@ function MainAppContent() {
   const [needRefresh, setNeedRefresh] = useState(false);
   const swRegistrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const { updateServiceWorker } = useRegisterSW({
-    // Check for new service worker every 60 seconds
     intervalMS: 60 * 1000,
-    onNeedRefresh: () => {
+    onNeedReload: () => {
       setNeedRefresh(true);
     },
     onRegisteredSW: (_swUrl, registration) => {
