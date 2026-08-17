@@ -308,6 +308,7 @@ function MainAppContent() {
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return;
     const onControllerChange = () => {
+      if (typeof window !== 'undefined' && sessionStorage.getItem('dor_redirecting') === '1') return;
       window.location.reload();
     };
     navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
