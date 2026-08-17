@@ -299,43 +299,13 @@ function MainAppContent() {
     onRegisteredSW: (_swUrl, registration) => {
       if (registration) {
         swRegistrationRef.current = registration;
-        // Force immediate update check on page load
-        registration.update();
       }
     },
   });
 
-  // Auto-reload when a new service worker takes control (covers all entry points)
-  useEffect(() => {
-    if (!('serviceWorker' in navigator)) return;
-    const onControllerChange = () => {
-      // New SW activated — reload to get fresh content
-      window.location.reload();
-    };
-    navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
-
-    // Check for updates when user returns to the tab/app (covers PWA icon click, tab switch)
-    const onVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && swRegistrationRef.current) {
-        swRegistrationRef.current.update();
-      }
-    };
-    document.addEventListener('visibilitychange', onVisibilityChange);
-
-    // Also check on window focus (covers alt-tab, mobile app switch)
-    const onFocus = () => {
-      if (swRegistrationRef.current) {
-        swRegistrationRef.current.update();
-      }
-    };
-    window.addEventListener('focus', onFocus);
-
-    return () => {
-      navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      window.removeEventListener('focus', onFocus);
-    };
-  }, []);
+  // Service worker update handling (vite-plugin-pwa handles registration automatically)
+  // Need-refresh prompt is shown via Footer; we avoid auto-reload on controllerchange
+  // because that interferes with redirect-based login and can cause reload loops.
 
 
   const { language, t, translateOffice, translateUnit } = useLanguage();
