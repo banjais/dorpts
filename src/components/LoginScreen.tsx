@@ -48,7 +48,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
           </div>
         )}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto bg-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/25">
+          <div className="w-16 h-16 mx-auto bg-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-[0_4px_16px_rgba(79,70,229,0.25)]">
             <ShieldCheck className="text-white w-8 h-8" strokeWidth={2} />
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{APP_NAME}</h1>
@@ -73,7 +73,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
               type="button"
               onClick={handleGoogleLogin}
               disabled={isLoading || loading}
-              className="w-full py-3 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-600 text-slate-700 dark:text-slate-200 text-sm font-bold rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-600 text-slate-700 dark:text-slate-200 text-sm font-bold rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md hover:shadow-indigo-500/10 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <Chrome className="w-5 h-5 text-red-500" />
               <span>{language === 'en' ? 'Sign in with Google' : 'गूगलले साइन इन गर्नुहोस्'}</span>
@@ -115,7 +115,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="mt-4 flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg px-3 py-2.5"
+              className="mt-4 flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 rounded-r-lg px-3 py-2.5"
             >
               <X className="w-3.5 h-3.5 text-red-500 shrink-0" />
               <p className="text-[11px] font-medium text-red-700 dark:text-red-400">{error}</p>

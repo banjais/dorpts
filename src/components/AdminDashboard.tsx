@@ -62,6 +62,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ language, active
   const activeTab = externalActiveTab || internalActiveTab;
   const handleTabChange = onTabChange || setInternalActiveTab;
 
+  const [dataInputOffice, setDataInputOffice] = useState('');
+  const [dataInputValues, setDataInputValues] = useState<Record<string, string>>({});
+  const [dataInputLoading, setDataInputLoading] = useState(false);
+  const [dataInputSaving, setDataInputSaving] = useState(false);
+  const [dataInputSheetHeaders, setDataInputSheetHeaders] = useState<string[]>([]);
+  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [feedbacksLoading, setFeedbacksLoading] = useState(false);
+
   // Listen for AI assistant fill_data requests
   useEffect(() => {
     const handler = (e: any) => {
@@ -145,13 +153,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ language, active
     }
   };
 
-  const [dataInputOffice, setDataInputOffice] = useState('');
-  const [dataInputValues, setDataInputValues] = useState<Record<string, string>>({});
-  const [dataInputLoading, setDataInputLoading] = useState(false);
-  const [dataInputSaving, setDataInputSaving] = useState(false);
-  const [dataInputSheetHeaders, setDataInputSheetHeaders] = useState<string[]>([]);
-  const [feedbacks, setFeedbacks] = useState<any[]>([]);
-  const [feedbacksLoading, setFeedbacksLoading] = useState(false);
+
 
   // Office-specific data input fetch
   const fetchIndicatorsForOffice = async () => {

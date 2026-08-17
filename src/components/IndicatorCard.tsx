@@ -123,7 +123,7 @@ export const IndicatorCard = React.memo<CardProps>(
       indicator.totalProgress !== null && indicator.totalProgress !== undefined;
 
     const annualCompletionPercent =
-      indicator.annualTarget > 0
+      indicator.annualTarget > 0 && typeof indicator.annualProgress === 'number' && !isNaN(indicator.annualProgress)
         ? Math.round((indicator.annualProgress / indicator.annualTarget) * 100)
         : 0;
 
@@ -345,8 +345,9 @@ export const IndicatorCard = React.memo<CardProps>(
       if (!indicator.updatedAt) return null;
       const updateDate = new Date(indicator.updatedAt);
       const now = new Date();
-      const diffTime = Math.abs(now.getTime() - updateDate.getTime());
+      const diffTime = now.getTime() - updateDate.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays < 0) return null;
 
       if (diffDays < 7) {
         return {
@@ -587,7 +588,9 @@ export const IndicatorCard = React.memo<CardProps>(
         ? Math.round(((endVal - startVal) / startVal) * 100)
         : endVal > 0
           ? 100
-          : 0;
+          : endVal < 0
+            ? -100
+            : 0;
 
     const trendText = React.useMemo(() => {
       if (isTrendUp) {
@@ -924,10 +927,10 @@ export const IndicatorCard = React.memo<CardProps>(
           }}
           className={`${isHighImpact ? "bg-gradient-to-br from-indigo-500/10 via-white to-white dark:from-indigo-950/20 dark:via-slate-900 dark:to-slate-900" : "bg-white dark:bg-slate-900"} rounded-xl border transition-all duration-300 py-2.5 pl-4 pr-2.5 sm:py-5 sm:pl-6 sm:pr-5 relative flex flex-col justify-between h-full text-left select-none cursor-pointer ${
             isAlertActive
-              ? highContrast ? "border-rose-600 dark:border-rose-400 border-2" : "border-rose-500/70 dark:border-rose-400/70 shadow-[0_0_25px_rgba(244,63,94,0.2)] hover:shadow-[0_0_35px_rgba(244,63,94,0.3)]"
+              ? highContrast ? "border-rose-600 dark:border-rose-400 border-2" : "border-rose-500/70 dark:border-rose-400/70 shadow-[0_8px_30px_rgba(244,63,94,0.15),0_2px_8px_rgba(244,63,94,0.08)] hover:shadow-[0_12px_40px_rgba(244,63,94,0.25),0_4px_12px_rgba(244,63,94,0.12)] dark:shadow-[0_8px_30px_rgba(244,63,94,0.2),0_2px_8px_rgba(244,63,94,0.1)]"
               : isHighImpact
-                ? highContrast ? "border-indigo-600 dark:border-indigo-400 border-2" : "border-indigo-500/80 dark:border-indigo-400/80 border-2 shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]"
-                : highContrast ? "border-slate-400 dark:border-slate-500 border-1.5" : "border-slate-100 dark:border-slate-800 shadow-sm hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-md"
+                ? highContrast ? "border-indigo-600 dark:border-indigo-400 border-2" : "border-indigo-500/80 dark:border-indigo-400/80 border-2 shadow-[0_8px_30px_rgba(0,0,0,0.08),0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12),0_4px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4),0_2px_8px_rgba(0,0,0,0.2)]"
+                : highContrast ? "border-slate-400 dark:border-slate-500 border-1.5" : "border-slate-100 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_6px_16px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08),0_2px_4px_rgba(0,0,0,0.04)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.3),0_2px_4px_rgba(0,0,0,0.15)]"
           }`}
           id={`indicator-card-${indicator.id}`}
           onClick={handleCardClick}
@@ -1439,7 +1442,7 @@ export const IndicatorCard = React.memo<CardProps>(
               <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
                 {confidenceBadge && (
                   <span
-                    className={`text-[0.5rem] sm:text-[0.59375rem] uppercase font-bold px-1.5 sm:px-2 py-0.5 rounded-full border flex items-center gap-0.5 sm:gap-1 ${confidenceBadge.color}`}
+                    className={`text-[0.5rem] sm:text-[0.59375rem] uppercase font-bold px-1.5 sm:px-2 py-0.5 rounded-full border flex items-center gap-0.5 sm:gap-1 ${confidenceBadge.color} shadow-sm`}
                     title={
                       language === "en"
                         ? "Data confidence score"
@@ -1451,18 +1454,18 @@ export const IndicatorCard = React.memo<CardProps>(
                 )}
                 {indicator.sdg && indicator.sdg !== "-" && (
                   <span
-                    className={`text-[0.5rem] sm:text-[0.59375rem] uppercase font-bold px-1.5 sm:px-2 py-0.5 rounded-full border ${getSdgColor(indicator.sdg)}`}
+                    className={`text-[0.5rem] sm:text-[0.59375rem] uppercase font-bold px-1.5 sm:px-2 py-0.5 rounded-full border ${getSdgColor(indicator.sdg)} shadow-sm`}
                   >
                     SDG {indicator.sdg}
                   </span>
                 )}
                 <span
-                  className={`text-[0.5rem] sm:text-[0.59375rem] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full border ${getPeriodColor(indicator.period)}`}
+                  className={`text-[0.5rem] sm:text-[0.59375rem] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full border ${getPeriodColor(indicator.period)} shadow-sm`}
                 >
                   {translatePeriod(indicator.period)}
                 </span>
                 <span
-                  className={`text-[0.5rem] sm:text-[0.59375rem] font-bold px-1.5 sm:px-2 py-0.5 rounded-full border ${status.className}`}
+                  className={`text-[0.5rem] sm:text-[0.59375rem] font-bold px-1.5 sm:px-2 py-0.5 rounded-full border ${status.className} shadow-sm`}
                 >
                   {status.label}
                 </span>
@@ -1632,7 +1635,7 @@ export const IndicatorCard = React.memo<CardProps>(
             <div className="mt-0.5 text-left min-h-[2.4rem] sm:min-h-[3.2rem] flex flex-col justify-start">
               <div className="flex items-start justify-between gap-1.5">
                 <h4
-                  className="text-[0.8125rem] sm:text-sm font-black text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 text-left"
+                  className="text-[0.8125rem] sm:text-sm font-black text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 text-left tracking-tight"
                   title={primaryName}
                 >
                   {highlightText(primaryName, searchQuery)}
@@ -1653,7 +1656,7 @@ export const IndicatorCard = React.memo<CardProps>(
                 </div>
               </div>
               <p
-                className="text-[0.5625rem] sm:text-[0.625rem] font-bold text-slate-400 dark:text-slate-400 mt-0.5 line-clamp-1 text-left"
+                className="text-[0.5625rem] sm:text-[0.625rem] font-bold text-slate-400 dark:text-slate-400 mt-0.5 line-clamp-1 text-left tracking-wide uppercase"
                 title={secondaryName}
               >
                 {highlightText(secondaryName, searchQuery)}
@@ -1818,28 +1821,28 @@ export const IndicatorCard = React.memo<CardProps>(
                         x2="0"
                         y2="1"
                       >
-                        <stop
-                          offset="0%"
-                          stopColor={
-                            isTrendUp
-                              ? "#10b981"
-                              : isTrendDown
-                                ? "#f43f5e"
-                                : "#6366f1"
-                          }
-                          stopOpacity="0.25"
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor={
-                            isTrendUp
-                              ? "#10b981"
-                              : isTrendDown
-                                ? "#f43f5e"
-                                : "#6366f1"
-                          }
-                          stopOpacity="0"
-                        />
+                     <stop
+                           offset="0%"
+                           stopColor={
+                             isTrendUp
+                               ? "#10b981"
+                               : isTrendDown
+                                 ? "#f43f5e"
+                                 : "#6366f1"
+                           }
+                           stopOpacity="0.35"
+                         />
+                         <stop
+                           offset="100%"
+                           stopColor={
+                             isTrendUp
+                               ? "#10b981"
+                               : isTrendDown
+                                 ? "#f43f5e"
+                                 : "#6366f1"
+                           }
+                           stopOpacity="0"
+                         />
                       </linearGradient>
                     </defs>
 
@@ -2070,31 +2073,31 @@ export const IndicatorCard = React.memo<CardProps>(
 
             {/* ANNUAL COMPLETION METER */}
             {statusView === 'annual' && (
-            <div className={`space-y-1 bg-slate-50/50 dark:bg-slate-800/30 p-2.5 rounded-xl border ${highContrast ? 'border-slate-300 dark:border-slate-600' : 'border-slate-100/50 dark:border-slate-800/50'}`}>
-              <div className="flex justify-between items-end mb-1">
-                <div className="flex flex-col">
-                  <span className="text-[0.5625rem] font-bold text-slate-400 dark:text-slate-500 font-sans uppercase tracking-tight">
-                    {t("annualProgressTillNow")}
-                  </span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowHistoricalTrend(!showHistoricalTrend);
-                    }}
-                    className={`text-[0.5625rem] font-bold uppercase tracking-tight ${
-                      showHistoricalTrend ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'
-                    }`}
-                  >
-                    {showHistoricalTrend ? (language === 'en' ? 'Hide Trend' : 'प्रवृत्ति लुकाउनुहोस्') : (language === 'en' ? 'Show Trend' : 'प्रवृत्ति देखाउनुहोस्')}
-                  </button>
-                  <span className="text-[0.6875rem] font-black text-slate-800 dark:text-slate-100 font-mono">
-                    {indicator.annualProgress}
-                    <span className="text-[0.5625rem] font-medium text-slate-450 dark:text-slate-500 mx-1">/</span>
-                    <span className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400">
-                      {indicator.annualTarget}
-                    </span>
-                  </span>
-                </div>
+             <div className={`space-y-1 bg-slate-50/80 dark:bg-slate-800/40 p-2.5 rounded-xl border ${highContrast ? 'border-slate-300 dark:border-slate-600' : 'border-slate-100/50 dark:border-slate-800/50'} backdrop-blur-sm`}>
+               <div className="flex justify-between items-end mb-1">
+                 <div className="flex flex-col">
+                   <span className="text-[0.5625rem] font-bold text-slate-400 dark:text-slate-500 font-sans uppercase tracking-tight mb-0.5">
+                     {t("annualProgressTillNow")}
+                   </span>
+                   <button
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       setShowHistoricalTrend(!showHistoricalTrend);
+                     }}
+                     className={`text-[0.5625rem] font-bold uppercase tracking-tight ${
+                       showHistoricalTrend ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'
+                     }`}
+                   >
+                     {showHistoricalTrend ? (language === 'en' ? 'Hide Trend' : 'प्रवृत्ति लुकाउनुहोस्') : (language === 'en' ? 'Show Trend' : 'प्रवृत्ति देखाउनुहोस्')}
+                   </button>
+                   <span className="text-[0.6875rem] font-black text-slate-800 dark:text-slate-100 font-mono">
+                     {indicator.annualProgress}
+                     <span className="text-[0.5625rem] font-medium text-slate-450 dark:text-slate-500 mx-1">/</span>
+                     <span className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400">
+                       {indicator.annualTarget}
+                     </span>
+                   </span>
+                 </div>
 
                 <div className="flex items-center gap-2">
                   {/* Mini Sparkline visualizing the last 3 data points */}
@@ -2174,21 +2177,23 @@ export const IndicatorCard = React.memo<CardProps>(
 
               {/* Progress track */}
               <div className="flex items-center gap-2">
-                <div className="w-full bg-slate-100 dark:bg-slate-950 h-1.5 rounded-full overflow-hidden shadow-inner ring-1 ring-slate-200/50 dark:ring-white/5">
+                <div className="w-full bg-slate-100 dark:bg-slate-950 h-2 rounded-full overflow-hidden shadow-inner ring-1 ring-slate-200/50 dark:ring-white/5 relative">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{
                       width: `${Math.min(annualCompletionPercent, 100)}%`,
                     }}
                     transition={{ type: "spring", stiffness: 60, damping: 12 }}
-                    className={`h-full rounded-full ${
+                    className={`h-full rounded-full relative overflow-hidden ${
                       annualCompletionPercent >= 100
-                        ? "bg-emerald-500"
+                        ? "bg-gradient-to-r from-emerald-400 to-emerald-600"
                         : annualCompletionPercent >= 50
-                          ? "bg-indigo-500"
-                          : "bg-amber-500"
+                          ? "bg-gradient-to-r from-indigo-400 to-indigo-600"
+                          : "bg-gradient-to-r from-amber-400 to-amber-600"
                     }`}
-                  />
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_2s_ease-in-out_infinite]" />
+                  </motion.div>
                 </div>
                 <div className="flex flex-col items-end">
                   <span className={`text-[0.625rem] font-black font-mono min-w-[28px] text-right ${

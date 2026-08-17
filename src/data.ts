@@ -718,10 +718,10 @@ export const DEFAULT_INDICATORS: Indicator[] = [
   },
 ].map(ind => {
   const isBlank = (val: unknown) => val === null || val === undefined || isNaN(Number(val)) || String(val).trim() === '';
-  const annualTarget = isBlank(ind.annualTarget) ? 1 : ind.annualTarget;
-  const annualProgress = isBlank(ind.annualProgress) ? 1 : ind.annualProgress;
-  const totalTarget = isBlank(ind.totalTarget) ? 1 : ind.totalTarget;
-  const totalProgress = isBlank(ind.totalProgress) ? 1 : ind.totalProgress;
+  const annualTarget = isBlank(ind.annualTarget) ? 0 : ind.annualTarget;
+  const annualProgress = isBlank(ind.annualProgress) ? 0 : ind.annualProgress;
+  const totalTarget = isBlank(ind.totalTarget) ? 0 : ind.totalTarget;
+  const totalProgress = isBlank(ind.totalProgress) ? 0 : ind.totalProgress;
   return {
     ...ind,
     category: getSectorForIndicator(ind.name, ind.sdg),
@@ -845,10 +845,10 @@ export function parseGoogleSheetsCSV(csvText: string): {
     // Format fields correctly
     const sdg = cols[sdgIndex] || '-';
     const period = cols[periodIndex] || 'मासिक';
-    const parsedWeight = parseInt(cols[weightIndex], 10);
-    const weight = isNaN(parsedWeight) || parsedWeight <= 0 ? 5 : parsedWeight;
+    const parsedWeight = weightIndex >= 0 && weightIndex < cols.length ? parseInt(cols[weightIndex], 10) : NaN;
+    const weight = isNaN(parsedWeight) ? 5 : parsedWeight;
     const unit = cols[unitIndex] || '';
-    const baseline = cols[baselineIndex] === '-' ? '-' : (parseFloat(cols[baselineIndex]) || '-');
+    const baseline = baselineIndex >= 0 && baselineIndex < cols.length ? (cols[baselineIndex] === '-' ? '-' : (parseFloat(cols[baselineIndex]) ?? '-')) : '-';
     const rawTotalTarget = cols[totalTargetIndex];
     const rawTotalProgress = cols[totalProgressIndex];
     const rawAnnualTarget = cols[annualTargetIndex];
@@ -871,9 +871,9 @@ export function parseGoogleSheetsCSV(csvText: string): {
       return s === '' || s === '-' || s.toLowerCase() === 'null' || s.toLowerCase() === 'undefined';
     };
 
-    const finalTotalTarget = isRawBlank(rawTotalTarget) ? 1 : (parseNumber(rawTotalTarget) || 1);
+    const finalTotalTarget = isRawBlank(rawTotalTarget) ? 1 : (parseNumber(rawTotalTarget) ?? 1);
     const finalTotalProgress = parseNumber(rawTotalProgress);
-    const finalAnnualTarget = isRawBlank(rawAnnualTarget) ? 1 : (parseNumber(rawAnnualTarget) || 1);
+    const finalAnnualTarget = isRawBlank(rawAnnualTarget) ? 1 : (parseNumber(rawAnnualTarget) ?? 1);
     const finalAnnualProgress = parseNumber(rawAnnualProgress);
 
     // Retrieve Office & Gmail values dynamically

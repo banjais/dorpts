@@ -659,10 +659,10 @@ function MainAppContent() {
     return DEFAULT_INDICATORS
       .map(ind => {
         if (!ind) return ind;
-        const annualTarget = isBlank(ind.annualTarget) ? 1 : ind.annualTarget;
-        const annualProgress = isBlank(ind.annualProgress) ? 1 : ind.annualProgress;
-        const totalTarget = isBlank(ind.totalTarget) ? 1 : ind.totalTarget;
-        const totalProgress = isBlank(ind.totalProgress) ? 1 : ind.totalProgress;
+        const annualTarget = isBlank(ind.annualTarget) ? 0 : ind.annualTarget;
+        const annualProgress = isBlank(ind.annualProgress) ? 0 : ind.annualProgress;
+        const totalTarget = isBlank(ind.totalTarget) ? 0 : ind.totalTarget;
+        const totalProgress = isBlank(ind.totalProgress) ? 0 : ind.totalProgress;
         return {
           ...ind,
           annualTarget,
@@ -907,18 +907,16 @@ function MainAppContent() {
             const indIdx = c - (officeColIdx + 1);
             const weight = (indicators[indIdx] && typeof indicators[indIdx].weight === 'number' && indicators[indIdx].weight! > 0)
               ? indicators[indIdx].weight!
-              : 1;
+              : 0;
             if (!isNaN(officeVal) && officeVal >= 0 && totalVal > 0) {
               const completionPct = Math.min(100, (officeVal / totalVal) * 100);
-              sumWeightedCompletion += completionPct * weight;
-              totalWeightSum += weight;
+              sumWeightedCompletion += completionPct * ((indicators[indIdx]?.weight || 0) / 100);
+              totalWeightSum += (indicators[indIdx]?.weight || 0) / 100;
               count++;
             }
           }
           if (count > 0) {
-            office.avgCompletion = totalWeightSum > 0
-              ? Math.round(sumWeightedCompletion / totalWeightSum)
-              : Math.round(sumWeightedCompletion / count);
+            office.avgCompletion = totalWeightSum > 0 ? Math.round(sumWeightedCompletion / totalWeightSum) : 0;
             office.total = count;
             console.log(`[Verification] Office: ${office.name} | Weighted Contribution: ${office.avgCompletion}% | Weighted Sum: ${sumWeightedCompletion.toFixed(2)} / Total Weight: ${totalWeightSum}`);
           }
@@ -1455,6 +1453,20 @@ function MainAppContent() {
     }
   }, [user, authLoading, showLogin]);
 
+  const [isGeneratingAiSummary, setIsGeneratingAiSummary] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isBudgetOpen, setIsBudgetOpen] = useState(false);
+  const [aboutModalTab, setAboutModalTab] = useState<
+    "tour" | "logic" | "offices" | "indicators" | "status" | "sync" | "settings"
+  >("logic");
+  const [selectedIndicatorId, setSelectedIndicatorId] = useState<string | null>(null);
+  const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [pendingSharedReport, setPendingSharedReport] = useState(false);
+
   const goToIndicators = useCallback(() => {
     setMainView('dashboard');
     setViewMode('card');
@@ -1583,7 +1595,7 @@ function MainAppContent() {
       const achievement = target > 0 ? (progress / target) * 100 : 0;
       return achievement < 20;
     });
-    const totalWeight = indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0) || 100;
+    const totalWeight = indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0);
     const achievedWeight = indicators.reduce((acc, curr) => {
       if (!curr) return acc;
       const target = curr.annualTarget || 0;
@@ -1622,7 +1634,7 @@ function MainAppContent() {
 
    const handleManualSync = async (suppressToast = false) => {
      setIsSyncing(true);
-     let isOfflineFallback = !isOnline;
+      const isOfflineFallback = !isOnline;
     try {
       let metadataSnap: any = null;
       let indicatorsSnap: any = null;
@@ -1889,19 +1901,6 @@ function MainAppContent() {
       window.speechSynthesis.cancel();
     }
   }, [isPrinting, reportAiSummary, hasSpokenSummary, language]);
-  const [isGeneratingAiSummary, setIsGeneratingAiSummary] = useState(false);
-  const [isHelpOpen, setIsHelpOpen] = useState(false);
-  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isBudgetOpen, setIsBudgetOpen] = useState(false);
-  const [aboutModalTab, setAboutModalTab] = useState<
-    "tour" | "logic" | "offices" | "indicators" | "status" | "sync" | "settings"
-  >("logic");
-  const [selectedIndicatorId, setSelectedIndicatorId] = useState<string | null>(null);
-  const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
-  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
-  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
-  const [pendingSharedReport, setPendingSharedReport] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -2062,12 +2061,13 @@ function MainAppContent() {
           const pending: Indicator[] = [];
           snap.forEach((d) => {
             const data = d.data() as Indicator;
-            const annualTarget = typeof data.annualTarget === 'number' && data.annualTarget > 0 ? data.annualTarget : (data.totalTarget || 0);
-            const annualProgress = typeof data.annualProgress === 'number' ? data.annualProgress : 0;
-            // Skip Firestore indicators whose progress values are all zero — these
-            // represent incomplete/blank rows that would overwrite good data.
+            const annualTarget = Number(data.annualTarget) > 0 ? Number(data.annualTarget) : (Number(data.totalTarget) || 0);
+            const annualProgress = Number(data.annualProgress) || 0;
+            const totalTarget = Number(data.totalTarget) || 0;
+            const totalProgress = Number(data.totalProgress) || 0;
+            if (!Number.isFinite(annualTarget) || !Number.isFinite(annualProgress) || !Number.isFinite(totalTarget) || !Number.isFinite(totalProgress)) return;
             if (annualTarget === 0 && annualProgress === 0) return;
-            list.push(data);
+            list.push({ ...data, annualTarget, annualProgress, totalTarget, totalProgress });
             if (d.metadata.hasPendingWrites) {
               pending.push(data);
             }
@@ -2320,21 +2320,21 @@ function MainAppContent() {
 
   const { totalWeightForAvg, weightedRateForAvg, averageValue } = useMemo(() => {
     const totalWeightForAvg =
-      indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0) || 100;
+      indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0);
     const weightedRateForAvg = indicators.reduce((acc, curr) => {
       if (!curr) return acc;
       const progress =
         curr.annualTarget > 0
           ? Math.min((curr.annualProgress / curr.annualTarget) * 100, 100)
           : 0;
-      return acc + progress * ((curr.weight || 0) / totalWeightForAvg);
+      return acc + progress * (totalWeightForAvg > 0 ? ((curr.weight || 0) / totalWeightForAvg) : 0);
     }, 0);
     const averageValue = Math.round(weightedRateForAvg);
     return { totalWeightForAvg, weightedRateForAvg, averageValue };
   }, [indicators]);
 
   const dashboardCalculations = useMemo(() => {
-    const totalWeight = filteredIndicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0) || 100;
+    const totalWeight = filteredIndicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0);
     
     const achievedWeight = filteredIndicators.reduce((acc, curr) => {
       if (!curr) return acc;
@@ -2457,7 +2457,7 @@ function MainAppContent() {
       const categoryIndicators = indicators.filter(ind => normalizeCategory(ind.category) === categoryName);
       if (categoryIndicators.length === 0) return { name: categoryName, value: 0 };
       
-      const totalWeight = categoryIndicators.reduce((acc, curr) => acc + (curr.weight || 0), 0) || 100;
+      const totalWeight = categoryIndicators.reduce((acc, curr) => acc + (curr.weight || 0), 0);
       const achievedWeight = categoryIndicators.reduce((acc, curr) => {
         const target = curr.annualTarget || 0;
         const progress = curr.annualProgress || 0;
@@ -3219,15 +3219,18 @@ function MainAppContent() {
            />
 
          <div
-           className={`flex flex-col min-h-[100dvh] transition-all duration-700 ease-in-out pt-2 sm:pt-4 pb-28 sm:pb-32 ${
-             isFooterExpanded ? "opacity-0 pointer-events-none scale-[0.98]" : "opacity-100"
-           }`}
-         >
+            className={`flex flex-col min-h-[100dvh] transition-all duration-700 ease-in-out pt-2 sm:pt-4 pb-28 sm:pb-32 bg-gradient-to-b from-slate-50/80 via-slate-50/60 to-slate-100/80 dark:from-slate-950/80 dark:via-slate-950/60 dark:to-slate-900/80 ${
+              isFooterExpanded ? "opacity-0 pointer-events-none scale-[0.98]" : "opacity-100"
+            }`}
+          >
            <OfflineStatusBar />
-             <main
-               className="flex-1 container mx-auto px-4 md:pl-16 lg:pl-20 pb-8 max-w-7xl relative z-10 pt-[134px] sm:pt-[152px]"
-               style={{ transition: "padding-top 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
-              >
+              <main
+                className="flex-1 container mx-auto px-4 md:pl-16 lg:pl-20 pb-8 max-w-7xl relative z-10 pt-[134px] sm:pt-[152px]"
+                style={{ transition: "padding-top 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
+               >
+                <div className="relative">
+                  <div className="absolute -top-20 -right-20 w-96 h-96 bg-indigo-500/5 dark:bg-indigo-500/8 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-500/5 dark:bg-blue-500/8 rounded-full blur-3xl pointer-events-none" />
 
               <AnimatePresence mode="wait">
                 {authLoading ? (
@@ -3247,15 +3250,25 @@ function MainAppContent() {
                     </div>
                   </motion.div>
                 ) : loading ? (
-                 <motion.div
-                   key="loading"
-                   initial={{ opacity: 0 }}
-                   animate={{ opacity: 1 }}
-                   exit={{ opacity: 0 }}
-                   transition={{ duration: 0.3 }}
-                 >
-                   <LoadingSkeleton />
-                 </motion.div>
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex items-center justify-center min-h-[50vh]"
+                  >
+                    <div className="w-full max-w-md mx-auto space-y-4">
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="w-3 h-3 rounded-full bg-indigo-500/80 animate-bounce [animation-delay:0ms]"></div>
+                        <div className="w-3 h-3 rounded-full bg-indigo-500/80 animate-bounce [animation-delay:150ms]"></div>
+                        <div className="w-3 h-3 rounded-full bg-indigo-500/80 animate-bounce [animation-delay:300ms]"></div>
+                      </div>
+                      <p className="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wide">
+                        {language === 'en' ? 'Loading dashboard...' : 'ड्यासबोर्ड लोड हुँदै...'}
+                      </p>
+                    </div>
+                  </motion.div>
                ) : !isOnline && !dismissedOfflineDashboard ? (
                 <motion.div
                   key="offline-dashboard"
@@ -3569,8 +3582,9 @@ function MainAppContent() {
                    </AnimatePresence>
                  </motion.div>
                )}
-             </AnimatePresence>
-            </main>
+              </AnimatePresence>
+            </div>
+          </main>
           </div>
         </>
         )}

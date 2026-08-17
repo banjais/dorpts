@@ -93,9 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             uid: d.id,
             email: data.email,
             role: data.role,
-            createdAt: data.createdAt?.seconds
-              ? new Date(data.createdAt.seconds * 1000).toISOString()
-              : data.createdAt || new Date().toISOString(),
+            createdAt: typeof data.createdAt?.seconds === 'number' ? new Date(data.createdAt.seconds * 1000).toISOString() : String(data.createdAt || new Date().toISOString()),
           });
         });
         setAdminsList(list);
@@ -176,8 +174,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithGoogle = async (rememberMe = false) => {
     try {
       await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('dor_redirecting', '1');
+      }
       await signInWithRedirect(auth, googleProvider);
     } catch (error: any) {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('dor_redirecting');
+      }
       console.error('Login action encountered error:', error);
       const message = error?.message || error?.code || String(error);
       const friendly = message.includes('redirect')
@@ -189,7 +193,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  useEffect(() => {
+   useEffect(() => {
     const handleRedirectResult = async () => {
       try {
         const result = await getRedirectResult(auth);
@@ -201,6 +205,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } catch (error) {
         console.error('Redirect result error:', error);
+      } finally {
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('dor_redirecting');
+        }
       }
     };
     handleRedirectResult();

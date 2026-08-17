@@ -467,7 +467,7 @@ const SummaryCard: React.FC<{
         style={{ borderRightColor: catColor.hex }}
       >
         {/* Top accent strip - normal background */}
-        <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700" />
+        <div className="h-1.5 w-full bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 dark:from-slate-700 dark:via-slate-800 dark:to-slate-700" />
 
         <div className="p-3 sm:p-4 text-left">
           {/* Header row */}
@@ -1212,12 +1212,12 @@ export const Overview: React.FC<OverviewProps> = ({
 
     const totalTarget = list.reduce((acc, curr) => acc + (curr.annualTarget || 0), 0);
     const totalProgress = list.reduce((acc, curr) => acc + (curr.annualProgress || 0), 0);
-    const percentage = totalTarget > 0 ? Math.min(100, Math.round((totalProgress / totalTarget) * 1000) / 10) : 78.4;
+    const percentage = totalTarget > 0 ? Math.round((totalProgress / totalTarget) * 100) : 0;
 
     return {
       indicators: list,
       totalTarget,
-      totalProgress: totalProgress > 0 ? totalProgress : 12.4,
+      totalProgress: totalProgress > 0 ? totalProgress : 0,
       percentage,
       unit: translateUnit(list[0]?.unit || (language === 'en' ? 'Billion NPR' : 'अर्ब रुपैयाँ')),
     };
@@ -1232,12 +1232,12 @@ export const Overview: React.FC<OverviewProps> = ({
 
     const totalTarget = list.reduce((acc, curr) => acc + (curr.annualTarget || 0), 0);
     const totalProgress = list.reduce((acc, curr) => acc + (curr.annualProgress || 0), 0);
-    const percentage = totalTarget > 0 ? Math.min(100, Math.round((totalProgress / totalTarget) * 100)) : 82;
+    const percentage = totalTarget > 0 ? Math.round((totalProgress / totalTarget) * 100) : 0;
 
     return {
       indicators: list,
       totalTarget,
-      totalProgress: totalProgress > 0 ? totalProgress : 14250,
+      totalProgress: totalProgress > 0 ? totalProgress : 0,
       percentage,
       unit: translateUnit(list[0]?.unit || (language === 'en' ? 'Person Days' : 'व्यक्ति दिन')),
     };

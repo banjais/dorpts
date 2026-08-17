@@ -225,7 +225,7 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({
 
     const matchesCount = matchedItems.length;
 
-    let textToSpeak = '';
+    let textToSpeak;
     if (language === 'en') {
       if (matchesCount === 0) {
         textToSpeak = `Searched for "${queryText}". No matching indicators or offices were found. Please try another search term.`;
@@ -401,7 +401,7 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({
   };
 
   const speakCategorySwitchConfirmation = (category: string) => {
-    let textToSpeak = '';
+    let textToSpeak;
     if (language === 'en') {
       if (category === 'All') {
         textToSpeak = "Showing all categories.";
@@ -421,7 +421,7 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({
   };
 
   const speakViewSwitchConfirmation = (view: ViewMode) => {
-    let textToSpeak = '';
+    let textToSpeak;
     if (language === 'en') {
       switch (view) {
         case 'dashboard':

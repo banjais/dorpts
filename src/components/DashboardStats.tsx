@@ -70,7 +70,7 @@ const CustomSparklineTooltip = ({ active, payload, language, translateUnit, unit
     const data = payload[0].payload;
     const val = data.value;
     
-    let displayValue = '';
+    let displayValue;
     const formattedVal = typeof val === 'number' 
       ? (language === 'np' ? toNepaliNumerals(val.toLocaleString()) : val.toLocaleString())
       : val;
@@ -92,7 +92,7 @@ const CustomSparklineTooltip = ({ active, payload, language, translateUnit, unit
     }
 
     return (
-      <div className="bg-slate-900/95 dark:bg-slate-950/95 border border-slate-700/50 dark:border-white/10 px-2.5 py-1.5 rounded-xl shadow-xl text-[10px] text-white font-medium pointer-events-none backdrop-blur-sm z-50">
+      <div className="bg-slate-900/95 dark:bg-slate-950/95 border border-slate-700/50 dark:border-white/10 px-3 py-2 rounded-2xl shadow-2xl text-[10px] text-white font-medium pointer-events-none backdrop-blur-md z-50">
         <div className="font-extrabold text-indigo-400">
           {language === 'en' ? 'Progress' : 'प्रगति'}: {displayValue}
         </div>
@@ -489,7 +489,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
   }, []);
 
   // Calculations based on actual data
-  const totalWeight = indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0) || 100;
+  const totalWeight = indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0);
   
   // Calculate actual completed weight progress dynamically
   const achievedWeight = indicators.reduce((acc, curr) => {
@@ -711,7 +711,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
       return achievement < 20;
     });
 
-    let text = '';
+    let text;
     if (language === 'en') {
       text = `System Dashboard Summary. Tracking ${total} performance indicators. The overall weighted achievement rate is ${weightedAchievementRate} percent. `;
       if (lowIndicators.length > 0) {
@@ -1101,7 +1101,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden"
+        className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl p-4 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.2),0_8px_24px_rgba(0,0,0,0.3)] border border-slate-200/60 dark:border-slate-700/50 relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl -mr-40 -mt-40 pointer-events-none" />
         
@@ -1134,7 +1134,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
           </div>
           
           {/* Master Segment Toggles */}
-          <div className="flex flex-wrap items-center gap-1.5 bg-slate-50 dark:bg-slate-950 p-1.5 rounded-3xl border border-slate-100 dark:border-white/5 shadow-inner">
+          <div className="flex flex-wrap items-center gap-1.5 bg-slate-50/80 dark:bg-slate-950/80 p-1.5 rounded-3xl border border-slate-200/60 dark:border-white/5 shadow-inner backdrop-blur-sm">
             {[
               { id: 'trajectory', labelEn: 'Trend', labelNp: 'प्रवृत्ति', icon: <TrendingUp size={14} />, descEn: 'Historical Growth', descNp: 'ऐतिहासिक वृद्धि' },
               { id: 'radial', labelEn: 'Overall Circular', labelNp: 'समग्र चक्र', icon: <Activity size={14} />, descEn: 'Radial Progress', descNp: 'रेडियल प्रगति' },
@@ -1152,8 +1152,8 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
                   }}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                     isSelected
-                      ? 'bg-indigo-600 text-white dark:bg-indigo-500 shadow-md border border-indigo-500'
-                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-850/50'
+                      ? 'bg-indigo-600 text-white dark:bg-indigo-500 shadow-md shadow-indigo-500/20 border border-indigo-500'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-800/50 border border-transparent'
                   }`}
                   title={language === 'en' ? tab.descEn : tab.descNp}
                 >
@@ -1193,7 +1193,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:hidden" />
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.15} className="hidden dark:block" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.12} className="hidden dark:block" />
                     <XAxis 
                       dataKey="date" 
                       stroke="#94a3b8" 

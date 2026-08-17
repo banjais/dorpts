@@ -312,7 +312,7 @@ const SummaryCard: React.FC<{
       <motion.button
         whileTap={{ scale: 0.97 }}
         onClick={onToggle}
-        className={`relative w-full rounded-[24px] border overflow-hidden transition-all duration-300 ${
+        className={`relative w-full rounded-[24px] border overflow-hidden transition-all duration-300 hover:-translate-y-1 ${
           isExpanded
             ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 shadow-2xl shadow-indigo-500/20'
             : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-white/5 shadow-lg hover:shadow-xl'
@@ -573,7 +573,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
   }, [highlightedCard]);
 
   const weightedAchievementRate = useMemo(() => {
-    const totalWeight = indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0) || 100;
+    const totalWeight = indicators.reduce((acc, curr) => acc + (curr?.weight || 0), 0);
     const achievedWeight = indicators.reduce((acc, curr) => {
       if (!curr) return acc;
       const target = curr.annualTarget || 0;
@@ -721,7 +721,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
   }, [highlightedCard]);
 
   return (
-    <div className="relative min-h-screen space-y-4 max-w-7xl mx-auto px-0 sm:px-3 pb-12 sm:pb-16">
+    <div className="relative min-h-screen space-y-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
       <style>{`
         @media (max-width: 768px) {
           .dashboard-cards-grid {
@@ -800,7 +800,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
 
       {/* Summary Stats Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-100 dark:border-slate-800 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-100 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5">
           <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
             {language === 'en' ? 'Total' : 'कुल'}
           </div>
@@ -808,7 +808,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
             {fmt(stats.total)}
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-100 dark:border-slate-800 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-100 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5">
           <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
             {language === 'en' ? 'On Track' : 'सम्पादनमा'}
           </div>
@@ -816,7 +816,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
             {fmt(stats.onTrack)}
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-100 dark:border-slate-800 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-100 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5">
           <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
             {language === 'en' ? 'Offices' : 'कार्यालय'}
           </div>
@@ -824,7 +824,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
             {fmt(reportingOffices.length)}
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-100 dark:border-slate-800 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-100 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5">
           <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
             {language === 'en' ? 'Weighted Rate' : 'भारित दर'}
           </div>
@@ -834,42 +834,42 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-3">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="flex-1">
-            <span className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
-              {language === 'en' ? 'Category' : 'वर्ग'}
-            </span>
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-300 dark:focus:border-slate-600 cursor-pointer"
-            >
-              <option value="All">{language === 'en' ? 'All Categories' : 'सबै वर्गहरू'}</option>
-              {STANDARD_CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{language === 'en' ? cat.split(' ')[0] : cat.split(' ')[0]}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex-1">
-            <span className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
-              {language === 'en' ? 'Sort By' : 'क्रमबद्ध गर्नुहोस्'}
-            </span>
-            <select
-              value={sortType}
-              onChange={(e) => setSortType(e.target.value as any)}
-              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-300 dark:focus:border-slate-600 cursor-pointer"
-            >
-              <option value="default">{language === 'en' ? 'Default' : 'पूर्वावस्थानुसार'}</option>
-              <option value="low">{language === 'en' ? 'Low to High' : 'कमदेखि बढी'}</option>
-              <option value="high">{language === 'en' ? 'High to Low' : 'बढीदेखि कम'}</option>
-              <option value="weight">{language === 'en' ? 'By Weight' : 'भार अनुसार'}</option>
-              <option value="status">{language === 'en' ? 'By Status' : 'स्थिति अनुसार'}</option>
-            </select>
-          </div>
-        </div>
-      </div>
+       {/* Filters */}
+       <div className="bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 backdrop-blur-sm">
+         <div className="flex flex-col sm:flex-row gap-3">
+           <div className="flex-1">
+             <span className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
+               {language === 'en' ? 'Category' : 'वर्ग'}
+             </span>
+             <select
+               value={categoryFilter}
+               onChange={(e) => setCategoryFilter(e.target.value)}
+               className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 dark:focus:border-indigo-500 cursor-pointer transition-all"
+             >
+               <option value="All">{language === 'en' ? 'All Categories' : 'सबै वर्गहरू'}</option>
+               {STANDARD_CATEGORIES.map((cat) => (
+                 <option key={cat} value={cat}>{language === 'en' ? cat.split(' ')[0] : cat.split(' ')[0]}</option>
+               ))}
+             </select>
+           </div>
+           <div className="flex-1">
+             <span className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
+               {language === 'en' ? 'Sort By' : 'क्रमबद्ध गर्नुहोस्'}
+             </span>
+             <select
+               value={sortType}
+               onChange={(e) => setSortType(e.target.value as any)}
+               className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 dark:focus:border-indigo-500 cursor-pointer transition-all"
+             >
+               <option value="default">{language === 'en' ? 'Default' : 'पूर्वावस्थानुसार'}</option>
+               <option value="low">{language === 'en' ? 'Low to High' : 'कमदेखि बढी'}</option>
+               <option value="high">{language === 'en' ? 'High to Low' : 'बढीदेखि कम'}</option>
+               <option value="weight">{language === 'en' ? 'By Weight' : 'भार अनुसार'}</option>
+               <option value="status">{language === 'en' ? 'By Status' : 'स्थिति अनुसार'}</option>
+             </select>
+           </div>
+         </div>
+       </div>
 
       {/* Indicator Grid */}
       {!expandedId && filteredIndicators.length === 0 ? (
@@ -885,7 +885,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 mt-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 mt-3">
           <AnimatePresence mode="popLayout">
             {filteredIndicators.map((ind, idx) => {
               if (!ind) return null;
@@ -936,10 +936,10 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[9990] bg-white dark:bg-slate-900 overflow-y-auto"
+              className="fixed inset-0 z-[9990] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl overflow-y-auto"
               onClick={() => setExpandedId(null)}
             >
-              <div className="sticky top-0 z-20 flex items-center justify-between p-3 sm:p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800">
+              <div className="sticky top-0 z-20 flex items-center justify-between p-3 sm:p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
                 <div className="flex items-center gap-3">
                   <span className="p-2 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-xl border border-indigo-200 dark:border-indigo-500/30">
                     <TrendingUp size={18} className="text-indigo-600 dark:text-indigo-400" />

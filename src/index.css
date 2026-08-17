@@ -69,8 +69,48 @@
     font-size: 0.875rem;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     transition: background-color 0.2s ease, color 0.2s ease;
     overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+
+  ::selection {
+    background-color: rgba(79, 70, 229, 0.25);
+    color: #1e1b4b;
+  }
+  html.dark ::selection {
+    background-color: rgba(99, 102, 241, 0.35);
+    color: #e0e7ff;
+  }
+
+  *:focus-visible {
+    outline: 2px solid rgba(79, 70, 229, 0.5);
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+  html.dark *:focus-visible {
+    outline-color: rgba(99, 102, 241, 0.6);
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  }
+  html.dark a:focus-visible,
+  html.dark button:focus-visible {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+  }
+
+  .focus-ring {
+    transition: box-shadow 0.2s ease-out, outline 0.2s ease-out;
+  }
+  .focus-ring:focus-visible {
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    outline: none;
+  }
+  html.dark .focus-ring:focus-visible {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
   }
 
   html.dark body {

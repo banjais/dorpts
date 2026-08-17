@@ -165,7 +165,7 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
   const handleCreateChannel = async () => {
     if (!newChannelName.trim()) return;
     try {
-      let membersList = [...selectedMembers];
+      const membersList = [...selectedMembers];
       if (!membersList.includes(userEmail)) membersList.push(userEmail);
 
       if (currentUserRole === 'superadmin') {

@@ -38,7 +38,7 @@ const getShortOfficeName = (name: string, lang: 'en' | 'np') => {
 
   // English replacements
   const translatedName = translateOffice(name, 'en');
-  let result = translatedName !== name ? translatedName : cleanName;
+  const result = translatedName !== name ? translatedName : cleanName;
   return result
     .replace('Planning, Monitoring & Evaluation Division', 'Planning & Eval')
     .replace('Development Cooperation Implementation Division (DCID)', 'DCID')

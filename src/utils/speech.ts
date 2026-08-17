@@ -15,7 +15,7 @@ export const getMuted = () => isMuted;
 
 const normalizeText = (text: string): string => {
   return text
-    .replace(/[\/\*\(\)\[\]\{\}_#@&%=+~`|\\<>^"']/g, ' ')
+    .replace(/[/*()\[\]{}_#@&%=+~`|\\<>^"']/g, ' ')
     .replace(/\.{3,}/g, ' ')
     .replace(/--+/g, ' ')
     .replace(/[—–-]/g, ' ')

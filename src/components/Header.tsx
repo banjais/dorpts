@@ -306,34 +306,35 @@ export const Header: React.FC<HeaderProps> = ({
     <header
       className={`w-full fixed top-0 left-0 right-0 z-[5000] smooth-header-transition transition-all duration-500 ease-out ${
         scrolled
-          ? 'bg-white/75 dark:bg-slate-950/75 backdrop-blur-2xl border-b border-slate-200/60 dark:border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.08)] h-[72px]'
-          : 'bg-white/60 dark:bg-slate-950/60 backdrop-blur-2xl border-b border-transparent h-[80px]'
+          ? 'bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl border-b border-slate-200/60 dark:border-white/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.25),0_1px_2px_rgba(0,0,0,0.15)] h-[72px]'
+          : 'bg-white/70 dark:bg-slate-950/70 backdrop-blur-2xl border-b border-transparent h-[80px]'
       }`}
     >
-      {/* Small, persistent 'Offline' visual banner */}
-      {!isOnline && (
-        <div
-          className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-500 to-orange-500 shadow-[0_1px_12px_rgba(244,63,94,0.8)] animate-pulse z-[5010]"
-                  title={language === 'en' ? 'System offline' : 'प्रणाली अफलाइन'}
-        />
-      )}
+        {/* Small, persistent 'Offline' visual banner */}
+        {!isOnline && (
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-500 via-orange-500 to-amber-500 shadow-[0_1px_12px_rgba(244,63,94,0.8)] animate-pulse z-[5010]"
+                    title={language === 'en' ? 'System offline' : 'प्रणाली अफलाइन'}
+          />
+        )}
+        <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent z-[5010] pointer-events-none" />
        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-3 h-[72px]">
             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
               <motion.button
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.92 }}
-                onClick={onOpenDrawer}
-                className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all"
-                title={language === 'en' ? 'Menu' : 'मेनु'}
-              >
-                <Menu size={18} strokeWidth={2.5} />
-              </motion.button>
+                 whileHover={{ scale: 1.08 }}
+                 whileTap={{ scale: 0.92 }}
+                 onClick={onOpenDrawer}
+                 className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl bg-white/80 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:border-indigo-300 dark:hover:border-indigo-700 transition-all"
+                 title={language === 'en' ? 'Menu' : 'मेनु'}
+               >
+                 <Menu size={18} strokeWidth={2.5} />
+               </motion.button>
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="relative shrink-0 flex items-center justify-center smooth-branding-transition w-9 h-9 sm:w-10 sm:h-10"
               >
-                <div className="w-full h-full rounded-2xl bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 flex items-center justify-center shadow-sm">
+                <div className="w-full h-full rounded-2xl bg-white/90 dark:bg-white/10 backdrop-blur-2xl border border-slate-200/70 dark:border-white/15 flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3),0_1px_3px_rgba(0,0,0,0.2)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
                   <img
                     src="/GovtLogo.svg"
                     alt="Government of Nepal Logo"
@@ -347,7 +348,7 @@ export const Header: React.FC<HeaderProps> = ({
                     title={language === 'en' ? 'System offline - changes saved to local cache' : 'प्रणाली अफलाइन - परिवर्तनहरू स्थानीय क्यासमा सुरक्षित छन्'}
                   >
                     <span className="absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75 animate-ping" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600 border border-white dark:border-slate-900 shadow-sm" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600 border-2 border-white dark:border-slate-900 shadow-md" />
                   </span>
                 )}
               </motion.div>
@@ -363,12 +364,12 @@ export const Header: React.FC<HeaderProps> = ({
                   </span>
                 </div>
             </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                <div
-                  className="flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-2xl bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-slate-200/50 dark:border-white/10"
-                  onMouseEnter={onMouseEnterFab}
-                  onMouseLeave={onMouseLeaveFab}
-                >
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                 <div
+                   className="flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-2xl bg-white/80 dark:bg-white/5 backdrop-blur-2xl border border-slate-200/60 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.2),0_1px_2px_rgba(0,0,0,0.1)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]"
+                   onMouseEnter={onMouseEnterFab}
+                   onMouseLeave={onMouseLeaveFab}
+                 >
                     {/* Theme Toggle Button */}
                    <motion.button
                      whileHover={{ scale: 1.08 }}

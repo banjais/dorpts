@@ -51,7 +51,7 @@ export const AlertLog: React.FC<AlertLogProps> = ({ logs, onClearLogs }) => {
       return;
     }
 
-    let text = "";
+    let text;
     if (language === 'en') {
       text = `There are ${logs.length} system alerts. `;
       const topAlerts = logs.slice(0, 3).map(l => `${l.indicatorNameEn || l.indicatorName} at ${l.progress} percent`).join(', ');

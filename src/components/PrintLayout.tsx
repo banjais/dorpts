@@ -111,7 +111,6 @@ export function PrintLayout({ indicators, metadata, updatesHistory, customTitle,
     };
     
     try {
-      // @ts-ignore
       const worker = html2pdf();
       worker.set(opt).from(element).save().then(() => {
         setIsExporting(false);

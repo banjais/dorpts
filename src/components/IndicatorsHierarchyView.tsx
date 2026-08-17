@@ -86,7 +86,7 @@ export const IndicatorsHierarchyView: React.FC<IndicatorsHierarchyViewProps> = (
         scores[sector] = 0;
         return;
       }
-      const totalWeight = list.reduce((acc, curr) => acc + (curr.weight || 0), 0) || 100;
+      const totalWeight = list.reduce((acc, curr) => acc + (curr.weight || 0), 0);
       const achievedWeight = list.reduce((acc, curr) => {
         const target = curr.annualTarget || 0;
         const progress = curr.annualProgress || 0;

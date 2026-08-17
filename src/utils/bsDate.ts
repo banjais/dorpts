@@ -1,7 +1,7 @@
 // Accurate Gregorian (AD) -> Bikram Sambat (BS / Nepal Sambat) conversion.
 // BS months are 1-indexed starting from Baisakh. Fiscal year starts Shrawan 1.
-// Verified anchors: BS 2081/1/1 = AD 2024-04-13, BS 2082/1/1 = AD 2025-04-14,
-// BS 2083/1/1 = AD 2026-04-14. A -1 day correction aligns the standard table.
+// Verified anchors: BS 2081/1/1 = AD 2024-04-12, BS 2082/1/1 = AD 2025-04-13,
+// BS 2083/1/1 = AD 2026-04-13.
 
 const NEPALI_DIGITS = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
 
@@ -123,7 +123,7 @@ const BS_MONTHS_EN = [
   'Kartik', 'Mangsir', 'Poush', 'Magh', 'Falgun', 'Chaitra',
 ];
 
-// Anchor: BS 2081/01/01 = AD 2024/04/13. A -1 day correction aligns the table.
+// Anchor: BS 2081/01/01 = AD 2024/04/12.
 const ANCHOR_AD = new Date(2024, 3, 12); // month is 0-indexed (3 = April)
 const ANCHOR_BS_YEAR = 2081;
 const ANCHOR_BS_MONTH = 1; // Baisakh
@@ -182,8 +182,13 @@ export const parseToBs = (dateStr?: string | null): BSDate | null => {
     const y = parseInt(bsMatch[1], 10);
     const m = parseInt(bsMatch[2], 10);
     const d = parseInt(bsMatch[3], 10);
-    if (y >= 2000 && y <= 2099 && m >= 1 && m <= 12 && d >= 1 && d <= 32) {
-      return { year: y, month: m, day: d };
+    if (y >= 2000 && y <= 2099 && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+      const idx = y - 2000;
+      const monthDays = BS_DAYS_IN_MONTH[idx]?.[m - 1];
+      if (monthDays && d <= monthDays) {
+        return { year: y, month: m, day: d };
+      }
+      return null;
     }
   }
   const ad = new Date(trimmed);
@@ -229,13 +234,13 @@ export const formatNepaliDate = (dateStr?: string | null, lang: string = 'np'): 
 // Fiscal year (Nepali): starts Shrawan 1 (month 4). Returns e.g. "2083/84".
 export const fiscalYear = (bs: BSDate): string => {
   const startYear = bs.month >= 4 ? bs.year : bs.year - 1;
-  const endYear = (startYear + 1) % 100;
+  const endYear = startYear >= 2099 ? 2100 : (startYear + 1) % 100;
   return `${toNepaliNumerals(startYear)}/${toNepaliNumerals(String(endYear).padStart(2, '0'))}`;
 };
 
 export const fiscalYearEn = (bs: BSDate): string => {
   const startYear = bs.month >= 4 ? bs.year : bs.year - 1;
-  const endYear = (startYear + 1) % 100;
+  const endYear = startYear >= 2099 ? 2100 : (startYear + 1) % 100;
   return `${startYear}/${String(endYear).padStart(2, '0')}`;
 };
 
@@ -245,7 +250,7 @@ export const getFiscalYearForBsDateStr = (dateStr: string): string => {
   const year = parseInt(match[1], 10);
   const month = parseInt(match[2], 10);
   const startYear = month >= 4 ? year : year - 1;
-  const endYear = (startYear + 1) % 100;
+  const endYear = startYear >= 2099 ? 2100 : (startYear + 1) % 100;
   return `${startYear}/${String(endYear).padStart(2, '0')}`;
 };
 

@@ -250,19 +250,19 @@ export const Footer: React.FC<FooterProps> = ({
 
   return (
     <>
-       <footer 
-          id="app-footer"
-          onMouseEnter={() => { setIsHovered(true); onExpandChange?.(true); }}
-          onMouseLeave={() => { setIsHovered(false); onExpandChange?.(false); }}
-          onTouchStart={() => { setIsTouched(true); onExpandChange?.(true); }}
-          onTouchEnd={() => { setIsTouched(false); onExpandChange?.(false); }}
-          onClick={(e) => { e.stopPropagation(); onExpandChange?.(!shouldExpand); }}
-         className={`fixed bottom-0 left-0 w-full z-[850] transition-all duration-500 ease-out cursor-pointer ${
-           shouldExpand
-             ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t-2 border-indigo-500/40 dark:border-indigo-400/30 shadow-[0_-4px_32px_rgba(0,0,0,0.08)] py-10 sm:py-14'
-             : 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-300/60 dark:border-slate-700/60 shadow-[0_-2px_12px_rgba(0,0,0,0.04)] py-3 sm:py-3.5'
-         }`}
-       >
+         <footer 
+           id="app-footer"
+           onMouseEnter={() => { setIsHovered(true); onExpandChange?.(true); }}
+           onMouseLeave={() => { setIsHovered(false); onExpandChange?.(false); }}
+           onTouchStart={() => { setIsTouched(true); onExpandChange?.(true); }}
+           onTouchEnd={() => { setIsTouched(false); onExpandChange?.(false); }}
+           onClick={(e) => { e.stopPropagation(); onExpandChange?.(!shouldExpand); }}
+          className={`fixed bottom-0 left-0 w-full z-[850] transition-all duration-500 ease-out cursor-pointer ${
+            shouldExpand
+              ? 'bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl border-t-2 border-indigo-500/40 dark:border-indigo-400/30 shadow-[0_-4px_32px_rgba(0,0,0,0.08)] py-10 sm:py-14'
+              : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-slate-300/60 dark:border-slate-700/60 shadow-[0_-2px_12px_rgba(0,0,0,0.04)] py-3 sm:py-3.5'
+          }`}
+        >
         <motion.div 
           className="max-w-7xl mx-auto px-6 flex flex-col items-center justify-center relative min-h-[28px]"
           animate={{ 
@@ -386,21 +386,21 @@ export const Footer: React.FC<FooterProps> = ({
                             onMouseLeave={() => { 
                               if (item.id === 'btn-sync') handleSyncPressEnd();
                             }}
-                            className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl transition-all active:scale-95 cursor-pointer border relative ${
-                              item.id === 'btn-menu'
-                                ? 'bg-white/70 dark:bg-white/5 backdrop-blur-xl border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700'
-                               : item.id === 'btn-ai'
-                                 ? 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white border-indigo-500/50 shadow-md shadow-indigo-600/30 hover:scale-105'
-                                 : item.id === 'btn-install'
-                                   ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
-                                    : item.id === 'btn-messaging'
-                                      ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
-                                      : item.id === 'btn-sync'
-                                         ? hasPendingWrites
-                                           ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-300 hover:border-amber-500/50'
-                                           : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
-                                       : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
-                            }`}
+                             className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl transition-all active:scale-95 cursor-pointer border relative ${
+                               item.id === 'btn-menu'
+                                 ? 'bg-white/80 dark:bg-white/5 backdrop-blur-xl border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:border-indigo-300 dark:hover:border-indigo-700'
+                                : item.id === 'btn-ai'
+                                  ? 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white border-indigo-500/50 shadow-md shadow-indigo-600/30 hover:scale-105'
+                                  : item.id === 'btn-install'
+                                    ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
+                                     : item.id === 'btn-messaging'
+                                       ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500/50'
+                                       : item.id === 'btn-sync'
+                                          ? hasPendingWrites
+                                            ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-300 hover:border-amber-500/50 hover:shadow-[0_0_12px_rgba(245,158,11,0.2)]'
+                                            : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50 hover:shadow-[0_0_12px_rgba(79,70,229,0.15)]'
+                                        : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50'
+                             }`}
                              title={
                                item.id === 'btn-reports'
                                  ? (language === 'en' ? 'Reports' : 'रिपोर्टहरू')
@@ -472,32 +472,33 @@ export const Footer: React.FC<FooterProps> = ({
                  </div>
                </div>
 
-               <div className="flex flex-col items-center gap-2 mt-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
-                  <p className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                    {APP_TITLES.copyright[language]}
-                  </p>
-                  <div className="h-[1px] w-8 bg-slate-200 dark:bg-slate-800"></div>
-                </div>
+             <div className="flex flex-col items-center gap-2 mt-4">
+                 <div className="flex items-center gap-3">
+                   <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-slate-300 dark:to-slate-700"></div>
+                   <p className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                     {APP_TITLES.copyright[language]}
+                   </p>
+                   <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-slate-300 dark:to-slate-700"></div>
+                 </div>
                  <div className="flex items-center justify-center gap-3">
-                  <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
-                    v{APP_VERSION}
-                  </p>
-                  {needRefresh && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); onUpdateClick?.(); }}
-                      className="animate-pulse text-[0.5625rem] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors cursor-pointer"
-                    >
-                      {language === 'en' ? 'Update' : 'अपडेट'}
-                    </button>
-                  )}
-                  {minutesAgo !== null && (
-                  <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium truncate">
-                    {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
-                  </p>
-                )}
-               </div>
+                   <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
+                     v{APP_VERSION}
+                   </p>
+                   <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+                   {needRefresh && (
+                     <button
+                       onClick={(e) => { e.stopPropagation(); onUpdateClick?.(); }}
+                       className="animate-pulse text-[0.5625rem] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors cursor-pointer"
+                     >
+                       {language === 'en' ? 'Update' : 'अपडेट'}
+                     </button>
+                   )}
+                   {minutesAgo !== null && (
+                   <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium truncate">
+                     {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
+                   </p>
+                 )}
+                </div>
              </div>
             </>
           )}

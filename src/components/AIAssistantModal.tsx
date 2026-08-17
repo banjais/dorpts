@@ -35,6 +35,93 @@ export function AIAssistantModal({ isOpen, onClose }: AIAssistantModalProps) {
     }
   }, [messages]);
 
+  const handleSendMessage = async (text: string) => {
+    if (!text.trim()) return;
+    
+    const newMessages = [...messages, { role: 'user' as const, content: text }];
+    setMessages(newMessages);
+    setTranscript('');
+    setIsProcessing(true);
+    
+    try {
+      const history = messages.slice(1).map(msg => ({
+        role: msg.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: msg.content }]
+      }));
+
+      const response = await fetch(`${API_BASE}/api/ai/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Network response was not ok', { cause: errData });
+      }
+
+      const data = await response.json();
+      
+      let assistantReply = data.text;
+      const functionCalls = data.functionCalls || [];
+
+      if (functionCalls.length > 0) {
+        for (const call of functionCalls) {
+          switch (call.name) {
+            case 'open_page':
+              window.dispatchEvent(new CustomEvent('ai:open_page', { detail: call.args }));
+              assistantReply += `\nOpening ${call.args.page} view...`;
+              break;
+            case 'make_report':
+              window.dispatchEvent(new CustomEvent('ai:make_report', { detail: call.args }));
+              assistantReply += `\nGenerating ${call.args.type} report...`;
+              break;
+            case 'print_screen':
+              window.dispatchEvent(new CustomEvent('ai:print_screen'));
+              assistantReply += '\nOpening print dialog...';
+              break;
+            case 'show_menu':
+              window.dispatchEvent(new CustomEvent('ai:show_menu'));
+              assistantReply += '\nShowing menu options...';
+              break;
+            case 'set_volume':
+              window.dispatchEvent(new CustomEvent('ai:set_volume', { detail: call.args }));
+              assistantReply += `\nVolume ${call.args.enabled ? 'enabled' : 'disabled'}.`;
+              break;
+            case 'fill_data':
+              window.dispatchEvent(new CustomEvent('ai:fill_data', { detail: call.args }));
+              assistantReply += '\nOpening data input section and applying suggested values...';
+              break;
+          }
+        }
+      }
+
+      if (!assistantReply) {
+        assistantReply = language === 'en' ? 'Done.' : 'भयो।';
+      }
+
+      setMessages([...newMessages, { 
+        role: 'assistant', 
+        content: assistantReply
+      }]);
+    } catch (error: any) {
+      console.error('AI processing error:', error);
+      const errMsg = error?.message || "";
+      const displayMessage = errMsg.includes("API key") 
+        ? errMsg
+        : (language === 'en' 
+            ? 'Sorry, I encountered an error communicating with the server.' 
+            : 'माफ गर्नुहोस्, सर्भरसँग सञ्चार गर्दा मैले एउटा त्रुटि सामना गरें।');
+             
+      setMessages([...newMessages, { 
+        role: 'assistant', 
+        content: displayMessage
+      }]);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   useEffect(() => {
     if (!isOpen) {
       if (isListening && recognitionRef.current) {
@@ -125,94 +212,7 @@ export function AIAssistantModal({ isOpen, onClose }: AIAssistantModalProps) {
     }
   };
 
-  const handleSendMessage = async (text: string) => {
-    if (!text.trim()) return;
-    
-    const newMessages = [...messages, { role: 'user' as const, content: text }];
-    setMessages(newMessages);
-    setTranscript('');
-    setIsProcessing(true);
-    
-    try {
-      // Map messages for the history format expected by the API
-      const history = messages.slice(1).map(msg => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
-      }));
 
-      const response = await fetch(`${API_BASE}/api/ai/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, history })
-      });
-
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || 'Network response was not ok');
-      }
-
-      const data = await response.json();
-      
-      let assistantReply = data.text;
-      const functionCalls = data.functionCalls || [];
-
-      // Process function calls
-      if (functionCalls.length > 0) {
-        for (const call of functionCalls) {
-          switch (call.name) {
-            case 'open_page':
-              window.dispatchEvent(new CustomEvent('ai:open_page', { detail: call.args }));
-              assistantReply += `\nOpening ${call.args.page} view...`;
-              break;
-            case 'make_report':
-              window.dispatchEvent(new CustomEvent('ai:make_report', { detail: call.args }));
-              assistantReply += `\nGenerating ${call.args.type} report...`;
-              break;
-            case 'print_screen':
-              window.dispatchEvent(new CustomEvent('ai:print_screen'));
-              assistantReply += '\nOpening print dialog...';
-              break;
-            case 'show_menu':
-              window.dispatchEvent(new CustomEvent('ai:show_menu'));
-              assistantReply += '\nShowing menu options...';
-              break;
-            case 'set_volume':
-              window.dispatchEvent(new CustomEvent('ai:set_volume', { detail: call.args }));
-              assistantReply += `\nVolume ${call.args.enabled ? 'enabled' : 'disabled'}.`;
-              break;
-            case 'fill_data':
-              window.dispatchEvent(new CustomEvent('ai:fill_data', { detail: call.args }));
-              assistantReply += '\nOpening data input section and applying suggested values...';
-              break;
-          }
-        }
-      }
-
-      if (!assistantReply) {
-        assistantReply = language === 'en' ? 'Done.' : 'भयो।';
-      }
-
-      setMessages([...newMessages, { 
-        role: 'assistant', 
-        content: assistantReply
-      }]);
-    } catch (error: any) {
-      console.error('AI processing error:', error);
-      const errMsg = error?.message || "";
-      const displayMessage = errMsg.includes("API key") 
-        ? errMsg
-        : (language === 'en' 
-            ? 'Sorry, I encountered an error communicating with the server.' 
-            : 'माफ गर्नुहोस्, सर्भरसँग सञ्चार गर्दा मैले एउटा त्रुटि सामना गरें।');
-            
-      setMessages([...newMessages, { 
-        role: 'assistant', 
-        content: displayMessage
-      }]);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
 
   return (
     <AnimatePresence>
