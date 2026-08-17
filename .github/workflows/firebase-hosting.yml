@@ -35,9 +35,6 @@ jobs:
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseToken: "${{ secrets.FIREBASE_TOKEN }}"
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: dor-progress
           target: dorpts
-          channelId: live
-          deployTimeout: 120000
