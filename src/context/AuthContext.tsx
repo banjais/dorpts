@@ -25,6 +25,13 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const withTimeout = <T,>(promise: Promise<T>, ms: number, fallback: T): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
+  ]);
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [adminsList, setAdminsList] = useState<AdminUser[]>([]);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userAssignedOffice, setUserAssignedOffice] = useState<string | null>(null);
-  const loadingRef = useRef(false);
+  const currentLoadIdRef = useRef<string | null>(null);
 
   const isSuperadmin = role === 'superadmin';
   const isAdmin = role === 'superadmin' || role === 'system_admin';
@@ -44,14 +51,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const uid = user?.uid || 'anonymous';
       const email = user?.email || 'anonymous';
       const actId = `act_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-      await setDoc(doc(db, 'activities', actId), {
+      await withTimeout(setDoc(doc(db, 'activities', actId), {
         id: actId,
         userId: uid,
         email,
         actionType,
         details,
         timestamp: serverTimestamp(),
-      });
+      }), 5000, undefined);
     } catch {
       // suppress
     }
@@ -61,19 +68,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setRole(newRole);
     if (newRole === 'superadmin' || newRole === 'system_admin') {
       try {
-        const snap = await getDocs(collection(db, 'admins'));
+        const snap = await withTimeout(getDocs(collection(db, 'admins')), 8000, null);
         const list: AdminUser[] = [];
-        snap.forEach(d => {
-          const data = d.data();
-          list.push({
-            uid: d.id,
-            email: data.email,
-            role: data.role,
-            createdAt: data.createdAt?.seconds
-              ? new Date(data.createdAt.seconds * 1000).toISOString()
-              : data.createdAt || new Date().toISOString(),
+        if (snap) {
+          snap.forEach(d => {
+            const data = d.data();
+            list.push({
+              uid: d.id,
+              email: data.email,
+              role: data.role,
+              createdAt: data.createdAt?.seconds
+                ? new Date(data.createdAt.seconds * 1000).toISOString()
+                : data.createdAt || new Date().toISOString(),
+            });
           });
-        });
+        }
         setAdminsList(list);
       } catch {
         // suppress
@@ -85,8 +94,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (email === SUPERADMIN_EMAIL) return null;
     try {
       const q = query(collection(db, 'admins'), where('email', '==', email));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
+      const snap = await withTimeout(getDocs(q), 8000, null);
+      if (snap && !snap.empty) {
         const data = snap.docs[0].data();
         const office = data.office as string | undefined;
         if (office && office.trim()) return office.trim();
@@ -98,29 +107,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const loadUserRole = useCallback(async (currentUser: User) => {
-    if (loadingRef.current) return;
-    loadingRef.current = true;
+    const loadId = currentUser.uid;
+    currentLoadIdRef.current = loadId;
     setReady(false);
+    setLoading(true);
+    console.log('[Auth] loadUserRole start', currentUser.email);
     try {
       const adminRef = doc(db, 'admins', currentUser.uid);
-      const adminSnap = await getDoc(adminRef);
-      if (adminSnap.exists()) {
+      const adminSnap = await withTimeout(getDoc(adminRef), 8000, null);
+      console.log('[Auth] adminSnap', currentUser.email, adminSnap?.exists());
+      if (adminSnap?.exists()) {
         const val = adminSnap.data();
         const detectedRole = val.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
         await setRoleAndLoadAdmins(detectedRole);
       } else if (currentUser.email === SUPERADMIN_EMAIL) {
-        await setDoc(adminRef, {
+        await withTimeout(setDoc(adminRef, {
           email: SUPERADMIN_EMAIL,
           role: 'superadmin',
           createdAt: serverTimestamp(),
-        });
+        }), 5000, undefined);
         await setRoleAndLoadAdmins('superadmin');
         await logActivity('role_change', `Bootstrapped ${SUPERADMIN_EMAIL} as Initial Superadmin`);
       } else {
         try {
           const q = query(collection(db, 'admins'), where('email', '==', currentUser.email));
-          const emailSnap = await getDocs(q);
-          if (!emailSnap.empty) {
+          const emailSnap = await withTimeout(getDocs(q), 8000, null);
+          console.log('[Auth] emailSnap', currentUser.email, emailSnap?.empty);
+          if (emailSnap && !emailSnap.empty) {
             const val = emailSnap.docs[0].data();
             const detectedRole = val.role as 'superadmin' | 'system_admin' | 'office_admin' | 'viewer';
             await setRoleAndLoadAdmins(detectedRole);
@@ -137,31 +150,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {
       await setRoleAndLoadAdmins('viewer');
     } finally {
-      setReady(true);
-      setLoading(false);
-      loadingRef.current = false;
+      console.log('[Auth] loadUserRole finally', currentUser.email, 'currentLoadId=', currentLoadIdRef.current);
+      if (currentLoadIdRef.current === loadId) {
+        setReady(true);
+        setLoading(false);
+        currentLoadIdRef.current = null;
+      }
     }
   }, [setRoleAndLoadAdmins, logActivity, loadUserAssignedOffice]);
 
-  // Google auth state listener - keep it lightweight
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        setUser(null);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log('[Auth] onAuthStateChanged', currentUser?.email || 'null');
+      setUser(currentUser);
+      if (!currentUser) {
         setRole(null);
         setAccessToken(null);
         setAdminsList([]);
         setUserAssignedOffice(null);
         setReady(true);
         setLoading(false);
+        currentLoadIdRef.current = null;
       }
     });
     return unsubscribe;
   }, []);
 
-  // Load role data when user changes
   useEffect(() => {
     if (user) {
       loadUserRole(user);
