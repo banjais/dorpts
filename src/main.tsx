@@ -7,9 +7,11 @@ import { APP_VERSION } from './constants/appTitles';
 
 // Force fresh version on load: if the cached version differs from the current build,
 // clear caches and reload so the user always gets the latest app in any tab.
+// Skip hard reload when returning from Google redirect auth to avoid losing the Firebase redirect result.
 if (typeof window !== 'undefined') {
   const cachedVersion = localStorage.getItem('dor_app_version');
-  if (cachedVersion && cachedVersion !== APP_VERSION) {
+  const isRedirecting = sessionStorage.getItem('dor_redirecting') === '1';
+  if (cachedVersion && cachedVersion !== APP_VERSION && !isRedirecting) {
     localStorage.removeItem('dor_app_version');
     if ('caches' in window) {
       caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key)))).catch(() => {});

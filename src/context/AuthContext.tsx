@@ -188,8 +188,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithGoogle = async (rememberMe = false) => {
     try {
       await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+      sessionStorage.setItem('dor_redirecting', '1');
       await signInWithRedirect(auth, googleProvider);
     } catch (error: any) {
+      sessionStorage.removeItem('dor_redirecting');
       console.error('Login action encountered error:', error);
       const message = error?.message || error?.code || String(error);
       const friendly = message.includes('redirect')
@@ -213,6 +215,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } catch (error) {
         console.error('Redirect result error:', error);
+      } finally {
+        sessionStorage.removeItem('dor_redirecting');
       }
     };
     handleRedirectResult();
