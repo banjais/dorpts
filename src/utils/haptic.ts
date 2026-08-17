@@ -1,3 +1,14 @@
+let lastUserGesture = 0;
+
+if (typeof window !== 'undefined') {
+  const updateGesture = () => {
+    lastUserGesture = Date.now();
+  };
+  window.addEventListener('click', updateGesture, { passive: true });
+  window.addEventListener('touchstart', updateGesture, { passive: true });
+  window.addEventListener('keydown', updateGesture, { passive: true });
+}
+
 export const getHapticIntensity = (): 'light' | 'medium' | 'heavy' | 'off' => {
   if (typeof window !== 'undefined') {
     const saved = localStorage.getItem('dor_haptic_intensity');
@@ -24,6 +35,8 @@ export const triggerHaptic = (pattern: 'light' | 'medium' | 'heavy' | 'success' 
     try {
       const intensity = getHapticIntensity();
       if (intensity === 'off') return;
+
+      if (Date.now() - lastUserGesture > 3000) return;
 
       if (typeof document !== 'undefined') {
         if (document.visibilityState === 'hidden') return;

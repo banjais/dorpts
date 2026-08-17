@@ -63,6 +63,8 @@ export function PrintLayout({ indicators, metadata, updatesHistory, customTitle,
     navigator.clipboard.writeText(url.toString()).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {
+      console.debug('Clipboard write failed or was blocked');
     });
   };
 
