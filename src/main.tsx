@@ -13,7 +13,6 @@ if (typeof window !== 'undefined') {
   const cachedVersion = localStorage.getItem('dor_app_version');
   const isRedirecting = sessionStorage.getItem('dor_redirecting') === '1';
   if (cachedVersion && cachedVersion !== APP_VERSION && !isRedirecting) {
-    localStorage.removeItem('dor_app_version');
     const forceRefresh = async () => {
       if ('serviceWorker' in navigator) {
         try {
@@ -33,9 +32,8 @@ if (typeof window !== 'undefined') {
       window.location.reload();
     };
     forceRefresh();
-  } else {
-    localStorage.setItem('dor_app_version', APP_VERSION);
   }
+  localStorage.setItem('dor_app_version', APP_VERSION);
 }
 
 // Service worker registration is handled automatically by vite-plugin-pwa
