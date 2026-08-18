@@ -6,19 +6,36 @@ import 'leaflet/dist/leaflet.css';
 import { APP_VERSION } from './constants/appTitles';
 
 // Force fresh version on load: if the cached version differs from the current build,
-// clear caches and reload so the user always gets the latest app in any tab.
+// force the service worker to update, clear caches, and reload so the user always
+// gets the latest app in any tab.
 // Skip hard reload when returning from Google redirect auth to avoid losing the Firebase redirect result.
 if (typeof window !== 'undefined') {
   const cachedVersion = localStorage.getItem('dor_app_version');
   const isRedirecting = sessionStorage.getItem('dor_redirecting') === '1';
   if (cachedVersion && cachedVersion !== APP_VERSION && !isRedirecting) {
     localStorage.removeItem('dor_app_version');
-    if ('caches' in window) {
-      caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key)))).catch(() => {});
-    }
-    window.location.reload();
+    const forceRefresh = async () => {
+      if ('serviceWorker' in navigator) {
+        try {
+          const registration = await navigator.serviceWorker.getRegistration();
+          if (registration) {
+            await registration.update();
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        } catch {}
+        if ('caches' in window) {
+          try {
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map(name => caches.delete(name)));
+          } catch {}
+        }
+      }
+      window.location.reload();
+    };
+    forceRefresh();
+  } else {
+    localStorage.setItem('dor_app_version', APP_VERSION);
   }
-  localStorage.setItem('dor_app_version', APP_VERSION);
 }
 
 // Service worker registration is handled automatically by vite-plugin-pwa
