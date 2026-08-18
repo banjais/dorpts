@@ -2362,8 +2362,8 @@ export const Overview: React.FC<OverviewProps> = ({
                               <div className="space-y-1.5 min-w-0">
                                 {/* Line 1: Prefix numeric (office ID) */}
                                 <div className="flex items-center justify-between gap-1.5">
-                                  <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/40 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
-                                    <Building2 size={10} className="shrink-0" />
+                                  <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/40 px-2.5 py-1 rounded-md inline-flex items-center gap-1">
+                                    <Building2 size={14} className="shrink-0" />
                                     {language === "en"
                                       ? `ID: ${off.officeId || "—"}`
                                       : `कार्यालय कोड: ${formatNumber(off.officeId || "—", language)}`}

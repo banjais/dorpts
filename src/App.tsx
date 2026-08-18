@@ -1454,6 +1454,12 @@ function MainAppContent() {
     }
   }, [user, authLoading, showLogin]);
 
+  useEffect(() => {
+    if (!user && !authLoading) {
+      setShowLogin(true);
+    }
+  }, [user, authLoading]);
+
   const [isGeneratingAiSummary, setIsGeneratingAiSummary] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
@@ -4226,7 +4232,7 @@ function MainAppContent() {
 
         {/* Login Overlay */}
         {showLogin && (
-          <LoginScreen onClose={() => setShowLogin(false)} />
+          <LoginScreen onClose={user ? () => setShowLogin(false) : undefined} />
         )}
 
         {/* Superadmin Settings */}
