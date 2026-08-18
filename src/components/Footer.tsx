@@ -325,7 +325,7 @@ export const Footer: React.FC<FooterProps> = ({
                                 <div className="p-2 bg-white rounded-xl border border-slate-100">
                                   <QRCodeCanvas value={currentUrl} size={110} />
                                 </div>
-                                <span className="text-[0.5rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center whitespace-nowrap">
+                                <span className="text-[8px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center whitespace-nowrap">
                                   {t('scanToOpen') || 'Scan to Open'}
                                 </span>
                               </motion.div>
@@ -475,26 +475,26 @@ export const Footer: React.FC<FooterProps> = ({
              <div className="flex flex-col items-center gap-2 mt-4">
                  <div className="flex items-center gap-3">
                    <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-slate-300 dark:to-slate-700"></div>
-                   <p className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                      {APP_TITLES.copyright[language]}
                    </p>
                    <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-slate-300 dark:to-slate-700"></div>
                  </div>
                  <div className="flex items-center justify-center gap-3">
-                   <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
+                   <p className="text-[9px] font-mono tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase font-medium">
                      v{APP_VERSION}
                    </p>
                    <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
                    {needRefresh && (
                      <button
                        onClick={(e) => { e.stopPropagation(); onUpdateClick?.(); }}
-                       className="animate-pulse text-[0.5625rem] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors cursor-pointer"
+                       className="animate-pulse text-[9px] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors cursor-pointer"
                      >
                        {language === 'en' ? 'Update' : 'अपडेट'}
                      </button>
                    )}
                    {minutesAgo !== null && (
-                   <p className="text-[0.5625rem] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium truncate">
+                   <p className="text-[9px] font-mono tracking-[0.2em] text-indigo-500/70 dark:text-indigo-400/70 uppercase font-medium truncate">
                      {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
                    </p>
                  )}
@@ -513,7 +513,7 @@ export const Footer: React.FC<FooterProps> = ({
                   className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-500/15 border border-indigo-200 dark:border-indigo-500/30"
                 >
                   <RefreshCw size={10} className="animate-spin text-indigo-600 dark:text-indigo-400" />
-                  <span className="text-[0.5rem] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                  <span className="text-[8px] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
                     {language === 'en' ? 'Syncing' : 'सिंक'}
                   </span>
                 </motion.div>
@@ -525,7 +525,7 @@ export const Footer: React.FC<FooterProps> = ({
                   exit={{ opacity: 0, scale: 0.8 }}
                   className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/30"
                 >
-                  <span className="text-[0.5rem] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                  <span className="text-[8px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
                     {language === 'en' ? 'Updated' : 'अपडेट भयो'}
                   </span>
                 </motion.div>
@@ -544,13 +544,13 @@ export const Footer: React.FC<FooterProps> = ({
                   }}
                   className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-50 dark:bg-rose-500/15 border border-rose-200 dark:border-rose-500/30 cursor-pointer"
                 >
-                  <span className="text-[0.5rem] font-black uppercase tracking-wider text-rose-700 dark:text-rose-300">
+                  <span className="text-[8px] font-black uppercase tracking-wider text-rose-700 dark:text-rose-300">
                     {language === 'en' ? 'Update' : 'अपडेट'}
                   </span>
                 </motion.button>
               )}
               {minutesAgo !== null && !isSyncing && !syncSuccess && showLastSynced && (
-                <span className="text-[0.55rem] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   {language === 'en' ? `Synced ${minutesAgo}m ago` : `सिंक: ${minutesAgo} मिनेट अघि`}
                 </span>
               )}
@@ -579,7 +579,7 @@ export const Footer: React.FC<FooterProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 flex items-center justify-center bg-black/80 z-[100] p-6 backdrop-blur-md" 
+             className="fixed inset-0 flex items-center justify-center bg-slate-950/80 dark:bg-black/70 backdrop-blur-md z-[100] p-6"
             onClick={() => setShowQr(false)}
           >
             <motion.div 
@@ -596,19 +596,19 @@ export const Footer: React.FC<FooterProps> = ({
                 <h3 className="font-black text-slate-900 text-lg">
                   {t('instantAccess')}
                 </h3>
-                <div className="flex items-center gap-2 bg-slate-100 p-2 rounded-lg text-[0.625rem] font-mono text-slate-600 overflow-hidden">
+                <div className="flex items-center gap-2 bg-slate-100 p-2 rounded-lg text-[10px] font-mono text-slate-600 overflow-hidden">
                   <span className="truncate flex-1">{currentUrl}</span>
                   <button onClick={handleCopy} className="p-1.5 bg-white rounded-md shadow-sm hover:text-indigo-600 cursor-pointer">
                     {copied ? <Check size={12} className="text-emerald-500 font-bold" /> : <Copy size={12} />}
                   </button>
                 </div>
                 {copied && (
-                  <p className="text-[0.625rem] font-bold text-emerald-500 tracking-wider">
+                  <p className="text-[10px] font-bold text-emerald-500 tracking-wider">
                     {language === 'en' ? 'Link Copied!' : 'लिङ्क कपि भयो!'}
                   </p>
                 )}
                 <div className="pt-2">
-                  <p className="text-[0.625rem] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
                     {t('shareTo')}
                   </p>
                   <div className="grid grid-cols-5 gap-2">

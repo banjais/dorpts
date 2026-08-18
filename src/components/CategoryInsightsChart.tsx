@@ -46,7 +46,7 @@ export default function CategoryInsightsChart({ indicators, t, language, height 
       <ResponsiveContainer width="100%" height="100%">
         {mode === 'bar' ? (
           <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 35 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.5} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-chart-grid)" opacity={0.5} />
             <XAxis
               dataKey="name"
               axisLine={false}

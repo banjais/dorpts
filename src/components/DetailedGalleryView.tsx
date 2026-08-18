@@ -8,6 +8,7 @@ import { normalizeCategory, getCategoryColor, STANDARD_CATEGORIES } from '../uti
 import { triggerHaptic } from '../utils/haptic';
 import { HISTORICAL_DATA } from '../historicalData';
 import { formatNepaliDate } from '../utils/date';
+import { formatNumber, formatPercent } from '../utils/format';
 import {
   Filter,
   ChevronDown,
@@ -72,11 +73,6 @@ interface DetailedGalleryViewProps {
   onSpeakDashboardSummary?: () => void;
 }
 
-const toNepaliNumerals = (numStr: string | number): string => {
-  const nepaliDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
-  return String(numStr).replace(/[0-9]/g, (digit) => nepaliDigits[parseInt(digit, 10)]);
-};
-
 const getSparklineData = (
   indicatorId: string,
   currentProgress: number,
@@ -105,22 +101,8 @@ const getSparklineData = (
   return deduped.slice(-5);
 };
 
-const CustomSparklineTooltip = ({ active, payload, language }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-slate-900/95 dark:bg-slate-950/95 border border-slate-700/50 dark:border-white/10 px-2.5 py-1.5 rounded-xl shadow-xl text-[10px] text-white font-medium pointer-events-none backdrop-blur-sm z-50">
-        <div className="font-extrabold text-indigo-400">
-          {language === 'en' ? 'Progress' : 'प्रगति'}: {data.value}%
-        </div>
-        <div className="text-slate-300 font-semibold mt-0.5">
-          {language === 'en' ? 'Date' : 'मिति'}: {data.date}
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
+import { PremiumTooltip } from './PremiumTooltip';
+import { EmptyState } from './EmptyState';
 
 const MiniSparkline: React.FC<{
   data: { date: string; value: number }[];
@@ -134,7 +116,7 @@ const MiniSparkline: React.FC<{
         <LineChart data={data}>
           <YAxis hide domain={[0, 100]} />
           <RechartsTooltip
-            content={<CustomSparklineTooltip language={language} />}
+            content={<PremiumTooltip language={language} />}
             cursor={{ stroke: color, strokeWidth: 1, strokeDasharray: '2 2' }}
             allowEscapeViewBox={{ x: true, y: true }}
             position={{ y: -45 }}
@@ -173,10 +155,6 @@ const ExpandedDetailsSmall: React.FC<{
   const target = indicator.annualTarget || 0;
   const progress = indicator.annualProgress || 0;
   const pct = target > 0 ? Math.round((progress / target) * 100) : 0;
-  const fmt = (val: number | string): string => {
-    if (language === 'ne') return toNepaliNumerals(val);
-    return String(val);
-  };
 
   return (
     <div className="space-y-3">
@@ -189,10 +167,10 @@ const ExpandedDetailsSmall: React.FC<{
                 <stop offset="95%" stopColor={catColor.hex} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-            <XAxis dataKey="date" stroke="#94a3b8" fontSize={8} fontWeight={600} />
-            <YAxis domain={[0, 100]} stroke="#94a3b8" fontSize={8} fontWeight={600} />
-            <RechartsTooltip content={<CustomSparklineTooltip language={language} />} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid)" vertical={false} />
+            <XAxis dataKey="date" stroke="var(--color-chart-axis)" fontSize={8} fontWeight={600} />
+            <YAxis domain={[0, 100]} stroke="var(--color-chart-axis)" fontSize={8} fontWeight={600} />
+            <RechartsTooltip content={<PremiumTooltip language={language} />} />
             <Area type="monotone" dataKey="value" stroke={catColor.hex} strokeWidth={2} fill={`url(#grad-card-${indicator.id})`} dot={{ r: 3, fill: catColor.hex, strokeWidth: 0 }} />
           </AreaChart>
         </ResponsiveContainer>
@@ -204,7 +182,7 @@ const ExpandedDetailsSmall: React.FC<{
             {language === 'en' ? 'Target vs Progress' : 'लक्ष्य र प्रगति'}
           </span>
           <span className={`text-xs font-black ${pct >= 60 ? 'text-emerald-600' : pct >= 40 ? 'text-amber-600' : 'text-rose-600'}`}>
-            {fmt(pct)}%
+            {formatNumber(pct, language)}%
           </span>
         </div>
         <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -218,10 +196,10 @@ const ExpandedDetailsSmall: React.FC<{
         </div>
         <div className="flex justify-between mt-1">
           <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300">
-            {language === 'en' ? 'Target' : 'लक्ष्य'}: {fmt(target.toLocaleString())}
+            {language === 'en' ? 'Target' : 'लक्ष्य'}: {formatNumber(target.toLocaleString(), language)}
           </span>
           <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300">
-            {language === 'en' ? 'Progress' : 'प्रगति'}: {fmt(progress.toLocaleString())}
+            {language === 'en' ? 'Progress' : 'प्रगति'}: {formatNumber(progress.toLocaleString(), language)}
           </span>
         </div>
       </div>
@@ -289,17 +267,12 @@ const SummaryCard: React.FC<{
 }> = ({ indicator, language, isExpanded, onToggle, onClick, sparklineData, status, progressPercent, isAdmin, onViewHistory, onOpenComments, index, translateUnit, addToast }) => {
   const catColor = getCategoryColor(indicator.category);
   const gradient = getCardGradient(status, catColor);
-  const nepaliPercent = language === 'ne' ? toNepaliNumerals(progressPercent.toString()) : progressPercent.toString();
   const weight = indicator.weight || 0;
   const trendDirection = sparklineData.length >= 2
     ? sparklineData[sparklineData.length - 1].value - sparklineData[0].value
     : 0;
   const isTrendUp = trendDirection > 0;
   const isTrendDown = trendDirection < 0;
-  const fmt = (val: number | string): string => {
-    if (language === 'ne') return toNepaliNumerals(val);
-    return String(val);
-  };
 
   return (
     <motion.div
@@ -353,14 +326,14 @@ const SummaryCard: React.FC<{
           <div className="flex items-end justify-between gap-3">
             <div>
               <div className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white leading-none">
-                {nepaliPercent}%
+                {formatNumber(progressPercent, language)}%
               </div>
               <div className="flex items-center gap-2 mt-1.5 min-w-0">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                  {language === 'en' ? 'Weight' : 'भार'}: {fmt(weight)}%
+                  {language === 'en' ? 'Weight' : 'भार'}: {formatNumber(weight, language)}%
                 </span>
                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate">
-                  {fmt(indicator.annualProgress?.toLocaleString() ?? 0)} / {fmt(indicator.annualTarget?.toLocaleString() ?? 0)}
+                  {formatNumber(indicator.annualProgress ?? 0, language)} / {formatNumber(indicator.annualTarget ?? 0, language)}
                 </span>
               </div>
             </div>
@@ -434,12 +407,6 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
 }) => {
   const { language, t, translateUnit, translateOffice } = useLanguage();
   const { isAdmin } = useAuth();
-  const isNepali = language === 'ne';
-  const fmt = (val: number | string): string => {
-    if (isNepali) return toNepaliNumerals(val);
-    return String(val);
-  };
-
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [sortType, setSortType] = useState<'default' | 'low' | 'high' | 'weight' | 'status'>('default');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -805,7 +772,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
             {language === 'en' ? 'Total' : 'कुल'}
           </div>
           <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1">
-            {fmt(stats.total)}
+            {formatNumber(stats.total, language)}
           </div>
         </div>
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-100 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5">
@@ -813,7 +780,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
             {language === 'en' ? 'On Track' : 'सम्पादनमा'}
           </div>
           <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
-            {fmt(stats.onTrack)}
+            {formatNumber(stats.onTrack, language)}
           </div>
         </div>
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-100 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5">
@@ -821,7 +788,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
             {language === 'en' ? 'Offices' : 'कार्यालय'}
           </div>
           <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1">
-            {fmt(reportingOffices.length)}
+            {formatNumber(reportingOffices.length, language)}
           </div>
         </div>
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-100 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5">
@@ -829,7 +796,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
             {language === 'en' ? 'Weighted Rate' : 'भारित दर'}
           </div>
           <div className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
-            {fmt(stats.weightedRate)}%
+            {formatNumber(stats.weightedRate, language)}%
           </div>
         </div>
       </div>
@@ -873,17 +840,12 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
 
       {/* Indicator Grid */}
       {!expandedId && filteredIndicators.length === 0 ? (
-        <div className="text-center py-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
-          <div className="p-3 bg-slate-100 dark:bg-slate-800 inline-block rounded-full mb-3">
-            <Filter className="text-slate-400" size={24} />
-          </div>
-          <h3 className="text-slate-700 dark:text-slate-300 font-bold text-sm">
-            {language === 'en' ? 'No indicators found' : 'कुनै सूचकहरू फेला परेनन्'}
-          </h3>
-          <p className="text-[0.6875rem] text-slate-400 dark:text-slate-500 mt-1">
-            {language === 'en' ? 'Try adjusting your category filter' : 'वर्ग फिल्टर परिवर्तन गर्नुहोस्'}
-          </p>
-        </div>
+        <EmptyState
+          icon={<Filter size={32} className="text-slate-300 dark:text-slate-600" />}
+          title={language === 'en' ? 'No indicators found' : 'कुनै सूचकहरू फेला परेनन्'}
+          description={language === 'en' ? 'Try adjusting your category filter' : 'वर्ग फिल्टर परिवर्तन गर्नुहोस्'}
+          className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl"
+        />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 mt-3">
           <AnimatePresence mode="popLayout">
@@ -965,14 +927,14 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
                 <div className="flex items-end justify-between gap-4 mb-6">
                   <div>
                     <div className="text-5xl sm:text-6xl font-black text-slate-900 dark:text-white leading-none">
-                      {language === 'ne' ? toNepaliNumerals(pct.toString()) : pct}%
+                      {formatNumber(pct, language)}%
                     </div>
                     <div className="flex items-center gap-3 mt-2">
                       <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                        {language === 'en' ? 'Weight' : 'भार'}: {language === 'ne' ? toNepaliNumerals(weight.toString()) : weight}%
+                        {language === 'en' ? 'Weight' : 'भार'}: {formatNumber(weight, language)}%
                       </span>
                       <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                        {fmt(expandedIndicator.annualProgress?.toLocaleString() ?? 0)} / {fmt(expandedIndicator.annualTarget?.toLocaleString() ?? 0)}
+                        {formatNumber(expandedIndicator.annualProgress ?? 0, language)} / {formatNumber(expandedIndicator.annualTarget ?? 0, language)}
                       </span>
                     </div>
                   </div>
@@ -993,10 +955,10 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
                           <stop offset="95%" stopColor={catColor.hex} stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                      <XAxis dataKey="date" stroke="#94a3b8" fontSize={10} fontWeight={600} />
-                      <YAxis domain={[0, 100]} stroke="#94a3b8" fontSize={10} fontWeight={600} />
-                      <RechartsTooltip content={<CustomSparklineTooltip language={language} />} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid)" vertical={false} />
+                      <XAxis dataKey="date" stroke="var(--color-chart-axis)" fontSize={10} fontWeight={600} />
+                      <YAxis domain={[0, 100]} stroke="var(--color-chart-axis)" fontSize={10} fontWeight={600} />
+                      <RechartsTooltip content={<PremiumTooltip language={language} />} />
                       <Area type="monotone" dataKey="value" stroke={catColor.hex} strokeWidth={2} fill={`url(#grad-expanded-${expandedIndicator.id})`} dot={{ r: 4, fill: catColor.hex, strokeWidth: 0 }} />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -1007,7 +969,7 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
                       {language === 'en' ? 'Target vs Progress' : 'लक्ष्य र प्रगति'}
                     </span>
                     <span className={`text-sm font-black ${pct >= 60 ? 'text-emerald-600' : pct >= 40 ? 'text-amber-600' : 'text-rose-600'}`}>
-                      {fmt(pct)}%
+                      {formatNumber(pct, language)}%
                     </span>
                   </div>
                   <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -1021,10 +983,10 @@ export const DetailedGalleryView: React.FC<DetailedGalleryViewProps> = ({
                   </div>
                   <div className="flex justify-between mt-2">
                     <span className="text-xs font-bold text-slate-500 dark:text-slate-300">
-                      {language === 'en' ? 'Target' : 'लक्ष्य'}: {fmt(expandedIndicator.annualTarget?.toLocaleString() ?? 0)}
+                      {language === 'en' ? 'Target' : 'लक्ष्य'}: {formatNumber(expandedIndicator.annualTarget ?? 0, language)}
                     </span>
                     <span className="text-xs font-bold text-slate-500 dark:text-slate-300">
-                      {language === 'en' ? 'Progress' : 'प्रगति'}: {fmt(expandedIndicator.annualProgress?.toLocaleString() ?? 0)}
+                      {language === 'en' ? 'Progress' : 'प्रगति'}: {formatNumber(expandedIndicator.annualProgress ?? 0, language)}
                     </span>
                   </div>
                 </div>

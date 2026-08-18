@@ -221,7 +221,7 @@ export const ActionPortalView: React.FC<ActionPortalViewProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 flex items-center justify-center bg-black/80 z-[100] p-6 backdrop-blur-md"
+              className="fixed inset-0 flex items-center justify-center bg-slate-950/80 dark:bg-black/70 backdrop-blur-md z-[100] p-6"
               onClick={() => setShowQr(false)}
             >
               <motion.div

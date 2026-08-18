@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Printer, Check } from 'lucide-react';
+import { X, Printer, Check, FileText } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { EmptyState } from './EmptyState';
 import { Indicator } from '../types';
 
 interface ReportBuilderModalProps {
@@ -129,7 +130,7 @@ export function ReportBuilderModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[6000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+      <div className="fixed inset-0 z-[6000] flex items-center justify-center p-4 bg-slate-950/80 dark:bg-black/70 backdrop-blur-md">
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -195,8 +196,12 @@ export function ReportBuilderModal({
               <div className="border border-slate-100 dark:border-slate-800 rounded-2xl sm:rounded-[2rem] overflow-hidden bg-white dark:bg-slate-950/40 shadow-inner">
                 <div className="max-h-[30vh] sm:max-h-[35vh] overflow-y-auto divide-y divide-slate-50 dark:divide-slate-800/50 custom-scroll">
                   {modalFilteredIndicators.length === 0 ? (
-                    <div className="p-12 text-center text-slate-400 dark:text-slate-500 text-xs italic">
-                      {language === 'en' ? 'No indicators found matching current filter.' : 'मिल्दो सूचक फेला परेन।'}
+                    <div className="p-8 text-center">
+                      <EmptyState
+                        icon={<FileText size={28} className="text-slate-300 dark:text-slate-600" />}
+                        title={language === 'en' ? 'No indicators found' : 'कुनै सूचकहरू फेला परेनन्'}
+                        description={language === 'en' ? 'Try adjusting your filters' : 'फिल्टरहरू परिवर्तन गर्नुहोस्'}
+                      />
                     </div>
                   ) : (
                     modalFilteredIndicators.map(ind => {

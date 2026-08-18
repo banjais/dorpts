@@ -395,11 +395,11 @@ export const TrendAnalysisView: React.FC<TrendAnalysisViewProps> = ({ indicators
                           <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:hidden" />
-                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.15} className="hidden dark:block" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid-light)" className="dark:hidden" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid-dark)" opacity={0.15} className="hidden dark:block" />
                       <XAxis 
                         dataKey="date" 
-                        stroke="#94a3b8" 
+                        stroke="var(--color-chart-axis)" 
                         fontSize={10} 
                         fontWeight={600} 
                         tickLine={false} 
@@ -408,7 +408,7 @@ export const TrendAnalysisView: React.FC<TrendAnalysisViewProps> = ({ indicators
                         tickFormatter={(tick) => language === 'np' ? toNepaliNumerals(tick.split('/').slice(-2).join('/')) : tick.split('/').slice(-2).join('/')}
                       />
                       <YAxis 
-                        stroke="#94a3b8" 
+                        stroke="var(--color-chart-axis)" 
                         fontSize={10} 
                         fontWeight={600} 
                         tickLine={false} 

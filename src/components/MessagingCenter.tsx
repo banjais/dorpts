@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Send, MessageSquare, Users, Hash, X, Plus, CheckCircle, XCircle, Clock, LogOut, Trash2, Search, RefreshCw } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { EmptyState } from './EmptyState';
 import { collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, limit, doc, updateDoc, getDoc, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -448,9 +449,12 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
               {sidebarSection === 'my-channels' && (
                 <div className="flex flex-col gap-1">
                   {myChannels.length === 0 && (
-                    <p className="text-[9px] text-slate-400 text-center py-2">
-                      {language === 'en' ? 'No channels' : 'च्यानल छैन'}
-                    </p>
+                    <EmptyState
+                      icon={<MessageSquare size={24} className="text-slate-300 dark:text-slate-600" />}
+                      title={language === 'en' ? 'No channels' : 'च्यानल छैन'}
+                      description={language === 'en' ? 'Create or join a channel to get started' : 'सुरु गर्न च्यानल सिर्जना गर्नुहोस् वा सामेल हुनुहोस्'}
+                      className="py-4"
+                    />
                   )}
                   {myChannels.map((ch) => {
                     const isCreator = ch.createdBy === userEmail;
@@ -512,9 +516,12 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
               {sidebarSection === 'available' && (
                 <div className="flex flex-col gap-1">
                   {availableChannels.length === 0 && (
-                    <p className="text-[9px] text-slate-400 text-center py-2">
-                      {language === 'en' ? 'No channels' : 'च्यानल छैन'}
-                    </p>
+                    <EmptyState
+                      icon={<Users size={24} className="text-slate-300 dark:text-slate-600" />}
+                      title={language === 'en' ? 'No channels' : 'च्यानल छैन'}
+                      description={language === 'en' ? 'Check back later for new channels' : 'नयाँ च्यानलहरूका लागि पछि फेरि जाँच गर्नुहोस्'}
+                      className="py-4"
+                    />
                   )}
                   {availableChannels.map((ch) => {
                     return (
@@ -784,12 +791,11 @@ export const MessagingCenter: React.FC<{ language: 'en' | 'ne'; offices: Array<{
                 </div>
               )}
               {messages.length === 0 && (
-                <div className="text-center py-8">
-                  <MessageSquare size={32} className="mx-auto text-slate-300 dark:text-slate-600 mb-2" />
-                  <p className="text-[11px] text-slate-400">
-                    {language === 'en' ? 'No messages yet. Start the conversation!' : 'अहिले सम्म कुनै सन्देश छैन। संवाद सुरु गर्नुहोस्!'}
-                  </p>
-                </div>
+                <EmptyState
+                  icon={<MessageSquare size={32} className="text-slate-300 dark:text-slate-600" />}
+                  title={language === 'en' ? 'No messages yet' : 'अहिले सम्म कुनै सन्देश छैन'}
+                  description={language === 'en' ? 'Start the conversation!' : 'संवाद सुरु गर्नुहोस्!'}
+                />
               )}
               {messages.filter(msg => 
                 messageSearch ? 

@@ -135,7 +135,7 @@ export const MetricsChart: React.FC<ChartProps> = ({ indicators }) => {
       if (currentPercent >= 100 && prevPercent < 100) {
         annotation = { type: 'milestone', label: '100%', icon: <Trophy size={10} className="text-amber-500" />, color: '#f59e0b', bg: '#fef3c7' };
       } else if (currentPercent >= 75 && prevPercent < 75) {
-        annotation = { type: 'milestone', label: '75%', icon: <Star size={10} className="text-slate-400" />, color: '#94a3b8', bg: '#f1f5f9' };
+        annotation = { type: 'milestone', label: '75%', icon: <Star size={10} className="text-slate-400" />, color: 'var(--color-chart-axis)', bg: 'var(--color-chart-grid-light)' };
       } else if (currentPercent >= 50 && prevPercent < 50) {
         annotation = { type: 'milestone', label: '50%', icon: <Pin size={10} className="text-indigo-500" />, color: '#6366f1', bg: '#e0e7ff' };
       } else if (delta >= 15) {

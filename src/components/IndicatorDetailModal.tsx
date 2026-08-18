@@ -32,7 +32,7 @@ export const IndicatorDetailModal: React.FC<IndicatorDetailModalProps> = ({ isOp
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+             className="absolute inset-0 bg-slate-950/80 dark:bg-black/70 backdrop-blur-md"
           />
           
           <motion.div

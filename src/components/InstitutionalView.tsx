@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Indicator, SystemMetadata } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { EmptyState } from './EmptyState';
 import { Building2, Activity, Database, Brain, ShieldAlert, Search, Trophy, Award, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Target, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { DOR_OFFICES_LIST } from '../data';
 import { RecentActivityLog } from './RecentActivityLog';
@@ -242,14 +243,12 @@ export const InstitutionalView: React.FC<InstitutionalViewProps> = ({
                   <OfficeCard key={`${office.name}-${idx}`} office={office} variant="row" />
                 ))}
                 {filteredOffices.length === 0 && (
-                  <div className="text-center py-10">
-                    <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto text-slate-400 mb-3">
-                      <Search size={20} />
-                    </div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                      {language === 'en' ? 'No results matched your query' : 'कुनै नतिजा फेला परेन'}
-                    </p>
-                  </div>
+                  <EmptyState
+                    icon={<Search size={24} className="text-slate-300 dark:text-slate-600" />}
+                    title={language === 'en' ? 'No results matched your query' : 'कुनै नतिजा फेला परेन'}
+                    description={language === 'en' ? 'Try different search terms or filters' : 'फरक खोज शब्द वा फिल्टरहरू प्रयास गर्नुहोस्'}
+                    className="py-8"
+                  />
                 )}
               </div>
 

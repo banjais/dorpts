@@ -26,7 +26,7 @@ declare module 'virtual:pwa-register/react' {
   import type { FunctionComponent } from 'react';
 
   export interface RegisterSWOptionsReact {
-    immediate?: boolean;
+    immediate?: booleffddan;
     intervalMS?: number;
     onNeedRefresh?: () => void;
     onOfflineReady?: () => void;

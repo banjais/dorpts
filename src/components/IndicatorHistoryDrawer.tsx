@@ -273,7 +273,7 @@ export const IndicatorHistoryDrawer: React.FC<IndicatorHistoryDrawerProps> = ({
                             <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.1} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid)" opacity={0.1} />
                         <XAxis 
                           dataKey="date" 
                           tick={{ fontSize: 9, fill: '#94a3b8' }} 

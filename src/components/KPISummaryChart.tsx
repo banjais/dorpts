@@ -40,7 +40,7 @@ export const KPISummaryChart: React.FC<Props> = ({ indicators, t, language }) =>
     <div className="h-48 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.5} />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-chart-grid)" opacity={0.5} />
           <XAxis 
             dataKey="name" 
             axisLine={false}

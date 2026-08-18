@@ -589,7 +589,7 @@ export const PerformanceCorrelationHeatmap: React.FC<CorrelationProps> = ({ indi
                     <ZoomableChartContainer>
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={overlayChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "#334155" : "#e2e8f0"} opacity={0.5} />
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "var(--color-chart-grid-dark)" : "var(--color-chart-grid)"} opacity={0.5} />
                           <XAxis dataKey="date" tick={{ fontSize: 10, fill: isDark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} dy={10} />
                           <YAxis tick={{ fontSize: 10, fill: isDark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(val) => `${Math.round(val)}%`} />
                           <RechartsTooltip

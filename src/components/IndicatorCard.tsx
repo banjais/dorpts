@@ -28,6 +28,7 @@ import { triggerHaptic } from "../utils/haptic";
 import { highlightText } from "../utils/highlight";
 import { useTextScale } from "../hooks/useTextScale";
 import { formatDisplayDate } from "../utils/date";
+import { formatNumber } from "../utils/format";
 
 interface HistoryItem {
   id: string;
@@ -925,7 +926,7 @@ export const IndicatorCard = React.memo<CardProps>(
             stiffness: 400,
             damping: 25,
           }}
-          className={`${isHighImpact ? "bg-gradient-to-br from-indigo-500/10 via-white to-white dark:from-indigo-950/20 dark:via-slate-900 dark:to-slate-900" : "bg-white dark:bg-slate-900"} rounded-xl border transition-all duration-300 py-2.5 pl-4 pr-2.5 sm:py-5 sm:pl-6 sm:pr-5 relative flex flex-col justify-between h-full text-left select-none cursor-pointer ${
+          className={`${isHighImpact ? "bg-gradient-to-br from-indigo-500/10 via-white to-white dark:from-indigo-950/20 dark:via-slate-900 dark:to-slate-900" : "bg-white dark:bg-slate-900"} rounded-2xl border transition-all duration-300 py-2.5 pl-4 pr-2.5 sm:py-5 sm:pl-6 sm:pr-5 relative flex flex-col justify-between h-full text-left select-none cursor-pointer ${
             isAlertActive
               ? highContrast ? "border-rose-600 dark:border-rose-400 border-2" : "border-rose-500/70 dark:border-rose-400/70 shadow-[0_8px_30px_rgba(244,63,94,0.15),0_2px_8px_rgba(244,63,94,0.08)] hover:shadow-[0_12px_40px_rgba(244,63,94,0.25),0_4px_12px_rgba(244,63,94,0.12)] dark:shadow-[0_8px_30px_rgba(244,63,94,0.2),0_2px_8px_rgba(244,63,94,0.1)]"
               : isHighImpact
@@ -980,7 +981,7 @@ export const IndicatorCard = React.memo<CardProps>(
                 exit={{ opacity: 0, scale: 0.92, y: 4 }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
                 onClick={(e) => e.stopPropagation()}
-                className="absolute inset-0 bg-slate-950/50 dark:bg-slate-950/60 md:bg-slate-950/95 md:dark:bg-slate-950/98 backdrop-blur-sm md:backdrop-blur-md rounded-xl p-3 sm:p-4 flex flex-col justify-between text-white z-[300] border border-indigo-500/40 shadow-2xl overflow-hidden"
+                className="absolute inset-0 bg-slate-950/80 dark:bg-black/70 backdrop-blur-md rounded-xl p-3 sm:p-4 flex flex-col justify-between text-white z-[300] border border-indigo-500/40 shadow-2xl overflow-hidden"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-2">
@@ -1175,7 +1176,7 @@ export const IndicatorCard = React.memo<CardProps>(
                 {/* Footer Info / Progress Summary */}
                 <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-400 font-mono">
                   <span>
-                    {language === 'en' ? 'Annual Progress:' : 'वार्षिक प्रगति:'} {indicator.annualProgress} / {indicator.annualTarget}
+                    {language === 'en' ? 'Annual Progress:' : 'वार्षिक प्रगति:'} {formatNumber(indicator.annualProgress, language)} / {formatNumber(indicator.annualTarget, language)}
                   </span>
                   <span className="font-bold text-indigo-300">
                     {annualCompletionPercent}%
@@ -1190,7 +1191,7 @@ export const IndicatorCard = React.memo<CardProps>(
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
                 onClick={(e) => e.stopPropagation()} // Prevent card clicks
-                className="absolute inset-0 bg-slate-900/98 dark:bg-slate-950/98 backdrop-blur-md rounded-xl p-5 flex flex-col justify-between text-white z-[240] border border-amber-500/30 overflow-hidden shadow-2xl"
+                className="absolute inset-0 bg-slate-900/95 dark:bg-slate-950/95 backdrop-blur-md rounded-xl p-5 flex flex-col justify-between text-white z-[240] border border-amber-500/30 overflow-hidden shadow-2xl"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-2">
@@ -1340,7 +1341,7 @@ export const IndicatorCard = React.memo<CardProps>(
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="absolute inset-0 bg-slate-950/50 dark:bg-slate-950/60 md:bg-slate-950/95 md:dark:bg-slate-950/98 backdrop-blur-sm md:backdrop-blur-md rounded-xl p-4 sm:p-5 flex flex-col justify-between text-white z-[250] border border-indigo-500/30 overflow-hidden shadow-2xl"
+                className="absolute inset-0 bg-slate-950/80 dark:bg-black/70 backdrop-blur-md rounded-xl p-4 sm:p-5 flex flex-col justify-between text-white z-[250] border border-indigo-500/30 overflow-hidden shadow-2xl"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-2">
@@ -1686,7 +1687,7 @@ export const IndicatorCard = React.memo<CardProps>(
                   {t("annualTarget")}
                 </span>
                 <span className="font-bold text-slate-700 dark:text-slate-200">
-                  {indicator.annualTarget}{" "}
+                  {formatNumber(indicator.annualTarget, language)}{" "}
                   <span className="text-[0.5625rem] text-slate-450 dark:text-slate-500 font-normal">
                     ({translateUnit(indicator.unit)})
                   </span>
@@ -1700,7 +1701,7 @@ export const IndicatorCard = React.memo<CardProps>(
                     {t("totalTarget")}
                   </span>
                   <span className="font-bold text-slate-700 dark:text-slate-200 font-mono">
-                    {indicator.totalTarget}
+                    {formatNumber(indicator.totalTarget, language)}
                   </span>
                 </div>
               )}
@@ -1711,7 +1712,7 @@ export const IndicatorCard = React.memo<CardProps>(
                     {t("totalProgress")}
                   </span>
                   <span className="font-bold text-indigo-600 dark:text-indigo-400 font-mono">
-                    {indicator.totalProgress}
+                    {formatNumber(indicator.totalProgress, language)}
                   </span>
                 </div>
               )}
@@ -1785,7 +1786,7 @@ export const IndicatorCard = React.memo<CardProps>(
                             isAnomaly
                               ? "bg-amber-950/95 dark:bg-amber-950/95 border-amber-500/50 text-amber-200"
                               : "bg-slate-900/95 dark:bg-slate-950/95 border-slate-700/50 text-white"
-                          } text-[9px] font-black font-mono px-2 py-0.5 rounded-md shadow-lg border backdrop-blur-sm pointer-events-none whitespace-nowrap z-[200] flex flex-col items-center gap-0.5 -translate-x-1/2`}
+                           } text-[9px] font-black font-mono px-2 py-0.5 rounded-md shadow-lg border backdrop-blur-md pointer-events-none whitespace-nowrap z-[200] flex flex-col items-center gap-0.5 -translate-x-1/2`}
                           style={{ left: `${xPct}%` }}
                         >
                           <span
@@ -2090,13 +2091,13 @@ export const IndicatorCard = React.memo<CardProps>(
                    >
                      {showHistoricalTrend ? (language === 'en' ? 'Hide Trend' : 'प्रवृत्ति लुकाउनुहोस्') : (language === 'en' ? 'Show Trend' : 'प्रवृत्ति देखाउनुहोस्')}
                    </button>
-                   <span className="text-[0.6875rem] font-black text-slate-800 dark:text-slate-100 font-mono">
-                     {indicator.annualProgress}
-                     <span className="text-[0.5625rem] font-medium text-slate-450 dark:text-slate-500 mx-1">/</span>
-                     <span className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400">
-                       {indicator.annualTarget}
-                     </span>
-                   </span>
+                    <span className="text-[0.6875rem] font-black text-slate-800 dark:text-slate-100 font-mono">
+                      {formatNumber(indicator.annualProgress, language)}
+                      <span className="text-[0.5625rem] font-medium text-slate-450 dark:text-slate-500 mx-1">/</span>
+                      <span className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400">
+                        {formatNumber(indicator.annualTarget, language)}
+                      </span>
+                    </span>
                  </div>
 
                 <div className="flex items-center gap-2">

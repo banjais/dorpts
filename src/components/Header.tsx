@@ -383,7 +383,7 @@ export const Header: React.FC<HeaderProps> = ({
                      title={language === 'en' ? `Theme: ${themePref}` : `थिम: ${themePref}`}
                    >
                      {getThemeIcon()}
-                     <span className="text-[0.65rem] font-extrabold uppercase tracking-wider hidden sm:inline">{themePref}</span>
+                     <span className="text-[10px] font-extrabold uppercase tracking-wider hidden sm:inline">{themePref}</span>
                    </motion.button>
 
                   {/* Language Toggle */}
@@ -398,7 +398,7 @@ export const Header: React.FC<HeaderProps> = ({
                         triggerHaptic('light');
                         setLanguage(language === 'ne' ? 'en' : 'ne');
                       }}
-                      className="p-2 sm:p-2.5 rounded-xl text-indigo-700 dark:text-indigo-300 font-extrabold uppercase text-[0.65rem] tracking-wider flex items-center justify-center gap-1 transition-all hover:bg-indigo-50 dark:hover:bg-indigo-500/10 min-w-[36px] sm:min-w-[44px] min-h-[36px] sm:min-h-[44px] active:scale-95"
+                      className="p-2 sm:p-2.5 rounded-xl text-indigo-700 dark:text-indigo-300 font-extrabold uppercase text-[10px] tracking-wider flex items-center justify-center gap-1 transition-all hover:bg-indigo-50 dark:hover:bg-indigo-500/10 min-w-[36px] sm:min-w-[44px] min-h-[36px] sm:min-h-[44px] active:scale-95"
                       title={language === 'en' ? 'Switch to Nepali' : 'अंग्रेजीमा स्विच गर्नुहोस्'}
                     >
                       <Languages size={14} className="sm:w-4 sm:h-4" />

@@ -10,6 +10,7 @@ import { ResponsiveContainer, LineChart, Line, YAxis, Tooltip, AreaChart, Area, 
 import { HISTORICAL_DATA } from '../historicalData';
 import { getSectorForIndicator, DOR_OFFICES_LIST } from '../data';
 import { triggerHaptic } from '../utils/haptic';
+import { formatNumber, formatPercent } from '../utils/format';
 import { VoiceHelpModal } from './VoiceHelpModal';
 import { RadialPerformanceChart } from './RadialPerformanceChart';
 
@@ -65,69 +66,7 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
 };
 
-const CustomSparklineTooltip = ({ active, payload, language, translateUnit, unit, isPercentage }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    const val = data.value;
-    
-    let displayValue;
-    const formattedVal = typeof val === 'number' 
-      ? (language === 'np' ? toNepaliNumerals(val.toLocaleString()) : val.toLocaleString())
-      : val;
-
-    const actualIsPercentage = isPercentage ?? data.isPercentage ?? true;
-
-    if (actualIsPercentage) {
-      displayValue = `${formattedVal}%`;
-    } else if (unit) {
-      displayValue = `${formattedVal} ${translateUnit(unit)}`;
-    } else {
-      displayValue = String(formattedVal);
-    }
-
-    const rawDate = data.date || '2082/04/01';
-    let displayDate = rawDate;
-    if (language === 'np') {
-      displayDate = toNepaliNumerals(rawDate);
-    }
-
-    return (
-      <div className="bg-slate-900/95 dark:bg-slate-950/95 border border-slate-700/50 dark:border-white/10 px-3 py-2 rounded-2xl shadow-2xl text-[10px] text-white font-medium pointer-events-none backdrop-blur-md z-50">
-        <div className="font-extrabold text-indigo-400">
-          {language === 'en' ? 'Progress' : 'प्रगति'}: {displayValue}
-        </div>
-        <div className="text-slate-300 font-semibold mt-0.5">
-          {language === 'en' ? 'Date' : 'मिति'}: {displayDate}
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
-
-const CustomOverallChartTooltip = ({ active, payload, language }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-slate-900/95 dark:bg-slate-950/95 border border-slate-700/50 dark:border-white/10 p-3 rounded-2xl shadow-2xl text-[11px] text-white backdrop-blur-md z-50">
-        <p className="font-extrabold text-indigo-400 mb-1.5 leading-tight">
-          {language === 'en' ? data.labelEn : data.labelNp}
-        </p>
-        <div className="space-y-1 pt-1.5 border-t border-white/5">
-          <div className="flex items-center justify-between gap-6">
-            <span className="text-slate-400 font-semibold">{language === 'en' ? 'Date' : 'मिति'}:</span>
-            <span className="font-bold">{language === 'en' ? data.date : toNepaliNumerals(data.date)}</span>
-          </div>
-          <div className="flex items-center justify-between gap-6">
-            <span className="text-slate-400 font-semibold">{language === 'en' ? 'Achievement' : 'उपलब्धि'}:</span>
-            <span className="font-black text-indigo-300">{language === 'en' ? `${data.progress}%` : `${toNepaliNumerals(data.progress)}%`}</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
+import { PremiumTooltip } from './PremiumTooltip';
 
 const Sparkline: React.FC<{ 
   data: any[]; 
@@ -155,7 +94,7 @@ const Sparkline: React.FC<{
         <LineChart data={data} onMouseEnter={() => triggerHaptic('light')}>
           <YAxis hide domain={['dataMin - 10', 'dataMax + 10']} />
           <Tooltip 
-            content={<CustomSparklineTooltip language={language} translateUnit={translateUnit} unit={unit} isPercentage={isPercentage} />} 
+            content={<PremiumTooltip language={language} translateUnit={translateUnit} unit={unit} isPercentage={isPercentage} />} 
             cursor={{ stroke: color, strokeWidth: 1, strokeDasharray: '2 2' }}
             allowEscapeViewBox={{ x: true, y: true }}
             position={{ y: -45 }}
@@ -204,12 +143,12 @@ const StatCard: React.FC<StatCardProps> = ({ stat, activeMetric, language, trans
       }}
       onClick={onClick}
       transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-      className={`relative flex flex-col justify-between transition-all duration-500 min-h-[150px] sm:min-h-[180px] rounded-[32px] border ${
+      className={`relative flex flex-col justify-between transition-all duration-500 min-h-[150px] sm:min-h-[180px] rounded-2xl border ${
         isSummary 
-          ? 'bg-gradient-to-br from-indigo-500/10 via-white to-white dark:from-indigo-950/20 dark:via-slate-900 dark:to-slate-900 p-4 sm:p-6 border border-indigo-150 dark:border-indigo-950/60 shadow-sm relative overflow-hidden transition-all hover:border-indigo-200 dark:hover:border-indigo-800' 
+          ? 'bg-gradient-to-br from-indigo-500/10 via-white to-white dark:from-indigo-950/20 dark:via-slate-900 dark:to-slate-900 p-5 sm:p-6 border border-indigo-150 dark:border-indigo-950/60 shadow-sm relative overflow-hidden transition-all hover:border-indigo-200 dark:hover:border-indigo-800' 
           : isSector
-            ? 'bg-white dark:bg-slate-900 p-4 sm:p-6 border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:border-slate-200 dark:hover:border-slate-700'
-            : 'bg-white dark:bg-slate-900 p-4 sm:p-5 border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:border-slate-200 dark:hover:border-slate-700'
+            ? 'bg-white dark:bg-slate-900 p-5 sm:p-6 border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:border-slate-200 dark:hover:border-slate-700'
+            : 'bg-white dark:bg-slate-900 p-5 sm:p-6 border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:border-slate-200 dark:hover:border-slate-700'
       } ${isClickable ? 'cursor-pointer active:scale-95 hover:border-indigo-500/50 group/card' : ''}`}
     >
       {isSummary && (
@@ -356,7 +295,7 @@ const StatCard: React.FC<StatCardProps> = ({ stat, activeMetric, language, trans
                     {milestone.date.split('/').slice(-2).join('/')}
                   </span>
                   <span className={`text-[0.5625rem] sm:text-[0.625rem] font-black mt-0.5 ${isSummary ? 'text-indigo-300' : 'text-slate-700 dark:text-slate-200'}`}>
-                    {milestone.value}{milestone.isPercentage ? '%' : ''}
+                    {formatPercent(milestone.value, language)}
                   </span>
                 </div>
               ))}
@@ -1192,11 +1131,11 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
                         <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:hidden" />
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.12} className="hidden dark:block" />
+                     <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid-light)" className="dark:hidden" />
+                     <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid-dark)" opacity={0.12} className="hidden dark:block" />
                     <XAxis 
                       dataKey="date" 
-                      stroke="#94a3b8" 
+                      stroke="var(--color-chart-axis)" 
                       fontSize={10} 
                       fontWeight={600} 
                       tickLine={false} 
@@ -1205,7 +1144,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
                       tickFormatter={(tick) => language === 'np' ? toNepaliNumerals(tick.split('/').slice(-2).join('/')) : tick.split('/').slice(-2).join('/')}
                     />
                     <YAxis 
-                      stroke="#94a3b8" 
+                      stroke="var(--color-chart-axis)" 
                       fontSize={10} 
                       fontWeight={600} 
                       tickLine={false} 
@@ -1214,7 +1153,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
                       dx={-10}
                       tickFormatter={(tick) => language === 'np' ? `${toNepaliNumerals(tick)}%` : `${tick}%`}
                     />
-                    <Tooltip content={<CustomOverallChartTooltip language={language} />} cursor={{ stroke: '#4f46e5', strokeWidth: 1.5, strokeDasharray: '3 3' }} />
+                    <Tooltip content={<PremiumTooltip language={language} isPercentage={true} />} cursor={{ stroke: '#4f46e5', strokeWidth: 1.5, strokeDasharray: '3 3' }} />
                     <Area 
                       type="monotone" 
                       dataKey="progress" 
@@ -1285,7 +1224,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
                     <YAxis 
                       dataKey="category" 
                       type="category" 
-                      stroke="#94a3b8" 
+                      stroke="var(--color-chart-axis)" 
                       fontSize={9} 
                       fontWeight={700} 
                       width={100}
