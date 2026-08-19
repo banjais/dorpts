@@ -20,6 +20,7 @@ interface AuthContextType {
   refreshAdmins: () => Promise<void>;
   accessToken: string | null;
   userAssignedOffice: string | null;
+  redirectError: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,6 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [adminsList, setAdminsList] = useState<AdminUser[]>([]);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userAssignedOffice, setUserAssignedOffice] = useState<string | null>(null);
+  const [redirectError, setRedirectError] = useState<string | null>(null);
 
   const isSuperadmin = role === 'superadmin';
   const isAdmin = role === 'superadmin' || role === 'system_admin';
@@ -203,8 +205,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setAccessToken(credential.accessToken);
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Redirect result error:', error);
+        const code = error?.code || '';
+        const friendly = code === 'auth/unauthorized-domain'
+          ? `This domain (${typeof window !== 'undefined' ? window.location.hostname : ''}) is not authorized for Google sign-in. Add it in Firebase Console → Authentication → Settings → Authorized domains.`
+          : error?.message || 'Sign-in did not complete after returning from Google. Please try again.';
+        setRedirectError(friendly);
       } finally {
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem('dor_redirecting');
@@ -262,6 +269,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       refreshAdmins,
       accessToken,
       userAssignedOffice,
+      redirectError,
     }}>
       {children}
     </AuthContext.Provider>
@@ -282,6 +290,7 @@ const defaultAuthContext: AuthContextType = {
   refreshAdmins: async () => {},
   accessToken: null,
   userAssignedOffice: null,
+  redirectError: null,
 };
 
 export const useAuth = () => {

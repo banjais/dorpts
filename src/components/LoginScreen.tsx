@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 
 export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
   const { language } = useLanguage();
-  const { loginWithGoogle, loading } = useAuth();
+  const { loginWithGoogle, loading, redirectError } = useAuth();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -110,7 +110,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
         </div>
 
         <AnimatePresence>
-          {error && (
+          {(error || redirectError) && (
             <motion.div
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
@@ -118,7 +118,7 @@ export const LoginScreen: React.FC<{ onClose?: () => void }> = ({ onClose }) => 
               className="mt-4 flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 rounded-r-lg px-3 py-2.5"
             >
               <X className="w-3.5 h-3.5 text-red-500 shrink-0" />
-              <p className="text-[11px] font-medium text-red-700 dark:text-red-400">{error}</p>
+              <p className="text-[11px] font-medium text-red-700 dark:text-red-400">{error || redirectError}</p>
             </motion.div>
           )}
         </AnimatePresence>
