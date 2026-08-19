@@ -331,36 +331,8 @@ export const Footer: React.FC<FooterProps> = ({
                               </motion.div>
                             )}
                           </AnimatePresence>
-                         )}
-                         {item.id === 'btn-install' && showInstallSteps && (
-                           <AnimatePresence>
-                             <motion.div
-                               initial={{ opacity: 0, y: 15, scale: 0.8 }}
-                               animate={{ opacity: 1, y: 0, scale: 1 }}
-                               exit={{ opacity: 0, y: 10, scale: 0.8 }}
-                               className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 flex flex-col items-center gap-2 pointer-events-none"
-                             >
-                               <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
-                                 {language === 'en' ? 'How to install' : 'कसरी इन्स्टल गर्ने'}
-                               </span>
-                               <ol className="space-y-1.5 text-[10px] font-semibold text-slate-600 dark:text-slate-400 leading-snug">
-                                 {/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream ? (
-                                   <>
-                                     <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">1</span><span>{language === 'en' ? 'Tap Share button in Safari' : 'सफारीमा सेयर बटन मा ट्याप गर्नुहोस्'}</span></li>
-                                     <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">2</span><span>{language === 'en' ? 'Choose "Add to Home Screen"' : '"Add to Home Screen" छान्नुहोस्'}</span></li>
-                                     <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">3</span><span>{language === 'en' ? 'Tap Add to complete' : 'Add मा ट्याप गरेर पूरा गर्नुहोस्'}</span></li>
-                                   </>
-                                 ) : (
-                                   <>
-                                     <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">1</span><span>{language === 'en' ? 'Open browser menu (⋮ or ⋯)' : 'ब्राउजर मेनु (⋮ वा ⋯) खोल्नुहोस्'}</span></li>
-                                     <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">2</span><span>{language === 'en' ? 'Select "Install App" or "Add to Home Screen"' : '"Install App" वा "Add to Home Screen" चयन गर्नुहोस्'}</span></li>
-                                   </>
-                                 )}
-                               </ol>
-                             </motion.div>
-                           </AnimatePresence>
-                         )}
-                           <button
+                           )}
+                             <button
                             id={item.id}
                             onClick={(e) => { 
                               e.stopPropagation(); 
@@ -498,10 +470,31 @@ export const Footer: React.FC<FooterProps> = ({
                      {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
                    </p>
                  )}
-                </div>
-             </div>
-            </>
-          )}
+                 </div>
+                 {showInstallSteps && shouldExpand && (
+                   <div className="w-full max-w-md mt-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700/40 rounded-xl p-3">
+                     <span className="text-[10px] font-black uppercase tracking-widest text-indigo-700 dark:text-indigo-300">
+                       {language === 'en' ? 'How to install' : 'कसरी इन्स्टल गर्ने'}
+                     </span>
+                     <ol className="mt-1.5 space-y-1 text-[10px] font-semibold text-slate-600 dark:text-slate-400 leading-snug">
+                       {/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream ? (
+                         <>
+                           <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">1</span><span>{language === 'en' ? 'Tap Share button in Safari' : 'सफारीमा सेयर बटन मा ट्याप गर्नुहोस्'}</span></li>
+                           <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">2</span><span>{language === 'en' ? 'Choose "Add to Home Screen"' : '"Add to Home Screen" छान्नुहोस्'}</span></li>
+                           <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">3</span><span>{language === 'en' ? 'Tap Add to complete' : 'Add मा ट्याप गरेर पूरा गर्नुहोस्'}</span></li>
+                         </>
+                       ) : (
+                         <>
+                           <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">1</span><span>{language === 'en' ? 'Open browser menu (⋮ or ⋯)' : 'ब्राउजर मेनु (⋮ वा ⋯) खोल्नुहोस्'}</span></li>
+                           <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">2</span><span>{language === 'en' ? 'Select "Install App" or "Add to Home Screen"' : '"Install App" वा "Add to Home Screen" चयन गर्नुहोस्'}</span></li>
+                         </>
+                       )}
+                     </ol>
+                   </div>
+                 )}
+              </div>
+             </>
+           )}
 
            {!shouldExpand && (
             <div className="flex items-center justify-center gap-2">
