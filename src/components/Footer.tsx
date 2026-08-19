@@ -54,6 +54,7 @@ export const Footer: React.FC<FooterProps> = ({
   const prevSyncingRef = React.useRef(isSyncing);
   const [showLastSynced, setShowLastSynced] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallSteps, setShowInstallSteps] = useState(false);
   const [showSyncDropdown, setShowSyncDropdown] = useState(false);
   const longPressTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const didLongPressRef = React.useRef(false);
@@ -66,6 +67,7 @@ export const Footer: React.FC<FooterProps> = ({
 
   const closeMenuPopups = useCallback(() => {
     setIsQrHovered(false);
+    setShowInstallSteps(false);
     setShowSyncDropdown(false);
   }, []);
   
@@ -351,13 +353,15 @@ export const Footer: React.FC<FooterProps> = ({
                             onMouseUp={(e) => { if (item.id === 'btn-sync') { e.stopPropagation(); handleSyncPressEnd(); } }}
                             onTouchStart={(e) => { if (item.id === 'btn-sync') { e.stopPropagation(); handleSyncPressStart(); } }}
                             onTouchEnd={(e) => { if (item.id === 'btn-sync') { e.stopPropagation(); handleSyncPressEnd(); } }}
-                             onMouseEnter={() => { 
-                               closeMenuPopups();
-                               if (item.id === 'btn-share') setIsQrHovered(true); 
-                             }}
-                             onMouseLeave={() => { 
-                               if (item.id === 'btn-sync') handleSyncPressEnd();
-                             }}
+                              onMouseEnter={() => { 
+                                closeMenuPopups();
+                                if (item.id === 'btn-share') setIsQrHovered(true); 
+                                if (item.id === 'btn-install' && !deferredPrompt) setShowInstallSteps(true);
+                              }}
+                              onMouseLeave={() => { 
+                                if (item.id === 'btn-sync') handleSyncPressEnd();
+                                if (item.id === 'btn-install') setShowInstallSteps(false);
+                              }}
                              className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl transition-all active:scale-95 cursor-pointer border relative ${
                                item.id === 'btn-menu'
                                  ? 'bg-white/80 dark:bg-white/5 backdrop-blur-xl border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:border-indigo-300 dark:hover:border-indigo-700'
@@ -404,8 +408,39 @@ export const Footer: React.FC<FooterProps> = ({
                               </span>
                             )}
                               <item.icon size={18} strokeWidth={2.5} className={`${item.id === 'btn-ai' ? 'text-white' : item.id === 'btn-install' ? 'text-indigo-700 dark:text-indigo-300' : item.id === 'btn-messaging' ? 'text-indigo-700 dark:text-indigo-300' : item.id === 'btn-sync' && hasPendingWrites ? 'text-amber-700 dark:text-amber-300' : 'text-slate-700 dark:text-slate-300'} sm:size-[20px] transition-colors shrink-0 ${item.id === 'btn-sync' && isSyncing ? 'animate-spin' : ''}`} />
-                          </button>
-                          {item.id === 'btn-sync' && showSyncDropdown && (
+                           </button>
+                           {item.id === 'btn-install' && showInstallSteps && (
+                             <AnimatePresence>
+                               <motion.div
+                                 initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                                 animate={{ opacity: 1, y: 0, scale: 1 }}
+                                 exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                                 transition={{ duration: 0.15 }}
+                                 className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden"
+                               >
+                                 <div className="p-2 space-y-1">
+                                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
+                                     {language === 'en' ? 'How to install' : 'कसरी इन्स्टल गर्ने'}
+                                   </p>
+                                   <ol className="space-y-1.5 text-[10px] font-semibold text-slate-600 dark:text-slate-400 leading-snug">
+                                     {/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream ? (
+                                       <>
+                                         <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">1</span><span>{language === 'en' ? 'Tap Share button in Safari' : 'सफारीमा सेयर बटन मा ट्याप गर्नुहोस्'}</span></li>
+                                         <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">2</span><span>{language === 'en' ? 'Choose "Add to Home Screen"' : '"Add to Home Screen" छान्नुहोस्'}</span></li>
+                                         <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">3</span><span>{language === 'en' ? 'Tap Add to complete' : 'Add मा ट्याप गरेर पूरा गर्नुहोस्'}</span></li>
+                                       </>
+                                     ) : (
+                                       <>
+                                         <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">1</span><span>{language === 'en' ? 'Open browser menu (⋮ or ⋯)' : 'ब्राउजर मेनु (⋮ वा ⋯) खोल्नुहोस्'}</span></li>
+                                         <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">2</span><span>{language === 'en' ? 'Select "Install App" or "Add to Home Screen"' : '"Install App" वा "Add to Home Screen" चयन गर्नुहोस्'}</span></li>
+                                       </>
+                                     )}
+                                   </ol>
+                                 </div>
+                               </motion.div>
+                             </AnimatePresence>
+                           )}
+                           {item.id === 'btn-sync' && showSyncDropdown && (
                             <AnimatePresence>
                               <motion.div
                                 initial={{ opacity: 0, y: 8, scale: 0.95 }}
@@ -470,31 +505,10 @@ export const Footer: React.FC<FooterProps> = ({
                      {language === 'en' ? `Last synced: ${minutesAgo}m ago` : `पछिल्लो पटक सिंक: ${minutesAgo} मिनेट अघि`}
                    </p>
                  )}
-                 </div>
-                  {shouldExpand && (
-                    <div className="w-full max-w-md mt-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700/40 rounded-xl p-3">
-                     <span className="text-[10px] font-black uppercase tracking-widest text-indigo-700 dark:text-indigo-300">
-                       {language === 'en' ? 'How to install' : 'कसरी इन्स्टल गर्ने'}
-                     </span>
-                     <ol className="mt-1.5 space-y-1 text-[10px] font-semibold text-slate-600 dark:text-slate-400 leading-snug">
-                       {/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream ? (
-                         <>
-                           <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">1</span><span>{language === 'en' ? 'Tap Share button in Safari' : 'सफारीमा सेयर बटन मा ट्याप गर्नुहोस्'}</span></li>
-                           <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">2</span><span>{language === 'en' ? 'Choose "Add to Home Screen"' : '"Add to Home Screen" छान्नुहोस्'}</span></li>
-                           <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">3</span><span>{language === 'en' ? 'Tap Add to complete' : 'Add मा ट्याप गरेर पूरा गर्नुहोस्'}</span></li>
-                         </>
-                       ) : (
-                         <>
-                           <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">1</span><span>{language === 'en' ? 'Open browser menu (⋮ or ⋯)' : 'ब्राउजर मेनु (⋮ वा ⋯) खोल्नुहोस्'}</span></li>
-                           <li className="flex gap-2"><span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[8px] font-black shrink-0">2</span><span>{language === 'en' ? 'Select "Install App" or "Add to Home Screen"' : '"Install App" वा "Add to Home Screen" चयन गर्नुहोस्'}</span></li>
-                         </>
-                       )}
-                     </ol>
-                   </div>
-                 )}
-              </div>
-             </>
-           )}
+                  </div>
+               </div>
+              </>
+            )}
 
            {!shouldExpand && (
             <div className="flex items-center justify-center gap-2">
