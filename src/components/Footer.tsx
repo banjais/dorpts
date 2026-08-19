@@ -54,7 +54,6 @@ export const Footer: React.FC<FooterProps> = ({
   const prevSyncingRef = React.useRef(isSyncing);
   const [showLastSynced, setShowLastSynced] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [showInstallSteps, setShowInstallSteps] = useState(false);
   const [showSyncDropdown, setShowSyncDropdown] = useState(false);
   const longPressTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const didLongPressRef = React.useRef(false);
@@ -62,7 +61,11 @@ export const Footer: React.FC<FooterProps> = ({
   const closeAllPanels = useCallback(() => {
     setIsQrHovered(false);
     setShowQr(false);
-    setShowInstallSteps(false);
+    setShowSyncDropdown(false);
+  }, []);
+
+  const closeMenuPopups = useCallback(() => {
+    setIsQrHovered(false);
     setShowSyncDropdown(false);
   }, []);
   
@@ -139,7 +142,7 @@ export const Footer: React.FC<FooterProps> = ({
 
   const handleSyncLongPress = () => {
     didLongPressRef.current = true;
-    closeAllPanels();
+    closeMenuPopups();
     setShowSyncDropdown(prev => !prev);
   };
 
@@ -207,15 +210,12 @@ export const Footer: React.FC<FooterProps> = ({
   };
 
   const handleInstallClick = async () => {
-    closeAllPanels();
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
       }
-    } else {
-      setShowInstallSteps(prev => !prev);
     }
   };
 
@@ -351,13 +351,13 @@ export const Footer: React.FC<FooterProps> = ({
                             onMouseUp={(e) => { if (item.id === 'btn-sync') { e.stopPropagation(); handleSyncPressEnd(); } }}
                             onTouchStart={(e) => { if (item.id === 'btn-sync') { e.stopPropagation(); handleSyncPressStart(); } }}
                             onTouchEnd={(e) => { if (item.id === 'btn-sync') { e.stopPropagation(); handleSyncPressEnd(); } }}
-                            onMouseEnter={() => { 
-                              if (item.id === 'btn-share') setIsQrHovered(true); 
-                              if (item.id === 'btn-install' && !deferredPrompt) setShowInstallSteps(true);
-                            }}
-                            onMouseLeave={() => { 
-                              if (item.id === 'btn-sync') handleSyncPressEnd();
-                            }}
+                             onMouseEnter={() => { 
+                               closeMenuPopups();
+                               if (item.id === 'btn-share') setIsQrHovered(true); 
+                             }}
+                             onMouseLeave={() => { 
+                               if (item.id === 'btn-sync') handleSyncPressEnd();
+                             }}
                              className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl transition-all active:scale-95 cursor-pointer border relative ${
                                item.id === 'btn-menu'
                                  ? 'bg-white/80 dark:bg-white/5 backdrop-blur-xl border-slate-200/60 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:border-indigo-300 dark:hover:border-indigo-700'
@@ -471,8 +471,8 @@ export const Footer: React.FC<FooterProps> = ({
                    </p>
                  )}
                  </div>
-                 {showInstallSteps && shouldExpand && (
-                   <div className="w-full max-w-md mt-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700/40 rounded-xl p-3">
+                  {shouldExpand && (
+                    <div className="w-full max-w-md mt-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700/40 rounded-xl p-3">
                      <span className="text-[10px] font-black uppercase tracking-widest text-indigo-700 dark:text-indigo-300">
                        {language === 'en' ? 'How to install' : 'कसरी इन्स्टल गर्ने'}
                      </span>
