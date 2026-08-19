@@ -1454,12 +1454,6 @@ function MainAppContent() {
     }
   }, [user, authLoading, showLogin]);
 
-  useEffect(() => {
-    if (!user && !authLoading) {
-      setShowLogin(true);
-    }
-  }, [user, authLoading]);
-
   const [isGeneratingAiSummary, setIsGeneratingAiSummary] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
@@ -3600,8 +3594,20 @@ function MainAppContent() {
           <>
           {/* Footer */}
            <Footer
-             onOpenReportBuilder={() => setIsReportBuilderOpen(true)}
-             onOpenAI={() => setIsAIAssistantOpen(true)}
+             onOpenReportBuilder={() => {
+              if (!user) {
+                setShowLogin(true);
+              } else {
+                setIsReportBuilderOpen(true);
+              }
+            }}
+             onOpenAI={() => {
+              if (!user) {
+                setShowLogin(true);
+              } else {
+                setIsAIAssistantOpen(true);
+              }
+            }}
               isScrolled={isScrolled}
              viewMode={viewMode}
              fiscalYear={selectedFiscalYear}
@@ -3752,7 +3758,11 @@ function MainAppContent() {
               <button
                 onClick={() => {
                   triggerHaptic("success");
-                  setIsAIAssistantOpen(true);
+                  if (!user) {
+                    setShowLogin(true);
+                  } else {
+                    setIsAIAssistantOpen(true);
+                  }
                 }}
                 className="w-9 h-9 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-all active:scale-95 cursor-pointer relative font-bold"
                 title={language === "en" ? "AI assistant" : "एआई सहायक"}

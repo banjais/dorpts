@@ -108,7 +108,11 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       labelEn: 'Feedbacks',
       labelNp: 'प्रतिक्रियाहरू',
       onClick: () => {
-        onNavigate('feedbacks');
+        if (!user) {
+          onOpenLogin?.();
+        } else {
+          onNavigate('feedbacks');
+        }
         onClose();
       },
     },

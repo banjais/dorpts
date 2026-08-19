@@ -59,7 +59,7 @@ export default defineConfig(() => {
           skipWaiting: true,
           runtimeCaching: [
             {
-              urlPattern: ({ request }) => request.mode === 'navigate',
+              urlPattern: ({ request }) => request.mode === 'navigate' && new URL(request.url).origin === self.location.origin,
               handler: 'NetworkFirst',
               options: {
                 cacheName: 'pages-cache',
