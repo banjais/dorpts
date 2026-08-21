@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { motion, useSpring, useTransform } from 'motion/react';
-import { LayoutDashboard, TrendingUp, Activity, Building2, Megaphone, MessageSquare, CalendarDays } from 'lucide-react';
+import { motion } from 'motion/react';
+import { LayoutDashboard, TrendingUp, Activity, Building2, Megaphone, MessageSquare, CalendarDays, Route } from 'lucide-react';
 import type { MainView } from '../types';
 
 export const NAV_ITEMS = [
   { id: 'dashboard' as MainView, labelEn: 'HOME', labelNp: 'गृहपृष्ठ', icon: <LayoutDashboard size={18} /> },
+  { id: 'highways-info' as MainView, labelEn: 'HIGHWAYS', labelNp: 'राजमार्ग', icon: <Route size={18} /> },
   { id: 'trends' as MainView, labelEn: 'TRENDS', labelNp: 'प्रवृत्ति', icon: <TrendingUp size={18} /> },
   { id: 'heatmap' as MainView, labelEn: 'HEATMAP', labelNp: 'हिटम्याप', icon: <Activity size={18} /> },
   { id: 'institutional' as MainView, labelEn: 'INSTITUTIONAL', labelNp: 'संस्थागत', icon: <Building2 size={18} /> },
@@ -23,6 +24,12 @@ type PillarColor = {
 
 const SECTION_COLORS: Record<MainView, PillarColor> = {
   dashboard: {
+    bg: 'bg-slate-50/80 dark:bg-slate-900/80',
+    activeBg: 'bg-indigo-600 dark:bg-indigo-500',
+    glow: 'shadow-indigo-500/40',
+    border: 'border-indigo-200 dark:border-indigo-700/40',
+  },
+  'highways-info': {
     bg: 'bg-slate-50/80 dark:bg-slate-900/80',
     activeBg: 'bg-indigo-600 dark:bg-indigo-500',
     glow: 'shadow-indigo-500/40',
@@ -127,7 +134,7 @@ export const LeftPillarNav: React.FC<LeftPillarNavProps> = ({ activeView, onView
   }, []);
 
   const effectiveView = hovered || activeView;
-  const colors = SECTION_COLORS[effectiveView];
+  const colors = SECTION_COLORS[effectiveView] || SECTION_COLORS.dashboard;
 
   if (isMobile) {
     return (
@@ -140,7 +147,7 @@ export const LeftPillarNav: React.FC<LeftPillarNavProps> = ({ activeView, onView
                 <button
                   key={item.id}
                   onClick={() => onViewChange(item.id)}
-                  className={`relative px-3 py-2 rounded-xl transition-all duration-300 flex flex-col items-center gap-0.5 min-w-[48px] ${
+                  className={`relative px-3 py-2 rounded-xl transition-all duration-300 flex flex-col items-center gap-0.5 min-w-[48px] cursor-pointer ${
                     isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'
                   }`}
                 >
@@ -168,28 +175,19 @@ export const LeftPillarNav: React.FC<LeftPillarNavProps> = ({ activeView, onView
     <nav className="fixed right-3 top-1/2 -translate-y-1/2 z-[6000] hidden md:flex">
       <motion.div
         animate={{
-          backgroundColor: effectiveView === 'dashboard' ? 'rgba(255,255,255,0.9)' : effectiveView === 'trends' ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.9)',
+          backgroundColor: 'rgba(255,255,255,0.92)',
         }}
         transition={{ duration: 0.6, ease: 'easeInOut' }}
         className={`relative flex flex-col items-center gap-1 p-1.5 rounded-2xl border backdrop-blur-xl shadow-xl ${colors.glow} ${colors.border}`}
-        style={{
-          backgroundColor: effectiveView === 'dashboard' ? 'rgba(255,255,255,0.92)' : effectiveView === 'trends' ? 'rgba(255,255,255,0.92)' : effectiveView === 'heatmap' ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.92)',
-        }}
       >
-        {/* Active glow background */}
         <motion.div
           layoutId="rightPillarGlow"
           transition={{ type: 'spring', stiffness: 200, damping: 30 }}
-          className={`absolute inset-0 rounded-2xl opacity-15 blur-md ${colors.activeBg.replace('bg-', 'bg-')}`}
-          style={{ backgroundColor: effectiveView === 'dashboard' ? '#4f46e5' : effectiveView === 'trends' ? '#059669' : effectiveView === 'heatmap' ? '#d97706' : '#7c3aed' }}
+          className={`absolute inset-0 rounded-2xl opacity-15 blur-md ${colors.activeBg}`}
         />
 
-        {/* Scroll progress indicator */}
         <motion.div
-          className="absolute -right-[3px] top-0 bottom-0 w-[3px] rounded-full"
-          animate={{
-            backgroundColor: effectiveView === 'dashboard' ? '#4f46e5' : effectiveView === 'trends' ? '#059669' : effectiveView === 'heatmap' ? '#d97706' : '#7c3aed',
-          }}
+          className="absolute -right-[3px] top-0 bottom-0 w-[3px] rounded-full bg-indigo-600"
           transition={{ duration: 0.6, ease: 'easeInOut' }}
         />
 
@@ -201,7 +199,7 @@ export const LeftPillarNav: React.FC<LeftPillarNavProps> = ({ activeView, onView
               onClick={() => onViewChange(item.id)}
               onMouseEnter={() => setHovered(item.id)}
               onMouseLeave={() => setHovered(null)}
-              className={`relative w-10 h-10 rounded-xl transition-all duration-300 flex items-center justify-center group ${
+              className={`relative w-10 h-10 rounded-xl transition-all duration-300 flex items-center justify-center group cursor-pointer ${
                 isActive
                   ? `${colors.activeBg} text-white shadow-lg scale-110`
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -219,7 +217,6 @@ export const LeftPillarNav: React.FC<LeftPillarNavProps> = ({ activeView, onView
                 {item.icon}
               </span>
 
-              {/* Tooltip */}
               <span className="absolute right-full mr-3 px-2.5 py-1.5 bg-slate-900 dark:bg-slate-700 text-white text-[10px] font-black rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg">
                 {item.labelEn}
                 <span className="block text-[8px] font-medium text-slate-300 normal-case">

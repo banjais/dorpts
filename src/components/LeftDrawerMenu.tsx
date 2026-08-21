@@ -3,19 +3,18 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
   LayoutDashboard,
-  Image,
-  BarChart3,
-  TrendingUp,
-  Activity,
-  ShieldCheck,
-  LogIn,
-  LogOut,
-  User,
-  Info,
   Crown,
   Megaphone,
   MessageSquare,
   CalendarDays,
+  Compass,
+  Route,
+  Map as MapIcon,
+  Info,
+  User,
+  LogOut,
+  LogIn,
+  ShieldCheck
 } from 'lucide-react';
 import type { MainView } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -30,6 +29,8 @@ interface LeftDrawerMenuProps {
   onOpenAbout?: () => void;
   onOpenLogin?: () => void;
   onExpandFooter?: () => void;
+  onOpenDistanceCalc?: () => void;
+  onOpenMap?: () => void;
   isSuperadmin?: boolean;
 }
 
@@ -39,13 +40,13 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
   language,
   activeView,
   onNavigate,
-  onOpenVisualInsights,
   onOpenAbout,
   onOpenLogin,
-  onExpandFooter,
+  onOpenDistanceCalc,
+  onOpenMap,
   isSuperadmin = false,
 }) => {
-  const { user, isAdmin, loginWithGoogle, logout } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
 
   const items: {
     id: string;
@@ -63,6 +64,37 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
       labelNp: 'अवलोकन',
       onClick: () => onNavigate('dashboard'),
       active: activeView === 'dashboard',
+    },
+    {
+      id: 'distance-calc',
+      icon: <Compass size={18} />,
+      labelEn: 'Distance Calculator',
+      labelNp: 'दूरी तथा लागत क्याल्कुलेटर',
+      onClick: () => {
+        onOpenDistanceCalc?.();
+        onClose();
+      },
+    },
+    {
+      id: 'highways-info',
+      icon: <Route size={18} />,
+      labelEn: 'Highways & Local Roads',
+      labelNp: 'राजमार्ग तथा स्थानीय सडक',
+      onClick: () => {
+        onNavigate('highways-info');
+        onClose();
+      },
+      active: activeView === 'highways-info',
+    },
+    {
+      id: 'interactive-map',
+      icon: <MapIcon size={18} />,
+      labelEn: 'Interactive Road Map',
+      labelNp: 'अन्तरक्रियात्मक सडक नक्सा',
+      onClick: () => {
+        onOpenMap?.();
+        onClose();
+      },
     },
     ...(isSuperadmin ? [{
       id: 'superadmin',
@@ -162,18 +194,16 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
               >
                 <X size={18} />
               </button>
             </div>
 
-            {/* Role Portal Section - Separated from menu items */}
+            {/* Role Portal Section */}
             {isAdmin && (
               <div className="px-3 pt-3 pb-1">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                <div
                   className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl border-2 shadow-md transition-all ${
                     isSuperadmin
                       ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/40 text-amber-800 dark:text-amber-200'
@@ -189,23 +219,17 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
                   </span>
                   <div className="flex-1 min-w-0 text-left">
                     <p className="text-sm font-black uppercase tracking-tight truncate">
-                      {isSuperadmin 
+                      {isSuperadmin
                         ? (language === 'en' ? 'Superadmin Portal' : 'सुपरएडमिन पोर्टल')
                         : (language === 'en' ? 'Admin Portal' : 'एडमिन पोर्टल')
                       }
                     </p>
-                    <p className="text-[10px] font-bold uppercase tracking-wider opacity-80 truncate">
-                      {isSuperadmin
-                        ? (language === 'en' ? 'Control Panel' : 'नियन्त्रण प्यानल')
-                        : (language === 'en' ? 'Management Panel' : 'व्यवस्थापन प्यानल')
-                      }
-                    </p>
                   </div>
-                </motion.button>
+                </div>
               </div>
             )}
 
-            {/* Divider between portal and menu items */}
+            {/* Divider */}
             {isAdmin && <div className="h-px bg-slate-200 dark:bg-slate-800 mx-3 my-2" />}
 
             {/* Items */}
@@ -217,7 +241,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
                     item.onClick();
                     onClose();
                   }}
-                  className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl transition-all text-left group ${
+                  className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl transition-all text-left group cursor-pointer ${
                     item.active
                       ? 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-200'
                       : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
@@ -237,11 +261,6 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
                       {language === 'en' ? item.labelEn : item.labelNp}
                     </span>
                   </span>
-                  {item.soon && (
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300">
-                      {language === 'en' ? 'Soon' : 'चाँडो'}
-                    </span>
-                  )}
                 </button>
               ))}
             </nav>
@@ -258,7 +277,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
                   </div>
                   <button
                     onClick={() => { logout(); onClose(); }}
-                    className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all"
+                    className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all cursor-pointer"
                     title={language === 'en' ? 'Sign out' : 'साइन आउट'}
                   >
                     <LogOut size={16} />
@@ -269,7 +288,7 @@ export const LeftDrawerMenu: React.FC<LeftDrawerMenuProps> = ({
               <div className="px-5 py-4 border-t border-slate-100 dark:border-white/5">
                 <button
                   onClick={() => { onClose(); onOpenLogin?.(); }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-black shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98]"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-black shadow-lg shadow-indigo-500/20 transition-all cursor-pointer"
                 >
                   <LogIn size={14} />
                   {language === 'en' ? 'Sign In' : 'साइन इन'}
