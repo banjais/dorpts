@@ -1,22 +1,40 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { X, Map as MapIcon, Loader2, Building2, Sliders, Layers, Info } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  X,
+  Map as MapIcon,
+  Loader2,
+  Building2,
+  Sliders,
+  Info,
+  Navigation,
+  Mic,
+  Compass,
+  Route,
+  ArrowRightLeft,
+  DollarSign
+} from 'lucide-react';
 import { Indicator } from '../types';
 import { useLanguage } from '../context/LanguageContext';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { TOWN_COORDINATES } from '../utils/officeDetector';
 import { DOR_OFFICES_LIST } from '../data';
+import {
+  NATIONAL_HIGHWAYS,
+  calculateTripMetrics,
+  TravelCalculationResult
+} from '../data/nepalGeoData';
 
-// Fix leaflet default icon issue in react-leaflet
+// Leaflet default icon fix
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 const DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
@@ -36,6 +54,7 @@ interface MapViewModalProps {
   isOpen: boolean;
   onClose: () => void;
   indicators: Indicator[];
+  onStartVoiceSearch?: () => void;
 }
 
 interface OfficePerformanceData {
@@ -48,11 +67,11 @@ interface OfficePerformanceData {
   highCount: number;
 }
 
-// Color-coded Leaflet DivIcon creator for individual indicators
+// Marker Icon Creators
 const createIndicatorIcon = (progress: number) => {
-  let color = '#f43f5e'; // rose-500 (low performance)
-  if (progress >= 80) color = '#10b981'; // emerald-500 (high performance)
-  else if (progress >= 50) color = '#f59e0b'; // amber-500 (medium performance)
+  let color = '#f43f5e';
+  if (progress >= 80) color = '#10b981';
+  else if (progress >= 50) color = '#f59e0b';
 
   const svgPin = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${color}" width="28" height="28" style="filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.25));">
@@ -69,7 +88,6 @@ const createIndicatorIcon = (progress: number) => {
   });
 };
 
-// Color-coded Leaflet DivIcon creator for DoR project offices
 const createOfficeIcon = (progress: number) => {
   let colorClass = 'bg-rose-500 text-rose-50 border-rose-300';
   if (progress >= 80) {
@@ -92,18 +110,71 @@ const createOfficeIcon = (progress: number) => {
   });
 };
 
+const createHighwayIcon = (code: string) => {
+  return L.divIcon({
+    className: 'custom-highway-badge',
+    html: `
+      <div class="bg-indigo-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-md border border-indigo-300 flex items-center justify-center">
+        ${code}
+      </div>
+    `,
+    iconSize: [32, 20],
+    iconAnchor: [16, 10],
+    popupAnchor: [0, -10]
+  });
+};
+
+const createRoutePointIcon = (label: string, isFrom: boolean) => {
+  const bg = isFrom ? 'bg-emerald-600' : 'bg-rose-600';
+  return L.divIcon({
+    className: 'custom-route-point',
+    html: `
+      <div class="${bg} text-white font-black text-[9px] px-2 py-1 rounded-full shadow-lg border-2 border-white flex items-center gap-1">
+        <span>${isFrom ? 'START' : 'END'}</span>: ${label}
+      </div>
+    `,
+    iconSize: [80, 24],
+    iconAnchor: [40, 12]
+  });
+};
+
+// Map Click Listener Component
+function MapClickListener({
+  onMapClick
+}: {
+  onMapClick: (lat: number, lng: number) => void;
+}) {
+  useMapEvents({
+    click(e) {
+      onMapClick(e.latlng.lat, e.latlng.lng);
+    }
+  });
+  return null;
+}
+
 export const MapViewModal: React.FC<MapViewModalProps> = ({
   isOpen,
   onClose,
-  indicators
+  indicators,
+  onStartVoiceSearch
 }) => {
   const { language, translateOffice, translateUnit } = useLanguage();
   const [mounted, setMounted] = useState(false);
-  const [activeLayer, setActiveLayer] = useState<'indicators' | 'offices'>('offices');
+  const [activeLayer, setActiveLayer] = useState<'offices' | 'highways' | 'indicators'>('offices');
+
+  // Search & Routing state
+  const [searchDestination, setSearchDestination] = useState('');
+  const [fromPoint, setFromPoint] = useState<{ lat: number; lng: number; name: string }>({
+    lat: 27.7172,
+    lng: 85.324,
+    name: 'Kathmandu'
+  });
+  const [toPoint, setToPoint] = useState<{ lat: number; lng: number; name: string } | null>(null);
+
+  const [routeSettingMode, setRouteSettingMode] = useState<'from' | 'to'>('to');
 
   useEffect(() => {
     if (isOpen) {
-      // Delay mounting map slightly to allow modal animation to finish
       const timer = setTimeout(() => setMounted(true), 300);
       return () => clearTimeout(timer);
     } else {
@@ -111,11 +182,8 @@ export const MapViewModal: React.FC<MapViewModalProps> = ({
     }
   }, [isOpen]);
 
-  // Translate Nepali town coordinates keys to check for matching office coordinates
   const getOfficeCoordinates = (officeName: string): [number, number] | null => {
-    const matchedTown = Object.keys(TOWN_COORDINATES).find(town => 
-      officeName.includes(town)
-    );
+    const matchedTown = Object.keys(TOWN_COORDINATES).find((town) => officeName.includes(town));
     if (matchedTown) {
       const coords = TOWN_COORDINATES[matchedTown];
       return [coords.lat, coords.lng];
@@ -123,20 +191,14 @@ export const MapViewModal: React.FC<MapViewModalProps> = ({
     return null;
   };
 
-  // Assign scattered dummy coordinates to prevent overlapping of indicators
   const getCoordinates = (id: string, index: number): [number, number] => {
     const latBase = 28.39;
     const lngBase = 84.12;
     const salt1 = (index * 1.5) % 3;
     const salt2 = (index * 2.1) % 5;
-    
-    const lat = latBase + (salt1 - 1.5) * 1.2;
-    const lng = lngBase + (salt2 - 2.5) * 1.5;
-    
-    return [lat, lng];
+    return [latBase + (salt1 - 1.5) * 1.2, lngBase + (salt2 - 2.5) * 1.5];
   };
 
-  // Assign scattered coordinates for unmapped offices
   const getFallbackCoordinates = (index: number): [number, number] => {
     const latBase = 28.39;
     const lngBase = 84.12;
@@ -145,14 +207,12 @@ export const MapViewModal: React.FC<MapViewModalProps> = ({
     return [latBase + (salt1 - 1.75) * 1.5, lngBase + (salt2 - 2.25) * 1.8];
   };
 
-  // Group indicators by DoR project offices and calculate their metrics
+  // Office Performances
   const officePerformances = useMemo(() => {
     const groups: Record<string, Indicator[]> = {};
-    indicators.forEach(ind => {
+    indicators.forEach((ind) => {
       const office = ind.office || (language === 'en' ? 'Department of Roads' : 'सडक विभाग');
-      if (!groups[office]) {
-        groups[office] = [];
-      }
+      if (!groups[office]) groups[office] = [];
       groups[office].push(ind);
     });
 
@@ -160,8 +220,9 @@ export const MapViewModal: React.FC<MapViewModalProps> = ({
     Object.entries(groups).forEach(([officeName, officeInds]) => {
       let coords = getOfficeCoordinates(officeName);
       if (!coords) {
-        // Search in Master DOR_OFFICES_LIST for corresponding match containing town name
-        const matchedOffice = DOR_OFFICES_LIST.find(o => o.name === officeName || o.name.includes(officeName) || officeName.includes(o.name));
+        const matchedOffice = DOR_OFFICES_LIST.find(
+          (o) => o.name === officeName || o.name.includes(officeName) || officeName.includes(o.name)
+        );
         if (matchedOffice) {
           coords = getOfficeCoordinates(matchedOffice.name);
         }
@@ -174,7 +235,7 @@ export const MapViewModal: React.FC<MapViewModalProps> = ({
       let mediumCount = 0;
       let highCount = 0;
 
-      officeInds.forEach(ind => {
+      officeInds.forEach((ind) => {
         const target = ind.annualTarget || 1;
         const progress = ind.annualProgress || 0;
         const rate = Math.min(100, Math.round((progress / target) * 100));
@@ -193,18 +254,80 @@ export const MapViewModal: React.FC<MapViewModalProps> = ({
         coordinates: finalCoords,
         lowCount,
         mediumCount,
-        highCount,
+        highCount
       });
     });
 
     return list;
   }, [indicators, language]);
 
+  // Handle map click to set From/To
+  const handleMapClick = (lat: number, lng: number) => {
+    const label = `Point (${lat.toFixed(3)}, ${lng.toFixed(3)})`;
+    if (routeSettingMode === 'from') {
+      setFromPoint({ lat, lng, name: label });
+      setRouteSettingMode('to');
+    } else {
+      setToPoint({ lat, lng, name: label });
+    }
+  };
+
+  // Get GPS current location for From
+  const handleUseGPSLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setFromPoint({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            name: language === 'en' ? 'My Location (GPS)' : 'मेरो हालको स्थान'
+          });
+        },
+        () => {
+          alert('GPS location unavailable.');
+        }
+      );
+    }
+  };
+
+  // Search destination filter
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchDestination.trim()) return;
+
+    const term = searchDestination.toLowerCase().trim();
+    // Search in highways major hubs
+    for (const hw of NATIONAL_HIGHWAYS) {
+      const hub = hw.majorHubs.find(
+        (h) => h.nameEn.toLowerCase().includes(term) || h.nameNp.includes(term)
+      );
+      if (hub) {
+        setToPoint({ lat: hub.lat, lng: hub.lng, name: language === 'en' ? hub.nameEn : hub.nameNp });
+        return;
+      }
+    }
+
+    // Search in offices
+    const off = officePerformances.find(
+      (o) => o.name.toLowerCase().includes(term) || translateOffice(o.name).toLowerCase().includes(term)
+    );
+    if (off) {
+      setToPoint({ lat: off.coordinates[0], lng: off.coordinates[1], name: translateOffice(off.name) });
+    }
+  };
+
+  // Calculated route polyline & metrics
+  const routeMetrics: TravelCalculationResult | null = useMemo(() => {
+    if (!toPoint) return null;
+    return calculateTripMetrics(fromPoint.lat, fromPoint.lng, toPoint.lat, toPoint.lng);
+  }, [fromPoint, toPoint]);
+
   if (!isOpen) return null;
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[5000] flex items-center justify-center p-4 sm:p-6 font-sans">
+      <div className="fixed inset-0 z-[5000] flex items-center justify-center p-3 sm:p-6 font-sans">
+        {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -212,232 +335,301 @@ export const MapViewModal: React.FC<MapViewModalProps> = ({
           onClick={onClose}
           className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm cursor-pointer"
         />
-        
+
+        {/* Modal Body */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-5xl h-[85vh] bg-white dark:bg-slate-900 rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800"
+          className="relative w-full max-w-5xl h-[88vh] bg-white dark:bg-slate-900 rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800"
         >
           {/* Header */}
-          <div className="flex justify-between items-center p-5 border-b border-slate-100 dark:border-slate-800 relative z-10 bg-white dark:bg-slate-900">
+          <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl">
-                <MapIcon size={20} />
+              <div className="p-2.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl">
+                <MapIcon size={22} />
               </div>
               <div>
-                <h2 className="text-lg font-black text-slate-800 dark:text-white uppercase tracking-tight">
-                  {language === 'en' ? 'Interactive Project Map' : 'परियोजना अन्तरक्रियात्मक नक्सा'}
+                <h2 className="text-base sm:text-lg font-black text-slate-800 dark:text-white uppercase tracking-tight">
+                  {language === 'en' ? 'Interactive Nepal Road & Navigation Map' : 'नेपाल सडक तथा नेभिगेसन नक्सा'}
                 </h2>
                 <p className="text-xs text-slate-500">
-                  {language === 'en' ? 'Geographical performance tracking of road divisions' : 'सडक डिभिजनहरूको भौगोलिक प्रदर्शन अनुगमन'}
+                  {language === 'en'
+                    ? 'Click anywhere on map to route from current place to destination'
+                    : 'नक्सामा थिचेर हालको स्थान वा गन्तव्य चयन गर्नुहोस्'}
                 </p>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
-            >
-              <X size={20} />
-            </button>
+
+            {/* Search destination bar */}
+            <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="relative flex-1 sm:w-64">
+                <input
+                  type="text"
+                  value={searchDestination}
+                  onChange={(e) => setSearchDestination(e.target.value)}
+                  placeholder={language === 'en' ? 'Where to go? (e.g. Pokhara, Butwal)' : 'कहाँ जाने? (उदा. पोखरा, बुटवल)'}
+                  className="w-full px-3.5 py-2 pl-9 text-xs font-bold bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20"
+                />
+                <Compass size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              </div>
+
+              {onStartVoiceSearch && (
+                <button
+                  type="button"
+                  onClick={onStartVoiceSearch}
+                  className="p-2 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 transition-colors cursor-pointer"
+                  title={language === 'en' ? 'Voice Search' : 'आवाज खोज'}
+                >
+                  <Mic size={16} />
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+            </form>
           </div>
 
-          {/* Map Container */}
+          {/* Map Section */}
           <div className="flex-1 bg-slate-50 dark:bg-slate-950 relative z-0">
             {!mounted ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
                 <Loader2 size={32} className="animate-spin mb-4" />
                 <span className="text-sm font-bold uppercase tracking-wider">
-                  {language === 'en' ? 'Loading Map Layers...' : 'नक्सा लेयरहरू लोड हुँदैछ...'}
+                  {language === 'en' ? 'Loading OpenStreetMap Road Layers...' : 'नक्सा लेयरहरू लोड हुँदैछ...'}
                 </span>
               </div>
             ) : (
               <>
-                {/* Floating Map Controls overlay */}
+                {/* Layer Control Buttons */}
                 <div className="absolute top-4 right-4 z-[1000] bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/60 dark:border-white/5 p-1.5 rounded-2xl shadow-xl flex items-center gap-1">
                   <button
                     onClick={() => setActiveLayer('offices')}
-                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
                       activeLayer === 'offices'
-                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10'
+                        ? 'bg-indigo-600 text-white shadow-md'
                         : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
                   >
                     <Building2 size={13} />
-                    <span>{language === 'en' ? 'Project Offices' : 'आयोजना कार्यालयहरू'}</span>
+                    <span>{language === 'en' ? 'Offices' : 'कार्यालयहरू'}</span>
                   </button>
+
+                  <button
+                    onClick={() => setActiveLayer('highways')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                      activeLayer === 'highways'
+                        ? 'bg-indigo-600 text-white shadow-md'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <Route size={13} />
+                    <span>{language === 'en' ? 'Highways' : 'राजमार्गहरू'}</span>
+                  </button>
+
                   <button
                     onClick={() => setActiveLayer('indicators')}
-                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
                       activeLayer === 'indicators'
-                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10'
+                        ? 'bg-indigo-600 text-white shadow-md'
                         : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
                   >
                     <Sliders size={13} />
-                    <span>{language === 'en' ? 'Indicators Pin' : 'सूचक पिनहरू'}</span>
+                    <span>{language === 'en' ? 'Indicators' : 'सूचकहरू'}</span>
                   </button>
                 </div>
 
-                {/* Floating Map Legend overlay */}
-                <div className="absolute bottom-4 left-4 z-[1000] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/60 dark:border-white/5 p-4 rounded-2xl shadow-xl space-y-2.5 max-w-[240px]">
-                  <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                    <Info size={11} />
-                    <span>{language === 'en' ? 'Performance Legend' : 'कार्यसम्पादन सूचक संकेत'}</span>
+                {/* GPS Location Button */}
+                <div className="absolute top-4 left-4 z-[1000]">
+                  <button
+                    onClick={handleUseGPSLocation}
+                    className="px-3.5 py-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 text-indigo-600 dark:text-indigo-400 rounded-2xl text-xs font-black shadow-xl flex items-center gap-1.5 hover:bg-indigo-50 transition-all cursor-pointer"
+                  >
+                    <Navigation size={14} />
+                    <span>{language === 'en' ? 'Use GPS Location' : 'जीपीएस स्थान प्रयोग'}</span>
+                  </button>
+                </div>
+
+                {/* Route Result Floating Banner */}
+                {routeMetrics && toPoint && (
+                  <div className="absolute bottom-4 right-4 z-[1000] bg-slate-900/95 text-white p-4 rounded-2xl shadow-2xl border border-indigo-500/30 max-w-xs space-y-2">
+                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-indigo-400">
+                      <span>{language === 'en' ? 'Active Route Metrics' : 'सक्रिय मार्ग विवरण'}</span>
+                      <button onClick={() => setToPoint(null)} className="text-slate-400 hover:text-white">
+                        <X size={14} />
+                      </button>
+                    </div>
+
+                    <div className="text-xs font-bold">
+                      {fromPoint.name} ➔ {toPoint.name}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-center text-xs pt-1">
+                      <div className="bg-white/10 p-2 rounded-xl">
+                        <span className="text-[9px] text-slate-300 block uppercase font-extrabold">Distance</span>
+                        <span className="font-black text-indigo-300">{routeMetrics.distanceKm} KM</span>
+                      </div>
+                      <div className="bg-white/10 p-2 rounded-xl">
+                        <span className="text-[9px] text-slate-300 block uppercase font-extrabold">Est. Cost</span>
+                        <span className="font-black text-emerald-400">NPR {routeMetrics.totalEstimatedCostNpr}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 border border-white dark:border-slate-800 shadow" />
-                      <span>{language === 'en' ? 'High Target (≥ 80%)' : 'उच्च प्रगतितर्फ (≥ ८०%)'}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 rounded-full bg-amber-500 border border-white dark:border-slate-800 shadow" />
-                      <span>{language === 'en' ? 'Medium Target (50%-79%)' : 'मध्यम प्रगति (५०%-७९%)'}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3.5 h-3.5 rounded-full bg-rose-500 border border-white dark:border-slate-800 shadow animate-pulse" />
-                      <span>{language === 'en' ? 'Low Target (< 50%)' : 'न्यून प्रगति (< ५०%)'}</span>
-                    </div>
+                )}
+
+                {/* Legend overlay */}
+                <div className="absolute bottom-4 left-4 z-[1000] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/60 dark:border-white/5 p-3 rounded-2xl shadow-xl space-y-2 text-xs font-bold text-slate-700 dark:text-slate-300 hidden sm:block">
+                  <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    <Info size={11} />
+                    <span>{language === 'en' ? 'Legend' : 'संकेत'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                    <span>≥ 80% Performance</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-amber-500" />
+                    <span>50-79% Performance</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-rose-500" />
+                    <span>&lt; 50% Low Performance</span>
                   </div>
                 </div>
 
-                <MapContainer 
-                  center={[28.2096, 83.9856]} // Pokhara/Center of Nepal for better balanced zoom center
-                  zoom={7} 
+                {/* Leaflet Map */}
+                <MapContainer
+                  center={[28.2096, 83.9856]}
+                  zoom={7}
                   style={{ height: '100%', width: '100%', zIndex: 0 }}
                 >
                   <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
 
-                  {activeLayer === 'indicators' && indicators.map((indicator, index) => {
-                    const pos = getCoordinates(indicator.id, index);
-                    const target = indicator.annualTarget || 1;
-                    const progress = indicator.annualProgress || 0;
-                    const rate = Math.min(100, Math.round((progress / target) * 100));
+                  <MapClickListener onMapClick={handleMapClick} />
 
-                    return (
-                      <Marker key={indicator.id} position={pos} icon={createIndicatorIcon(rate)}>
-                        <Popup>
-                          <div className="font-sans text-left max-w-xs p-1">
-                            <div className="flex items-center gap-1.5 text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1.5">
-                              <Sliders size={12} />
-                              <span>{language === 'en' ? 'Road Indicator' : 'सडक विकास सूचक'}</span>
-                            </div>
-                            <h3 className="font-black text-sm text-slate-900 dark:text-white leading-snug mb-2">
-                              {language === 'en' ? (indicator.nameEn || indicator.name) : indicator.name}
-                            </h3>
-                            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold mb-3 flex items-center gap-1">
-                              <Building2 size={10} className="text-slate-400" />
-                               <span className="truncate max-w-[200px]">{translateOffice(indicator.office) || (language === 'en' ? 'Department of Roads' : 'सडक विभाग')}</span>
-                            </div>
+                  {/* ROUTE POLYLINE */}
+                  {toPoint && (
+                    <>
+                      <Marker position={[fromPoint.lat, fromPoint.lng]} icon={createRoutePointIcon(fromPoint.name, true)} />
+                      <Marker position={[toPoint.lat, toPoint.lng]} icon={createRoutePointIcon(toPoint.name, false)} />
+                      <Polyline
+                        positions={[
+                          [fromPoint.lat, fromPoint.lng],
+                          [toPoint.lat, toPoint.lng]
+                        ]}
+                        color="#6366f1"
+                        weight={5}
+                        opacity={0.8}
+                        dashArray="10, 8"
+                      />
+                    </>
+                  )}
 
-                            <div className="bg-slate-50 dark:bg-slate-800/40 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1.5">
-                              <div className="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-300">
-                                <span>{language === 'en' ? 'Completion' : 'उपलब्धि'}:</span>
-                                <span className={`font-black ${rate >= 80 ? 'text-emerald-500' : rate >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>
-                                  {language === 'en' ? `${rate}%` : `${toNepaliNumerals(rate)}%`}
-                                </span>
-                              </div>
-                              <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                                <motion.div 
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${rate}%` }}
-                                  transition={{ type: "spring", stiffness: 60, damping: 12, delay: 0.1 }}
-                                  className={`h-full rounded-full ${rate >= 80 ? 'bg-emerald-500' : rate >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
-                                />
-                              </div>
-                              
-                              <div className="flex justify-between items-center text-[10px] pt-1 text-slate-500 dark:text-slate-400 font-mono">
-                                 <span>{language === 'en' ? 'Progress' : 'प्रगति'}: <b>{language === 'en' ? indicator.annualProgress : toNepaliNumerals(indicator.annualProgress)} {translateUnit(indicator.unit)}</b></span>
-                                 <span>{language === 'en' ? 'Target' : 'लक्ष्य'}: <b>{language === 'en' ? indicator.annualTarget : toNepaliNumerals(indicator.annualTarget)} {translateUnit(indicator.unit)}</b></span>
+                  {/* HIGHWAYS LAYER */}
+                  {activeLayer === 'highways' &&
+                    NATIONAL_HIGHWAYS.map((hw) =>
+                      hw.majorHubs.map((hub, idx) => (
+                        <Marker
+                          key={`hw_${hw.id}_${idx}`}
+                          position={[hub.lat, hub.lng]}
+                          icon={createHighwayIcon(hw.code)}
+                        >
+                          <Popup>
+                            <div className="p-1 max-w-xs font-sans">
+                              <span className="text-[10px] font-black text-indigo-600 uppercase block">{hw.code} - {hw.nameEn}</span>
+                              <h4 className="font-black text-sm text-slate-900">{hub.nameEn} ({hub.nameNp})</h4>
+                              <p className="text-[10px] text-slate-500 font-bold mt-1">
+                                {hw.lengthKm} KM • {hw.surfaceType} • {hw.status}
+                              </p>
+                              <button
+                                onClick={() => setToPoint({ lat: hub.lat, lng: hub.lng, name: hub.nameEn })}
+                                className="mt-2 w-full py-1 bg-indigo-600 text-white rounded text-[10px] font-black"
+                              >
+                                {language === 'en' ? 'Set as Destination' : 'गन्तव्य तोक्नुहोस्'}
+                              </button>
+                            </div>
+                          </Popup>
+                        </Marker>
+                      ))
+                    )}
+
+                  {/* INDICATORS LAYER */}
+                  {activeLayer === 'indicators' &&
+                    indicators.map((indicator, index) => {
+                      const pos = getCoordinates(indicator.id, index);
+                      const target = indicator.annualTarget || 1;
+                      const progress = indicator.annualProgress || 0;
+                      const rate = Math.min(100, Math.round((progress / target) * 100));
+
+                      return (
+                        <Marker key={indicator.id} position={pos} icon={createIndicatorIcon(rate)}>
+                          <Popup>
+                            <div className="font-sans text-left max-w-xs p-1">
+                              <span className="text-[10px] font-black text-indigo-500 uppercase block mb-1">
+                                {language === 'en' ? 'Road Indicator' : 'सडक विकास सूचक'}
+                              </span>
+                              <h3 className="font-black text-sm text-slate-900 mb-2">
+                                {language === 'en' ? indicator.nameEn || indicator.name : indicator.name}
+                              </h3>
+                              <div className="bg-slate-50 p-2 rounded-xl text-xs font-bold space-y-1">
+                                <div>Achievement: <span className="font-black">{rate}%</span></div>
+                                <div>Progress: {indicator.annualProgress} {translateUnit(indicator.unit)}</div>
                               </div>
                             </div>
-                          </div>
-                        </Popup>
-                      </Marker>
-                    );
-                  })}
+                          </Popup>
+                        </Marker>
+                      );
+                    })}
 
-                  {activeLayer === 'offices' && officePerformances.map((office) => {
-                    return (
-                      <Marker key={office.name} position={office.coordinates} icon={createOfficeIcon(office.averageProgress)}>
+                  {/* OFFICES LAYER */}
+                  {activeLayer === 'offices' &&
+                    officePerformances.map((office) => (
+                      <Marker
+                        key={office.name}
+                        position={office.coordinates}
+                        icon={createOfficeIcon(office.averageProgress)}
+                      >
                         <Popup>
                           <div className="font-sans text-left max-w-sm p-1">
-                            <div className="flex items-center gap-1.5 text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1.5">
-                              <Building2 size={12} />
-                              <span>{language === 'en' ? 'DoR Project Office' : 'सडक विभाग आयोजना कार्यालय'}</span>
-                            </div>
-                            <h3 className="font-black text-sm text-slate-900 dark:text-white leading-snug mb-2">
+                            <span className="text-[10px] font-black text-indigo-500 uppercase block mb-1">
+                              {language === 'en' ? 'DoR Office' : 'सडक विभाग कार्यालय'}
+                            </span>
+                            <h3 className="font-black text-sm text-slate-900 mb-2">
                               {translateOffice(office.name)}
                             </h3>
-                            
-                            {/* Progress overview */}
-                            <div className="bg-slate-50 dark:bg-slate-800/40 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1.5 mb-3">
-                              <div className="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-300">
+
+                            <div className="bg-slate-50 p-2.5 rounded-xl border space-y-1.5 mb-2">
+                              <div className="flex justify-between items-center text-xs font-bold">
                                 <span>{language === 'en' ? 'Average Progress' : 'औसत प्रगति'}:</span>
-                                <span className={office.averageProgress >= 80 ? 'text-emerald-500 font-extrabold' : office.averageProgress >= 50 ? 'text-amber-500 font-extrabold' : 'text-rose-500 font-extrabold'}>
-                                  {language === 'en' ? `${office.averageProgress}%` : `${toNepaliNumerals(office.averageProgress)}%`}
-                                </span>
-                              </div>
-                              <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                                <motion.div 
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${office.averageProgress}%` }}
-                                  transition={{ type: "spring", stiffness: 60, damping: 12, delay: 0.2 }}
-                                  className={`h-full rounded-full ${office.averageProgress >= 80 ? 'bg-emerald-500' : office.averageProgress >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
-                                />
-                              </div>
-                              
-                              <div className="flex justify-between items-center text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                                <span>{language === 'en' ? 'Indicators Group' : 'सूचक समूह'}:</span>
-                                <span className="font-mono">{language === 'en' ? `${office.indicators.length} Items` : `${toNepaliNumerals(office.indicators.length)} सूचकहरू`}</span>
+                                <span className="font-black text-indigo-600">{office.averageProgress}%</span>
                               </div>
                             </div>
 
-                            {/* Counts */}
-                            <div className="grid grid-cols-3 gap-2 text-center text-[10px] mb-3">
-                              <div className="bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 rounded-lg p-1.5 font-bold border border-emerald-100 dark:border-emerald-500/10">
-                                <div className="font-black text-xs">{language === 'en' ? office.highCount : toNepaliNumerals(office.highCount)}</div>
-                                <div>{language === 'en' ? 'High' : 'उच्च'}</div>
-                              </div>
-                              <div className="bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-lg p-1.5 font-bold border border-amber-100 dark:border-amber-500/10">
-                                <div className="font-black text-xs">{language === 'en' ? office.mediumCount : toNepaliNumerals(office.mediumCount)}</div>
-                                <div>{language === 'en' ? 'Medium' : 'मध्यम'}</div>
-                              </div>
-                              <div className="bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-400 rounded-lg p-1.5 font-bold border border-rose-100 dark:border-rose-500/10">
-                                <div className="font-black text-xs">{language === 'en' ? office.lowCount : toNepaliNumerals(office.lowCount)}</div>
-                                <div>{language === 'en' ? 'Low' : 'न्यून'}</div>
-                              </div>
-                            </div>
-
-                            {/* Indicators List (Scrollable) */}
-                            <div className="max-h-24 overflow-y-auto space-y-1.5 border-t border-slate-100 dark:border-slate-800 pt-2.5">
-                              <div className="text-[9px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
-                                {language === 'en' ? 'Indicator Details' : 'सूचक विवरणहरू'}
-                              </div>
-                              {office.indicators.map((ind) => {
-                                const indTarget = ind.annualTarget || 1;
-                                const indProgress = ind.annualProgress || 0;
-                                const rate = Math.min(100, Math.round((indProgress / indTarget) * 100));
-                                return (
-                                  <div key={ind.id} className="flex justify-between items-center gap-3 text-[10px] hover:bg-slate-100 dark:hover:bg-slate-800/50 p-1 rounded transition-colors">
-                                    <span className="text-slate-700 dark:text-slate-300 font-bold truncate max-w-[160px]" title={language === 'en' ? ind.nameEn : ind.name}>
-                                      {language === 'en' ? ind.nameEn : ind.name}
-                                    </span>
-                                    <span className={`font-mono font-black shrink-0 ${rate >= 80 ? 'text-emerald-500' : rate >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>
-                                      {language === 'en' ? `${rate}%` : `${toNepaliNumerals(rate)}%`}
-                                    </span>
-                                  </div>
-                                );
-                              })}
-                            </div>
+                            <button
+                              onClick={() =>
+                                setToPoint({
+                                  lat: office.coordinates[0],
+                                  lng: office.coordinates[1],
+                                  name: translateOffice(office.name)
+                                })
+                              }
+                              className="w-full py-1.5 bg-indigo-600 text-white text-xs font-black rounded-lg"
+                            >
+                              {language === 'en' ? 'Route to this Office' : 'यहाँ जाने मार्ग देखाउनुहोस्'}
+                            </button>
                           </div>
                         </Popup>
                       </Marker>
-                    );
-                  })}
+                    ))}
                 </MapContainer>
               </>
             )}

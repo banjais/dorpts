@@ -88,7 +88,7 @@ export interface Toast {
 
 export type ViewMode = 'hierarchy' | 'dashboard' | 'card' | 'chart' | 'table' | 'heatmap' | 'compare' | 'data-health' | 'institutional' | 'unified' | 'superadmin';
 
-export type MainView = 'dashboard' | 'insights' | 'institutional' | 'trends' | 'heatmap' | 'superadmin' | 'admin' | 'viewer' | 'detailed-gallery' | 'announcements' | 'messaging' | 'calendar' | 'feedbacks';
+export type MainView = 'dashboard' | 'insights' | 'institutional' | 'trends' | 'heatmap' | 'superadmin' | 'admin' | 'viewer' | 'detailed-gallery' | 'announcements' | 'messaging' | 'calendar' | 'feedbacks' | 'highways-info';
 
 export interface WidgetVisibility {
   radialChart: boolean;
@@ -109,5 +109,3 @@ export interface IndicatorComment {
   parentId?: string; // Optional parent comment ID for discussion threads
   createdAt: string; // ISO string
 }
-
-
